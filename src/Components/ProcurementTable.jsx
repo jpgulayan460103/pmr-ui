@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Space } from 'antd';
-const ProcurementTable = ({sampleData}) => {
-    const [formData, setFormData] = useState([]);
+import { Table, Tag, Input, Image  } from 'antd';
+
+const { Search } = Input;
+
+const ProcurementTable = ({sampleData, setFormData, setIsModalVisible}) => {
+    const [sampleDataFiltered, setSampleDataFiltered] = useState([]);
+    useEffect(() => {
+        setSampleDataFiltered(sampleData);
+    }, [sampleData]);
+    const editTable = (item) => {
+        setFormData(item);
+        setIsModalVisible(true);
+    };
     const columns = [
         {
             title: "Code (UACS/PAP)",
@@ -19,59 +29,74 @@ const ProcurementTable = ({sampleData}) => {
             key: "particulars"
         },
         {
-            title: "PR Link",
-            dataIndex: "pr_scanned",
-            key: "pr_scanned"
+            title: "Scanned PR",
+            key: "pr_scanned",
+            render: item => (
+                <>
+<Image
+      width={200}
+      src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+    />
+                </>
+            )
         },
         {
             title: "PMO/End-User",
-            dataIndex: "schedule_procurement",
-            key: "schedule_procurement"
+            dataIndex: "end_user",
+            key: "end_user"
         },
         {
-            title: "Types (Infra, Goods, Services - catering, tranpo, consultancy)",
-            dataIndex: "source_of_funds",
-            key: "source_of_funds"
+            title: "Types",
+            dataIndex: "types",
+            key: "types"
         },
         {
             title: "Mode of Procurement",
-            dataIndex: "abc_php",
-            key: "abc_php"
+            dataIndex: "mode_of_procurement",
+            key: "mode_of_procurement"
+        },
+        {
+            title: "Pre-Proc Conference",
+            dataIndex: "preproc_conference",
+            key: "preproc_conference"
+        },
+        {
+            title: "Ads/Post of IB",
+            dataIndex: "post_of_ib",
+            key: "post_of_ib"
+        },
+        {
+            title: "",
+            key: "action",
+            render: tags => (
+                <>
+                  <Tag color="blue" style={{width:60, textAlign: "center", cursor: "pointer", margin: 2}} onClick={() => { editTable(tags) }}>EDIT</Tag>
+                  <Tag color="red" style={{width:60, textAlign: "center", cursor: "pointer", margin: 2}} onClick={() => { editTable(tags) }}>DELETE</Tag>
+                </>
+              )
         },
 
     ];
-    const dataSource = [
-        {code_uacs: "123123123"},
-        {code_uacs: "asdasdasd"}
-      ];
-    const add = () => {
-        let test = [
-            {
-                code_uacs: "code_uacs"
-            }
-        ];
-        let d = [...formData, ...test]
-        console.log(d);
-        setFormData(d);
+    const dataSource = sampleDataFiltered;
+
+
+    const filter = (array, value, key)  => {
+        return array.filter(key? a => a[key].toLowerCase() === value : a => Object.keys(a).some(k => a[k] === value))
     }
+    const search = (str) => {
+        // let result = filter(sampleData, str);
+        let result = sampleData.filter(object => Object.values(object).some(i => i.includes(str)));
+        console.log(str);;
+        setSampleDataFiltered(result);
+    }
+
     return (
         <div>
-            <Table dataSource={dataSource} columns={columns} />;
-            <button onClick={ () => { add() } }>asdasd</button>
+            <Table dataSource={[...dataSource]} columns={columns} />
         </div>
     );
 
     /* 
-            {
-            title: "Pre-Proc Conference",
-            dataIndex: "remarks_brief_description",
-            key: "remarks_brief_description"
-        },
-        {
-            title: "Ads/Post of IB",
-            dataIndex: "end_user",
-            key: "end_user"
-        },
         {
             title: "Pre-bid Conf",
             dataIndex: "types",

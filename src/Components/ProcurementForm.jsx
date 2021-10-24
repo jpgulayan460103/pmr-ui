@@ -1,21 +1,21 @@
-import React, { useState  } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Tabs, Form, Input, message  } from 'antd';
 
 const { TabPane } = Tabs;
 
-const ProcurementForm = ({ setSampleData, sampleData }) => {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [formData, setFormData] = useState({});
-
-    const showModal = () => {
-      setIsModalVisible(true);
-    };
+const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isModalVisible, setIsModalVisible}) => {
+    const [form] = Form.useForm();
+    const formRef = React.useRef();
+    useEffect(() => {
+        form.setFieldsValue({
+            ...formData
+        });
+    }, [formData]);
   
     const handleOk = () => {
       setIsModalVisible(false);
-      let add = sampleData;
-      add.push(formData);
-      setSampleData(add);
+      let sample = sampleData;
+      setSampleData([formData,...sample]);
       message.success('Successfuly saved.');
     };
   
@@ -36,16 +36,16 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
         let form = {...formData, ...errorInfo};
         setFormData(form);
     };
+
+    
   
     return (
       <>
-        <Button type="primary" onClick={showModal}>
-          Add
-        </Button>
-        <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title="Procurement Monitoring" visible={isModalVisible} onOk={handleOk} okText="Submit" onCancel={handleCancel} width={"70%"} getContainer={false} >
             <Tabs defaultActiveKey="1" tabPosition="top" type="line">
-                <TabPane tab="Annex A" key="1">
+                <TabPane tab="Annex A" key="1" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
+                        form={form}
                         name="basic"
                         labelCol={{ span: 24 }}
                         wrapperCol={{ span: 24 }}
@@ -55,6 +55,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         onValuesChange={onValuesChange}
                         autoComplete="off"
                         layout="vertical"
+                        
                     >
 
                         <Form.Item
@@ -78,7 +79,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         </Form.Item>
                         <Form.Item
                             label="PR Scanned Copy"
-                            name="pr_scanned"
+                            name="pr_scanned_file"
                         >
                             <Input type="file" />
                         </Form.Item>
@@ -105,8 +106,9 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         </Form.Item>
                     </Form>
                 </TabPane>
-                <TabPane tab="Annex B" key="2">
+                <TabPane tab="Annex B" key="2" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
+                        form={form}
                         name="basic"
                         labelCol={{ span: 24 }}
                         wrapperCol={{ span: 24 }}
@@ -138,8 +140,9 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         
                     </Form>
                 </TabPane>
-                <TabPane tab="Actual Procurement Activity" key="3">
+                <TabPane tab="Actual Procurement Activity" key="3" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
+                        form={form}
                         name="basic"
                         labelCol={{ span: 24 }}
                         wrapperCol={{ span: 24 }}
@@ -232,7 +235,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         </Form.Item>
                         <Form.Item
                             label="PO (Scanned Copy)"
-                            name="po_scanned_1"
+                            name="po_scanned_1_file"
                         >
                             <Input type="file" />
                         </Form.Item>
@@ -244,7 +247,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         </Form.Item>
                         <Form.Item
                             label="PO (Scanned Copy)"
-                            name="po_scanned_2"
+                            name="po_scanned_2_file"
                         >
                             <Input type="file"/>
                         </Form.Item>
@@ -288,8 +291,9 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
 
                     </Form>
                 </TabPane>
-                <TabPane tab="Issuance" key="4">
+                <TabPane tab="Issuance" key="4" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
+                        form={form}
                         name="basic"
                         labelCol={{ span: 24 }}
                         wrapperCol={{ span: 24 }}
@@ -302,7 +306,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                     >
                        <Form.Item
                             label="Receipt (Scanned Copy)"
-                            name="receipt_scanned"
+                            name="receipt_scanned_file"
                         >
                             <Input type="file" />
                         </Form.Item>
@@ -350,7 +354,7 @@ const ProcurementForm = ({ setSampleData, sampleData }) => {
                         </Form.Item>
                         <Form.Item
                             label="Voucher (Scanned Copy)"
-                            name="voucher_scanned"
+                            name="voucher_scanned_file"
                         >
                             <Input type="file" />
                         </Form.Item>
