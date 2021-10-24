@@ -4,10 +4,11 @@ import { Modal, Button, Tabs, Form, Input, message  } from 'antd';
 
 const { Search } = Input;
 
-const ProcurementFilters = ({setIsModalVisible}) => {
+const ProcurementFilters = ({setIsModalVisible, setFormType}) => {
 
     const showModal = () => {
         setIsModalVisible(true);
+        setFormType("create");
     };
     return (
         <div>

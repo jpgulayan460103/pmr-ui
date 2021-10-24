@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Tag, Input, Image  } from 'antd';
 
+import Lightbox from 'react-image-lightbox';
+
 const { Search } = Input;
 
-const ProcurementTable = ({sampleData, setFormData, setIsModalVisible}) => {
+const ProcurementTable = ({sampleData, setFormData, setIsModalVisible, setFormType}) => {
     const [sampleDataFiltered, setSampleDataFiltered] = useState([]);
+    const [openImage, setOpenImage] = useState(false);
+    const [openedImage, setOpenedImage] = useState("");
     useEffect(() => {
         setSampleDataFiltered(sampleData);
     }, [sampleData]);
     const editTable = (item) => {
         setFormData(item);
         setIsModalVisible(true);
+        setFormType("update");
     };
     const columns = [
         {
@@ -33,10 +38,7 @@ const ProcurementTable = ({sampleData, setFormData, setIsModalVisible}) => {
             key: "pr_scanned",
             render: item => (
                 <>
-<Image
-      width={200}
-      src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-    />
+                    <img style={{cursor:"pointer"}} src="https://guillaumejaume.github.io/FUNSD/img/form_example.png" alt="" srcset="" onClick={() => { setOpenedImage("https://guillaumejaume.github.io/FUNSD/img/form_example.png"); setOpenImage(true); }} />
                 </>
             )
         },
@@ -92,6 +94,12 @@ const ProcurementTable = ({sampleData, setFormData, setIsModalVisible}) => {
 
     return (
         <div>
+        { openImage && (
+            <Lightbox
+            mainSrc={openedImage}
+            onCloseRequest={() => {  setOpenImage(false) }}
+          />
+        ) }
             <Table dataSource={[...dataSource]} columns={columns} />
         </div>
     );

@@ -7,6 +7,7 @@ import ProcurementForm from './Components/ProcurementForm'
 import ProcurementFilters from './Components/ProcurementFilters'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import bootstrap from 'bootstrap'
+import 'react-image-lightbox/style.css';
 
 
 function App() {
@@ -20650,8 +20651,7 @@ function App() {
   ]);
 
 
-  
-
+  const [formType, setFormType] = useState("create");
   const [formData, setFormData] = useState({
     code_uacs:"",
     pr_number:"",
@@ -20710,12 +20710,15 @@ function App() {
             formData={formData}
             setIsModalVisible={setIsModalVisible}
             isModalVisible={isModalVisible}
-          />
+            formType={formType}
+            />
           <ProcurementFilters
             isModalVisible={isModalVisible}
             setIsModalVisible={setIsModalVisible}
+            setFormType={setFormType}
           />
           <ProcurementTable
+            setFormType={setFormType}
             setSampleData={setSampleData}
             sampleData={sampleData}
             setFormData={setFormData}

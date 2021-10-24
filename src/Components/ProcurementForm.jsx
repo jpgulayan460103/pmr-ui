@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Tabs, Form, Input, message  } from 'antd';
+import { Modal, Button, Tabs, Form, Input, message, Timeline   } from 'antd';
 
 const { TabPane } = Tabs;
 
-const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isModalVisible, setIsModalVisible}) => {
+const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isModalVisible, setIsModalVisible, formType}) => {
     const [form] = Form.useForm();
     const formRef = React.useRef();
     useEffect(() => {
@@ -107,6 +107,8 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
                     </Form>
                 </TabPane>
                 <TabPane tab="Annex B" key="2" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+
+                    <span style={{color: "red"}}>* Forms can be disabled, depending on user account.</span>
                     <Form
                         form={form}
                         name="basic"
@@ -123,19 +125,19 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
                             label="PMO/End-User"
                             name="end_user"
                         >
-                            <Input />
+                            <Input disabled />
                         </Form.Item>
                         <Form.Item
                             label="Types (Infra, Goods, Services - catering, tranpo, consultancy)"
                             name="types"
                         >
-                            <Input />
+                            <Input disabled />
                         </Form.Item>
                         <Form.Item
                             label="Mode of Procurement"
                             name="mode_of_procurement"
                         >
-                            <Input />
+                            <Input disabled />
                         </Form.Item>
                         
                     </Form>
@@ -360,6 +362,15 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
                         </Form.Item>
 
                     </Form>
+                </TabPane>
+                <TabPane tab="Edit History" key="5" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                    <br />
+                    <Timeline>
+                        <Timeline.Item color="green">2021-09-01 09:30:AM - Admin - Created Procurement Monitoring Data. <a href="#">View Changes</a></Timeline.Item>
+                        <Timeline.Item color="green">2021-09-01 09:30:AM - Admin - Updated Procurement Monitoring Data. <a href="#">View Changes</a></Timeline.Item>
+                        <Timeline.Item color="green">2021-09-02 11:30:AM - User1 - Added PR Scanned Copy. <a href="#">View Image</a></Timeline.Item>
+                        <Timeline.Item color="green">2021-09-03 10:30:AM - User2 - Added Payment. <a href="#">View Changes</a></Timeline.Item>
+                    </Timeline>
                 </TabPane>
             </Tabs>
         </Modal>
