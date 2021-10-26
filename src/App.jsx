@@ -20698,12 +20698,13 @@ function App() {
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
   return (
-    <div className="App container">
-      <div className="row">
-        <div className="col-12">
-          <h1 style={{textAlign: "center"}}>PROCUREMENT MONITORING REPORT</h1>
-          
-          <ProcurementForm
+    <div className="App container-fluid">
+      <br />
+      <div className="row mb-6">
+        <div className="col-md-6">
+          <h3 style={{textAlign: "center"}}>LIST APPLET 1</h3>
+          <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
+            <ProcurementForm
             setSampleData={setSampleData}
             sampleData={sampleData}
             setFormData={setFormData}
@@ -20717,17 +20718,138 @@ function App() {
             setIsModalVisible={setIsModalVisible}
             setFormType={setFormType}
           />
-          <ProcurementTable
-            setFormType={setFormType}
+            <ProcurementTable
+              setFormType={setFormType}
+              setSampleData={setSampleData}
+              sampleData={sampleData}
+              setFormData={setFormData}
+              formData={formData}
+              setIsModalVisible={setIsModalVisible}
+              isModalVisible={isModalVisible}
+            />
+          </div>
+        </div>
+        <div className="col-md-6">
+          <h3 style={{textAlign: "center"}}>LIST APPLET 2</h3>
+          <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
+            <ProcurementForm
             setSampleData={setSampleData}
             sampleData={sampleData}
             setFormData={setFormData}
             formData={formData}
             setIsModalVisible={setIsModalVisible}
             isModalVisible={isModalVisible}
+            formType={formType}
+            />
+          <ProcurementFilters
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setFormType={setFormType}
           />
+            <ProcurementTable
+              setFormType={setFormType}
+              setSampleData={setSampleData}
+              sampleData={sampleData}
+              setFormData={setFormData}
+              formData={formData}
+              setIsModalVisible={setIsModalVisible}
+              isModalVisible={isModalVisible}
+            />
+          </div>
         </div>
       </div>
+
+      <div className="row mb-6">
+        <div className="col-md-12">
+        <h3 style={{textAlign: "center"}}>LIST APPLET 3</h3>
+        <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
+            <ProcurementForm
+            setSampleData={setSampleData}
+            sampleData={sampleData}
+            setFormData={setFormData}
+            formData={formData}
+            setIsModalVisible={setIsModalVisible}
+            isModalVisible={isModalVisible}
+            formType={formType}
+            />
+          <ProcurementFilters
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setFormType={setFormType}
+          />
+            <ProcurementTable
+              setFormType={setFormType}
+              setSampleData={setSampleData}
+              sampleData={sampleData}
+              setFormData={setFormData}
+              formData={formData}
+              setIsModalVisible={setIsModalVisible}
+              isModalVisible={isModalVisible}
+            />
+          </div>
+        </div>
+      
+      </div>
+
+      <div className="row mb-6">
+        <div className="col-md-6">
+          <h3 style={{textAlign: "center"}}>LIST APPLET 4</h3>
+          <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
+            <ProcurementForm
+            setSampleData={setSampleData}
+            sampleData={sampleData}
+            setFormData={setFormData}
+            formData={formData}
+            setIsModalVisible={setIsModalVisible}
+            isModalVisible={isModalVisible}
+            formType={formType}
+            />
+          <ProcurementFilters
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setFormType={setFormType}
+          />
+            <ProcurementTable
+              setFormType={setFormType}
+              setSampleData={setSampleData}
+              sampleData={sampleData}
+              setFormData={setFormData}
+              formData={formData}
+              setIsModalVisible={setIsModalVisible}
+              isModalVisible={isModalVisible}
+            />
+          </div>
+        </div>
+        <div className="col-md-6">
+          <h3 style={{textAlign: "center"}}>LIST APPLET 5</h3>
+          <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
+            <ProcurementForm
+            setSampleData={setSampleData}
+            sampleData={sampleData}
+            setFormData={setFormData}
+            formData={formData}
+            setIsModalVisible={setIsModalVisible}
+            isModalVisible={isModalVisible}
+            formType={formType}
+            />
+          <ProcurementFilters
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setFormType={setFormType}
+          />
+            <ProcurementTable
+              setFormType={setFormType}
+              setSampleData={setSampleData}
+              sampleData={sampleData}
+              setFormData={setFormData}
+              formData={formData}
+              setIsModalVisible={setIsModalVisible}
+              isModalVisible={isModalVisible}
+            />
+          </div>
+        </div>
+      </div>
+      <br />
     </div>
   );
 }

@@ -33,40 +33,40 @@ const ProcurementTable = ({sampleData, setFormData, setIsModalVisible, setFormTy
             dataIndex: "particulars",
             key: "particulars"
         },
-        {
-            title: "Scanned PR",
-            key: "pr_scanned",
-            render: item => (
-                <>
-                    <img style={{cursor:"pointer"}} src="https://guillaumejaume.github.io/FUNSD/img/form_example.png" alt="" srcset="" onClick={() => { setOpenedImage("https://guillaumejaume.github.io/FUNSD/img/form_example.png"); setOpenImage(true); }} />
-                </>
-            )
-        },
-        {
-            title: "PMO/End-User",
-            dataIndex: "end_user",
-            key: "end_user"
-        },
-        {
-            title: "Types",
-            dataIndex: "types",
-            key: "types"
-        },
-        {
-            title: "Mode of Procurement",
-            dataIndex: "mode_of_procurement",
-            key: "mode_of_procurement"
-        },
-        {
-            title: "Pre-Proc Conference",
-            dataIndex: "preproc_conference",
-            key: "preproc_conference"
-        },
-        {
-            title: "Ads/Post of IB",
-            dataIndex: "post_of_ib",
-            key: "post_of_ib"
-        },
+        // {
+        //     title: "Scanned PR",
+        //     key: "pr_scanned",
+        //     render: item => (
+        //         <>
+        //             <img style={{cursor:"pointer"}} src="https://guillaumejaume.github.io/FUNSD/img/form_example.png" alt="" srcset="" onClick={() => { setOpenedImage("https://guillaumejaume.github.io/FUNSD/img/form_example.png"); setOpenImage(true); }} />
+        //         </>
+        //     )
+        // },
+        // {
+        //     title: "PMO/End-User",
+        //     dataIndex: "end_user",
+        //     key: "end_user"
+        // },
+        // {
+        //     title: "Types",
+        //     dataIndex: "types",
+        //     key: "types"
+        // },
+        // {
+        //     title: "Mode of Procurement",
+        //     dataIndex: "mode_of_procurement",
+        //     key: "mode_of_procurement"
+        // },
+        // {
+        //     title: "Pre-Proc Conference",
+        //     dataIndex: "preproc_conference",
+        //     key: "preproc_conference"
+        // },
+        // {
+        //     title: "Ads/Post of IB",
+        //     dataIndex: "post_of_ib",
+        //     key: "post_of_ib"
+        // },
         {
             title: "",
             key: "action",
