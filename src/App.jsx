@@ -5,9 +5,21 @@ import 'antd/dist/antd.css';
 import ProcurementTable from './Components/ProcurementTable'
 import ProcurementForm from './Components/ProcurementForm'
 import ProcurementFilters from './Components/ProcurementFilters'
+import PurchaseOrdersTable from './Components/PurchaseOrdersTable'
+import ContractManagementTable from './Components/ContractManagementTable'
+import DeliveryTables from './Components/DeliveryTables'
+import VoucherTables from './Components/VoucherTables'
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
+
+import Lightbox from 'react-image-lightbox';
+
+import { Tabs, Typography  } from 'antd';
+
+const { TabPane } = Tabs;
+const { Title } = Typography;
 
 
 function App() {
@@ -20697,12 +20709,19 @@ function App() {
     voucher_scanned:"",
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [labelTwo, setLabelTwo] = useState("DELIVERIES");
+
+  const [openImage, setOpenImage] = useState(false);
+  const [openedImage, setOpenedImage] = useState("");
+
+  const [openImage2, setOpenImage2] = useState(false);
+  const [openedImage2, setOpenedImage2] = useState("");
   return (
     <div className="App container-fluid">
       <br />
       <div className="row mb-6">
-        <div className="col-md-6">
-          <h3 style={{textAlign: "center"}}>LIST APPLET 1</h3>
+        <div className="col-md-8">
+          <Title level={3} style={{textAlign: "center"}}>APPROVED PURCHASE REQUESTS</Title>
           <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
             <ProcurementForm
             setSampleData={setSampleData}
@@ -20726,129 +20745,83 @@ function App() {
               formData={formData}
               setIsModalVisible={setIsModalVisible}
               isModalVisible={isModalVisible}
+              setOpenedImage={setOpenedImage}
+              setOpenImage={setOpenImage}
             />
           </div>
         </div>
-        <div className="col-md-6">
-          <h3 style={{textAlign: "center"}}>LIST APPLET 2</h3>
+        <div className="col-md-4">
+          <Title level={3} style={{textAlign: "center"}}>SCANNED PURCHASE REQUESTS</Title>
           <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
-            <ProcurementForm
-            setSampleData={setSampleData}
-            sampleData={sampleData}
-            setFormData={setFormData}
-            formData={formData}
-            setIsModalVisible={setIsModalVisible}
-            isModalVisible={isModalVisible}
-            formType={formType}
-            />
-          <ProcurementFilters
-            isModalVisible={isModalVisible}
-            setIsModalVisible={setIsModalVisible}
-            setFormType={setFormType}
-          />
-            <ProcurementTable
-              setFormType={setFormType}
-              setSampleData={setSampleData}
-              sampleData={sampleData}
-              setFormData={setFormData}
-              formData={formData}
-              setIsModalVisible={setIsModalVisible}
-              isModalVisible={isModalVisible}
-            />
+            <img src={openedImage} alt="" srcset="" onClick={() => { setOpenImage(true); }} />
           </div>
         </div>
       </div>
 
       <div className="row mb-6">
         <div className="col-md-12">
-        <h3 style={{textAlign: "center"}}>LIST APPLET 3</h3>
+        <Title level={3} style={{textAlign: "center"}}></Title>
         <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
-            <ProcurementForm
-            setSampleData={setSampleData}
-            sampleData={sampleData}
-            setFormData={setFormData}
-            formData={formData}
-            setIsModalVisible={setIsModalVisible}
-            isModalVisible={isModalVisible}
-            formType={formType}
-            />
-          <ProcurementFilters
-            isModalVisible={isModalVisible}
-            setIsModalVisible={setIsModalVisible}
-            setFormType={setFormType}
-          />
-            <ProcurementTable
-              setFormType={setFormType}
-              setSampleData={setSampleData}
-              sampleData={sampleData}
-              setFormData={setFormData}
-              formData={formData}
-              setIsModalVisible={setIsModalVisible}
-              isModalVisible={isModalVisible}
-            />
-          </div>
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Contracts" key="1">
+            <ContractManagementTable />
+          </TabPane>
+          <TabPane tab="Purchase Orders" key="2">
+            <PurchaseOrdersTable />
+          </TabPane>
+        </Tabs>
+        </div>
         </div>
       
       </div>
 
       <div className="row mb-6">
-        <div className="col-md-6">
-          <h3 style={{textAlign: "center"}}>LIST APPLET 4</h3>
+        <div className="col-md-8">
+          <Title level={3} style={{textAlign: "center"}}>{labelTwo}</Title>
           <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
-            <ProcurementForm
-            setSampleData={setSampleData}
-            sampleData={sampleData}
-            setFormData={setFormData}
-            formData={formData}
-            setIsModalVisible={setIsModalVisible}
-            isModalVisible={isModalVisible}
-            formType={formType}
+
+          <Tabs defaultActiveKey="DELIVERIES" onChange={(key) => { setLabelTwo(key); setOpenedImage2("") }}>
+          <TabPane tab="Deliveries" key="DELIVERIES">
+            <DeliveryTables
+              setOpenedImage={setOpenedImage2}
+              setOpenImage={setOpenImage2}
             />
-          <ProcurementFilters
-            isModalVisible={isModalVisible}
-            setIsModalVisible={setIsModalVisible}
-            setFormType={setFormType}
-          />
-            <ProcurementTable
-              setFormType={setFormType}
-              setSampleData={setSampleData}
-              sampleData={sampleData}
-              setFormData={setFormData}
-              formData={formData}
-              setIsModalVisible={setIsModalVisible}
-              isModalVisible={isModalVisible}
+          </TabPane>
+          <TabPane tab="Vouchers" key="VOUCHERS">
+            <VoucherTables
+              setOpenedImage={setOpenedImage2}
+              setOpenImage={setOpenImage2}
             />
+          </TabPane>
+        </Tabs>
           </div>
         </div>
-        <div className="col-md-6">
-          <h3 style={{textAlign: "center"}}>LIST APPLET 5</h3>
+        <div className="col-md-4">
+          <Title level={3} style={{textAlign: "center"}}>{ labelTwo == "DELIVERIES" ? "SCANNED DELIVERY RECEIPT" : "SCANNED VOUCHER" }</Title>
           <div className="col-md-12" style={{border: "1px solid black", overflow: "scroll", height: "70vh", padding: 10}}>
-            <ProcurementForm
-            setSampleData={setSampleData}
-            sampleData={sampleData}
-            setFormData={setFormData}
-            formData={formData}
-            setIsModalVisible={setIsModalVisible}
-            isModalVisible={isModalVisible}
-            formType={formType}
-            />
-          <ProcurementFilters
-            isModalVisible={isModalVisible}
-            setIsModalVisible={setIsModalVisible}
-            setFormType={setFormType}
-          />
-            <ProcurementTable
-              setFormType={setFormType}
-              setSampleData={setSampleData}
-              sampleData={sampleData}
-              setFormData={setFormData}
-              formData={formData}
-              setIsModalVisible={setIsModalVisible}
-              isModalVisible={isModalVisible}
-            />
+            <img src={openedImage2} alt="" srcset="" onClick={() => { setOpenImage2(true); }} />
           </div>
         </div>
       </div>
+
+      { openImage && (
+            <Lightbox
+            mainSrc={openedImage}
+            animationDisabled={true}
+            onCloseRequest={() => {  setOpenImage(false) }}
+            enableZoom={false}
+          />
+        ) }
+
+
+      { openImage2 && (
+            <Lightbox
+            mainSrc={openedImage2}
+            animationDisabled={true}
+            onCloseRequest={() => {  setOpenImage2(false) }}
+            enableZoom={false}
+          />
+        ) }
       <br />
     </div>
   );

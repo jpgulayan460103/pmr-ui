@@ -41,9 +41,9 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
   
     return (
       <>
-        <Modal title="Procurement Monitoring" visible={isModalVisible} onOk={handleOk} okText="Submit" onCancel={handleCancel} width={"70%"} getContainer={false} >
+        <Modal title="Procurement Monitoring" visible={isModalVisible} onOk={handleOk} okText="Submit" onCancel={handleCancel} width={"70%"} getContainer={false} centered={true} >
             <Tabs defaultActiveKey="1" tabPosition="top" type="line">
-                <TabPane tab="Annex A" key="1" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                <TabPane tab="Annex A" key="1" style={{height: "60vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
                         form={form}
                         name="basic"
@@ -106,7 +106,7 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
                         </Form.Item>
                     </Form>
                 </TabPane>
-                <TabPane tab="Annex B" key="2" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                <TabPane tab="Annex B" key="2" style={{height: "60vh", overflowY: "scroll", paddingRight: 20}}>
 
                     <span style={{color: "red"}}>* Forms can be disabled, depending on user account.</span>
                     <Form
@@ -142,7 +142,7 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
                         
                     </Form>
                 </TabPane>
-                <TabPane tab="Actual Procurement Activity" key="3" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                <TabPane tab="Actual Procurement Activity" key="3" style={{height: "60vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
                         form={form}
                         name="basic"
@@ -293,7 +293,7 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
 
                     </Form>
                 </TabPane>
-                <TabPane tab="Issuance" key="4" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                <TabPane tab="Issuance" key="4" style={{height: "60vh", overflowY: "scroll", paddingRight: 20}}>
                     <Form
                         form={form}
                         name="basic"
@@ -363,7 +363,7 @@ const ProcurementForm = ({setSampleData, sampleData, formData, setFormData, isMo
 
                     </Form>
                 </TabPane>
-                <TabPane tab="Edit History" key="5" style={{height: "50vh", overflowY: "scroll", paddingRight: 20}}>
+                <TabPane tab="Edit History" key="5" style={{height: "60vh", overflowY: "scroll", paddingRight: 20}}>
                     <br />
                     <Timeline>
                         <Timeline.Item color="green">2021-09-01 09:30:AM - Admin - Created Procurement Monitoring Data. <a href="#">View Changes</a></Timeline.Item>
