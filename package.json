@@ -19,7 +19,8 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "set PUBLIC_URL=./&&craco build",
+    "build": "craco build",
+    "deploy": "set PUBLIC_URL=./&&craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
