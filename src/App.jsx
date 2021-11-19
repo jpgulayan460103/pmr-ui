@@ -9,6 +9,7 @@ import PurchaseOrdersTable from './Components/PurchaseOrdersTable'
 import ContractManagementTable from './Components/ContractManagementTable'
 import DeliveryTables from './Components/DeliveryTables'
 import VoucherTables from './Components/VoucherTables'
+import Login from './Components/Login'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import bootstrap from 'bootstrap'
@@ -20716,6 +20717,9 @@ function App() {
 
   const [openImage2, setOpenImage2] = useState(false);
   const [openedImage2, setOpenedImage2] = useState("");
+  return (
+    <Login />
+  );
   return (
     <div className="App container-fluid">
       <br />
