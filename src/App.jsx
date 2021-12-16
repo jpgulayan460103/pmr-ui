@@ -14,6 +14,7 @@ const App = (props) => {
     <div className="App">
       <Routes>
         <Route path="/" element={<Layout>home</Layout>} />
+        <Route path="/home" element={<Layout>home</Layout>} />
         <Route path="about" element={<Layout>about</Layout>} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>
