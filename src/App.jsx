@@ -6,10 +6,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
+import Login from './Pages/Login'
 
 
 const App = (props) => {
-  
+  return (
+    <div className="App">
+      <Login />
+    </div>
+  );
   return (
     <div className="App">
       <Routes>
