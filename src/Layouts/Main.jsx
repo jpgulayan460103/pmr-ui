@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 
 import logo from './../Images/logo.png'
 import logoCropped from './../Images/logo-cropped-1.png'
-import { Layout, Divider   } from 'antd';
+import { Layout, Divider, BackTop  } from 'antd';
 import Headers from './Headers'
 import SideMenu from './SideMenu'
 import Footers from './Footers';
 
-const { Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 const Main = (props) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -45,6 +45,7 @@ const Main = (props) => {
         </Content>
         <Footers/>
         </Layout>
+        <BackTop />
       </Layout>
       </div>
     );

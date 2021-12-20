@@ -7,9 +7,13 @@ import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
 import Login from './Pages/Login'
+import PurchaseRequest from './Pages/PurchaseRequest/PurchaseRequest'
 
 
 const App = (props) => {
+  return (
+    <PurchaseRequest />
+  );
   return (
     <div className="App">
       <Routes>
