@@ -9,13 +9,15 @@ const Login = () => {
             password: "admin123"
         })
         .then(res =>{
-            setToken(res.data.access_token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            // setToken(res.data.access_token);
+            sessionStorage.setItem('session',JSON.stringify(res.data));
+            // cookies.set('token', res.data.access_token, { path: '/' });
+            // axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
         });
     }
     const itemsTest = () => {
-        // axios.defaults.withCredentials = true;
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        let access_token = JSON.parse(sessionStorage.getItem("session")).access_token;
+        axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
         axios.get("http://pmr-api.test/api/items");
     }
     const docuTest = () => {

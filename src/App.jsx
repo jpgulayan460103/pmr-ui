@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from "react-router-dom";
 import './App.less';
 import './App.css';
@@ -10,11 +10,6 @@ import Login from './Pages/Login'
 
 
 const App = (props) => {
-  return (
-    <div className="App">
-      <Login />
-    </div>
-  );
   return (
     <div className="App">
       <Routes>

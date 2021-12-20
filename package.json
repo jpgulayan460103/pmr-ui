@@ -21,6 +21,7 @@
     "react-router-dom": "^6.1.1",
     "react-scripts": "4.0.3",
     "redux-devtools-extension": "^2.13.9",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
