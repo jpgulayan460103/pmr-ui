@@ -1,38 +1,125 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import style from './style.less'
-
-import { Button, Input } from 'antd';
+import { debounce, isEmpty } from 'lodash'
+import api from './../../api';
+import { connect } from 'react-redux';
+import { Button, Input, Select, AutoComplete, DatePicker, Form  } from 'antd';
 import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
+function mapStateToProps(state) {
+    return {
+        unit_of_measures: state.library.unit_of_measures,
+        items: state.library.items,
+        sections: state.library.sections,
+    };
+}
+
 const { TextArea } = Input;
+const { Option } = Select;
 
-const Purchaserequest = () => {
+const Purchaserequest = (props) => {
 
-    const [data, setData] = useState([]);
-    const [formData, setFormData] = useState({});
+    useEffect(() => {
+        if(isEmpty(props.unit_of_measures)){
+            getUnitOfMeasures();
+        }
+        if(isEmpty(props.unit_of_measures)){
+            getItems();
+        }
+        if(isEmpty(props.sections)){
+            getSections();
+        }
+    }, []);
+
+    const [formErrors, setFormErrors] = useState({});
+    const [formData, setFormData] = useState({
+        items: []
+    });
     const [tableKey, setTableKey] = useState(0);
+
+    const getUnitOfMeasures = () => {
+        api.Library.getLibraries('unit_of_measure')
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_UNIT_OF_MEASURES",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
+    const getItems = () => {
+        api.Library.getLibraries('items')
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_ITEMS",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
+    const getSections = () => {
+        api.Library.getLibraries("user_section")
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_USER_SECTION",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
+
+    const savePurchaseRequest = debounce(() => {
+        api.PurchaseRequest.save(formData,"create")
+        .then(res => {})
+        .catch(err => {
+            setFormErrors(err.response.data.errors);
+        })
+        .then(res => {})
+        ;
+        console.log(formData);
+    }, 200);
 
     const addItem = () => {
         setTableKey(tableKey + 1);
         let newValue = {
             key: tableKey + 1,
-            code: "",
-            unit_of_measure: "",
-            description: "",
-            quantity: 0,
+            item_code: null,
+            unit_of_measure_id: null,
+            item_name: null,
+            quantity: 1,
             unit_cost: 0,
             total_cost: 0,
+            is_ppmp: false,
+            item_id: null,
         };
-        setData(oldArray => [...oldArray,newValue]);
+        setFormData(oldArray => ({
+            ...oldArray,
+            items: [...oldArray.items, newValue]
+        }));
     }
 
     const deleteItem = (key) => {
-        let newValue = data.filter(item => item.key !== key)
-        setData(newValue);
+        let newValue = formData.items.filter(item => item.key !== key)
+        setFormData(oldArray => ({
+            ...oldArray,
+            items: newValue
+        }));
     }
 
-    const changeFieldValue = (e, field) => {
-        let value = e.target.value;
+    const changeFieldValue = (e, field, target = true) => {
+        let value = e;
+        if(target){
+            value = e.target.value;
+        }
         setFormData(oldArray => ({
             ...oldArray,
             [field]: value
@@ -40,36 +127,60 @@ const Purchaserequest = () => {
     }
 
     const changeTableFieldValue = (e, item, field, index) => {
-        let value = e.target.value;
-        let newValue = data;
+        let value = e;
+        let newValue = formData.items;
         switch (field) {
             case 'unit_cost':
-                value = isNaN(value) || value == "" ? 0 : parseFloat(value);
+                value = isNaN(value) ? 1 : parseFloat(value);
                 break;
             case 'quantity':
-                value =  isNaN(value) || value == "" ? 0 : parseInt(value);
+                value =  isNaN(value) ? 1 : parseInt(value);
                 break;
         
             default:
                 break;
         }
         newValue[index][field] = value;
-        // console.log(newValue);
         setFormData(oldArray => ({
             ...oldArray,
             items: newValue
         }));
     }
 
+
+    const selectUnit = (value, index) => {
+        changeTableFieldValue(value, {}, 'unit_of_measure_id', index);
+    }
+
+    const selectItem = (value, item, index) => {
+        console.log(item);
+        changeTableFieldValue(item.item_code, {}, 'item_code', index);
+        changeTableFieldValue(item.unit_of_measure.id, {}, 'unit_of_measure_id', index);
+        changeTableFieldValue(true, {}, 'is_ppmp', index);
+        changeTableFieldValue(value, {}, 'item_name', index);
+        changeTableFieldValue(item.id, {}, 'item_id', index);
+    }
+
     const total_cost = () => {
-        return data.reduce((sum, item) => {
+        return formData.items.reduce((sum, item) => {
             return sum += (item.quantity * item.unit_cost);
         }, 0);
     }
+
+    const displayError = (field) => {
+        if(formErrors && formErrors[field]){
+            return {
+                validateStatus: 'error',
+                help: formErrors[field][0]
+            }
+        }
+    }
+    
     return (
         <div id="pr-container" className='container'>
             <p className="text-right ...">Appendix 60</p>
             <p className="text-center ..."><b>PURCHASE REQUEST</b></p>
+            <Form>
             <table id="pr-table" style={style}>
                 <thead>
                     <tr>
@@ -78,20 +189,51 @@ const Purchaserequest = () => {
                         <td></td>
                     </tr>
                     <tr>
-                        <td colSpan={2}>Office/Section: <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'end_user')} value={formData.end_user} /></td>
-                        <td colSpan={2}>PR No.: <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_order_number')} value={formData.purchase_order_number} /></td>
+                        <td colSpan={2}>
+                            Office/Section:
+                            <Form.Item { ...displayError(`end_user`) }>
+                                <Select
+                                    showSearch
+                                    value={formData.end_user}
+                                    placeholder="Select a Unit"
+                                    optionFilterProp="children"
+                                    onChange={(e) => changeFieldValue(e, 'end_user', false)}
+                                    style={{ width: "100%" }}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                >
+                                    { props.sections.map((option, index) => (
+                                        <Option value={option.id} key={option.id}>{option.name}</Option>
+                                    )) }
+                                </Select>
+                            </Form.Item>
+                        </td>
+                        <td colSpan={2}>PR No.:
+                            <Form.Item { ...displayError(`purchase_request_number`) }>
+                                <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={formData.purchase_request_number} />
+                            </Form.Item>
+                        </td>
                         <td colSpan={2}></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colSpan={2}></td>
-                        <td colSpan={2}>Responsibility Center Code: <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={formData.center_code} /></td>
-                        <td colSpan={2}>Date: <Input placeholder="Type here..." /></td>
+                        <td colSpan={2}>Responsibility Center Code:
+                            <Form.Item { ...displayError(`purpose`) }>
+                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={formData.center_code} />
+                            </Form.Item>
+                        </td>
+                        <td colSpan={2}>Date:
+                        <Form.Item { ...displayError(`pr_date`) }>
+                            <DatePicker style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} />
+                        </Form.Item>
+                        </td>
                         <td></td>
                     </tr>
                     <tr>
                         <td className='text-center'>Stock/ Property No.</td>
-                        <td className='text-center'>Unit</td>
+                        <td className='text-center' style={{ width: 120}}>Unit</td>
                         <td className='text-center' style={{ width: "40%"}}>Item Description</td>
                         <td className='text-center'>Quantity</td>
                         <td className='text-center'>Unit Cost</td>
@@ -101,13 +243,62 @@ const Purchaserequest = () => {
                 </thead>
                 <tbody>
                     {
-                        data.map((item, index) => (
+                        formData.items.map((item, index) => (
                             <tr key={item.key}>
-                                <td className='text-center'><Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e, item, 'code', index) } value={item.code} /></td>
-                                <td className='text-center'><Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e, item, 'unit_of_measure', index) } value={item.unit_of_measure} /></td>
-                                <td><Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e, item, 'description', index) } value={item.description} /></td>
-                                <td className='text-center'><Input type="number" placeholder="Type here..." onChange={(e) => changeTableFieldValue(e, item, 'quantity', index) } value={item.quantity} /></td>
-                                <td className='text-right'><Input type="number" step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e, item, 'unit_cost', index) } value={item.unit_cost} /></td>
+                                <td className='text-center'>
+                                    <Form.Item { ...displayError(`items.${index}.item_code`) }>
+                                        <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled={ item.is_ppmp } />
+                                    </Form.Item>
+                                </td>
+                                <td className='text-center'>
+                                    <Form.Item { ...displayError(`items.${index}.unit_of_measure_id`) }>
+                                        <Select
+                                            showSearch
+                                            value={item.unit_of_measure_id}
+                                            placeholder="Select a Unit"
+                                            optionFilterProp="children"
+                                            onChange={(e) => selectUnit(e, index)}
+                                            style={{ width: "100%" }}
+                                            disabled={ item.is_ppmp }
+                                            filterOption={(input, option) =>
+                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                        >
+                                            { props.unit_of_measures.map((option, index) => (
+                                                <Option value={option.id} key={option.id}>{option.name}</Option>
+                                            )) }
+                                        </Select>
+                                    </Form.Item>
+                                </td>
+                                <td>
+                                    <Form.Item { ...displayError(`items.${index}.item_name`) }>
+                                        <AutoComplete
+                                            style={{ width: "100%" }}
+                                            allowClear
+                                            options={props.items}
+                                            onSelect={(val, item) => selectItem(val, item, index)}
+                                            placeholder="Type here..."
+                                            filterOption={(input, option) =>
+                                                option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onChange={(e) => {
+                                                changeTableFieldValue(e, {}, 'item_name', index);
+                                            }}
+                                            disabled={ item.is_ppmp }
+                                        />
+                                    </Form.Item>
+                                    {/* <Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } value={item.description} /> */}
+                                </td>
+                                <td className='text-center'>
+                                    <Form.Item { ...displayError(`items.${index}.quantity`) }>
+                                        <Input type="number" min={1} autoComplete='off' placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
+                                    </Form.Item>
+                                    </td>
+                                <td className='text-right'>
+                                    <Form.Item { ...displayError(`items.${index}.unit_cost`) }>
+                                        <Input type="number" autoComplete='off' step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
+                                    </Form.Item>
+                                </td>
                                 <td className='text-right'>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format( (item.unit_cost * item.quantity) ) }</td>
                                 <td className='text-right'><Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button></td>
                             </tr>
@@ -125,7 +316,11 @@ const Purchaserequest = () => {
                         <td></td>
                     </tr>
                     <tr>
-                        <td colSpan={7}>Purpose: <Input placeholder="Type here..." /></td>
+                        <td colSpan={7}>Purpose:
+                            <Form.Item { ...displayError(`purpose`) }>
+                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={formData.purpose} />
+                            </Form.Item>
+                        </td>
                     </tr>
                     {/* <tr>
                         <td colSpan={2} style={{borderBottom: 0}}><br /><br />Signature:</td>
@@ -144,13 +339,16 @@ const Purchaserequest = () => {
                     </tr> */}
                 </tbody>
             </table>
+            </Form>
             <div className='text-center'>
                 <br />
-                <Button type="primary" onClick={() => deleteItem()}><SaveOutlined /> Save</Button>
+                <Button type="primary" onClick={() => savePurchaseRequest()}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => deleteItem()}><DeleteOutlined />Cancel</Button>
             </div>
         </div>
     );
 }
 
-export default Purchaserequest;
+export default connect(
+    mapStateToProps,
+  )(Purchaserequest);

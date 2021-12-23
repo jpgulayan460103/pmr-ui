@@ -11,13 +11,16 @@ import PurchaseRequest from './Pages/PurchaseRequest/PurchaseRequest'
 
 
 const App = (props) => {
-  return (
-    <PurchaseRequest />
-  );
+  // return (
+  //   <div>
+  //     <PurchaseRequest />
+  //     <Login />
+  //   </div>
+  // );
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Layout>home</Layout>} />
+        <Route path="/" element={<Layout><PurchaseRequest /><Login /></Layout>} />
         <Route path="/home" element={<Layout>home</Layout>} />
         <Route path="about" element={<Layout>about</Layout>} />
         <Route path="*" element={<Layout>404</Layout>} />

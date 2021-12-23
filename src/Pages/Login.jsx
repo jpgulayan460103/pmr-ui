@@ -1,29 +1,23 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axios from './../api/axios.settings';
 
 const Login = () => {
     const [token, setToken] = useState("");
     const loginTest = () => {
-        axios.post("http://pmr-api.test/api/login",{
+        axios.post("/api/login",{
             username: "jpgulayan",
             password: "admin123"
         })
         .then(res =>{
-            // setToken(res.data.access_token);
             sessionStorage.setItem('session',JSON.stringify(res.data));
-            // cookies.set('token', res.data.access_token, { path: '/' });
-            // axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
         });
     }
     const itemsTest = () => {
-        let access_token = JSON.parse(sessionStorage.getItem("session")).access_token;
-        axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-        axios.get("http://pmr-api.test/api/items");
+        axios.get("/api/items");
     }
     const docuTest = () => {
-        // axios.defaults.withCredentials = true;
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        axios.get('http://pmr-api.test/api/user')
+        axios.get('/api/user')
         .then(response => {
             console.log(response.data);
         });
