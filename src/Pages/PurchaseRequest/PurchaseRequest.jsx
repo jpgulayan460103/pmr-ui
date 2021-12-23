@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import style from './style.less'
-import { debounce, isEmpty } from 'lodash'
+import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
 import { Button, Input, Select, AutoComplete, DatePicker, Form  } from 'antd';
@@ -11,6 +11,8 @@ function mapStateToProps(state) {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
         sections: state.library.sections,
+        formData: state.purchaseRequest.formData,
+        formErrors: state.purchaseRequest.formErrors,
     };
 }
 
@@ -31,10 +33,6 @@ const Purchaserequest = (props) => {
         }
     }, []);
 
-    const [formErrors, setFormErrors] = useState({});
-    const [formData, setFormData] = useState({
-        items: []
-    });
     const [tableKey, setTableKey] = useState(0);
 
     const getUnitOfMeasures = () => {
@@ -78,14 +76,17 @@ const Purchaserequest = (props) => {
 
 
     const savePurchaseRequest = debounce(() => {
-        api.PurchaseRequest.save(formData,"create")
+        api.PurchaseRequest.save(props.formData,"create")
         .then(res => {})
         .catch(err => {
-            setFormErrors(err.response.data.errors);
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                data: err.response.data.errors
+            });
         })
         .then(res => {})
         ;
-        console.log(formData);
+        console.log(props.formData);
     }, 200);
 
     const addItem = () => {
@@ -101,18 +102,33 @@ const Purchaserequest = (props) => {
             is_ppmp: false,
             item_id: null,
         };
-        setFormData(oldArray => ({
-            ...oldArray,
-            items: [...oldArray.items, newValue]
-        }));
+        // setFormData(oldArray => ({
+        //     ...oldArray,
+        //     items: [...oldArray.items, newValue]
+        // }));
+
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            data: {
+                ...props.formData,
+                items: [...props.formData.items, newValue]
+            }
+        });
     }
 
     const deleteItem = (key) => {
-        let newValue = formData.items.filter(item => item.key !== key)
-        setFormData(oldArray => ({
-            ...oldArray,
-            items: newValue
-        }));
+        let newValue = props.formData.items.filter(item => item.key !== key)
+        // setFormData(oldArray => ({
+        //     ...oldArray,
+        //     items: newValue
+        // }));
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            data: {
+                ...props.formData,
+                items: newValue
+            }
+        });
     }
 
     const changeFieldValue = (e, field, target = true) => {
@@ -120,15 +136,22 @@ const Purchaserequest = (props) => {
         if(target){
             value = e.target.value;
         }
-        setFormData(oldArray => ({
-            ...oldArray,
-            [field]: value
-        }));
+        // setFormData(oldArray => ({
+        //     ...oldArray,
+        //     [field]: value
+        // }));
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            data: {
+                ...props.formData,
+                [field]: value
+            }
+        });
     }
 
     const changeTableFieldValue = (e, item, field, index) => {
         let value = e;
-        let newValue = formData.items;
+        let newValue = cloneDeep(props.formData.items);
         switch (field) {
             case 'unit_cost':
                 value = isNaN(value) ? 1 : parseFloat(value);
@@ -141,10 +164,17 @@ const Purchaserequest = (props) => {
                 break;
         }
         newValue[index][field] = value;
-        setFormData(oldArray => ({
-            ...oldArray,
-            items: newValue
-        }));
+        // setFormData(oldArray => ({
+        //     ...oldArray,
+        //     items: newValue
+        // }));
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            data: {
+                ...props.formData,
+                items: newValue
+            }
+        });
     }
 
 
@@ -153,25 +183,32 @@ const Purchaserequest = (props) => {
     }
 
     const selectItem = (value, item, index) => {
-        console.log(item);
-        changeTableFieldValue(item.item_code, {}, 'item_code', index);
-        changeTableFieldValue(item.unit_of_measure.id, {}, 'unit_of_measure_id', index);
-        changeTableFieldValue(true, {}, 'is_ppmp', index);
-        changeTableFieldValue(value, {}, 'item_name', index);
-        changeTableFieldValue(item.id, {}, 'item_id', index);
+        let newValue = cloneDeep(props.formData.items);
+        newValue[index]["item_code"] = item.item_code;
+        newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
+        newValue[index]["is_ppmp"] = true;
+        newValue[index]["item_name"] = value;
+        newValue[index]["item_id"] = item.id;
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            data: {
+                ...props.formData,
+                items: newValue
+            }
+        });
     }
 
     const total_cost = () => {
-        return formData.items.reduce((sum, item) => {
+        return props.formData.items.reduce((sum, item) => {
             return sum += (item.quantity * item.unit_cost);
         }, 0);
     }
 
     const displayError = (field) => {
-        if(formErrors && formErrors[field]){
+        if(props.formErrors && props.formErrors[field]){
             return {
                 validateStatus: 'error',
-                help: formErrors[field][0]
+                help: props.formErrors[field][0]
             }
         }
     }
@@ -185,7 +222,7 @@ const Purchaserequest = (props) => {
                 <thead>
                     <tr>
                         <td colSpan={3}>Entity Name: <Input placeholder="Type here..." value="DSWD FO XI" /></td>
-                        <td colSpan={3}>Fund Cluster: <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={formData.fund_cluster} /></td>
+                        <td colSpan={3}>Fund Cluster: <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} /></td>
                         <td></td>
                     </tr>
                     <tr>
@@ -194,7 +231,7 @@ const Purchaserequest = (props) => {
                             <Form.Item { ...displayError(`end_user`) }>
                                 <Select
                                     showSearch
-                                    value={formData.end_user}
+                                    value={props.formData.end_user}
                                     placeholder="Select a Unit"
                                     optionFilterProp="children"
                                     onChange={(e) => changeFieldValue(e, 'end_user', false)}
@@ -211,7 +248,7 @@ const Purchaserequest = (props) => {
                         </td>
                         <td colSpan={2}>PR No.:
                             <Form.Item { ...displayError(`purchase_request_number`) }>
-                                <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={formData.purchase_request_number} />
+                                <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} />
                             </Form.Item>
                         </td>
                         <td colSpan={2}></td>
@@ -221,7 +258,7 @@ const Purchaserequest = (props) => {
                         <td colSpan={2}></td>
                         <td colSpan={2}>Responsibility Center Code:
                             <Form.Item { ...displayError(`purpose`) }>
-                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={formData.center_code} />
+                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} />
                             </Form.Item>
                         </td>
                         <td colSpan={2}>Date:
@@ -243,7 +280,7 @@ const Purchaserequest = (props) => {
                 </thead>
                 <tbody>
                     {
-                        formData.items.map((item, index) => (
+                        props.formData.items.map((item, index) => (
                             <tr key={item.key}>
                                 <td className='text-center'>
                                     <Form.Item { ...displayError(`items.${index}.item_code`) }>
@@ -318,7 +355,7 @@ const Purchaserequest = (props) => {
                     <tr>
                         <td colSpan={7}>Purpose:
                             <Form.Item { ...displayError(`purpose`) }>
-                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={formData.purpose} />
+                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
                             </Form.Item>
                         </td>
                     </tr>
