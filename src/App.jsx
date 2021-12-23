@@ -7,6 +7,7 @@ import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
 import Login from './Pages/Login'
+import LoadLibraries from './Components/LoadLibraries'
 import PurchaseRequest from './Pages/PurchaseRequest/PurchaseRequest'
 
 
@@ -19,6 +20,7 @@ const App = (props) => {
   // );
   return (
     <div className="App">
+      <LoadLibraries />
       <Routes>
         <Route path="/" element={<Layout><PurchaseRequest /><Login /></Layout>} />
         <Route path="/home" element={<Layout>home</Layout>} />

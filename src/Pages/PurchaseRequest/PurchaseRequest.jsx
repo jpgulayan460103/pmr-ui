@@ -20,61 +20,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 const Purchaserequest = (props) => {
-
-    useEffect(() => {
-        if(isEmpty(props.unit_of_measures)){
-            getUnitOfMeasures();
-        }
-        if(isEmpty(props.unit_of_measures)){
-            getItems();
-        }
-        if(isEmpty(props.sections)){
-            getSections();
-        }
-    }, []);
-
     const [tableKey, setTableKey] = useState(0);
-
-    const getUnitOfMeasures = () => {
-        api.Library.getLibraries('unit_of_measure')
-        .then(res => {
-            props.dispatch({
-                type: "SET_LIBRARY_UNIT_OF_MEASURES",
-                data: res.data.data
-            });
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-    const getItems = () => {
-        api.Library.getLibraries('items')
-        .then(res => {
-            props.dispatch({
-                type: "SET_LIBRARY_ITEMS",
-                data: res.data.data
-            });
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-    const getSections = () => {
-        api.Library.getLibraries("user_section")
-        .then(res => {
-            props.dispatch({
-                type: "SET_LIBRARY_USER_SECTION",
-                data: res.data.data
-            });
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-
     const savePurchaseRequest = debounce(() => {
         api.PurchaseRequest.save(props.formData,"create")
         .then(res => {})
