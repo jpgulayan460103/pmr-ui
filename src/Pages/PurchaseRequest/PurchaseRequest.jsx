@@ -22,8 +22,16 @@ const { Option } = Select;
 const Purchaserequest = (props) => {
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
-        api.PurchaseRequest.save(props.formData,"create")
-        .then(res => {})
+        let formData = cloneDeep(props.formData);
+        formData.total_cost = total_cost();
+        api.PurchaseRequest.save(formData,"create")
+        .then(res => {
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                data: {}
+            });
+            window.location = `http://pmr-api.test/api/pdf/purchase-requests/${res.data.purchase_request_uuid}`;
+        })
         .catch(err => {
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
@@ -174,13 +182,13 @@ const Purchaserequest = (props) => {
                     <tr>
                         <td colSpan={2}>
                             Office/Section:
-                            <Form.Item { ...displayError(`end_user`) }>
+                            <Form.Item { ...displayError(`end_user_id`) }>
                                 <Select
                                     showSearch
-                                    value={props.formData.end_user}
+                                    value={props.formData.end_user_id}
                                     placeholder="Select a Unit"
                                     optionFilterProp="children"
-                                    onChange={(e) => changeFieldValue(e, 'end_user', false)}
+                                    onChange={(e) => changeFieldValue(e, 'end_user_id', false)}
                                     style={{ width: "100%" }}
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
