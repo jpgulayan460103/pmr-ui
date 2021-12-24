@@ -14,19 +14,20 @@ const Main = (props) => {
   const onCollapse = collapsed => {
     setCollapsed(collapsed);
   };
+  const [cw, setCw] = useState(80);
     return (
       <div>
       <Layout>
         <Sider
           theme="light"
           breakpoint="lg"
-          collapsedWidth="80"
+          collapsedWidth={cw}
           collapsible
           onBreakpoint={broken => {
           console.log(broken);
           }}
           onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
+          // console.log(collapsed, type);
           onCollapse(collapsed);
           }}
         >
@@ -37,7 +38,7 @@ const Main = (props) => {
         <SideMenu />
         </Sider>
       <Layout>
-        <Headers />
+        <Headers setCw={setCw} collapsed={collapsed} />
         <Content style={{ margin: '24px 16px 0' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: "83vh" }}>
           { props.children }

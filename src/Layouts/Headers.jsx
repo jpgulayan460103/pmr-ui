@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Layout, Menu, Dropdown, Badge } from 'antd';
-import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled  } from '@ant-design/icons';
+import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
 
 const { Header } = Layout;
 
@@ -29,16 +29,26 @@ const MenuIcon = (props) => {
         </span>
     );
 }
-const Headers = () => {
+const Headers = ({ setCw, collapsed }) => {
+    const [showSide, setShowSide] = useState(false);
+    const toggleSide = () => {
+        setShowSide(!showSide);
+        if(showSide){
+            setCw(80);
+        }else{
+            setCw(0);
+        }
+    }
     return (
         <React.Fragment>
             <Header className="site-layout-sub-header-background" style={{ padding: 0 }}>
+                { collapsed ? <span style={{color: "white", marginLeft: 10, fontSize: 20, cursor: "pointer"}} onClick={() => { toggleSide() }}>{ !showSide ? <MenuFoldOutlined /> : <MenuUnfoldOutlined /> }</span> : "" }
                 <Dropdown overlay={menu}  trigger={['click']} placement="bottomRight" >
-                    <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer", fontSize: 18}}> username <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
+                    <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}> username <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
                 <Dropdown overlay={menu}  trigger={['click']} placement="bottomRight" >
                         <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}>
-                        <Badge count={2}>
+                        <Badge count={0}>
                             <span  style={{color:"white", cursor: "pointer"}}>
                                 <MenuIcon icon={<BellFilled style={{fontSize: 18}} />} label="Menu" />
                             </span>

@@ -21,7 +21,7 @@
   }
 
   .site-layout-sub-header-background {
-    background: #4834d4;
+    background-image: linear-gradient(to left, #30336b, #4834d4, #686de0);
   }
   
   .site-layout-background {
@@ -34,5 +34,10 @@
 
   .ant-layout-sider-light .ant-layout-sider-trigger {
     color: #fff;
-    background: #4834d4;
+    /* background: #4834d4; */
+    background-image: linear-gradient(to right, #4834d4, #686de0);
+}
+
+.ant-layout-sider-light .ant-layout-sider-zero-width-trigger{
+  display: none;
 }
