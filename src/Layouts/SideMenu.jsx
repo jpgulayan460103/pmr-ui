@@ -3,7 +3,7 @@ import { Menu } from 'antd';
 import {
     UserOutlined,
     UploadOutlined,
-    VideoCameraOutlined ,
+    FormOutlined ,
   } from '@ant-design/icons';
 import { useLocation, Link  } from 'react-router-dom'
 const Sidemenu = () => {
@@ -16,10 +16,12 @@ const Sidemenu = () => {
         <React.Fragment>
             <Menu theme="light" mode="inline" selectedKeys={[defaultKey]} >
                 <Menu.Item key="/" icon={<UserOutlined />}>
-                <Link to="/" style={{textDecoration: "none"}}>Home</Link>
+                <Link to="/" style={{textDecoration: "none"}}></Link>
+                Home
                 </Menu.Item>
-                <Menu.Item key="/about" icon={<VideoCameraOutlined />}>
-                <Link to="/about" style={{textDecoration: "none"}}>About</Link>
+                <Menu.Item key="/purchase-request" icon={<FormOutlined />}>
+                <Link to="/purchase-request" style={{textDecoration: "none"}}></Link>
+                Purchase Request
                 </Menu.Item>
                 <Menu.Item key="3" icon={<UploadOutlined />}>
                     nav 3
