@@ -11,8 +11,8 @@ export default {
       return axios.post(`api/purchase-requests`,formdata);
     }
   },
-  getUsers(){
-    return axios.get(`api/users`);
+  get(){
+    return axios.get(`api/purchase-requests`);
   },
   logout(){
     return axios.post(`api/logout`);

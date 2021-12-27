@@ -41,3 +41,8 @@
 .ant-layout-sider-light .ant-layout-sider-zero-width-trigger{
   display: none;
 }
+
+.custom-pointer{
+  cursor: pointer;
+  color: #4834d4;
+}

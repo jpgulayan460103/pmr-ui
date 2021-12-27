@@ -6,15 +6,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
-import Login from './Pages/Login'
+import Login from './Pages/Login/Login'
 import LoadLibraries from './Components/LoadLibraries'
-import PurchaseRequest from './Pages/PurchaseRequest/PurchaseRequest'
+import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
+import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 
 
 const App = (props) => {
   // return (
   //   <div>
-  //     <PurchaseRequest />
+  //     {/* <PurchaseRequest /> */}
   //     <Login />
   //   </div>
   // );
@@ -22,8 +23,9 @@ const App = (props) => {
     <div className="App">
       <LoadLibraries />
       <Routes>
-        <Route path="/" element={<Layout><PurchaseRequest /><Login /></Layout>} />
-        <Route path="/home" element={<Layout>home</Layout>} />
+        <Route path="/" element={<Layout></Layout>} />
+        <Route path="/purchase-request/create" element={<Layout><CreatePurchaseRequest /><Login /></Layout>} />
+        <Route path="/purchase-request" element={<Layout><ListPurchaseRequest /><Login /></Layout>} />
         <Route path="about" element={<Layout>about</Layout>} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>

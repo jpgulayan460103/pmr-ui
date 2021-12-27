@@ -1,0 +1,26 @@
+/* body{
+    background-image: linear-gradient(to bottom, #30336b, #4834d4, #686de0);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: auto;
+}
+
+#container{
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 100%;
+}
+
+#login-container{
+    background-color: whitesmoke;
+    box-shadow: 1px 1px 18px #888888;
+    height: auto;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 50px
+} */

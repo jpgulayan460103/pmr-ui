@@ -19,7 +19,7 @@ function mapStateToProps(state) {
 const { TextArea } = Input;
 const { Option } = Select;
 
-const Purchaserequest = (props) => {
+const CreatePurchaseRequest = (props) => {
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
         let formData = cloneDeep(props.formData);
@@ -342,4 +342,4 @@ const Purchaserequest = (props) => {
 
 export default connect(
     mapStateToProps,
-  )(Purchaserequest);
+  )(CreatePurchaseRequest);

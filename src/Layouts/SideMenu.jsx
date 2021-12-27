@@ -6,6 +6,9 @@ import {
     FormOutlined ,
   } from '@ant-design/icons';
 import { useLocation, Link  } from 'react-router-dom'
+
+const { SubMenu } = Menu;
+
 const Sidemenu = () => {
     const location = useLocation();
     const [defaultKey, setDefaultKey] = useState('/');
@@ -16,13 +19,21 @@ const Sidemenu = () => {
         <React.Fragment>
             <Menu theme="light" mode="inline" selectedKeys={[defaultKey]} >
                 <Menu.Item key="/" icon={<UserOutlined />}>
-                <Link to="/" style={{textDecoration: "none"}}></Link>
+                <Link to="/"></Link>
                 Home
                 </Menu.Item>
-                <Menu.Item key="/purchase-request" icon={<FormOutlined />}>
-                <Link to="/purchase-request" style={{textDecoration: "none"}}></Link>
-                Purchase Request
-                </Menu.Item>
+                <SubMenu key="sub1" icon={<FormOutlined />} title="Navigation One">
+                    <Menu.Item key="/purchase-request/create">
+                        <Link to="/purchase-request/create"></Link>
+                        Create Purchase Requests
+                    </Menu.Item>
+                    <Menu.Item key="/purchase-request">
+                        <Link to="/purchase-request"></Link>
+                        View Purchase Requests
+                    </Menu.Item>
+                    <Menu.Item key="7">Option 7</Menu.Item>
+                    <Menu.Item key="8">Option 8</Menu.Item>
+                </SubMenu>
                 <Menu.Item key="3" icon={<UploadOutlined />}>
                     nav 3
                 </Menu.Item>
