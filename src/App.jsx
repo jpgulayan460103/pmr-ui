@@ -10,6 +10,7 @@ import Login from './Pages/Login/Login'
 import LoadLibraries from './Components/LoadLibraries'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
 import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
+import ListLibrary from './Pages/Library/ListLibrary'
 
 
 const App = (props) => {
@@ -24,8 +25,9 @@ const App = (props) => {
       <LoadLibraries />
       <Routes>
         <Route path="/" element={<Layout></Layout>} />
-        <Route path="/purchase-request/create" element={<Layout><CreatePurchaseRequest /><Login /></Layout>} />
-        <Route path="/purchase-request" element={<Layout><ListPurchaseRequest /><Login /></Layout>} />
+        <Route path="/purchase-requests/create" element={<Layout><CreatePurchaseRequest /><Login /></Layout>} />
+        <Route path="/purchase-requests" element={<Layout><ListPurchaseRequest /><Login /></Layout>} />
+        <Route path="/libraries" element={<Layout><ListLibrary /><Login /></Layout>} />
         <Route path="about" element={<Layout>about</Layout>} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>

@@ -10,7 +10,7 @@ function mapStateToProps(state) {
     return {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
-        sections: state.library.sections,
+        user_sections: state.library.user_sections,
         formData: state.purchaseRequest.formData,
         formErrors: state.purchaseRequest.formErrors,
     };
@@ -194,7 +194,7 @@ const CreatePurchaseRequest = (props) => {
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
                                 >
-                                    { props.sections.map((option, index) => (
+                                    { props.user_sections.map((option, index) => (
                                         <Option value={option.id} key={option.id}>{option.name}</Option>
                                     )) }
                                 </Select>
@@ -276,18 +276,20 @@ const CreatePurchaseRequest = (props) => {
                                                 changeTableFieldValue(e, {}, 'item_name', index);
                                             }}
                                             disabled={ item.is_ppmp }
-                                        />
+                                        >
+                                            <TextArea autoSize />
+                                        </AutoComplete>
                                     </Form.Item>
                                     {/* <Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } value={item.description} /> */}
                                 </td>
                                 <td className='text-center'>
                                     <Form.Item { ...displayError(`items.${index}.quantity`) }>
-                                        <Input type="number" min={1} autoComplete='off' placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
+                                        <Input type="number" min={1} autoComplete='off' style={{ width: 100 }} placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
                                     </Form.Item>
                                     </td>
                                 <td className='text-right'>
                                     <Form.Item { ...displayError(`items.${index}.unit_cost`) }>
-                                        <Input type="number" autoComplete='off' step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
+                                        <Input type="number" autoComplete='off' style={{ width: 150 }} step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
                                     </Form.Item>
                                 </td>
                                 <td className='text-right'>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format( (item.unit_cost * item.quantity) ) }</td>

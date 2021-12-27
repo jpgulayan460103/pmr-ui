@@ -1,8 +1,12 @@
 const initialState = () => {
     return {
-      unit_of_measures:[],
       items: [],
-      sections: [],
+      unit_of_measures: [],
+      user_sections: [],
+      item_categories: [],
+      user_divisions: [],
+      user_positions: [],
+      user_area_of_assignments: [],
     }
   }
   
@@ -21,7 +25,27 @@ const initialState = () => {
       case 'SET_LIBRARY_USER_SECTION':
         return {
           ...state,
-          sections: action.data,
+          user_sections: action.data,
+        };
+      case 'SET_LIBRARY_ITEM_CATEGORIES':
+        return {
+          ...state,
+          item_categories: action.data,
+        };
+      case 'SET_LIBRARY_USER_DIVISIONS':
+        return {
+          ...state,
+          user_divisions: action.data,
+        };
+      case 'SET_LIBRARY_USER_POSITIONS':
+        return {
+          ...state,
+          user_positions: action.data,
+        };
+      case 'SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS':
+        return {
+          ...state,
+          user_area_of_assignments: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

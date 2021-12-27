@@ -46,3 +46,11 @@
   cursor: pointer;
   color: #4834d4;
 }
+
+.selected-row{
+  background-color: #f8faec;
+}
+.ant-table-thead > tr >th{
+  color: white;
+  background-image: linear-gradient(to top, #4834d4, #686de0);
+}

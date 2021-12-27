@@ -7,29 +7,47 @@ function mapStateToProps(state) {
     return {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
-        sections: state.library.sections,
+        libraries: state.library.libraries,
     };
 }
 
 const Loadlibraries = (props) => {
     useEffect(() => {
         if(isEmpty(props.unit_of_measures)){
-            getUnitOfMeasures();
-        }
-        if(isEmpty(props.unit_of_measures)){
             getItems();
         }
-        if(isEmpty(props.sections)){
-            getSections();
+        if(isEmpty(props.libraries)){
+            getLibraries();
         }
     }, []);
 
-    const getUnitOfMeasures = () => {
-        api.Library.getLibraries('unit_of_measure')
+    const getLibraries = () => {
+        api.Library.all()
         .then(res => {
+            let libraries = res.data.data;
+            props.dispatch({
+                type: "SET_LIBRARY_USER_SECTION",
+                data: libraries.filter(library => library.type == "user_section")
+            });
             props.dispatch({
                 type: "SET_LIBRARY_UNIT_OF_MEASURES",
-                data: res.data.data
+                data: libraries.filter(library => library.type == "unit_of_measure")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_ITEM_CATEGORIES",
+                data: libraries.filter(library => library.type == "item_category")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_USER_DIVISIONS",
+                data: libraries.filter(library => library.type == "user_division")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_USER_POSITIONS",
+                data: libraries.filter(library => library.type == "user_position")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS",
+                data: libraries.filter(library => library.type == "user_area_of_assignment")
             });
         })
         .catch(err => {})
@@ -55,6 +73,10 @@ const Loadlibraries = (props) => {
         .then(res => {
             props.dispatch({
                 type: "SET_LIBRARY_USER_SECTION",
+                data: res.data.data
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_UNIT_OF_MEASURES",
                 data: res.data.data
             });
         })
