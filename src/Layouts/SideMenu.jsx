@@ -22,7 +22,7 @@ const Sidemenu = () => {
                     <Link to="/"></Link>
                     Home
                 </Menu.Item>
-                <SubMenu key="sub1" icon={<FormOutlined />} title="Navigation One">
+                <SubMenu key="sub1" icon={<FormOutlined />} title="Purchase Requests">
                     <Menu.Item key="/purchase-requests/create">
                         <Link to="/purchase-requests/create"></Link>
                         Create Purchase Requests
@@ -38,9 +38,9 @@ const Sidemenu = () => {
                     <Link to="/libraries"></Link>
                     Libraries
                 </Menu.Item>
-                <Menu.Item key="4" icon={<UserOutlined />}>
+                {/* <Menu.Item key="4" icon={<UserOutlined />}>
                     nav 4
-                </Menu.Item>
+                </Menu.Item> */}
             </Menu>
         </React.Fragment>
     );

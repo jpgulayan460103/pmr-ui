@@ -23,4 +23,7 @@ export default {
   toggleRoleUser(user){
     return axios.post(`api/users/role-status/${user.id}`);
   },
+  approve(id){
+    return axios.post(`api/purchase-requests/${id}/approve`);
+  },
 }

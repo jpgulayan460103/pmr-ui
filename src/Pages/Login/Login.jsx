@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from './../../api/axios.settings';
 import style from './style.css'
+import { useLocation } from 'react-router-dom'
 
 import { Form, Input, Button, Checkbox } from 'antd';
 
 const Login = () => {
+    const location = useLocation();
+    useEffect(() => {
+        if(location.pathname != "/login"){
+            if (sessionStorage.getItem("session") === null) {
+                window.location = "/login"
+            }
+        }
+    }, []);
     const [token, setToken] = useState("");
     const loginTest = () => {
         axios.post("/api/login",{
@@ -14,6 +23,9 @@ const Login = () => {
         .then(res =>{
             sessionStorage.setItem('session',JSON.stringify(res.data));
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            if(location.pathname == "/login"){
+                window.location = "/"
+            }
         });
     }
     const itemsTest = () => {
@@ -36,8 +48,8 @@ const Login = () => {
     return (
         <div style={style} id="container">
             <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button>
-            <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button>
-            <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button>
+            {/* <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button> */}
+            {/* <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button> */}
             { token }
             {/* <div id="login-container">
                 <Form

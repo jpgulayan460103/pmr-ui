@@ -25,9 +25,10 @@ const App = (props) => {
       <LoadLibraries />
       <Routes>
         <Route path="/" element={<Layout></Layout>} />
-        <Route path="/purchase-requests/create" element={<Layout><CreatePurchaseRequest /><Login /></Layout>} />
-        <Route path="/purchase-requests" element={<Layout><ListPurchaseRequest /><Login /></Layout>} />
-        <Route path="/libraries" element={<Layout><ListLibrary /><Login /></Layout>} />
+        <Route path="/purchase-requests/create" element={<Layout><CreatePurchaseRequest /></Layout>} />
+        <Route path="/purchase-requests" element={<Layout><ListPurchaseRequest /></Layout>} />
+        <Route path="/libraries" element={<Layout><ListLibrary /></Layout>} />
+        <Route path="/login" element={<Login />} />
         <Route path="about" element={<Layout>about</Layout>} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>

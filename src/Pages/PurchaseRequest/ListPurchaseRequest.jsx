@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Tag, Space, Button } from 'antd';
+import { Table, Tag, Divider, Button } from 'antd';
 import api from '../../api';
 import { CloseOutlined, HeartTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -39,6 +39,17 @@ const Listpurchaserequest = () => {
         setPurchaseRequestOutput("");
         setSelectedIndex(null);
     }
+    const approvePurchaseRequest = (item, index) => {
+        openPurchaseRequest(item, index)
+        api.PurchaseRequest.approve(item.id)
+        .then(res => {
+            getPurchaseRequest();
+            closePurchaseRequest();
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
 
 
     const dataSource = purchaseRequests
@@ -60,11 +71,18 @@ const Listpurchaserequest = () => {
             key: 'pr_date',
         },
         {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+        },
+        {
             title: 'Actions',
             key: 'actions',
             render: (text, item, index) => (
                 <>
                     <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
+                    <Divider type='vertical' />
+                    <span className='custom-pointer' onClick={() => { approvePurchaseRequest(item, index) }}>Approve</span>
                 </>
             )
         },
@@ -84,7 +102,7 @@ const Listpurchaserequest = () => {
                     <Button type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
                 </div> }
                 {
-                    purchaseRequestOutput == "" ? "" : (<iframe src={`http://pmr-api.test/api/pdf/purchase-requests/${purchaseRequestOutput}`} width="100%" height="100%"></iframe>) 
+                    purchaseRequestOutput == "" ? "" : (<iframe src={`http://pmr-api.test/api/pdf/purchase-requests/${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>) 
                 }
             </div>
         </div>
