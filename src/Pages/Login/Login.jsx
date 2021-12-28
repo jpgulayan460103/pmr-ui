@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import axios from './../../api/axios.settings';
 import style from './style.css'
 import { useLocation } from 'react-router-dom'
+import LoginForm from './LoginForm'
+import RegistrationFormAccount from './RegistrationFormAccount'
+import RegistrationFormActive from './RegistrationFormActive'
+import LoginFormActive from './LoginFormActive'
 
-import { Form, Input, Button, Checkbox } from 'antd';
-
+function mapStateToProps(state) {
+    return {
+        unit_of_measures: state.library.unit_of_measures,
+    };
+}
 const Login = () => {
     const location = useLocation();
     useEffect(() => {
@@ -14,6 +22,18 @@ const Login = () => {
             }
         }
     }, []);
+
+    const [formData, setFormData] = useState({
+        firstname: "",
+        middlename: "",
+        lastname: "",
+    });
+    const getAdInfo = (user_info) => {
+        setFormData(oldArray => ({
+            ...oldArray,
+            ...user_info
+        }));
+    }
     const [token, setToken] = useState("");
     const loginTest = () => {
         axios.post("/api/login",{
@@ -28,68 +48,29 @@ const Login = () => {
             }
         });
     }
-    const itemsTest = () => {
-        axios.get("/api/items");
-    }
-    const docuTest = () => {
-        axios.get('/api/user')
-        .then(response => {
-            console.log(response.data);
-        });
-    }
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-      };
-    
-      const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-      };
+
     return (
         <div style={style} id="container">
-            <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button>
+            {/* <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button> */}
             {/* <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button> */}
             {/* <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button> */}
             { token }
-            {/* <div id="login-container">
-                <Form
-                    name="basic"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    initialValues={{ remember: true }}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                    >
-                    <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
-                    >
-                        <Input.Password />
-                    </Form.Item>
-
-                    <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
-                        <Checkbox>Remember me</Checkbox>
-                    </Form.Item>
-
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                        Submit
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </div> */}
+            <div id="login-container">
+                <div className='row'>
+                    <div className='col-md-6 col-sm-12'>
+                        <LoginFormActive getAdInfo={getAdInfo} />
+                    </div>
+                    <div className='col-md-6 col-sm-12'>
+                        <RegistrationFormActive firstname={formData.firstname} middlename={formData.middlename} lastname={formData.lastname} />
+                    </div>
+                    
+                </div>
+            </div>
         </div>
     );
 }
 
-export default Login;
+export default connect(
+    mapStateToProps,
+  )(Login);

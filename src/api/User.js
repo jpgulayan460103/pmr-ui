@@ -11,6 +11,9 @@ export default {
       return axios.post(`api/users`,formdata);
     }
   },
+  loginAd(formdata){
+    return axios.post(`api/active-directory/login`,formdata);
+  },
   getUsers(){
     return axios.get(`api/users`);
   },

@@ -1,4 +1,4 @@
-/* body{
+body{
     background-image: linear-gradient(to bottom, #30336b, #4834d4, #686de0);
     background-repeat: no-repeat;
     background-position: center;
@@ -10,17 +10,39 @@
     margin: 0;
     position: absolute;
     top: 30%;
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
+    -ms-transform: translateY(-30%);
+    transform: translateY(-30%);
     width: 100%;
+}
+
+
+@media only screen and (max-width: 768px) {
+    #container{
+        width: 100%;
+        height: 100vh;
+    }
+
 }
 
 #login-container{
     background-color: whitesmoke;
     box-shadow: 1px 1px 18px #888888;
     height: auto;
-    width: 50%;
+    width: 60%;
     margin-left: auto;
     margin-right: auto;
     padding: 50px
-} */
+}
+
+#components-form-demo-normal-login .login-form {
+    max-width: 300px;
+}
+#components-form-demo-normal-login .login-form-forgot {
+    float: right;
+}
+#components-form-demo-normal-login .ant-col-rtl .login-form-forgot {
+    float: left;
+}
+#components-form-demo-normal-login .login-form-button {
+    width: 100%;
+}

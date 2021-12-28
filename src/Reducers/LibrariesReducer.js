@@ -2,9 +2,10 @@ const initialState = () => {
     return {
       items: [],
       unit_of_measures: [],
-      user_sections: [],
       item_categories: [],
+      user_sections: [],
       user_divisions: [],
+      divisions_sections_tree: [],
       user_positions: [],
       user_area_of_assignments: [],
     }
@@ -46,6 +47,11 @@ const initialState = () => {
         return {
           ...state,
           user_area_of_assignments: action.data,
+        };
+      case 'SET_LIBRARY_DIVISION_SECTION_TREE':
+        return {
+          ...state,
+          divisions_sections_tree: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

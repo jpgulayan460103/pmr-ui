@@ -25,9 +25,15 @@ const Loadlibraries = (props) => {
         api.Library.all()
         .then(res => {
             let libraries = res.data.data;
+            let user_division = libraries.filter(library => library.type == "user_division");
+            let user_section = libraries.filter(library => library.type == "user_section");
+            props.dispatch({
+                type: "SET_LIBRARY_USER_DIVISIONS",
+                data: user_division
+            });
             props.dispatch({
                 type: "SET_LIBRARY_USER_SECTION",
-                data: libraries.filter(library => library.type == "user_section")
+                data: user_section
             });
             props.dispatch({
                 type: "SET_LIBRARY_UNIT_OF_MEASURES",
@@ -38,10 +44,6 @@ const Loadlibraries = (props) => {
                 data: libraries.filter(library => library.type == "item_category")
             });
             props.dispatch({
-                type: "SET_LIBRARY_USER_DIVISIONS",
-                data: libraries.filter(library => library.type == "user_division")
-            });
-            props.dispatch({
                 type: "SET_LIBRARY_USER_POSITIONS",
                 data: libraries.filter(library => library.type == "user_position")
             });
@@ -49,6 +51,18 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS",
                 data: libraries.filter(library => library.type == "user_area_of_assignment")
             });
+
+            // props.dispatch({
+            //     type: "SET_LIBRARY_DIVISION_SECTION_TREE",
+            //     data: user_division
+            // });
+            
+            // user_division = user_division.map(division => {
+            //     division['child'] = user_section.filter(section => section.parent.name == division.name)
+            //     return division;
+            // });
+            // console.log(user_division);
+            
         })
         .catch(err => {})
         .then(res => {})

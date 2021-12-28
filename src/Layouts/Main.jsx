@@ -43,7 +43,7 @@ const Main = (props) => {
         <Content style={{ margin: '24px 16px 0' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: "83vh" }}>
             { props.children }
-            <Login />
+            {/* <Login /> */}
           </div>
         </Content>
         <Footers/>
