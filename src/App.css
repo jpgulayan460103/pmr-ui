@@ -54,3 +54,11 @@
   color: white;
   background-image: linear-gradient(to top, #4834d4, #686de0);
 }
+
+.site-page-header{
+  position: absolute;
+  top: 0;
+  /* border: 1px solid rgb(235, 237, 240); */
+  padding-left: 0;
+  margin-left: -20px;
+}

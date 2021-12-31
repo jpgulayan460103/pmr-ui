@@ -1,9 +1,11 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, Typography, PageHeader  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 
-const LoginFormActive = ({getAdInfo}) => {
+const { Title } = Typography;
+
+const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
 
     const onFinish = (values) => {
         console.log('Success:', values);
@@ -11,6 +13,7 @@ const LoginFormActive = ({getAdInfo}) => {
         .then(res => {
             console.log(res.data.data);
             getAdInfo(res.data.data);
+            setRegisterStep(1);
         })
         .catch(res => {})
         .then(res => {})

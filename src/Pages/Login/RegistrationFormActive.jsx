@@ -119,9 +119,13 @@ const RegistrationFormActive = (props) => {
                     <Button type="primary" htmlType="submit" className="login-form-button">
                     Register
                     </Button>
+                    &nbsp;&nbsp;&nbsp;
+                    <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
+                    Cancel
+                    </Button>
                 </Form.Item>
             </Form>
-            <span onClick={() => testField() }>aaaaaa</span>
+            {/* <span onClick={() => testField() }>aaaaaa</span> */}
         </div>
     );
 }

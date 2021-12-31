@@ -19,6 +19,7 @@ const Loadlibraries = (props) => {
         if(isEmpty(props.libraries)){
             getLibraries();
         }
+        getUsers();
     }, []);
 
     const getLibraries = () => {
@@ -82,21 +83,8 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getSections = () => {
-        api.Library.getLibraries("user_section")
-        .then(res => {
-            props.dispatch({
-                type: "SET_LIBRARY_USER_SECTION",
-                data: res.data.data
-            });
-            props.dispatch({
-                type: "SET_LIBRARY_UNIT_OF_MEASURES",
-                data: res.data.data
-            });
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
+    const getUsers = () => {
+        api.User.all();
     }
     return (
         <div>

@@ -14,7 +14,10 @@ export default {
   loginAd(formdata){
     return axios.post(`api/active-directory/login`,formdata);
   },
-  getUsers(){
+  registerAd(formdata){
+    return axios.post(`api/register`,formdata);
+  },
+  all(){
     return axios.get(`api/users`);
   },
   logout(){

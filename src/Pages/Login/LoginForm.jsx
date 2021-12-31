@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, Divider, Typography  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import api from '../../api';
+import customAxios from '../../api/axios.settings';
+
+const { Title } = Typography;
 
 function mapStateToProps(state) {
     return {
@@ -18,6 +22,14 @@ const Loginform = (props) => {
 
     const onFinish = (values) => {
         console.log('Success:', values);
+        api.User.login(values)
+        .then(res =>{
+            sessionStorage.setItem('session',JSON.stringify(res.data));
+            customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            // if(location.pathname == "/login"){
+            //     window.location = "/"
+            // }
+        });;
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -25,20 +37,24 @@ const Loginform = (props) => {
     };
     return (
         <div>
+            <Title level={2} className='text-center'>User Login</Title>
             <Form
                 name="normal_login"
                 className="login-form"
                 initialValues={{ remember: true, username: "jpgulayan", password: "admin123" }}
                 onFinish={onFinish}
+                layout='vertical'
             >
                 <Form.Item
                     name="username"
+                    label="Username"
                     rules={[{ required: true, message: 'Please input your Username!' }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>
                 <Form.Item
                     name="password"
+                    label="Password"
                     rules={[{ required: true, message: 'Please input your Password!' }]}
                 >
                     <Input.Password
@@ -48,12 +64,16 @@ const Loginform = (props) => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button">
+                    <Button type="primary" htmlType="submit" className="login-form-button" block>
                     Log in
-                    </Button>
-                    &nbsp;<a className="login-form-forgot" href=""> Forgot password</a>
+                    </Button>                    
+                    &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
                 </Form.Item>
             </Form>
+            <Divider>or</Divider>
+            <Button type="ghost" block onClick={() => { props.setShowRegister(true) }  }>
+                Register using Active Directory Account
+            </Button>
         </div>
     );
 }
