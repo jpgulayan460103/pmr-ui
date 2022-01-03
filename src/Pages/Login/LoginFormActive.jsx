@@ -1,11 +1,22 @@
-import React from 'react';
-import { Form, Input, Button, Typography, PageHeader  } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, Typography, Divider  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 
 const { Title } = Typography;
 
 const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
+
+    const [errorMessage, setErrorMessage] = useState("");
+    
+    const showErrorMessage = () => {
+        if(errorMessage != ""){
+            return {
+                validateStatus: 'error',
+                help: errorMessage
+            }
+        }
+    }
 
     const onFinish = (values) => {
         console.log('Success:', values);
@@ -15,10 +26,13 @@ const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
             getAdInfo(res.data.data);
             setRegisterStep(1);
         })
-        .catch(res => {})
+        .catch(err => {
+            setErrorMessage(err.response.data.message);
+        })
         .then(res => {})
         ;
     };
+
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -36,6 +50,7 @@ const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
                     name="username"
                     label="Username"
                     rules={[{ required: true, message: 'Please input your Username!' }]}
+                    { ...showErrorMessage() }
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>
@@ -51,12 +66,16 @@ const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button">
+                    <Button type="primary" htmlType="submit" className="login-form-button" block>
                     Log in
-                    </Button>
-                    &nbsp;<a className="login-form-forgot" href=""> Forgot password</a>
+                    </Button>                    
+                    &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
                 </Form.Item>
             </Form>
+            <Divider>or</Divider>
+            <Button type="danger" block onClick={() => { setShowRegister(false) }  }>
+                Back to Login Page
+            </Button>
         </div>
     );
 }

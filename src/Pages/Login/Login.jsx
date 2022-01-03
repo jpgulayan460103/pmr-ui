@@ -55,15 +55,6 @@ const Login = () => {
                     <div className='col-md-6 col-sm-12'>
                         { showRegister ? (
                             <>
-
-                            { registerStep == 0 ? ( 
-                                <PageHeader
-                                    className="site-page-header"
-                                    onBack={() => setShowRegister(false)}
-                                    title="Back to Login"
-                                />
-                             ) : "" }
-                            
                             <Title level={2} className='text-center'>Register</Title>
                                 <Steps current={registerStep}>
                                     <Step title="Login your Active Directory Account" />
@@ -71,7 +62,7 @@ const Login = () => {
                                 </Steps>
                                 <br />
                                 { registerStep == 0 ? ( <LoginFormActive getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} /> ) : "" }
-                                { registerStep == 1 ? ( <RegistrationFormActive firstname={formData.firstname} middlename={formData.middlename} lastname={formData.lastname}  setRegisterStep={setRegisterStep}/> ) : "" }
+                                { registerStep == 1 ? ( <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} /> ) : "" }
                             </>
                         ) : (
                             <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} />

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Form, Input, Button, Divider, Typography  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -20,8 +20,19 @@ const Loginform = (props) => {
         console.log(props.unit_of_measures);
     }, []);
 
+    const [errorMessage, setErrorMessage] = useState("");
+    
+    const showErrorMessage = () => {
+        if(errorMessage != ""){
+            return {
+                validateStatus: 'error',
+                help: errorMessage
+            }
+        }
+    }
+
     const onFinish = (values) => {
-        console.log('Success:', values);
+        setErrorMessage("");
         api.User.login(values)
         .then(res =>{
             sessionStorage.setItem('session',JSON.stringify(res.data));
@@ -29,7 +40,11 @@ const Loginform = (props) => {
             // if(location.pathname == "/login"){
             //     window.location = "/"
             // }
-        });;
+        })
+        .catch(err => {
+            setErrorMessage(err.response.data.message);
+        })
+        ;
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -49,6 +64,7 @@ const Loginform = (props) => {
                     name="username"
                     label="Username"
                     rules={[{ required: true, message: 'Please input your Username!' }]}
+                    { ...showErrorMessage() }
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>

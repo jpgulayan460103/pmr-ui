@@ -18,14 +18,18 @@ function mapStateToProps(state) {
 const RegistrationFormActive = (props) => {
     const formRef = React.useRef();
     useEffect(() => {
-        formRef.current.setFieldsValue({firstname: props.firstname, middlename: props.middlename, lastname: props.lastname})
+        formRef.current.setFieldsValue({firstname: props.userInfo.firstname, middlename: props.userInfo.middlename, lastname: props.userInfo.lastname})
     }, [props.firstname]);
     useEffect(() => {
         console.log(props);
     }, []);
     const onFinish = (values) => {
         console.log('Success:', values);
-        api.User.loginAd(values)
+        values.username = props.userInfo.username;
+        values.user_dn = props.userInfo.user_dn;
+        values.password = "ad_account";
+        values.type = "ad_account";
+        api.User.registerAd(values)
         .then(res => {
             console.log(res);
         })
