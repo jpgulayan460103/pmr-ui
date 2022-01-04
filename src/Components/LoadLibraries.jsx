@@ -19,7 +19,6 @@ const Loadlibraries = (props) => {
         if(isEmpty(props.libraries)){
             getLibraries();
         }
-        getUsers();
     }, []);
 
     const getLibraries = () => {
@@ -81,10 +80,6 @@ const Loadlibraries = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
-    }
-
-    const getUsers = () => {
-        api.User.all();
     }
     return (
         <div>

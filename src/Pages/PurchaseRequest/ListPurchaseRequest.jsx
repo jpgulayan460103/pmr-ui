@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Tag, Divider, Button } from 'antd';
+import { Table, Space, Divider, Button } from 'antd';
 import api from '../../api';
 import { CloseOutlined, HeartTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -79,11 +79,11 @@ const Listpurchaserequest = () => {
             title: 'Actions',
             key: 'actions',
             render: (text, item, index) => (
-                <>
+                <Space size={2}>
                     <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
                     <Divider type='vertical' />
                     <span className='custom-pointer' onClick={() => { approvePurchaseRequest(item, index) }}>Approve</span>
-                </>
+                </Space>
             )
         },
     ];

@@ -1,7 +1,7 @@
-import React, {useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Form, Input, Button, Select } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import api from '../../api';
 
 const { Option, OptGroup } = Select;
@@ -18,11 +18,19 @@ function mapStateToProps(state) {
 const RegistrationFormActive = (props) => {
     const formRef = React.useRef();
     useEffect(() => {
-        formRef.current.setFieldsValue({firstname: props.userInfo.firstname, middlename: props.userInfo.middlename, lastname: props.userInfo.lastname})
-    }, [props.firstname]);
-    useEffect(() => {
-        console.log(props);
-    }, []);
+        formRef.current.setFieldsValue({
+            firstname: props.userInfo.firstname,
+            middlename: props.userInfo.middlename,
+            lastname: props.userInfo.lastname,
+            username: props.userInfo.username,
+            cellphone_number: props.userInfo.cellphone_number,
+            email_address: props.userInfo.email_address,
+            section_id: props.userInfo.section_id,
+        })
+    }, [props.userInfo.username]);
+    
+    const [formErrors, setFormErrors] = useState({});
+
     const onFinish = (values) => {
         console.log('Success:', values);
         values.username = props.userInfo.username;
@@ -33,21 +41,29 @@ const RegistrationFormActive = (props) => {
         .then(res => {
             console.log(res);
         })
-        .catch(res => {})
+        .catch(err => {
+            setFormErrors(err.response.data.errors);
+        })
         .then(res => {})
         ;
     };
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
+    const displayError = (field) => {
+        if(formErrors && formErrors[field]){
+            return {
+              validateStatus: 'error',
+              help: formErrors[field][0]
+            }
+          }
+    }
+    
     const testField = () => {
         console.log(props);
-        // formRef.current.setFieldsValue({
-        //     firstname: "firstname", 
-        //     middlename: "middlename", 
-        //     lastname: "lastname"
-        // });
+        formRef.current.setFieldsValue({
+            firstname: "firstname", 
+            middlename: "middlename", 
+            lastname: "lastname"
+        });
     }
     return (
         <div>
@@ -62,8 +78,17 @@ const RegistrationFormActive = (props) => {
                 onFinish={onFinish}
             >
                 <Form.Item
+                    name="username"
+                    label="Username"
+                    { ...displayError(`username`) }
+                    rules={[{ required: true, message: 'Please input your Firstname!' }]}
+                >
+                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" readOnly />
+                </Form.Item>
+                <Form.Item
                     name="firstname"
                     label="Firstname"
+                    { ...displayError(`firstname`) }
                     rules={[{ required: true, message: 'Please input your Firstname!' }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" />
@@ -71,12 +96,14 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="middlename"
                     label="Middle Initial"
+                    { ...displayError(`middlename`) }
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="middlename" />
                 </Form.Item>
                 <Form.Item
                     name="lastname"
                     label="Lastname"
+                    { ...displayError(`lastname`) }
                     rules={[{ required: true, message: 'Please input your Lastname!' }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
@@ -84,6 +111,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="section_id"
                     label="Section/Unit/Office"
+                    { ...displayError(`section_id`) }
                     rules={[{ required: true, message: 'Please select section/unit/office' }]}
                 >
                     <Select
@@ -108,26 +136,40 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="cellphone_number"
                     label="Cellphone Number"
+                    { ...displayError(`cellphone_number`) }
                     rules={[{ required: true, message: 'Please input your Cellphone Number!' }]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
+                    <Input prefix={<PhoneOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
                 </Form.Item>
                 <Form.Item
                     name="email_address"
                     label="Email Address"
+                    { ...displayError(`email_address`) }
                     rules={[{ required: true, message: 'Please input your Email Address!' }]}
                 >
-                    <Input type="email" prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email Address" />
+                    <Input type="email" prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email Address" />
                 </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button">
-                    Register
-                    </Button>
-                    &nbsp;&nbsp;&nbsp;
-                    <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
-                    Cancel
-                    </Button>
-                </Form.Item>
+                { props.type == "create" ? (
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        Register
+                        </Button>
+                        &nbsp;&nbsp;&nbsp;
+                        <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
+                        Cancel
+                        </Button>
+                    </Form.Item>
+                ) : (
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        Update
+                        </Button>
+                        &nbsp;&nbsp;&nbsp;
+                        <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
+                        Cancel
+                        </Button>
+                    </Form.Item>
+                ) }
             </Form>
             {/* <span onClick={() => testField() }>aaaaaa</span> */}
         </div>

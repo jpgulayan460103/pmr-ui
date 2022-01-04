@@ -11,25 +11,20 @@ import LoadLibraries from './Components/LoadLibraries'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
 import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
+import User from './Pages/User/User'
 
 
 const App = (props) => {
-  // return (
-  //   <div>
-  //     {/* <PurchaseRequest /> */}
-  //     <Login />
-  //   </div>
-  // );
   return (
     <div className="App">
       <LoadLibraries />
       <Routes>
-        <Route path="/" element={<Layout></Layout>} />
-        <Route path="/purchase-requests/create" element={<Layout><CreatePurchaseRequest /></Layout>} />
-        <Route path="/purchase-requests" element={<Layout><ListPurchaseRequest /></Layout>} />
-        <Route path="/libraries" element={<Layout><ListLibrary /></Layout>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="about" element={<Layout>about</Layout>} />
+        <Route path="" element={<Layout></Layout>} />
+        <Route path="purchase-requests/create" element={<Layout><CreatePurchaseRequest /></Layout>} />
+        <Route path="purchase-requests" element={<Layout><ListPurchaseRequest /></Layout>} />
+        <Route path="libraries" element={<Layout><ListLibrary /></Layout>} />
+        <Route path="users" element={<Layout><User /></Layout>} />
+        <Route path="login" element={<Login />} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>
     </div>

@@ -4,6 +4,7 @@ import { Form, Input, Button, Divider, Typography  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -15,12 +16,10 @@ function mapStateToProps(state) {
 
 
 const Loginform = (props) => {
-
-    useEffect(() => {
-        console.log(props.unit_of_measures);
-    }, []);
-
+    let location = useLocation();
+    let navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
+    const [submit, setSubmit] = useState(false);
     
     const showErrorMessage = () => {
         if(errorMessage != ""){
@@ -33,15 +32,16 @@ const Loginform = (props) => {
 
     const onFinish = (values) => {
         setErrorMessage("");
+        setSubmit(true);
         api.User.login(values)
         .then(res =>{
+            setSubmit(false);
             sessionStorage.setItem('session',JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
-            // if(location.pathname == "/login"){
-            //     window.location = "/"
-            // }
+            navigate("/");
         })
         .catch(err => {
+            setSubmit(false);
             setErrorMessage(err.response.data.message);
         })
         ;
@@ -80,9 +80,9 @@ const Loginform = (props) => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button" block>
-                    Log in
-                    </Button>                    
+                    <Button type="primary" htmlType="submit" className="login-form-button" block disabled={submit} loading={submit}>
+                        { submit ? "Logging in" : "Log in" }
+                    </Button>                  
                     &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
                 </Form.Item>
             </Form>

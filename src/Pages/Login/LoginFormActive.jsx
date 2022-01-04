@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Typography, Divider  } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, LoadingOutlined } from '@ant-design/icons';
 import api from '../../api';
 
 const { Title } = Typography;
@@ -8,6 +8,7 @@ const { Title } = Typography;
 const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
 
     const [errorMessage, setErrorMessage] = useState("");
+    const [submit, setSubmit] = useState(false);
     
     const showErrorMessage = () => {
         if(errorMessage != ""){
@@ -19,24 +20,21 @@ const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
+        setErrorMessage("");
+        setSubmit(true);
         api.User.loginAd(values)
         .then(res => {
-            console.log(res.data.data);
+            setSubmit(false);
             getAdInfo(res.data.data);
             setRegisterStep(1);
         })
         .catch(err => {
+            setSubmit(false);
             setErrorMessage(err.response.data.message);
         })
-        .then(res => {})
-        ;
+        .then(res => {});
     };
 
-
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
     return (
         <div>
             <Form
@@ -66,14 +64,14 @@ const LoginFormActive = ({getAdInfo, setRegisterStep, setShowRegister}) => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button" block>
-                    Log in
+                    <Button type="primary" htmlType="submit" className="login-form-button" block disabled={submit} loading={submit}>
+                        { submit ? "Logging in" : "Log in" }
                     </Button>                    
                     &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
                 </Form.Item>
             </Form>
             <Divider>or</Divider>
-            <Button type="danger" block onClick={() => { setShowRegister(false) }  }>
+            <Button type="danger" block onClick={() => { setShowRegister(false) }  } >
                 Back to Login Page
             </Button>
         </div>

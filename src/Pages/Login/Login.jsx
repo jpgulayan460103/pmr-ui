@@ -56,13 +56,13 @@ const Login = () => {
                         { showRegister ? (
                             <>
                             <Title level={2} className='text-center'>Register</Title>
-                                <Steps current={registerStep}>
+                                <Steps current={registerStep} direction="vertical" >
                                     <Step title="Login your Active Directory Account" />
-                                    <Step title="Registration" />
+                                    <Step title="Fill Out Registration Form" />
                                 </Steps>
                                 <br />
                                 { registerStep == 0 ? ( <LoginFormActive getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} /> ) : "" }
-                                { registerStep == 1 ? ( <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} /> ) : "" }
+                                { registerStep == 1 ? ( <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} type="create" /> ) : "" }
                             </>
                         ) : (
                             <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} />

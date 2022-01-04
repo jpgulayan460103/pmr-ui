@@ -34,6 +34,10 @@ const Sidemenu = () => {
                     <Menu.Item key="7">Option 7</Menu.Item>
                     <Menu.Item key="8">Option 8</Menu.Item>
                 </SubMenu>
+                <Menu.Item key="/users" icon={<UserOutlined />}>
+                    <Link to="/users"></Link>
+                    Users
+                </Menu.Item>
                 <Menu.Item key="/libraries" icon={<UploadOutlined />}>
                     <Link to="/libraries"></Link>
                     Libraries
