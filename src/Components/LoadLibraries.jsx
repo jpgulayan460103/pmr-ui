@@ -35,8 +35,8 @@ const Loadlibraries = (props) => {
         api.Library.all()
         .then(res => {
             let libraries = res.data.data;
-            let user_division = libraries.filter(library => library.type == "user_division");
-            let user_section = libraries.filter(library => library.type == "user_section");
+            let user_division = libraries.filter(library => library.library_type == "user_division");
+            let user_section = libraries.filter(library => library.library_type == "user_section");
             props.dispatch({
                 type: "SET_LIBRARY_USER_DIVISIONS",
                 data: user_division
@@ -47,19 +47,19 @@ const Loadlibraries = (props) => {
             });
             props.dispatch({
                 type: "SET_LIBRARY_UNIT_OF_MEASURES",
-                data: libraries.filter(library => library.type == "unit_of_measure")
+                data: libraries.filter(library => library.library_type == "unit_of_measure")
             });
             props.dispatch({
                 type: "SET_LIBRARY_ITEM_CATEGORIES",
-                data: libraries.filter(library => library.type == "item_category")
+                data: libraries.filter(library => library.library_type == "item_category")
             });
             props.dispatch({
                 type: "SET_LIBRARY_USER_POSITIONS",
-                data: libraries.filter(library => library.type == "user_position")
+                data: libraries.filter(library => library.library_type == "user_position")
             });
             props.dispatch({
                 type: "SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS",
-                data: libraries.filter(library => library.type == "user_area_of_assignment")
+                data: libraries.filter(library => library.library_type == "user_area_of_assignment")
             });
 
             // props.dispatch({

@@ -56,6 +56,14 @@ const Listpurchaserequest = () => {
       
     const columns = [
         {
+            title: 'End User',
+            dataIndex: '',
+            key: 'end_user',
+            render: (text, item, index) => (
+                <span>{ item.end_user.name }</span>
+            )
+        },
+        {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',

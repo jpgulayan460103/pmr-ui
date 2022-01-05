@@ -11,13 +11,14 @@ function mapStateToProps(state) {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
         user_sections: state.library.user_sections,
+        user_divisions: state.library.user_divisions,
         formData: state.purchaseRequest.formData,
         formErrors: state.purchaseRequest.formErrors,
     };
 }
 
 const { TextArea } = Input;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 
 const CreatePurchaseRequest = (props) => {
     const [tableKey, setTableKey] = useState(0);
@@ -183,20 +184,27 @@ const CreatePurchaseRequest = (props) => {
                         <td colSpan={2}>
                             Office/Section:
                             <Form.Item { ...displayError(`end_user_id`) }>
+
                                 <Select
                                     showSearch
                                     value={props.formData.end_user_id}
-                                    placeholder="Select a Unit"
+                                    placeholder="Section/Unit/Office"
                                     optionFilterProp="children"
                                     onChange={(e) => changeFieldValue(e, 'end_user_id', false)}
                                     style={{ width: "100%" }}
                                     filterOption={(input, option) =>
-                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
                                 >
-                                    { props.user_sections.map((option, index) => (
-                                        <Option value={option.id} key={option.id}>{option.name}</Option>
-                                    )) }
+                                    { props.user_divisions.map(division =>  {
+                                        return (
+                                            <OptGroup label={division.name}  key={division.id}>
+                                                { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
+                                                    return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
+                                                }) }
+                                            </OptGroup>
+                                        );
+                                    }) }
                                 </Select>
                             </Form.Item>
                         </td>

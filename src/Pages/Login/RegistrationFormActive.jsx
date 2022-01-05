@@ -36,7 +36,7 @@ const RegistrationFormActive = (props) => {
         values.username = props.userInfo.username;
         values.user_dn = props.userInfo.user_dn;
         values.password = "ad_account";
-        values.type = "ad_account";
+        values.account_type = "ad_account";
         api.User.registerAd(values)
         .then(res => {
             console.log(res);
