@@ -12,9 +12,24 @@ import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest
 import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import User from './Pages/User/User'
+import Echo from 'laravel-echo';
 
+window.Pusher = require('pusher-js');
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: "12345",
+    cluster: "mt1",
+    forceTLS: false,
+    wsHost: "pmr-api.test",
+    wsPort: 6001,
+});
 
 const App = (props) => {
+  useEffect(async () => {
+    let permission = await Notification.requestPermission();
+    
+  }, []);
   return (
     <div className="App">
       <LoadLibraries />

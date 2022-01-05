@@ -19,6 +19,16 @@ const Loadlibraries = (props) => {
         if(isEmpty(props.libraries)){
             getLibraries();
         }
+
+        window.Echo.channel('home').listen('NewMessage', (e) => {
+            console.log(e);
+            var notification = new Notification(e.message);
+            console.log(notification);
+            props.dispatch({
+                type: "ADD_NOTIFICATION",
+                data: 0
+            });
+          });
     }, []);
 
     const getLibraries = () => {

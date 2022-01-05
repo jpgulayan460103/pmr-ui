@@ -1,17 +1,18 @@
 const initialState = () => {
   return {
     data: {
-        name: "test"
-    }
+      name: "test"
+    },
+    notifications: 0,
   }
 }
 
 export default function hheadReducer(state = initialState(), action) {
   switch (action.type) {
-    case 'HHEAD_FORM_ERROR':
+    case 'ADD_NOTIFICATION':
       return {
         ...state,
-        data: action.data,
+        notifications: state.notifications + 1,
       };
     case 'SET_INITIAL_STATE':
       state = initialState();

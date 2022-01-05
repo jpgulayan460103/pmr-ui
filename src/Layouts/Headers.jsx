@@ -1,9 +1,16 @@
 import React, {useState} from 'react';
+import { connect } from 'react-redux';
 import { Layout, Menu, Dropdown, Badge } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
 
 const { Header } = Layout;
 
+
+function mapStateToProps(state) {
+    return {
+        notifications: state.user.notifications,
+    };
+}
 
 const menu = (
     <Menu>
@@ -29,7 +36,7 @@ const MenuIcon = (props) => {
         </span>
     );
 }
-const Headers = ({ setCw, collapsed }) => {
+const Headers = ({ setCw, collapsed, notifications }) => {
     const [showSide, setShowSide] = useState(false);
     const toggleSide = () => {
         setShowSide(!showSide);
@@ -48,7 +55,7 @@ const Headers = ({ setCw, collapsed }) => {
                 </Dropdown>
                 <Dropdown overlay={menu}  trigger={['click']} placement="bottomRight" >
                         <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}>
-                        <Badge count={0}>
+                        <Badge count={notifications}>
                             <span  style={{color:"white", cursor: "pointer"}}>
                                 <MenuIcon icon={<BellFilled style={{fontSize: 18}} />} label="Menu" />
                             </span>
@@ -60,4 +67,7 @@ const Headers = ({ setCw, collapsed }) => {
     );
 }
 
-export default Headers;
+export default connect(
+    mapStateToProps,
+  )(Headers);
+
