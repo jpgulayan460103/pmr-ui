@@ -14,6 +14,7 @@ function mapStateToProps(state) {
         user_divisions: state.library.user_divisions,
         formData: state.purchaseRequest.formData,
         formErrors: state.purchaseRequest.formErrors,
+        formProccess: state.purchaseRequest.formProccess,
     };
 }
 
@@ -21,6 +22,22 @@ const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
 const CreatePurchaseRequest = (props) => {
+    useEffect(() => {
+        let section = props.user_sections.filter(i => i.id == props.formData.end_user_id);
+        section = section[0];
+        let ord = props.user_sections.filter(i => i.id == props.formData.end_user_id);
+        let process = [
+            {
+                process_description: "For approval",
+                office_id: section?.parent?.id,
+                office_type: section?.parent?.library_type,
+                office_name: section?.parent?.name,
+                signatory_name: "",
+                signatory_position: "",
+            },
+        ];
+        console.log(process);
+    }, [props.formData.end_user_id]);
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
         let formData = cloneDeep(props.formData);
@@ -176,13 +193,13 @@ const CreatePurchaseRequest = (props) => {
             <table id="pr-table" style={style}>
                 <thead>
                     <tr>
-                        <td colSpan={3}>Entity Name: <Input placeholder="Type here..." value="DSWD FO XI" /></td>
-                        <td colSpan={3}>Fund Cluster: <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} /></td>
+                        <td colSpan={3}><b>Entity Name:</b> <Input placeholder="Type here..." value="DSWD FO XI" /></td>
+                        <td colSpan={3}><b>Fund Cluster:</b> <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} /></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            Office/Section:
+                            <b>Office/Section:</b>
                             <Form.Item { ...displayError(`end_user_id`) }>
 
                                 <Select
@@ -208,7 +225,7 @@ const CreatePurchaseRequest = (props) => {
                                 </Select>
                             </Form.Item>
                         </td>
-                        <td colSpan={2}>PR No.:
+                        <td colSpan={2}><b>PR No.:</b>
                             <Form.Item { ...displayError(`purchase_request_number`) }>
                                 <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} />
                             </Form.Item>
@@ -218,12 +235,12 @@ const CreatePurchaseRequest = (props) => {
                     </tr>
                     <tr>
                         <td colSpan={2}></td>
-                        <td colSpan={2}>Responsibility Center Code:
+                        <td colSpan={2}><b>Responsibility Center Code:</b>
                             <Form.Item { ...displayError(`purpose`) }>
                                 <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} />
                             </Form.Item>
                         </td>
-                        <td colSpan={2}>Date:
+                        <td colSpan={2}><b>Date:</b>
                         <Form.Item { ...displayError(`pr_date`) }>
                             <DatePicker style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} />
                         </Form.Item>
@@ -231,12 +248,12 @@ const CreatePurchaseRequest = (props) => {
                         <td></td>
                     </tr>
                     <tr>
-                        <td className='text-center'>Stock/ Property No.</td>
-                        <td className='text-center' style={{ width: 120}}>Unit</td>
-                        <td className='text-center' style={{ width: "40%"}}>Item Description</td>
-                        <td className='text-center'>Quantity</td>
-                        <td className='text-center'>Unit Cost</td>
-                        <td className='text-center'>Total Cost</td>
+                        <td className='text-center'><b>Stock/ Property No.</b></td>
+                        <td className='text-center' style={{ width: 120}}><b>Unit</b></td>
+                        <td className='text-center' style={{ width: "40%"}}><b>Item Description</b></td>
+                        <td className='text-center'><b>Quantity</b></td>
+                        <td className='text-center'><b>Unit Cost</b></td>
+                        <td className='text-center'><b>Total Cost</b></td>
                         <td><Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button></td>
                     </tr>
                 </thead>
@@ -310,16 +327,16 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td></td>
                         <td></td>
-                        <td className='text-center'>Total</td>
+                        <td className='text-center'><b>Total</b></td>
                         <td></td>
                         <td></td>
                         <td className='text-right'> { new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(  total_cost() )}</td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td colSpan={7}>Purpose:
+                        <td colSpan={7}><b>Purpose:</b>
                             <Form.Item { ...displayError(`purpose`) }>
-                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                                <TextArea autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
                             </Form.Item>
                         </td>
                     </tr>
