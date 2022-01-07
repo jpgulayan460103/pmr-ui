@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import './App.less';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,7 +24,19 @@ window.Echo = new Echo({
     wsHost: "pmr-api.test",
     wsPort: 6001,
 });
-
+const auth = {
+  isAuthenticated: false,
+};
+const PrivateRoute  = ({ children, ...props }) => {
+  let location = useLocation();
+  if (sessionStorage.getItem("session") !== null) {
+    auth.isAuthenticated = true;
+  }
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
 const App = (props) => {
   useEffect(async () => {
     let permission = await Notification.requestPermission();
@@ -34,10 +46,10 @@ const App = (props) => {
     <div className="App">
       <Routes>
         <Route path="" element={<Layout></Layout>} />
-        <Route path="purchase-requests/create" element={<Layout><CreatePurchaseRequest /></Layout>} />
-        <Route path="purchase-requests" element={<Layout><ListPurchaseRequest /></Layout>} />
-        <Route path="libraries" element={<Layout><ListLibrary /></Layout>} />
-        <Route path="users" element={<Layout><User /></Layout>} />
+        <Route path="purchase-requests/create" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
+        <Route path="purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
+        <Route path="libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
+        <Route path="users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
         <Route path="login" element={<Login />} />
         <Route path="logout" element={<Login />} />
         <Route path="*" element={<Layout>404</Layout>} />

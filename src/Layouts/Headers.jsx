@@ -56,6 +56,7 @@ const Headers = ({ setCw, collapsed, notifications, dispatch }) => {
             type: "SET_INITIAL_STATE",
             data: {}
         });
+        sessionStorage.removeItem('session');
         navigate("/logout");
     }
     return (
