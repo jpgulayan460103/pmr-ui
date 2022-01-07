@@ -1,10 +1,12 @@
 import User from './User'
 import Library from './Library'
 import PurchaseRequest from './PurchaseRequest'
+import Signatories from './Signatories'
 
 
 export default {
   User,
   Library,
   PurchaseRequest,
+  Signatories,
 }

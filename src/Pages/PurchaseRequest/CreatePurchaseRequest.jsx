@@ -15,6 +15,9 @@ function mapStateToProps(state) {
         formData: state.purchaseRequest.formData,
         formErrors: state.purchaseRequest.formErrors,
         formProccess: state.purchaseRequest.formProccess,
+        signatories: state.library.signatories,
+        requestedBySignatory: state.purchaseRequest.requestedBySignatory,
+        approvedBySignatory: state.purchaseRequest.approvedBySignatory,
     };
 }
 
@@ -22,22 +25,39 @@ const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
 const CreatePurchaseRequest = (props) => {
-    useEffect(() => {
-        let section = props.user_sections.filter(i => i.id == props.formData.end_user_id);
-        section = section[0];
-        let ord = props.user_sections.filter(i => i.id == props.formData.end_user_id);
-        let process = [
-            {
-                process_description: "For approval",
-                office_id: section?.parent?.id,
-                office_type: section?.parent?.library_type,
-                office_name: section?.parent?.name,
-                signatory_name: "",
-                signatory_position: "",
-            },
-        ];
-        console.log(process);
-    }, [props.formData.end_user_id]);
+    // useEffect(() => {
+    //     let ord = props.user_divisions.filter(i => i.title == "ORD");
+    //     ord = ord[0];
+    //     let oarda = props.user_divisions.filter(i => i.title == "OARDA");
+    //     oarda = oarda[0];
+    //     let oardo = props.user_divisions.filter(i => i.title == "OARDO");
+    //     oardo = oardo[0];
+    //     let section = props.user_sections.filter(i => i.id == props.formData.end_user_id);
+    //     section = section[0];
+    //     let division = props.user_divisions.filter(i => i.id == section?.parent?.id);
+    //     division = division[0];
+
+    //     props.dispatch({
+    //         type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORIES",
+    //         data: [
+    //             { title: "Assistant Regional Director for Administration", data: oarda, key: "oarda" },
+    //             { title: "Assistant Regional Director for Operation", data: oardo, key: "oardo" },
+    //             // { title: "Division Chief", data: division, key: "division" },
+    //             // { title: "Unit/Section Head", data: section, key: "section" },
+    //         ]
+    //     });
+    //     props.dispatch({
+    //         type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORIES",
+    //         data: [
+    //             { title: "Regional Director", data: ord, key: "ord" },
+    //             { title: "Assistant Regional Director for Administration", data: oarda, key: "oarda" },
+    //             { title: "Assistant Regional Director for Operation", data: oardo, key: "oardo" },
+    //         ]
+    //     });
+    // }, [props.formData.end_user_id]);
+
+
+
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
         let formData = cloneDeep(props.formData);
@@ -182,6 +202,18 @@ const CreatePurchaseRequest = (props) => {
                 validateStatus: 'error',
                 help: props.formErrors[field][0]
             }
+        }
+    }
+
+
+    const setSignatory = (e, type) => {
+        changeFieldValue(e, type, false)
+        if(type == "requestedBy"){
+            let signatory = props.signatories.filter(i => i.signatory_type == e);
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
+                data: signatory[0]
+            });
         }
     }
     
@@ -340,21 +372,39 @@ const CreatePurchaseRequest = (props) => {
                             </Form.Item>
                         </td>
                     </tr>
-                    {/* <tr>
-                        <td colSpan={2} style={{borderBottom: 0}}><br /><br />Signature:</td>
-                        <td style={{borderBottom: 0}}>Requested By<br /><br />&nbsp;</td>
-                        <td colSpan={3} style={{borderBottom: 0}}><br /><br />&nbsp;</td>
+                    <tr>
+                        <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
+                        <td style={{borderBottom: 0}}>Requested By:
+                            <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e,'requestedBy') }} value={props.formData.requestedBy}>
+                                { props.signatories.filter(i => i.signatory_type == "OARDA" || i.signatory_type == "OARDO").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
+                            </Select>
+                        <br /><br />&nbsp;</td>
+                        <td colSpan={4} style={{borderBottom: 0}}>Approved by:
+                        <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy}>
+                            { props.signatories.filter(i => i.signatory_type == "ORD").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
+                        </Select>
+                        <br /><br />&nbsp;</td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0, borderBottom: 0}}>Printed Name:</td>
-                        <td style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>MERLINDA A. PARAGAMAC</td>
-                        <td colSpan={3} style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>RONALD RYAN R. CUI</td>
+                        <td style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
+                            { props.requestedBySignatory?.user?.user_information.fullname }
+                        </td>
+                        <td colSpan={4} style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
+                            { props.approvedBySignatory?.user?.user_information.fullname }
+                        </td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0}}>Designation:</td>
-                        <td style={{ textAlign: "center", borderTop: 0}}>OIC-ARD for Administration</td>
-                        <td colSpan={3} style={{ textAlign: "center", borderTop: 0}}>OIC - Regional Director</td>
-                    </tr> */}
+                        <td style={{ textAlign: "center", borderTop: 0}}>
+                            {/* { props.formData.requestedBy_designation } */}
+                            { props.requestedBySignatory?.title } { props.requestedBySignatory?.designation }
+                        </td>
+                        <td colSpan={4} style={{ textAlign: "center", borderTop: 0}}>
+                            {/* { props.formData.approvedBy_designation } */}
+                            { props.approvedBySignatory?.title } { props.approvedBySignatory?.designation }
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             </Form>

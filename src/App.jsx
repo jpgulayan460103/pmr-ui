@@ -32,7 +32,6 @@ const App = (props) => {
   }, []);
   return (
     <div className="App">
-      <LoadLibraries />
       <Routes>
         <Route path="" element={<Layout></Layout>} />
         <Route path="purchase-requests/create" element={<Layout><CreatePurchaseRequest /></Layout>} />
@@ -40,6 +39,7 @@ const App = (props) => {
         <Route path="libraries" element={<Layout><ListLibrary /></Layout>} />
         <Route path="users" element={<Layout><User /></Layout>} />
         <Route path="login" element={<Login />} />
+        <Route path="logout" element={<Login />} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>
     </div>

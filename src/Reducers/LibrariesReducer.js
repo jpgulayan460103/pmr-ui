@@ -8,10 +8,11 @@ const initialState = () => {
       divisions_sections_tree: [],
       user_positions: [],
       user_area_of_assignments: [],
+      signatories: [],
     }
   }
   
-  export default function hheadReducer(state = initialState(), action) {
+  export default function reducer(state = initialState(), action) {
     switch (action.type) {
       case 'SET_LIBRARY_UNIT_OF_MEASURES':
         return {
@@ -52,6 +53,11 @@ const initialState = () => {
         return {
           ...state,
           divisions_sections_tree: action.data,
+        };
+      case 'SET_LIBRARY_SIGNATORIES':
+        return {
+          ...state,
+          signatories: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

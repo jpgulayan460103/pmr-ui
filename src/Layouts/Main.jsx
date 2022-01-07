@@ -7,6 +7,7 @@ import Headers from './Headers'
 import SideMenu from './SideMenu'
 import Footers from './Footers';
 import Login from './../Pages/Login/Login'
+import LoadLibraries from './../Components/LoadLibraries'
 
 const { Content, Sider } = Layout;
 
@@ -40,6 +41,7 @@ const Main = (props) => {
         </Sider>
       <Layout>
         <Headers setCw={setCw} collapsed={collapsed} />
+        <LoadLibraries />
         <Content style={{ margin: '24px 16px 0' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: "83vh" }}>
             { props.children }

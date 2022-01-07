@@ -7,7 +7,7 @@ const initialState = () => {
   }
 }
 
-export default function hheadReducer(state = initialState(), action) {
+export default function reducer(state = initialState(), action) {
   switch (action.type) {
     case 'ADD_NOTIFICATION':
       return {

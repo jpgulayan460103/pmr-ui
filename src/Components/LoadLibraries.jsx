@@ -8,6 +8,7 @@ function mapStateToProps(state) {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
         libraries: state.library.libraries,
+        signatories: state.library.signatories,
     };
 }
 
@@ -18,6 +19,9 @@ const Loadlibraries = (props) => {
         }
         if(isEmpty(props.libraries)){
             getLibraries();
+        }
+        if(isEmpty(props.signatories)){
+            getSignatories();
         }
 
         window.Echo.channel('home').listen('NewMessage', (e) => {
@@ -90,6 +94,36 @@ const Loadlibraries = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
+    }
+
+    const getSignatories = () => {
+        api.Signatories.all()
+        .then(res => {
+            let signatory = res.data.data;
+            props.dispatch({
+                type: "SET_LIBRARY_SIGNATORIES",
+                data: signatory
+            });
+            setDefualtPrSignatories(signatory);
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
+    const setDefualtPrSignatories = (signatory) => {
+        let ord = signatory.filter(i => i.signatory_type == "ORD");
+        ord = ord[0];
+        let oarda = signatory.filter(i => i.signatory_type == "OARDA");
+        oarda = oarda[0];
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
+            data: oarda
+        });
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
+            data: ord
+        });
     }
     return (
         <div>
