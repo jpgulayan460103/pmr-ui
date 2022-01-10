@@ -11,6 +11,14 @@ export default {
       return axios.post(`api/purchase-requests`,formdata);
     }
   },
+
+  preview(formdata, formType){
+    if(formType != "create"){
+      return axios.put(`api/purchase-requests/${formdata.id}`,formdata);
+    }else{
+      return axios.post(`api/pdf/preview/purchase-requests`,formdata);
+    }
+  },
   get(){
     return axios.get(`api/purchase-requests`);
   },

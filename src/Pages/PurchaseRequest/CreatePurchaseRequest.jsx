@@ -62,6 +62,7 @@ const CreatePurchaseRequest = (props) => {
     const savePurchaseRequest = debounce(() => {
         let formData = cloneDeep(props.formData);
         formData.total_cost = total_cost();
+        getSignatories();
         api.PurchaseRequest.save(formData,"create")
         .then(res => {
             props.dispatch({
@@ -78,8 +79,42 @@ const CreatePurchaseRequest = (props) => {
         })
         .then(res => {})
         ;
-        console.log(props.formData);
     }, 200);
+
+    const previewPurchaseRequest = debounce(() => {
+        let formData = cloneDeep(props.formData);
+        formData.total_cost = total_cost();
+        getSignatories();
+        api.PurchaseRequest.preview(formData,"create")
+        .then(res => {
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                data: {}
+            });
+            let json = encodeURIComponent(JSON.stringify(formData));
+            window.open(`http://pmr-api.test/api/pdf/preview/purchase-requests?json=${json}`,
+                'newwindow',
+                'width=500,height=600');
+            return false;
+        })
+        .catch(err => {
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                data: err.response.data.errors
+            });
+        })
+        .then(res => {})
+        ;
+    }, 200);
+
+    const getSignatories = () => {
+        let requestedBy = props.signatories.filter(i => i.signatory_type == props.formData.requestedBy);
+        let approvedBy = props.signatories.filter(i => i.signatory_type == props.formData.approvedBy);
+        return {
+            requestedBy,
+            approvedBy,
+        }
+    }
 
     const addItem = () => {
         setTableKey(tableKey + 1);
@@ -90,7 +125,7 @@ const CreatePurchaseRequest = (props) => {
             item_name: null,
             quantity: 1,
             unit_cost: 0,
-            total_cost: 0,
+            total_unit_cost: 0,
             is_ppmp: false,
             item_id: null,
         };
@@ -147,9 +182,11 @@ const CreatePurchaseRequest = (props) => {
         switch (field) {
             case 'unit_cost':
                 value = isNaN(value) ? 1 : parseFloat(value);
+                newValue[index]["total_unit_cost"] = value * newValue[index]["quantity"];
                 break;
             case 'quantity':
                 value =  isNaN(value) ? 1 : parseInt(value);
+                newValue[index]["total_unit_cost"] = newValue[index]["unit_cost"] * value;
                 break;
         
             default:
@@ -410,6 +447,7 @@ const CreatePurchaseRequest = (props) => {
             </Form>
             <div className='text-center'>
                 <br />
+                <Button type="default" onClick={() => previewPurchaseRequest()}><DeleteOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => deleteItem()}><DeleteOutlined />Cancel</Button>
             </div>
