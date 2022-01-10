@@ -3,8 +3,8 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, DatePicker, Form  } from 'antd';
-import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } from 'antd';
+import { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 
 function mapStateToProps(state) {
     return {
@@ -25,50 +25,25 @@ const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
 const CreatePurchaseRequest = (props) => {
-    // useEffect(() => {
-    //     let ord = props.user_divisions.filter(i => i.title == "ORD");
-    //     ord = ord[0];
-    //     let oarda = props.user_divisions.filter(i => i.title == "OARDA");
-    //     oarda = oarda[0];
-    //     let oardo = props.user_divisions.filter(i => i.title == "OARDO");
-    //     oardo = oardo[0];
-    //     let section = props.user_sections.filter(i => i.id == props.formData.end_user_id);
-    //     section = section[0];
-    //     let division = props.user_divisions.filter(i => i.id == section?.parent?.id);
-    //     division = division[0];
-
-    //     props.dispatch({
-    //         type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORIES",
-    //         data: [
-    //             { title: "Assistant Regional Director for Administration", data: oarda, key: "oarda" },
-    //             { title: "Assistant Regional Director for Operation", data: oardo, key: "oardo" },
-    //             // { title: "Division Chief", data: division, key: "division" },
-    //             // { title: "Unit/Section Head", data: section, key: "section" },
-    //         ]
-    //     });
-    //     props.dispatch({
-    //         type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORIES",
-    //         data: [
-    //             { title: "Regional Director", data: ord, key: "ord" },
-    //             { title: "Assistant Regional Director for Administration", data: oarda, key: "oarda" },
-    //             { title: "Assistant Regional Director for Operation", data: oardo, key: "oardo" },
-    //         ]
-    //     });
-    // }, [props.formData.end_user_id]);
-
-
-
+    
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            data: {}
+        });
         let formData = cloneDeep(props.formData);
         formData.total_cost = total_cost();
-        getSignatories();
+        formData.requested_by_id = props.requestedBySignatory.id;
+        formData.approved_by_id = props.approvedBySignatory.id;
         api.PurchaseRequest.save(formData,"create")
         .then(res => {
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
-                data: {}
-            });
+            notification.success({
+                message: 'Purchase Request is successfully saved.',
+                description:
+                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                }
+            );
             window.location = `http://pmr-api.test/api/pdf/purchase-requests/${res.data.purchase_request_uuid}`;
         })
         .catch(err => {
@@ -82,15 +57,16 @@ const CreatePurchaseRequest = (props) => {
     }, 200);
 
     const previewPurchaseRequest = debounce(() => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            data: {}
+        });
         let formData = cloneDeep(props.formData);
         formData.total_cost = total_cost();
-        getSignatories();
+        formData.requested_by_id = props.requestedBySignatory.id;
+        formData.approved_by_id = props.approvedBySignatory.id;
         api.PurchaseRequest.preview(formData,"create")
         .then(res => {
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
-                data: {}
-            });
             let json = encodeURIComponent(JSON.stringify(formData));
             window.open(`http://pmr-api.test/api/pdf/preview/purchase-requests?json=${json}`,
                 'newwindow',
@@ -107,14 +83,6 @@ const CreatePurchaseRequest = (props) => {
         ;
     }, 200);
 
-    const getSignatories = () => {
-        let requestedBy = props.signatories.filter(i => i.signatory_type == props.formData.requestedBy);
-        let approvedBy = props.signatories.filter(i => i.signatory_type == props.formData.approvedBy);
-        return {
-            requestedBy,
-            approvedBy,
-        }
-    }
 
     const addItem = () => {
         setTableKey(tableKey + 1);
@@ -447,7 +415,7 @@ const CreatePurchaseRequest = (props) => {
             </Form>
             <div className='text-center'>
                 <br />
-                <Button type="default" onClick={() => previewPurchaseRequest()}><DeleteOutlined />Preview</Button>
+                <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => deleteItem()}><DeleteOutlined />Cancel</Button>
             </div>
