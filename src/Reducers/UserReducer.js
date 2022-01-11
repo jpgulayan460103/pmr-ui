@@ -4,6 +4,8 @@ const initialState = () => {
       name: "test"
     },
     notifications: 0,
+    collapsed: true,
+    collapsedWidth: 80,
   }
 }
 
@@ -13,7 +15,17 @@ export default function reducer(state = initialState(), action) {
       return {
         ...state,
         notifications: state.notifications + 1,
-      };
+      };    
+    case 'SET_COLLAPSE':
+      return {
+        ...state,
+        collapsed: action.data,
+      };    
+    case 'SET_COLLAPSE_WIDTH':
+      return {
+        ...state,
+        collapsedWidth: action.data,
+      };    
     case 'SET_INITIAL_STATE':
       state = initialState();
       return state

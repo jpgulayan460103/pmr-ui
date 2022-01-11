@@ -45,13 +45,13 @@ const App = (props) => {
   return (
     <div className="App">
       <Routes>
-        <Route path="" element={<Layout></Layout>} />
-        <Route path="purchase-requests/create" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
-        <Route path="purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
-        <Route path="libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
-        <Route path="login" element={<Login />} />
-        <Route path="logout" element={<Login />} />
+        <Route path="/" element={<PrivateRoute><Layout></Layout></PrivateRoute>} />
+        <Route path="/purchase-requests/create" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
+        <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
+        <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
+        <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Login />} />
         <Route path="*" element={<Layout>404</Layout>} />
       </Routes>
     </div>

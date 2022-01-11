@@ -9,6 +9,7 @@ import RegistrationFormActive from './RegistrationFormActive'
 import LoginFormActive from './LoginFormActive'
 import api from '../../api';
 import { Steps, Typography, PageHeader } from 'antd';
+import LoadLibraries from '../../Components/LoadLibraries';
 
 
 const { Title } = Typography;
@@ -47,6 +48,7 @@ const Login = () => {
     }
     return (
         <div style={style} id="container">
+            <LoadLibraries />
             {/* <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button> */}
             {/* <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button> */}
             {/* <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button> */}

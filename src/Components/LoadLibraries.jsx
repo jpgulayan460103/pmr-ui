@@ -8,6 +8,7 @@ function mapStateToProps(state) {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
         libraries: state.library.libraries,
+        isLibrariesLoadedd: state.library.isLibrariesLoadedd,
         signatories: state.library.signatories,
     };
 }
@@ -17,7 +18,7 @@ const Loadlibraries = (props) => {
         if(isEmpty(props.unit_of_measures)){
             getItems();
         }
-        if(isEmpty(props.libraries)){
+        if(!props.isLibrariesLoadedd){
             getLibraries();
         }
         if(isEmpty(props.signatories)){
@@ -42,6 +43,10 @@ const Loadlibraries = (props) => {
             let user_division = libraries.filter(library => library.library_type == "user_division");
             let user_section = libraries.filter(library => library.library_type == "user_section");
             props.dispatch({
+                type: "LOAD_LIBRARIES",
+                data: []
+            });
+            props.dispatch({
                 type: "SET_LIBRARY_USER_DIVISIONS",
                 data: user_division
             });
@@ -65,17 +70,6 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS",
                 data: libraries.filter(library => library.library_type == "user_area_of_assignment")
             });
-
-            // props.dispatch({
-            //     type: "SET_LIBRARY_DIVISION_SECTION_TREE",
-            //     data: user_division
-            // });
-            
-            // user_division = user_division.map(division => {
-            //     division['child'] = user_section.filter(section => section.parent.name == division.name)
-            //     return division;
-            // });
-            // console.log(user_division);
             
         })
         .catch(err => {})

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { connect } from 'react-redux';
 import logo from './../Images/logo.png'
 import logoCropped from './../Images/logo-cropped-1.png'
 import { Layout, Divider, BackTop  } from 'antd';
@@ -11,10 +11,22 @@ import LoadLibraries from './../Components/LoadLibraries'
 
 const { Content, Sider } = Layout;
 
+function mapStateToProps(state) {
+  return {
+      notifications: state.user.notifications,
+      collapsed: state.user.collapsed,
+      collapsedWidth: state.user.collapsedWidth,
+  };
+}
+
 const Main = (props) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const onCollapse = collapsed => {
-    setCollapsed(collapsed);
+  const handleOnCollapse = collapsed => {
+    console.log("collapsed", collapsed);
+    console.log("props", props.collapsed);
+    props.dispatch({
+      type: "SET_COLLAPSE",
+      data: collapsed
+    });
   };
   const [cw, setCw] = useState(80);
     return (
@@ -23,24 +35,24 @@ const Main = (props) => {
         <Sider
           theme="light"
           breakpoint="lg"
-          collapsedWidth={cw}
+          collapsedWidth={props.collapsedWidth}
           collapsible
           onBreakpoint={broken => {
           console.log(broken);
           }}
           onCollapse={(collapsed, type) => {
-          // console.log(collapsed, type);
-          onCollapse(collapsed);
+            handleOnCollapse(collapsed);
           }}
+          collapsed={props.collapsed}
         >
         <div className="logo bg-origin-padding">
-          { !collapsed ? <img src={logo} alt="" className='px-3 pt-2' /> : <img src={logoCropped} alt="" className='px-3 pt-2' /> }
+          { !props.collapsed ? <img src={logo} alt="" className='px-3 pt-2' /> : <img src={logoCropped} alt="" className='px-3 pt-2' /> }
         </div>
         <Divider />
         <SideMenu />
         </Sider>
       <Layout>
-        <Headers setCw={setCw} collapsed={collapsed} />
+        <Headers />
         <LoadLibraries />
         <Content style={{ margin: '24px 16px 0' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: "83vh" }}>
@@ -56,4 +68,6 @@ const Main = (props) => {
     );
 }
 
-export default Main;
+export default connect(
+  mapStateToProps,
+)(Main);

@@ -10,6 +10,7 @@ const { Header } = Layout;
 function mapStateToProps(state) {
     return {
         notifications: state.user.notifications,
+        collapsed: state.user.collapsed,
     };
 }
 
@@ -39,15 +40,23 @@ const MenuIcon = (props) => {
         </span>
     );
 }
-const Headers = ({ setCw, collapsed, notifications, dispatch }) => {
+const Headers = ({ notifications, dispatch, collapsed }) => {
     let navigate = useNavigate();
     const [showSide, setShowSide] = useState(false);
     const toggleSide = () => {
         setShowSide(!showSide);
         if(showSide){
-            setCw(80);
+            // setCw(80);
+            dispatch({
+                type: "SET_COLLAPSE_WIDTH",
+                data: 80
+            });
         }else{
-            setCw(0);
+            // setCw(0);
+            dispatch({
+                type: "SET_COLLAPSE_WIDTH",
+                data: 0
+            });
         }
     }
 
