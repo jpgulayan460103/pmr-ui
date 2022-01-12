@@ -9,7 +9,7 @@ const initialState = () => {
       user_positions: [],
       user_area_of_assignments: [],
       signatories: [],
-      isLibrariesLoadedd: false,
+      isLibrariesLoaded: false,
     }
   }
   
@@ -63,7 +63,7 @@ const initialState = () => {
       case 'LOAD_LIBRARIES':
         return {
           ...state,
-          isLibrariesLoadedd: true,
+          isLibrariesLoaded: true,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

@@ -134,6 +134,14 @@ const RegistrationFormActive = (props) => {
                     </Select>
                 </Form.Item>
                 <Form.Item
+                    name="designation"
+                    label="Designation"
+                    { ...displayError(`designation`) }
+                    rules={[{ required: true, message: 'Please input your Designation!' }]}
+                >
+                    <Input prefix={<PhoneOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
+                </Form.Item>
+                <Form.Item
                     name="cellphone_number"
                     label="Cellphone Number"
                     { ...displayError(`cellphone_number`) }

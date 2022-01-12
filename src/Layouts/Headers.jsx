@@ -11,6 +11,7 @@ function mapStateToProps(state) {
     return {
         notifications: state.user.notifications,
         collapsed: state.user.collapsed,
+        user: state.user.data,
     };
 }
 
@@ -40,7 +41,7 @@ const MenuIcon = (props) => {
         </span>
     );
 }
-const Headers = ({ notifications, dispatch, collapsed }) => {
+const Headers = ({ notifications, dispatch, collapsed, user }) => {
     let navigate = useNavigate();
     const [showSide, setShowSide] = useState(false);
     const toggleSide = () => {
@@ -73,7 +74,7 @@ const Headers = ({ notifications, dispatch, collapsed }) => {
             <Header className="site-layout-sub-header-background" style={{ padding: 0 }}>
                 { collapsed ? <span style={{color: "white", marginLeft: 10, fontSize: 20, cursor: "pointer"}} onClick={() => { toggleSide() }}>{ !showSide ? <MenuFoldOutlined /> : <MenuUnfoldOutlined /> }</span> : "" }
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
-                    <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}> username <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
+                    <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
                         <p className="px-1 float-right mr-4" style={{color:"white", cursor: "pointer"}}>

@@ -1,8 +1,6 @@
 const initialState = () => {
   return {
-    data: {
-      name: "test"
-    },
+    data: {},
     notifications: 0,
     collapsed: true,
     collapsedWidth: 80,
@@ -25,6 +23,11 @@ export default function reducer(state = initialState(), action) {
       return {
         ...state,
         collapsedWidth: action.data,
+      };    
+    case 'SET_USER_DATA':
+      return {
+        ...state,
+        data: action.data,
       };    
     case 'SET_INITIAL_STATE':
       state = initialState();

@@ -21,8 +21,8 @@ function mapStateToProps(state) {
 
 const Main = (props) => {
   const handleOnCollapse = collapsed => {
-    console.log("collapsed", collapsed);
-    console.log("props", props.collapsed);
+    // console.log("collapsed", collapsed);
+    // console.log("props", props.collapsed);
     props.dispatch({
       type: "SET_COLLAPSE",
       data: collapsed
@@ -38,7 +38,7 @@ const Main = (props) => {
           collapsedWidth={props.collapsedWidth}
           collapsible
           onBreakpoint={broken => {
-          console.log(broken);
+          // console.log(broken);
           }}
           onCollapse={(collapsed, type) => {
             handleOnCollapse(collapsed);

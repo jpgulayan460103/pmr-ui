@@ -6,7 +6,7 @@ const UserPermissions = () => {
     const treeData = [
         {
           title: 'Users',
-          key: 'users',
+          key: 'users-all',
           children: [
             {
               title: 'View',
@@ -28,8 +28,12 @@ const UserPermissions = () => {
         },
         {
             title: 'Purchase Requests',
-            key: 'purchase-requests',
+            key: 'purchase-requests-all',
             children: [
+              {
+                title: 'Approve',
+                key: 'purchase-requests-approve',
+              },
               {
                 title: 'View',
                 key: 'purchase-requests-view',
@@ -43,14 +47,14 @@ const UserPermissions = () => {
                 key: 'purchase-requests-update',
               },
               {
-                  title: 'Delete',
-                  key: 'purchase-requests-delete',
-                },
+                title: 'Delete',
+                key: 'purchase-requests-delete',
+              },
             ],
           },
       ];
-      const [expandedKeys, setExpandedKeys] = useState(['0-0-0', '0-0-1']);
-      const [checkedKeys, setCheckedKeys] = useState(['0-0-0']);
+      const [expandedKeys, setExpandedKeys] = useState();
+      const [checkedKeys, setCheckedKeys] = useState();
       const [selectedKeys, setSelectedKeys] = useState([]);
       const [autoExpandParent, setAutoExpandParent] = useState(true);
     

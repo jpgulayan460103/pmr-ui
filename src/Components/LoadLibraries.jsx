@@ -8,22 +8,33 @@ function mapStateToProps(state) {
         unit_of_measures: state.library.unit_of_measures,
         items: state.library.items,
         libraries: state.library.libraries,
-        isLibrariesLoadedd: state.library.isLibrariesLoadedd,
+        isLibrariesLoaded: state.library.isLibrariesLoaded,
         signatories: state.library.signatories,
+        user: state.user.data,
     };
 }
 
 const Loadlibraries = (props) => {
-    useEffect(() => {
+    useEffect(async () => {
         if(isEmpty(props.unit_of_measures)){
-            getItems();
+            await getItems();
         }
-        if(!props.isLibrariesLoadedd){
-            getLibraries();
+        if(!props.isLibrariesLoaded){
+            await getLibraries();
         }
         if(isEmpty(props.signatories)){
-            getSignatories();
+            await getSignatories();
         }
+        if(isEmpty(props.user)){
+            if (sessionStorage.getItem("session") !== null) {
+                await getUser();
+            }
+        }
+        
+        await props.dispatch({
+            type: "LOAD_LIBRARIES",
+            data: []
+        });
 
         window.Echo.channel('home').listen('NewMessage', (e) => {
             console.log(e);
@@ -36,16 +47,12 @@ const Loadlibraries = (props) => {
           });
     }, []);
 
-    const getLibraries = () => {
-        api.Library.all()
+    const getLibraries = async () => {
+        return api.Library.all()
         .then(res => {
             let libraries = res.data.data;
             let user_division = libraries.filter(library => library.library_type == "user_division");
             let user_section = libraries.filter(library => library.library_type == "user_section");
-            props.dispatch({
-                type: "LOAD_LIBRARIES",
-                data: []
-            });
             props.dispatch({
                 type: "SET_LIBRARY_USER_DIVISIONS",
                 data: user_division
@@ -77,8 +84,8 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getItems = () => {
-        api.Library.getLibraries('items')
+    const getItems = async () => {
+        return api.Library.getLibraries('items')
         .then(res => {
             props.dispatch({
                 type: "SET_LIBRARY_ITEMS",
@@ -90,8 +97,8 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getSignatories = () => {
-        api.Signatories.all()
+    const getSignatories = async () => {
+        return api.Signatories.all()
         .then(res => {
             let signatory = res.data.data;
             props.dispatch({
@@ -119,10 +126,20 @@ const Loadlibraries = (props) => {
             data: ord
         });
     }
+
+    const getUser = async () => {
+        return api.User.auth()
+        .then(res => {
+            props.dispatch({
+                type: "SET_USER_DATA",
+                data: res.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+    }
     return (
-        <div>
-            
-        </div>
+        <></>
     );
 }
 

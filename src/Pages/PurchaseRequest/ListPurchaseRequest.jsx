@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button } from 'antd';
+import { Table, Space, Divider, Button, Typography  } from 'antd';
 import api from '../../api';
 import { CloseOutlined, HeartTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 
 function mapStateToProps(state) {
@@ -99,6 +101,7 @@ const Listpurchaserequest = () => {
     return (
         <div className='row' style={{minHeight: "50vh"}}>
             <div className='col-md-8'>
+                <Title level={2} className='text-center'>Purchase Request</Title>
                 <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
                     if(selectedIndex == index){
                         return "selected-row";

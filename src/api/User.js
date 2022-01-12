@@ -20,6 +20,12 @@ export default {
   all(){
     return axios.get(`api/users`);
   },
+  auth(){
+    return axios.get(`api/user`);
+  },
+  get(id){
+    return axios.get(`api/users/${id}`);
+  },
   logout(){
     return axios.post(`api/logout`);
   },

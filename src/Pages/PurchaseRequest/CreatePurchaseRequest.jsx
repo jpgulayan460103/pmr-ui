@@ -12,12 +12,14 @@ function mapStateToProps(state) {
         items: state.library.items,
         user_sections: state.library.user_sections,
         user_divisions: state.library.user_divisions,
+        isLibrariesLoaded: state.library.isLibrariesLoaded,
         formData: state.purchaseRequest.formData,
         formErrors: state.purchaseRequest.formErrors,
         formProccess: state.purchaseRequest.formProccess,
         signatories: state.library.signatories,
         requestedBySignatory: state.purchaseRequest.requestedBySignatory,
         approvedBySignatory: state.purchaseRequest.approvedBySignatory,
+        user: state.user.data,
     };
 }
 
@@ -25,6 +27,12 @@ const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
 const CreatePurchaseRequest = (props) => {
+
+    useEffect(() => {
+        if(props.isLibrariesLoaded){
+            changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+        }
+    }, [props.isLibrariesLoaded]);
     
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
@@ -44,7 +52,7 @@ const CreatePurchaseRequest = (props) => {
                     'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
                 }
             );
-            window.location = `http://pmr-api.test/api/pdf/purchase-requests/${res.data.purchase_request_uuid}`;
+            // window.location = `http://pmr-api.test/api/pdf/purchase-requests/${res.data.purchase_request_uuid}`;
         })
         .catch(err => {
             props.dispatch({
