@@ -1,3 +1,5 @@
+import customDayJs from "./../customDayJs";
+
 const initialState = () => {
     return {
       formData: {
@@ -7,6 +9,7 @@ const initialState = () => {
         fund_cluster: "",
         purchase_request_number: "",
         center_code: "",
+        pr_date: customDayJs().format('YYYY-MM-DD')
       },
       formErrors: {},
       formProccess: [],

@@ -5,6 +5,7 @@ import api from './../../api';
 import { connect } from 'react-redux';
 import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } from 'antd';
 import { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs'
 
 function mapStateToProps(state) {
     return {
@@ -281,13 +282,13 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2}></td>
                         <td colSpan={2}><b>Responsibility Center Code:</b>
-                            <Form.Item { ...displayError(`purpose`) }>
+                            <Form.Item { ...displayError(`center_code`) }>
                                 <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} />
                             </Form.Item>
                         </td>
                         <td colSpan={2}><b>Date:</b>
                         <Form.Item { ...displayError(`pr_date`) }>
-                            <DatePicker style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} />
+                            <DatePicker defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} />
                         </Form.Item>
                         </td>
                         <td></td>

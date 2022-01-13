@@ -25,7 +25,7 @@ const RegistrationFormActive = (props) => {
             username: props.userInfo.username,
             cellphone_number: props.userInfo.cellphone_number,
             email_address: props.userInfo.email_address,
-            section_id: props.userInfo.section_id,
+            office_id: props.userInfo.office_id,
         })
     }, [props.userInfo.username]);
     
@@ -109,9 +109,9 @@ const RegistrationFormActive = (props) => {
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
                 </Form.Item>
                 <Form.Item
-                    name="section_id"
+                    name="office_id"
                     label="Section/Unit/Office"
-                    { ...displayError(`section_id`) }
+                    { ...displayError(`office_id`) }
                     rules={[{ required: true, message: 'Please select section/unit/office' }]}
                 >
                     <Select
