@@ -81,18 +81,11 @@ const Listpurchaserequest = () => {
             key: 'pr_date',
         },
         {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-        },
-        {
             title: 'Actions',
             key: 'actions',
             render: (text, item, index) => (
                 <Space size={2}>
                     <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
-                    <Divider type='vertical' />
-                    <span className='custom-pointer' onClick={() => { approvePurchaseRequest(item, index) }}>Approve</span>
                 </Space>
             )
         },

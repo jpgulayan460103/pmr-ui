@@ -3,16 +3,15 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import './App.less';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import bootstrap from 'bootstrap'
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
 import Login from './Pages/Login/Login'
-import LoadLibraries from './Components/LoadLibraries'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
 import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import User from './Pages/User/User'
 import Echo from 'laravel-echo';
+import ListForApproval from './Pages/Forms/ListForApproval';
 
 window.Pusher = require('pusher-js');
 
@@ -45,7 +44,7 @@ const App = (props) => {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<PrivateRoute><Layout></Layout></PrivateRoute>} />
+        <Route path="/" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests/create" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
