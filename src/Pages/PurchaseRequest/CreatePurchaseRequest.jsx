@@ -53,7 +53,6 @@ const CreatePurchaseRequest = (props) => {
                     'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
                 }
             );
-            // window.location = `http://pmr-api.test/api/pdf/purchase-requests/${res.data.purchase_request_uuid}`;
         })
         .catch(err => {
             props.dispatch({
@@ -77,9 +76,9 @@ const CreatePurchaseRequest = (props) => {
         api.PurchaseRequest.preview(formData,"create")
         .then(res => {
             let json = encodeURIComponent(JSON.stringify(formData));
-            window.open(`http://pmr-api.test/api/pdf/preview/purchase-requests?json=${json}`,
+            window.open(`${res.data.url}?json=${json}`,
                 'newwindow',
-                'width=500,height=600');
+                'width=960,height=1080');
             return false;
         })
         .catch(err => {

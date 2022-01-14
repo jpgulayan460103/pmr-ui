@@ -34,7 +34,7 @@ const Listpurchaserequest = () => {
 
 
     const openPurchaseRequest = (item, index) => {
-        setPurchaseRequestOutput(item.purchase_request_uuid);
+        setPurchaseRequestOutput(item.file);
         setSelectedIndex(index)
     }
     const closePurchaseRequest = () => {
@@ -106,7 +106,7 @@ const Listpurchaserequest = () => {
                     <Button type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
                 </div> }
                 {
-                    purchaseRequestOutput == "" ? "" : (<iframe src={`http://pmr-api.test/api/pdf/purchase-requests/${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>) 
+                    purchaseRequestOutput == "" ? "" : (<iframe src={`${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>) 
                 }
             </div>
         </div>

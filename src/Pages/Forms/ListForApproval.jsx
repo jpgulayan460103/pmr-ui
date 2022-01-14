@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography  } from 'antd';
+import { Table, Space, Divider, Button, Typography, Popconfirm } from 'antd';
 import api from '../../api';
-import { CloseOutlined, HeartTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { CloseOutlined, SelectOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -31,32 +31,74 @@ const ListForApproval = () => {
         .then(res => {})
         ;
     }
+    
+    const openInFull = () => {
+        window.open(`${formOutput}?view=1`,
+                'newwindow',
+                'width=960,height=1080');
+            return false;
+    }
 
-
-    const openForm = (item, index) => {
-        setFormOutput(item.purchase_request_uuid);
+    const viewForm = (item, index) => {
+        setFormOutput(item.form_routable.file);
+        setSelectedIndex(index)
+    }
+    const respondForm = (item, index) => {
+        // setFormOutput(item.form_routable.file);
         setSelectedIndex(index)
     }
     const closeForm = () => {
         setFormOutput("");
         setSelectedIndex(null);
     }
-    const approveForm = (item, index) => {
-        openForm(item, index)
-        api.Form.approve(item.id)
-        .then(res => {
-            getForm();
-            closeForm();
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
 
+    const confirm = () => {
+        return new Promise(resolve => {
+            setTimeout(() => resolve(), 3000);
+        });
+    }
 
     const dataSource = forms
       
-    const columns = [];
+    const columns = [
+        {
+            title: 'Form Type',
+            dataIndex: 'route_type',
+            key: 'route_type',
+        },
+        {
+            title: 'Particulars',
+            key: 'particulars',
+            render: (text, item, index) => (
+                <span>
+                    { item.form_routable.particulars }
+                </span>
+            )
+        },
+        {
+            title: 'End User',
+            key: 'end_user',
+            render: (text, item, index) => (
+                <span style={{ whiteSpace: "pre-line"}}>
+                    { item.end_user.name }
+                </span>
+            )
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (text, item, index) => (
+                <Space size={2}>
+                    <span className='custom-pointer' onClick={() => { viewForm(item, index) }}>View</span>
+                    <Divider type="vertical" />
+                    <Popconfirm icon="" title="" okText="Approve" cancelText="Reject" onConfirm={confirm}>
+                        {/* <a href="#">Delete</a> */}
+                        <span className='custom-pointer' onClick={() => { respondForm(item, index) }}>Respond</span>
+                    </Popconfirm>
+                </Space>
+            )
+        },
+    ];
     
     return (
         <div className='row' style={{minHeight: "50vh"}}>
@@ -69,11 +111,18 @@ const ListForApproval = () => {
                 }} />
             </div>
             <div className='col-md-4'>
-                { formOutput == "" ? "" : <div className='text-right'>
-                    <Button type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
-                </div> }
+                { formOutput == "" ? "" : 
+                    (
+                        <div>
+                            <div className='text-right'>
+                                <Button size='large' type='primary' onClick={() => openInFull() }><SelectOutlined /></Button>
+                                <Button size='large' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
+                            </div>
+                        </div>
+                    )
+                }
                 {
-                    formOutput == "" ? "" : (<iframe src={`http://pmr-api.test/api/pdf/purchase-requests/${formOutput}?view=1`} width="100%" height="100%"></iframe>) 
+                    formOutput == "" ? "" : (<iframe src={`${formOutput}?view=1`} width="100%" height="100%"></iframe>) 
                 }
             </div>
         </div>
