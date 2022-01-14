@@ -4,4 +4,7 @@ export default {
   getForApproval(){
     return axios.get(`api/form/routes/requests/pending`);
   },
+  approve(id){
+    return axios.post(`api/form/routes/requests/pending/${id}/approve`);
+  }
 }

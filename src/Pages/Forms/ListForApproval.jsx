@@ -52,10 +52,8 @@ const ListForApproval = () => {
         setSelectedIndex(null);
     }
 
-    const confirm = () => {
-        return new Promise(resolve => {
-            setTimeout(() => resolve(), 3000);
-        });
+    const confirm = (item) => {
+        return api.Forms.approve(item.id);
     }
 
     const dataSource = forms
@@ -91,7 +89,7 @@ const ListForApproval = () => {
                 <Space size={2}>
                     <span className='custom-pointer' onClick={() => { viewForm(item, index) }}>View</span>
                     <Divider type="vertical" />
-                    <Popconfirm icon="" title="" okText="Approve" cancelText="Reject" onConfirm={confirm}>
+                    <Popconfirm icon="" title="" okText="Approve" cancelText="Reject" onConfirm={() => confirm(item) }>
                         {/* <a href="#">Delete</a> */}
                         <span className='custom-pointer' onClick={() => { respondForm(item, index) }}>Respond</span>
                     </Popconfirm>
