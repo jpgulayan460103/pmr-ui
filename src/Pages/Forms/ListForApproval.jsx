@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Popconfirm } from 'antd';
+import { Table, Space, Divider, Button, Typography, Popconfirm, notification } from 'antd';
 import api from '../../api';
 import { CloseOutlined, SelectOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -53,7 +53,19 @@ const ListForApproval = () => {
     }
 
     const confirm = (item) => {
-        return api.Forms.approve(item.id);
+        api.Forms.approve(item.id)
+        .then(res => {
+            notification.success({
+                message: 'Purchase Request is approved.',
+                description:
+                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                }
+            );
+            getForm();
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
 
     const dataSource = forms
