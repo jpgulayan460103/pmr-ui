@@ -6,5 +6,8 @@ export default {
   },
   approve(id){
     return axios.post(`api/form/routes/requests/pending/${id}/approve`);
+  },
+  reject(id){
+    return axios.post(`api/form/routes/requests/pending/${id}/reject`);
   }
 }

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Popconfirm, notification } from 'antd';
+import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select } from 'antd';
 import api from '../../api';
-import { CloseOutlined, SelectOutlined, CheckCircleTwoTone } from '@ant-design/icons';
+import { CloseOutlined, SelectOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
+const { TextArea } = Input;
+const { Option } = Select;
 
 
 function mapStateToProps(state) {
@@ -14,12 +16,48 @@ function mapStateToProps(state) {
 }
 
 const ListForApproval = () => {
+    const formRef = React.useRef();
     useEffect(() => {
         getForm();
     }, []);
     const [forms, setForms] = useState([]);
     const [formOutput, setFormOutput] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [modalRejectForm, setModalRejectForm] = useState(false);
+    const [routeOptions, setRouteOptions] = useState([]);
+    const [formRoute, setFormRoute] = useState({});
+
+    const showRejectForm = (formRouteItem) => {
+        setFormRoute(formRouteItem)
+        setModalRejectForm(true);
+        let options = formRouteItem.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
+        setRouteOptions(options);
+        setTimeout(() => {
+            formRef.current.setFieldsValue({
+                to_office_id: formRouteItem.origin_office_id,
+            });
+        }, 150);
+        return false;
+       
+    }
+
+    const submitRejectForm = (val) => {
+        let formData = {
+            ...val,
+            from_office_id: formRoute.to_office_id,
+            route_type: formRoute.route_type,
+            rejected_route_id: formRoute.id,
+            origin_office_id: formRoute.origin_office_id,
+            form_routable_id: formRoute.form_routable_id,
+            form_routable_type: formRoute.form_routable_type,
+            form_process_id: formRoute.form_process_id,
+        };
+        console.log(formData);
+        // setModalRejectForm(false);
+    };
+    const cancelRejectForm = () => {
+        setModalRejectForm(false);
+    };
 
     const getForm = () => {
         api.Forms.getForApproval()
@@ -101,7 +139,7 @@ const ListForApproval = () => {
                 <Space size={2}>
                     <span className='custom-pointer' onClick={() => { viewForm(item, index) }}>View</span>
                     <Divider type="vertical" />
-                    <Popconfirm icon="" title="" okText="Approve" cancelText="Reject" onConfirm={() => confirm(item) }>
+                    <Popconfirm icon="" title="" okText="Approve" cancelText="Reject" onConfirm={() => confirm(item) } onCancel={() => { showRejectForm(item, index) }}>
                         {/* <a href="#">Delete</a> */}
                         <span className='custom-pointer' onClick={() => { respondForm(item, index) }}>Respond</span>
                     </Popconfirm>
@@ -112,6 +150,43 @@ const ListForApproval = () => {
     
     return (
         <div className='row' style={{minHeight: "50vh"}}>
+            <Modal title="Reject Form" visible={modalRejectForm} onOk={(e) => submitRejectForm(e)} onCancel={cancelRejectForm} 
+            footer={[
+                <Button form="rejectForm" key="submit" htmlType="submit">
+                    Submit
+                </Button>,
+                <Button form="rejectForm" key="cancel" htmlType="submit">
+                    Cancel
+                </Button>
+                ]}>
+            <Form
+                ref={formRef}
+                name="normal_login"
+                className="login-form"
+                initialValues={{ remember: true, username: "jpgulayan", password: "admin123" }}
+                onFinish={(e) => submitRejectForm(e)}
+                layout='vertical'
+                id="rejectForm"
+            >
+                <Form.Item
+                    name="remarks"
+                    label="Remarks"
+                    rules={[{ required: true, message: 'Please add remarks' }]}
+                >
+                    <TextArea rows={4} />
+                </Form.Item>
+                <Form.Item
+                    name="to_office_id"
+                    label="Return to"
+                    rules={[{ required: true, message: 'Please select office.' }]}
+                >
+                    <Select>
+                        { routeOptions.map((item, index) => <Option value={item.office_id} key={index}>{item.office_name}</Option> ) }
+                    </Select>
+                </Form.Item>
+
+            </Form>
+            </Modal>
             <div className='col-md-8'>
                 <Title level={2} className='text-center'>Approval of Forms</Title>
                 <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
