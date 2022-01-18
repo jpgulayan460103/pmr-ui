@@ -53,6 +53,7 @@ const ListForApproval = () => {
             form_process_id: formRoute.form_process_id,
         };
         console.log(formData);
+        api.Forms.reject(formRoute.id, formData);
         // setModalRejectForm(false);
     };
     const cancelRejectForm = () => {
@@ -111,8 +112,8 @@ const ListForApproval = () => {
     const columns = [
         {
             title: 'Form Type',
-            dataIndex: 'route_type',
-            key: 'route_type',
+            dataIndex: 'route_type_str',
+            key: 'route_type_str',
         },
         {
             title: 'Particulars',

@@ -168,7 +168,7 @@ const Listpurchaserequest = () => {
                                     color = "gray";
                                     label = `For approval of the ${timeline.to_office?.name}`;
                                 }
-                                return <Timeline.Item color={color} label={timeline.created_at} key={index}>{label}</Timeline.Item>
+                                return <Timeline.Item color={color} label={timeline.updated_at} key={index}>{label}</Timeline.Item>
                             }) }
                         </Timeline>
                     </TabPane>
