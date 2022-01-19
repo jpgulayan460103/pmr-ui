@@ -9,5 +9,8 @@ export default {
   },
   reject(id, formData){
     return axios.post(`api/form/routes/requests/pending/${id}/reject`, formData);
+  },
+  resolve(id, formData){
+    return axios.post(`api/form/routes/requests/pending/${id}/approve`, formData);
   }
 }

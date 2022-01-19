@@ -160,13 +160,19 @@ const Listpurchaserequest = () => {
                                 let label;
                                 if(timeline.status == "approved"){
                                     color = "green";
-                                    label = `${timeline.status_str} by the ${timeline.to_office?.name}`;
+                                    label = `${timeline.status_str} by the [${timeline.to_office?.name}]`;
                                 }else if(timeline.status == "rejected"){
                                     color = "red";
-                                    label = `${timeline.status_str} by the ${timeline.to_office?.name}`;
+                                    label = `Disapproved by the [${timeline.to_office?.name}] remarks: ${timeline.remarks}`;
+                                }else if(timeline.status == "with_issues"){
+                                    color = "gray";
+                                    label = `Returned from the [${timeline.from_office?.name}] to the [${timeline.to_office?.name}]`;
+                                }else if(timeline.status == "resolved"){
+                                    color = "green";
+                                    label = `Resolved issues and returned to the [${timeline.from_office?.name}]  remarks: ${timeline.remarks}`;
                                 }else{
                                     color = "gray";
-                                    label = `For approval of the ${timeline.to_office?.name}`;
+                                    label = `For approval of the [${timeline.to_office?.name}]`;
                                 }
                                 return <Timeline.Item color={color} label={timeline.updated_at} key={index}>{label}</Timeline.Item>
                             }) }
