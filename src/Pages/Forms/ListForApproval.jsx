@@ -20,6 +20,10 @@ const ListForApproval = () => {
     const resolveFormRef = React.useRef();
     useEffect(() => {
         getForm();
+
+        window.Echo.channel('home').listen('NewMessage', (e) => {
+            getForm();
+          });
     }, []);
     const [forms, setForms] = useState([]);
     const [formOutput, setFormOutput] = useState("");
@@ -169,7 +173,7 @@ const ListForApproval = () => {
             key: 'particulars',
             render: (text, item, index) => (
                 <span>
-                    { item.form_routable.particulars }
+                    { item.form_routable?.particulars }
                 </span>
             )
         },
