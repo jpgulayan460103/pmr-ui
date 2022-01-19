@@ -36,9 +36,14 @@ const Loginform = (props) => {
         api.User.login(values)
         .then(res =>{
             setSubmit(false);
-            sessionStorage.setItem('session',JSON.stringify(res.data));
-            customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
-            navigate("/");
+            if(res.data.error_code == "no_user"){
+                props.getAdInfo(res.data.data);
+                props.setShowRegister(true);
+            }else{
+                sessionStorage.setItem('session',JSON.stringify(res.data));
+                customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+                navigate("/");
+            }
         })
         .catch(err => {
             setSubmit(false);

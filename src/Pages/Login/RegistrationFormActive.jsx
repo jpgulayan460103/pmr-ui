@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Form, Input, Button, Select } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { useLocation, useNavigate } from "react-router-dom";
 import api from '../../api';
+import customAxios from '../../api/axios.settings';
 
 const { Option, OptGroup } = Select;
 
@@ -17,6 +19,7 @@ function mapStateToProps(state) {
 
 const RegistrationFormActive = (props) => {
     const formRef = React.useRef();
+    let navigate = useNavigate();
     useEffect(() => {
         formRef.current.setFieldsValue({
             firstname: props.userInfo.firstname,
@@ -39,7 +42,9 @@ const RegistrationFormActive = (props) => {
         values.account_type = "ad_account";
         api.User.registerAd(values)
         .then(res => {
-            console.log(res);
+            sessionStorage.setItem('session',JSON.stringify(res.data));
+            customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            navigate("/");
         })
         .catch(err => {
             setFormErrors(err.response.data.errors);

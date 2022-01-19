@@ -23,11 +23,7 @@ function mapStateToProps(state) {
 const Login = () => {
     const location = useLocation();
     useEffect(() => {
-        if(location.pathname != "/login"){
-            if (sessionStorage.getItem("session") === null) {
-                window.location = "/login"
-            }
-        }
+        
     }, []);
 
     const [formData, setFormData] = useState({
@@ -57,17 +53,11 @@ const Login = () => {
                     <div className='col-md-6 col-sm-12'>
                         { showRegister ? (
                             <>
-                            <Title level={2} className='text-center'>Register</Title>
-                                <Steps current={registerStep} direction="vertical" >
-                                    <Step title="Login your Active Directory Account" />
-                                    <Step title="Fill Out Registration Form" />
-                                </Steps>
-                                <br />
-                                { registerStep == 0 ? ( <LoginFormActive getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} /> ) : "" }
-                                { registerStep == 1 ? ( <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} type="create" /> ) : "" }
+                                <Title level={2} className='text-center'>User Registration</Title>
+                                <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} type="create" />
                             </>
                         ) : (
-                            <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} />
+                            <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
                         ) }
                     </div>
                     <div className='col-md-6 col-sm-12'>
