@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import { Menu } from 'antd';
 import {
     UserOutlined,
@@ -9,7 +10,13 @@ import { useLocation, Link  } from 'react-router-dom'
 
 const { SubMenu } = Menu;
 
-const Sidemenu = () => {
+function mapStateToProps(state) {
+    return {
+        purchaseRequestFormType: state.purchaseRequest.formType,
+    };
+}
+
+const Sidemenu = (props) => {
     const location = useLocation();
     const [defaultKey, setDefaultKey] = useState('/');
     useEffect(() => {
@@ -23,9 +30,9 @@ const Sidemenu = () => {
                     Home
                 </Menu.Item>
                 <SubMenu key="sub1" icon={<FormOutlined />} title="Purchase Requests">
-                    <Menu.Item key="/purchase-requests/create">
-                        <Link to="/purchase-requests/create"></Link>
-                        Create Purchase Requests
+                    <Menu.Item key="/purchase-requests/form">
+                        <Link to="/purchase-requests/form"></Link>
+                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Requests
                     </Menu.Item>
                     <Menu.Item key="/purchase-requests">
                         <Link to="/purchase-requests"></Link>
@@ -50,4 +57,6 @@ const Sidemenu = () => {
     );
 }
 
-export default Sidemenu;
+export default connect(
+    mapStateToProps,
+  )(Sidemenu);

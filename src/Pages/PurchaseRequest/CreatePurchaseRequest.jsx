@@ -15,6 +15,7 @@ function mapStateToProps(state) {
         user_divisions: state.library.user_divisions,
         isLibrariesLoaded: state.library.isLibrariesLoaded,
         formData: state.purchaseRequest.formData,
+        formType: state.purchaseRequest.formType,
         formErrors: state.purchaseRequest.formErrors,
         formProccess: state.purchaseRequest.formProccess,
         signatories: state.library.signatories,
@@ -31,9 +32,20 @@ const CreatePurchaseRequest = (props) => {
 
     useEffect(() => {
         if(props.isLibrariesLoaded){
-            changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+            if(props.formData.end_user_id){
+            }else{
+                changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+            }
         }
     }, [props.isLibrariesLoaded]);
+    useEffect(() => {
+        return function cleanup() {
+            props.dispatch({
+                type: "RESET_PURCHASE_REQUEST_FORM_DATA",
+                data: {}
+            });
+          };
+    }, []);
     
     const [tableKey, setTableKey] = useState(0);
     const savePurchaseRequest = debounce(() => {
@@ -45,7 +57,7 @@ const CreatePurchaseRequest = (props) => {
         formData.total_cost = total_cost();
         formData.requested_by_id = props.requestedBySignatory.id;
         formData.approved_by_id = props.approvedBySignatory.id;
-        api.PurchaseRequest.save(formData,"create")
+        api.PurchaseRequest.save(formData,props.formType)
         .then(res => {
             notification.success({
                 message: 'Purchase Request is successfully saved.',
@@ -53,6 +65,8 @@ const CreatePurchaseRequest = (props) => {
                     'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
                 }
             );
+
+            clearForm();
         })
         .catch(err => {
             props.dispatch({
@@ -63,6 +77,17 @@ const CreatePurchaseRequest = (props) => {
         .then(res => {})
         ;
     }, 200);
+
+    const clearForm = () => {
+        props.dispatch({
+            type: "RESET_PURCHASE_REQUEST_FORM_DATA",
+            data: {}
+        });
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_TYPE",
+            data: "create"
+        });
+    }
 
     const previewPurchaseRequest = debounce(() => {
         props.dispatch({
@@ -345,6 +370,7 @@ const CreatePurchaseRequest = (props) => {
                                             onChange={(e) => {
                                                 changeTableFieldValue(e, {}, 'item_name', index);
                                             }}
+                                            value={item.item_name}
                                             disabled={ item.is_ppmp }
                                         >
                                             <TextArea autoSize />
@@ -425,7 +451,7 @@ const CreatePurchaseRequest = (props) => {
                 <br />
                 <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()}><SaveOutlined /> Save</Button>
-                <Button type="danger" onClick={() => deleteItem()}><DeleteOutlined />Cancel</Button>
+                <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />Cancel</Button>
             </div>
         </div>
     );

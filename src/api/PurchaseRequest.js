@@ -19,8 +19,11 @@ export default {
       return axios.post(`api/pdf/preview/purchase-requests`,formdata);
     }
   },
-  get(){
+  all(){
     return axios.get(`api/purchase-requests`);
+  },
+  get(id){
+    return axios.get(`api/purchase-requests/${id}`);
   },
   logout(){
     return axios.post(`api/logout`);

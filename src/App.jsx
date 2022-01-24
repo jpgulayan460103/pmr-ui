@@ -45,7 +45,7 @@ const App = (props) => {
     <div className="App">
       <Routes>
         <Route path="/" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
-        <Route path="/purchase-requests/create" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
+        <Route path="/purchase-requests/form" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />

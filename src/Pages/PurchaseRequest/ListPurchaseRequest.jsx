@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Table, Space, Divider, Button, Typography, Timeline, Tabs   } from 'antd';
 import api from '../../api';
 import { CloseOutlined, HeartTwoTone, SelectOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom'
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -14,17 +15,18 @@ function mapStateToProps(state) {
     };
 }
 
-const Listpurchaserequest = () => {
+const Listpurchaserequest = (props) => {
+    let navigate = useNavigate()
     useEffect(() => {
-        getPurchaseRequest();
+        getPurchaseRequests();
     }, []);
     const [purchaseRequests, setPurchaseRequests] = useState([]);
     const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [timelines, setTimelines] = useState([]);
 
-    const getPurchaseRequest = () => {
-        api.PurchaseRequest.get()
+    const getPurchaseRequests = () => {
+        api.PurchaseRequest.all()
         .then(res => {
             let response = res.data.data;
             setPurchaseRequests(response);
@@ -33,6 +35,11 @@ const Listpurchaserequest = () => {
         .then(res => {})
         ;
     }
+
+    const getPurchaseRequest = (id) => {
+        api.PurchaseRequest.get(id);
+    }
+    
 
     const openInFull = () => {
         window.open(`${purchaseRequestOutput}?view=1`,
@@ -82,12 +89,34 @@ const Listpurchaserequest = () => {
         openPurchaseRequest(item, index)
         api.PurchaseRequest.approve(item.id)
         .then(res => {
-            getPurchaseRequest();
+            getPurchaseRequests();
             closePurchaseRequest();
         })
         .catch(err => {})
         .then(res => {})
         ;
+    }
+
+    const editPurchaseRequest = (item, index) => {
+        api.PurchaseRequest.get(item.id)
+        .then(res => {
+            let purchaseRequest = res.data;
+            purchaseRequest.items = res.data.items.data;
+            console.log(purchaseRequest);
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_DATA",
+                data: purchaseRequest
+            });
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_FORM_TYPE",
+                data: "update"
+            });
+            navigate("/purchase-requests/form");
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+
     }
 
 
@@ -123,6 +152,7 @@ const Listpurchaserequest = () => {
             key: 'actions',
             render: (text, item, index) => (
                 <Space size={2}>
+                    <span className='custom-pointer' onClick={() => { editPurchaseRequest(item, index) }}>Edit</span> |
                     <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
                 </Space>
             )

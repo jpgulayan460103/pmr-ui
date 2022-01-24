@@ -15,6 +15,7 @@ const initialState = () => {
       formProccess: [],
       requestedBySignatory: {},
       approvedBySignatory: {},
+      formType: "create",
     }
   }
   
@@ -44,6 +45,16 @@ const initialState = () => {
         return {
           ...state,
           approvedBySignatory: action.data,
+        };
+      case 'SET_PURCHASE_REQUEST_FORM_TYPE':
+        return {
+          ...state,
+          formType: action.data,
+        };
+      case 'RESET_PURCHASE_REQUEST_FORM_DATA':
+        return {
+          ...state,
+          formData: initialState().formData,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

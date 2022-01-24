@@ -38,8 +38,8 @@ const Loadlibraries = (props) => {
 
         window.Echo.channel('home').listen('NewMessage', (e) => {
             console.log(e);
-            var notification = new Notification(e.message);
-            console.log(notification);
+            // var notification = new Notification(e.message);
+            // console.log(notification);
             props.dispatch({
                 type: "ADD_NOTIFICATION",
                 data: 0
