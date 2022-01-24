@@ -4,7 +4,7 @@ import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
 import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } from 'antd';
-import { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
+import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 
 function mapStateToProps(state) {
@@ -28,6 +28,9 @@ function mapStateToProps(state) {
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
+
+
+
 const CreatePurchaseRequest = (props) => {
 
     useEffect(() => {
@@ -40,11 +43,10 @@ const CreatePurchaseRequest = (props) => {
     }, [props.isLibrariesLoaded]);
     useEffect(() => {
         return function cleanup() {
-            props.dispatch({
-                type: "RESET_PURCHASE_REQUEST_FORM_DATA",
-                data: {}
-            });
-          };
+            if(props.formType == "update"){
+                clearForm();
+            }
+        };
     }, []);
     
     const [tableKey, setTableKey] = useState(0);
