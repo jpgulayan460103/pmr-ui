@@ -125,6 +125,12 @@ const Listpurchaserequest = (props) => {
 
     }
 
+    const handleTableChange = (pagination, filters, sorter) => {
+        console.log(sorter);
+        console.log(filters);
+    };
+    
+
 
     const dataSource = purchaseRequests
       
@@ -133,6 +139,10 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
+            filters: [
+                { text: 'Male', value: 'male' },
+                { text: 'Female', value: 'female' },
+              ]
         },
         {
             title: 'Total Cost',
@@ -173,7 +183,9 @@ const Listpurchaserequest = (props) => {
                     if(selectedIndex == index){
                         return "selected-row";
                     }
-                }} />
+                }}
+                onChange={handleTableChange}
+                />
             </div>
             
             <div className='col-md-4'>
@@ -186,7 +198,7 @@ const Listpurchaserequest = (props) => {
                     
 
                     <Tabs defaultActiveKey="1" type="card" size="small">
-                    <TabPane tab="File" key="1">
+                    <TabPane tab="File" key="1" style={{minHeight: "50vh"}}>
                         <iframe src={`${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>
                     </TabPane>
                     <TabPane tab="Routing" key="2">
@@ -217,9 +229,6 @@ const Listpurchaserequest = (props) => {
                     </Tabs>
                 </>
                 }
-            </div>
-            <div className='col-md-4'>
-                
             </div>
         </div>
     );

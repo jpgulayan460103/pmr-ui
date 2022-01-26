@@ -11,13 +11,14 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-
+        user: state.user.data
     };
 }
 
-const ListForApproval = () => {
+const ListForApproval = (props) => {
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
+    const budgetFormRef = React.useRef();
     useEffect(() => {
         getForm();
 
@@ -28,8 +29,10 @@ const ListForApproval = () => {
     const [forms, setForms] = useState([]);
     const [formOutput, setFormOutput] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [selectedForm, setSelectedForm] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
+    const [modalBudgetForm, setModalBudgetForm] = useState(false);
     const [routeOptions, setRouteOptions] = useState([]);
     const [formRoute, setFormRoute] = useState({});
 
@@ -144,7 +147,38 @@ const ListForApproval = () => {
         setSelectedIndex(null);
     }
 
+    const cancelBudgetForm = () => {
+        setModalBudgetForm(false);
+    }
+    const submitBudgetForm = async (e) => {
+        let formData = {
+            ...e,
+            id: selectedForm.form_routable.id
+        };
+        if(selectedForm.route_type == "purchase_request"){
+            await api.PurchaseRequest.save(formData, 'update');
+            await approve(selectedForm);
+            setModalBudgetForm(false);
+        }
+        // console.log(selectedForm);
+    }
+
     const confirm = (item) => {
+        setSelectedForm(item);
+        let budget_signatory = props.user.signatories.filter(i => i.office.title == "BS");
+        if(budget_signatory.length != 0){
+            setModalBudgetForm(true);
+            setTimeout(() => {
+                budgetFormRef.current.setFieldsValue({
+                    alloted_amount: item.form_routable.common_amount,
+                });
+            }, 150);
+        }else{
+            approve(item);
+        }
+    }
+
+    const approve = async (item) => {
         api.Forms.approve(item.id)
         .then(res => {
             notification.success({
@@ -289,6 +323,55 @@ const ListForApproval = () => {
                     >
                         <TextArea rows={4} />
                     </Form.Item>
+                </Form>
+            </Modal>
+
+            <Modal title="Budget Approval Form" visible={modalBudgetForm} 
+                footer={[
+                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit">
+                        Submit
+                    </Button>,
+                    <Button form="budgetForm" key="cancel" onClick={() => cancelBudgetForm()}>
+                        Cancel
+                    </Button>
+                    ]}>
+                <Form
+                    ref={budgetFormRef}
+                    name="normal_login"
+                    className="login-form"
+                    onFinish={(e) => submitBudgetForm(e)}
+                    layout='vertical'
+                    id="budgetForm"
+                >
+                    <Form.Item
+                        name="charge_to"
+                        label="Charge To"
+                        rules={[{ required: true, message: 'Please where to charge' }]}
+                    >
+                        <Input placeholder='Charge to' />
+                    </Form.Item>
+                    <Form.Item
+                        name="alloted_amount"
+                        label="Amount"
+                        rules={[{ required: true, message: 'Please enter amount' }]}
+                    >
+                        <Input placeholder='Amount' type="number" min={1} />
+                    </Form.Item>
+                    <Form.Item
+                        name="uacs_code"
+                        label="UACS Code"
+                        rules={[{ required: true, message: 'Please enter UACS Code' }]}
+                    >
+                        <Input placeholder='UACS CODE' />
+                    </Form.Item>
+                    <Form.Item
+                        name="sa_or"
+                        label="SA/OR"
+                        rules={[{ required: true, message: 'Please enter SA/OR' }]}
+                    >
+                        <Input placeholder='SA/OR' />
+                    </Form.Item>
+
                 </Form>
             </Modal>
 

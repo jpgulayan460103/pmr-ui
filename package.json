@@ -29,7 +29,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "deploy": "set PUBLIC_URL=./&&craco build",
+    "deploy": "set PUBLIC_URL=/fms&&craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
