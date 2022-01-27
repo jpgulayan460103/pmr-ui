@@ -6,6 +6,7 @@ import Icon, { CloseOutlined, HeartTwoTone, SearchOutlined } from '@ant-design/i
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
+import filter from '../../Shared/filter';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -148,36 +149,6 @@ const Listpurchaserequest = (props) => {
         getPurchaseRequests({...filterData, page: e})
     }
 
-    const handleSearch = (event) => {
-        if(event.target.nodeName == "INPUT" && event.type=="click"){
-            return false
-        }
-        getPurchaseRequests();
-    }
-    const searchBox = (e, dataIndex, type) => {
-        if(type == "date_range"){
-            setFilterData(prev => ({...prev, [dataIndex]: e}));
-        }else{
-            setFilterData(prev => ({...prev, [dataIndex]: e.target.value}));
-        }
-    }
-
-    const getColumnSearchProps = (dataIndex, type) => ({
-        filterDropdown: ({ }) => (
-          <div style={{ padding: 8 }}>
-              { type == "text" ? <Search placeholder="input search text" allowClear onChange={(e) => searchBox(e, dataIndex, type)} onSearch={(e, event) => handleSearch(event)} style={{ width: 200 }} /> : "" }
-              { type == "number" ? <Input type="number" placeholder="input search text" allowClear onChange={(e) => searchBox(e, dataIndex, type)} onPressEnter={() => getPurchaseRequests() } style={{ width: 200 }} /> : "" }
-              { type == "date_range" ? <RangePicker format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e) => searchBox(e, dataIndex, type)} /> : "" }
-          </div>
-        ),
-        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-        filteredValue: filterData[dataIndex] || null,
-        onFilterDropdownVisibleChange: visible => {
-            if (!visible) {
-                getPurchaseRequests();
-            }
-        }
-    });
     const dataSource = purchaseRequests
       
     const columns = [
@@ -185,20 +156,19 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
-            // filtered: true,
-            ...getColumnSearchProps('purpose','text'),
+            ...filter('purpose','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Total Cost',
             dataIndex: 'total_cost',
             key: 'total_cost',
-            ...getColumnSearchProps('total_cost','number')
+            ...filter('total_cost','number', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'PR Date',
             dataIndex: 'pr_date',
             key: 'pr_date',
-            ...getColumnSearchProps('pr_date','date_range')
+            ...filter('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Status',
