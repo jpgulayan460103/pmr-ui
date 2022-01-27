@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
-import './App.css';
-import 'antd/dist/antd.css';
+// import './App.css';
+// import 'antd/dist/antd.css';
 import ProcurementTable from './Components/ProcurementTable'
 import ProcurementForm from './Components/ProcurementForm'
 import ProcurementFilters from './Components/ProcurementFilters'

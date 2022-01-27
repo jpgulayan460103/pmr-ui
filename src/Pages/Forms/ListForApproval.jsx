@@ -382,7 +382,9 @@ const ListForApproval = (props) => {
                     if(selectedIndex == index){
                         return "selected-row";
                     }
-                }} />
+                }}
+                size={"small"}
+                />
             </div>
             <div className='col-md-4'>
                 { formOutput == "" ? "" : 

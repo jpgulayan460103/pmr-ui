@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Timeline, Tabs   } from 'antd';
+import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker  } from 'antd';
 import api from '../../api';
-import Icon, { CloseOutlined, HeartTwoTone, SelectOutlined } from '@ant-design/icons';
+import Icon, { CloseOutlined, HeartTwoTone, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs';
+import { debounce } from 'lodash';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
+const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 
 function mapStateToProps(state) {
@@ -26,21 +30,41 @@ const Listpurchaserequest = (props) => {
     useEffect(() => {
         getPurchaseRequests();
     }, []);
+    
     const [purchaseRequests, setPurchaseRequests] = useState([]);
+    const [paginationMeta, setPaginationMeta] = useState({
+        current_page: 1,
+        total: 1,
+        per_page: 1,
+    });
     const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
-    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [tableLoading, setTableLoading] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
     const [timelines, setTimelines] = useState([]);
+    const [filterData, setFilterData] = useState({
+        page: 1,
+    });
 
-    const getPurchaseRequests = () => {
-        api.PurchaseRequest.all()
+    const getPurchaseRequests = debounce((filters) => {
+        if(filters == null){
+            filters = filterData
+        }
+        setTableLoading(true);
+        api.PurchaseRequest.all(filters)
         .then(res => {
-            let response = res.data.data;
-            setPurchaseRequests(response);
+            setTableLoading(false);
+            let data = res.data.data;
+            let meta = res.data.meta;
+            setPurchaseRequests(data);
+            setPaginationMeta(meta.pagination);
         })
-        .catch(res => {})
+        .catch(res => {
+            setTableLoading(false);
+        })
         .then(res => {})
         ;
-    }
+    }, 200);
+     
 
     const getPurchaseRequest = (id) => {
         api.PurchaseRequest.get(id);
@@ -57,7 +81,7 @@ const Listpurchaserequest = (props) => {
 
     const openPurchaseRequest = (item, index) => {
         setPurchaseRequestOutput(item.file);
-        setSelectedIndex(index)
+        setSelectedItem(item)
         let form_routes = item.form_routes.data;
         let form_routes_process = item.form_process.form_routes;
         let new_route = [];
@@ -89,18 +113,7 @@ const Listpurchaserequest = (props) => {
     }
     const closePurchaseRequest = () => {
         setPurchaseRequestOutput("");
-        setSelectedIndex(null);
-    }
-    const approvePurchaseRequest = (item, index) => {
-        openPurchaseRequest(item, index)
-        api.PurchaseRequest.approve(item.id)
-        .then(res => {
-            getPurchaseRequests();
-            closePurchaseRequest();
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
+        setSelectedItem(null);
     }
 
     const editPurchaseRequest = (item, index) => {
@@ -122,16 +135,49 @@ const Listpurchaserequest = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
-
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(sorter);
-        console.log(filters);
+        // console.log(sorter);
+        // console.log(filters);
+        getPurchaseRequests(filters)
     };
-    
 
+    const paginationChange = async (e) => {
+        setFilterData(prev => ({...prev, page: e}));
+        getPurchaseRequests({...filterData, page: e})
+    }
 
+    const handleSearch = (event) => {
+        if(event.target.nodeName == "INPUT" && event.type=="click"){
+            return false
+        }
+        getPurchaseRequests();
+    }
+    const searchBox = (e, dataIndex, type) => {
+        if(type == "date_range"){
+            setFilterData(prev => ({...prev, [dataIndex]: e}));
+        }else{
+            setFilterData(prev => ({...prev, [dataIndex]: e.target.value}));
+        }
+    }
+
+    const getColumnSearchProps = (dataIndex, type) => ({
+        filterDropdown: ({ }) => (
+          <div style={{ padding: 8 }}>
+              { type == "text" ? <Search placeholder="input search text" allowClear onChange={(e) => searchBox(e, dataIndex, type)} onSearch={(e, event) => handleSearch(event)} style={{ width: 200 }} /> : "" }
+              { type == "number" ? <Input type="number" placeholder="input search text" allowClear onChange={(e) => searchBox(e, dataIndex, type)} onPressEnter={() => getPurchaseRequests() } style={{ width: 200 }} /> : "" }
+              { type == "date_range" ? <RangePicker format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e) => searchBox(e, dataIndex, type)} /> : "" }
+          </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        filteredValue: filterData[dataIndex] || null,
+        onFilterDropdownVisibleChange: visible => {
+            if (!visible) {
+                getPurchaseRequests();
+            }
+        }
+    });
     const dataSource = purchaseRequests
       
     const columns = [
@@ -139,29 +185,36 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
-            filters: [
-                { text: 'Male', value: 'male' },
-                { text: 'Female', value: 'female' },
-              ]
+            // filtered: true,
+            ...getColumnSearchProps('purpose','text'),
         },
         {
             title: 'Total Cost',
             dataIndex: 'total_cost',
             key: 'total_cost',
+            ...getColumnSearchProps('total_cost','number')
         },
         {
             title: 'PR Date',
             dataIndex: 'pr_date',
             key: 'pr_date',
+            ...getColumnSearchProps('pr_date','date_range')
         },
         {
             title: 'Status',
-            key: 'process_complete_status',
+            key: 'status',
             render: (text, item, index) => (
                 <span>
-                    { item.process_complete_status ? "Approved" : "" }
+                    { item.status }
                 </span>
-            )
+            ),
+            filters: [
+                { text: 'Approved', value: "Approved" },
+                { text: 'Pending', value: "Pending" },
+            ],
+            onFilter: async (value, record) => {
+                setFilterData(prev => ({...prev, status: value}));
+            },
         },
         {
             title: 'Actions',
@@ -180,11 +233,21 @@ const Listpurchaserequest = (props) => {
             <div className='col-md-8'>
                 <Title level={2} className='text-center'>Purchase Request</Title>
                 <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                    if(selectedIndex == index){
+                    if(selectedItem?.id == record.id){
                         return "selected-row";
                     }
                 }}
                 onChange={handleTableChange}
+                size={"small"}
+                pagination={false}
+                loading={tableLoading}
+                />
+                <Pagination
+                    current={paginationMeta.current_page}
+                    total={paginationMeta.total}
+                    pageSize={paginationMeta.per_page}
+                    className='mt-2'
+                    onChange={paginationChange}
                 />
             </div>
             

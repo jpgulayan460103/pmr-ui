@@ -47,7 +47,9 @@ const UserTable = (props) => {
                     if(selectedIndex == index){
                         return "selected-row";
                     }
-                }} />
+                }}
+                size={"small"}
+                />
         </div>
     );
 }
