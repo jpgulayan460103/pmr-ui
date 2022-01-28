@@ -156,19 +156,19 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
-            ...filter('purpose','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Total Cost',
             dataIndex: 'total_cost',
             key: 'total_cost',
-            ...filter('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'PR Date',
             dataIndex: 'pr_date',
             key: 'pr_date',
-            ...filter('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Status',
@@ -182,9 +182,7 @@ const Listpurchaserequest = (props) => {
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
             ],
-            onFilter: async (value, record) => {
-                setFilterData(prev => ({...prev, status: value}));
-            },
+            ...filter.list('status','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Actions',
