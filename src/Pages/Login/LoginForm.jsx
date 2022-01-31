@@ -61,7 +61,7 @@ const Loginform = (props) => {
             <Form
                 name="normal_login"
                 className="login-form"
-                initialValues={{ remember: true, username: "jpgulayan", password: "admin123" }}
+                initialValues={{ remember: true, username: "ict", password: "admin123" }}
                 onFinish={onFinish}
                 layout='vertical'
             >

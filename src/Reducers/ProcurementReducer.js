@@ -1,6 +1,7 @@
 const initialState = () => {
     return {
       selectedPurchaseRequest: {},
+      columns: [],
     }
   }
   
@@ -14,6 +15,11 @@ const initialState = () => {
       case 'SET_INITIAL_STATE':
         state = initialState();
         return state
+      case 'SET_PROCUREMENT_COLUMNS':
+        return {
+          ...state,
+          columns: action.data,
+        };
       case 'SET_PROCUREMENT_INITIAL_STATE':
         state = initialState();
         return state

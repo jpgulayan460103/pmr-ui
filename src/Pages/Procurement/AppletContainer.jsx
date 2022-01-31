@@ -16,7 +16,8 @@ function mapStateToProps(state) {
 const AppletContainer = (props) => {
     return (
         <>
-            <Title level={2} className='text-center'>{props.title}</Title>
+            <Title level={2}>{props.title}</Title>
+            <hr />
             <div className="col-md-12 applet-container">
                 { props.children }
             </div>  
