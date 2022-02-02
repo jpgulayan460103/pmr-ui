@@ -53,15 +53,7 @@ const ListForApproval = (props) => {
     const submitRejectForm = (val) => {
         let formData = {
             ...val,
-            from_office_id: formRoute.to_office_id,
-            route_type: formRoute.route_type,
-            rejected_route_id: formRoute.id,
-            origin_office_id: formRoute.origin_office_id,
-            form_routable_id: formRoute.form_routable_id,
-            form_routable_type: formRoute.form_routable_type,
-            form_process_id: formRoute.form_process_id,
         };
-        console.log(formData);
         api.Forms.reject(formRoute.id, formData)
         .then(res => {
             setModalRejectForm(false);
