@@ -34,7 +34,7 @@ const Procurement = (props) => {
 
             <div className="row mb-6">
                 <div className="col-md-12">
-                    <AppletContainer title="Section 3">
+                    <AppletContainer title={props.type}>
                     </AppletContainer>
                 </div>
             
