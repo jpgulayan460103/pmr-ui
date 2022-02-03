@@ -77,6 +77,14 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_USER_AREA_OF_ASSIGNMENTS",
                 data: libraries.filter(library => library.library_type == "user_area_of_assignment")
             });
+            props.dispatch({
+                type: "SET_LIBRARY_PROCUREMENT_TYPES",
+                data: libraries.filter(library => library.library_type == "procurement_type")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES",
+                data: libraries.filter(library => library.library_type == "mode_of_procurement")
+            });
             
         })
         .catch(err => {})

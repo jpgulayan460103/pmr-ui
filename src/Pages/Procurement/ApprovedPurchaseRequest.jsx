@@ -8,6 +8,8 @@ import {
     SettingOutlined,
     EyeOutlined,
     EyeInvisibleOutlined,
+    MoreOutlined,
+    EllipsisOutlined,
 } from '@ant-design/icons';
 
 
@@ -16,6 +18,8 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user_sections: state.library.user_sections,
+        procurement_types: state.library.procurement_types,
+        mode_of_procurements: state.library.mode_of_procurements,
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
         columns: state.procurement.columns
     };
@@ -36,9 +40,12 @@ const Settings = ({columns, toggleColumn}) => {
             dataSource={columns.filter(i => i.filterable)}
             renderItem={(item, index) => (
             <List.Item actions={[
-                <span key="custom-pointer" className='custom-pointer' onClick={() => { toggleColumn(index) }}>
+                <span key="custom-pointer" className='custom-pointer' onClick={() => { toggleColumn(index, 'shown') }}>
                     { item.shown ? <EyeOutlined /> : <EyeInvisibleOutlined /> }
-                </span>
+                </span>,
+                <span key="custom-pointer" className='custom-pointer' onClick={() => { toggleColumn(index, 'ellipsis') }}>
+                { item.ellipsis ? <EllipsisOutlined /> : <MoreOutlined /> }
+            </span>
             ]}>
                 {item.title}
             </List.Item>
@@ -54,11 +61,11 @@ const ApprovedPurchaseRequest = (props) => {
             type: "SET_PROCUREMENT_COLUMNS",
             data: columns.map(i => (
                 {
-                    'shown':i.shown,
                     'key': i.key,
                     'title': i.title,
-                    'dataIndex': i.dataIndex,
-                    'filterable': i.dataIndex,
+                    'shown':i.shown,
+                    'filterable': i.filterable,
+                    'ellipsis': i.ellipsis,
                 }
             ))
         })
@@ -104,8 +111,14 @@ const ApprovedPurchaseRequest = (props) => {
     }, 200);
 
     const paginationChange = async (e) => {
+        console.log(e);
         setFilterData(prev => ({...prev, page: e}));
         getPurchaseRequests({...filterData, page: e})
+    }
+
+    const changePageSize = (page, size) => {
+        setFilterData(prev => ({...prev, page: page, size: size}));
+        getPurchaseRequests({...filterData, page: page, size: size})
     }
     const openPurchaseRequest = (item, index) => {
         setSelectedItem(item);
@@ -115,18 +128,28 @@ const ApprovedPurchaseRequest = (props) => {
         });
     }
 
-    const toggleColumn = (index) => {
+    const toggleColumn = (index, prop) => {
         let prev = cloneDeep(props.columns);
         prev[index] = {
             ...prev[index],
-            shown: !prev[index].shown,
+            [prop]: !prev[index][prop],
         };
         props.dispatch({
             type: "SET_PROCUREMENT_COLUMNS",
             data: prev
         })
     }
-    const endUserFilter = props.user_sections.map(i => {
+    const endUserFilter = cloneDeep(props.user_sections).map(i => {
+        i.value = i.id;
+        return i;
+    });
+
+    const purchaseRequestTypeFilter = cloneDeep(props.procurement_types).map(i => {
+        i.value = i.id;
+        return i;
+    });
+
+    const modeOfProcurementFilter = cloneDeep(props.mode_of_procurements).map(i => {
         i.value = i.id;
         return i;
     });
@@ -139,7 +162,7 @@ const ApprovedPurchaseRequest = (props) => {
             dataIndex: 'sa_or',
             key: 'sa_or',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].shown : true,
             filterable: true,
             ...filter.search('sa_or','text', setFilterData, filterData, getPurchaseRequests),
@@ -149,7 +172,7 @@ const ApprovedPurchaseRequest = (props) => {
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
             ...filter.search('purchase_request_number','text', setFilterData, filterData, getPurchaseRequests),
@@ -159,7 +182,7 @@ const ApprovedPurchaseRequest = (props) => {
             dataIndex: 'purpose',
             key: 'purpose',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].shown : true,
             filterable: true,
             ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
@@ -170,7 +193,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'end_user_id',
             filters: endUserFilter,
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'end_user_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'end_user_id')[0].shown : true,
             filterable: true,
             render: (text, item, index) => (
@@ -182,28 +205,55 @@ const ApprovedPurchaseRequest = (props) => {
         },
         {
             title: 'Type',
-            key: 'purchase_request_type',
-            dataIndex: 'purchase_request_type',
+            key: 'purchase_request_type_id',
+            filters: purchaseRequestTypeFilter,
             width: 150,
-            ellipsis: true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type')[0].shown : true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
             filterable: true,
+            ...filter.list('purchase_request_type_id','text', setFilterData, filterData, getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    { item.purchase_request_type.name }
+                </span>
+            ),
+        },
+        {
+            title: 'Total Cost',
+            key: 'total_cost',
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
+            ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            filterable: true,
+            render: (text, item, index) => (
+                <span>
+                    { item.total_cost_formatted }
+                </span>
+            ),
+            
         },
         {
             title: 'Mode of Procurement',
-            key: 'mode_of_procurement',
-            dataIndex: 'mode_of_procurement',
+            key: 'mode_of_procurement_id',
+            filters: modeOfProcurementFilter,
             width: 150,
-            ellipsis: true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement')[0].shown : true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].shown : true,
             filterable: true,
+            ...filter.list('mode_of_procurement_id','text', setFilterData, filterData, getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    { item.mode_of_procurement.name }
+                </span>
+            )
         },
         {
             title: 'Pre-Proc Conference',
             key: 'preproc_conference',
             dataIndex: 'preproc_conference',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'preproc_conference')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'preproc_conference')[0].shown : true,
             filterable: true,
         },
@@ -212,7 +262,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'adspost_of_ib',
             dataIndex: 'adspost_of_ib',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'adspost_of_ib')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'adspost_of_ib')[0].shown : true,
             filterable: true,
         },
@@ -221,7 +271,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'prebid_conf',
             dataIndex: 'prebid_conf',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'prebid_conf')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'prebid_conf')[0].shown : true,
             filterable: true,
         },
@@ -230,7 +280,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'eligibility_check',
             dataIndex: 'eligibility_check',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'eligibility_check')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'eligibility_check')[0].shown : true,
             filterable: true,
         },
@@ -239,7 +289,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'subopen_of_bids',
             dataIndex: 'subopen_of_bids',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'subopen_of_bids')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'subopen_of_bids')[0].shown : true,
             filterable: true,
         },
@@ -248,7 +298,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'bid_evaluation',
             dataIndex: 'bid_evaluation',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'bid_evaluation')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'bid_evaluation')[0].shown : true,
             filterable: true,
         },
@@ -257,7 +307,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'post_qual',
             dataIndex: 'post_qual',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'post_qual')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'post_qual')[0].shown : true,
             filterable: true,
         },
@@ -266,7 +316,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'notice_of_award',
             dataIndex: 'notice_of_award',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'notice_of_award')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'notice_of_award')[0].shown : true,
             filterable: true,
         },
@@ -275,7 +325,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'contract_signing',
             dataIndex: 'contract_signing',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'contract_signing')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'contract_signing')[0].shown : true,
             filterable: true,
         },
@@ -284,7 +334,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'notice_to_proceed',
             dataIndex: 'notice_to_proceed',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'notice_to_proceed')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'notice_to_proceed')[0].shown : true,
             filterable: true,
         },
@@ -293,7 +343,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'estimated_ldd',
             dataIndex: 'estimated_ldd',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'estimated_ldd')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'estimated_ldd')[0].shown : true,
             filterable: true,
         },
@@ -302,7 +352,7 @@ const ApprovedPurchaseRequest = (props) => {
             key: 'abstract_of_quotations',
             dataIndex: 'abstract_of_quotations',
             width: 150,
-            ellipsis: true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'abstract_of_quotations')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'abstract_of_quotations')[0].shown : true,
             filterable: true,
         },
@@ -350,9 +400,10 @@ const ApprovedPurchaseRequest = (props) => {
                     total={paginationMeta.total}
                     pageSize={paginationMeta.per_page}
                     onChange={paginationChange}
-                    showSizeChanger
+                    // showSizeChanger
                     showQuickJumper
                     size="small"
+                    onShowSizeChange={(current, size) => changePageSize(current, size)}
                 />
             </div>
             

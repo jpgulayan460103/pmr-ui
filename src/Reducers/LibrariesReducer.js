@@ -9,6 +9,8 @@ const initialState = () => {
       user_positions: [],
       user_area_of_assignments: [],
       signatories: [],
+      procurement_types: [],
+      mode_of_procurements: [],
       isLibrariesLoaded: false,
     }
   }
@@ -59,6 +61,16 @@ const initialState = () => {
         return {
           ...state,
           signatories: action.data,
+        };
+      case 'SET_LIBRARY_PROCUREMENT_TYPES':
+        return {
+          ...state,
+          procurement_types: action.data,
+        };
+      case 'SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES':
+        return {
+          ...state,
+          mode_of_procurements: action.data,
         };
       case 'LOAD_LIBRARIES':
         return {

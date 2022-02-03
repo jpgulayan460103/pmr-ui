@@ -54,18 +54,18 @@ const App = (props) => {
         <Route path="/forms/disapproved" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests/form" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
-        <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
+        {/* <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/items" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/items/categories" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/items/measures" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/offices/divisions" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/offices/sections" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/signatories/administrators" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/signatories/purchase-requests" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
+        <Route path="/libraries/signatories/purchase-requests" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} /> */}
+        {/* <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Login />} />
-        <Route path="*" element={<Layout>404</Layout>} />
+        <Route path="*" element={<Layout></Layout>} />
       </Routes>
     </div>
   );

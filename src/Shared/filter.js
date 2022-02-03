@@ -31,11 +31,6 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
     ),
     filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     filteredValue: filterData[dataIndex] || null,
-    onFilterDropdownVisibleChange: visible => {
-        if (!visible) {
-            getData();
-        }
-    }
 });
 
 const list = (dataIndex, type, setFilters, filterData, getData) => ({
@@ -47,14 +42,10 @@ const list = (dataIndex, type, setFilters, filterData, getData) => ({
             filters={filters}
             setFilters={setFilters}
             dataIndex={dataIndex}
+            getData={getData}
         />;
     },
     filteredValue: filterData[dataIndex] || null,
-    onFilterDropdownVisibleChange: visible => {
-        if (!visible) {
-            getData();
-        }
-    },
 });
 export default {
     search,

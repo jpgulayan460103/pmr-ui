@@ -160,9 +160,14 @@ const Listpurchaserequest = (props) => {
         },
         {
             title: 'Total Cost',
-            dataIndex: 'total_cost',
             key: 'total_cost',
             ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    { item.total_cost_formatted }
+                </span>
+            ),
+            
         },
         {
             title: 'PR Date',

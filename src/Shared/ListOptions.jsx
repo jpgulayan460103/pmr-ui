@@ -11,6 +11,7 @@ const ListOptions = (
         filters,
         setFilters,
         dataIndex,
+        getData,
     }
 ) => {
     useEffect(() => {
@@ -23,10 +24,12 @@ const ListOptions = (
     }
     const resetSelected = () => {
         setSelectedKeys([]);
+        setFilters(prev => ({...prev, [dataIndex]: []}));
     }
     const setFilterOptions = () => {
         confirm({ closeDropdown: true });
         setFilters(prev => ({...prev, [dataIndex]: selectedKeys}));
+        getData();
     }
     const selectOption = (e, option) => {
         if(e.target.checked){
