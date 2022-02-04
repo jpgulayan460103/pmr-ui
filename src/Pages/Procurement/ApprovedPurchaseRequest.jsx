@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Pagination, Popover, Select, Button, List } from 'antd';
+import {
+    Table,
+    Space,
+    Pagination,
+    Popover,
+    Select,
+    Button,
+    List,
+    Menu,
+    Dropdown,
+    Modal,
+    Form,
+    Input,
+    Tooltip,
+} from 'antd';
 import filter from '../../Shared/filter';
 import api from '../../api';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
@@ -10,6 +24,10 @@ import {
     EyeInvisibleOutlined,
     MoreOutlined,
     EllipsisOutlined,
+    UserOutlined,
+    EditOutlined,
+    FormOutlined,
+    MessageOutlined,
 } from '@ant-design/icons';
 
 
@@ -21,7 +39,10 @@ function mapStateToProps(state) {
         procurement_types: state.library.procurement_types,
         mode_of_procurements: state.library.mode_of_procurements,
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
-        columns: state.procurement.columns
+        columns: state.procurement.columns,
+        purchaseRequests: state.procurement.purchaseRequests,
+        purchaseRequestsPagination: state.procurement.purchaseRequestsPagination,
+        filterData: state.procurement.purchaseRequestsTableFilter,
     };
 }
 
@@ -56,7 +77,9 @@ const Settings = ({columns, toggleColumn}) => {
 
 const ApprovedPurchaseRequest = (props) => {
     useEffect(() => {
-        getPurchaseRequests();
+        if(isEmpty(props.purchaseRequests)){
+            getPurchaseRequests();
+        }
         props.dispatch({
             type: "SET_PROCUREMENT_COLUMNS",
             data: columns.map(i => (
@@ -70,29 +93,27 @@ const ApprovedPurchaseRequest = (props) => {
             ))
         })
     }, []);
-    const [filterData, setFilterData] = useState({
-        page: 1,
-        type: 'all'
-    });
+    const setFilterData = (data) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
+            data: {...props.filterData, ...data()}
+        });
+    }
     const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
     const [tableLoading, setTableLoading] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [purchaseRequests, setPurchaseRequests] = useState([]);
-    const [paginationMeta, setPaginationMeta] = useState({
-        current_page: 1,
-        total: 1,
-        per_page: 1,
-    });
+    const [showPurchaseRequestModal, setShowPurchaseRequestModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [submit, setSubmit] = useState(false);
 
     const handleTableChange = (pagination, filters, sorter) => {
         console.log(sorter);
         console.log(filters);
-        getPurchaseRequests({...filterData, ...filters})
+        getPurchaseRequests({...props.filterData, ...filters})
     };
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
-            filters = filterData
+            filters = props.filterData
         }
         setTableLoading(true);
         api.PurchaseRequest.all(filters)
@@ -100,8 +121,15 @@ const ApprovedPurchaseRequest = (props) => {
             setTableLoading(false);
             let data = res.data.data;
             let meta = res.data.meta;
-            setPurchaseRequests(data);
-            setPaginationMeta(meta.pagination);
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS",
+                data: data
+            });
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_PAGINATION",
+                data: meta.pagination
+            });
+            // setPaginationMeta(meta.pagination);
         })
         .catch(res => {
             setTableLoading(false);
@@ -113,20 +141,40 @@ const ApprovedPurchaseRequest = (props) => {
     const paginationChange = async (e) => {
         console.log(e);
         setFilterData(prev => ({...prev, page: e}));
-        getPurchaseRequests({...filterData, page: e})
+        getPurchaseRequests({...props.filterData, page: e})
     }
 
     const changePageSize = (page, size) => {
         setFilterData(prev => ({...prev, page: page, size: size}));
-        getPurchaseRequests({...filterData, page: page, size: size})
+        getPurchaseRequests({...props.filterData, page: page, size: size})
     }
-    const openPurchaseRequest = (item, index) => {
-        setSelectedItem(item);
+
+    const viewPurchaseRequest = (item, index) => {
+        selectPurchaseRequest(item)
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
+            data: "pdf"
+        });
+    }
+    const selectPurchaseRequest = (item) => {
         props.dispatch({
             type: "SELECT_PURCHASE_REQUEST",
             data: item
         });
     }
+
+    const editPurchaseRequest = (item, index) => {
+        setShowPurchaseRequestModal(true);
+        selectPurchaseRequest(item);
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
+            data: "edit-form"
+        });
+      }
+
+      const submitForm = () => {
+        setShowPurchaseRequestModal(false);
+      }
 
     const toggleColumn = (index, prop) => {
         let prev = cloneDeep(props.columns);
@@ -154,7 +202,7 @@ const ApprovedPurchaseRequest = (props) => {
         return i;
     });
     
-    const dataSource = purchaseRequests
+    const dataSource = props.purchaseRequests
 
     const columns = [
         {
@@ -165,7 +213,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].shown : true,
             filterable: true,
-            ...filter.search('sa_or','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('sa_or','text', setFilterData, props.filterData, getPurchaseRequests),
         },
         {
             title: 'PR Number',
@@ -175,7 +223,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
-            ...filter.search('purchase_request_number','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('purchase_request_number','text', setFilterData, props.filterData, getPurchaseRequests),
         },
         {
             title: 'Particulars',
@@ -185,7 +233,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].shown : true,
             filterable: true,
-            ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('purpose','text', setFilterData, props.filterData, getPurchaseRequests),
         },
         {
             title: 'PMO/End-User',
@@ -201,22 +249,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item.end_user.name }
                 </span>
             ),
-            ...filter.list('end_user_id','text', setFilterData, filterData, getPurchaseRequests),
-        },
-        {
-            title: 'Type',
-            key: 'purchase_request_type_id',
-            filters: purchaseRequestTypeFilter,
-            width: 150,
-            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
-            filterable: true,
-            ...filter.list('purchase_request_type_id','text', setFilterData, filterData, getPurchaseRequests),
-            render: (text, item, index) => (
-                <span>
-                    { item.purchase_request_type.name }
-                </span>
-            ),
+            ...filter.list('end_user_id','text', setFilterData, props.filterData, getPurchaseRequests),
         },
         {
             title: 'Total Cost',
@@ -224,7 +257,7 @@ const ApprovedPurchaseRequest = (props) => {
             width: 150,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
-            ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('total_cost','number', setFilterData, props.filterData, getPurchaseRequests),
             filterable: true,
             render: (text, item, index) => (
                 <span>
@@ -234,6 +267,21 @@ const ApprovedPurchaseRequest = (props) => {
             
         },
         {
+            title: 'Type',
+            key: 'purchase_request_type_id',
+            filters: purchaseRequestTypeFilter,
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
+            filterable: true,
+            ...filter.list('purchase_request_type_id','text', setFilterData, props.filterData, getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    { item?.purchase_request_type?.name }
+                </span>
+            ),
+        },
+        {
             title: 'Mode of Procurement',
             key: 'mode_of_procurement_id',
             filters: modeOfProcurementFilter,
@@ -241,10 +289,10 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].shown : true,
             filterable: true,
-            ...filter.list('mode_of_procurement_id','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.list('mode_of_procurement_id','text', setFilterData, props.filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    { item.mode_of_procurement.name }
+                    { item?.mode_of_procurement?.name }
                 </span>
             )
         },
@@ -357,7 +405,7 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
         },
         {
-            title: "Actions",
+            title: "",
             key: "action",
             fixed: 'right',
             width: 100,
@@ -365,18 +413,46 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: false,
             render: (text, item, index) => (
                 <Space  size={2}>
-                    <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
+
+                <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                    <Button>
+                        Actions
+                    </Button>
+                </Dropdown>
                 </Space>
               )
         },
     ];
+
+    const menu = (item, index) => (
+        <Menu onClick={() => handleMenuClick()}>
+            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
+                View
+            </Menu.Item>
+            <Menu.Item key="menu-edit" icon={<EditOutlined />} onClick={() => { editPurchaseRequest(item, index) }}>
+                Edit
+            </Menu.Item>
+            <Menu.Item key="menu-quotation" icon={<MessageOutlined />}>
+                Make Quotation
+            </Menu.Item>
+        </Menu>
+      );
+
+    const handleMenuClick =() => {
+
+    }
+
+
+
 
     return (
         <>
             <div className="flex justify-end mb-2">
             
             <Popover content={<Settings columns={props.columns} toggleColumn={toggleColumn} />} title="Column Settings" trigger="click" placement='bottomRight'>
-                <SettingOutlined />
+                <Tooltip placement="left" title="Settings">
+                    <SettingOutlined />
+                </Tooltip>
             </Popover>
             
             </div>
@@ -396,9 +472,9 @@ const ApprovedPurchaseRequest = (props) => {
             />
             <div className="flex justify-end mt-2">
             <Pagination
-                    current={paginationMeta.current_page}
-                    total={paginationMeta.total}
-                    pageSize={paginationMeta.per_page}
+                    current={props.purchaseRequestsPagination?.current_page || 1}
+                    total={props.purchaseRequestsPagination?.total || 1}
+                    pageSize={props.purchaseRequestsPagination?.per_page || 1}
                     onChange={paginationChange}
                     // showSizeChanger
                     showQuickJumper
@@ -406,7 +482,6 @@ const ApprovedPurchaseRequest = (props) => {
                     onShowSizeChange={(current, size) => changePageSize(current, size)}
                 />
             </div>
-            
         </>
     );
 }

@@ -17,7 +17,7 @@ const AppletContainer = (props) => {
     return (
         <>
             <Title level={2}>{props.title}</Title>
-            <hr />
+            <hr /><br />
             <div className="col-md-12 applet-container">
                 { props.children }
             </div>  

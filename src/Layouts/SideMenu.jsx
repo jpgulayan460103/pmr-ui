@@ -63,9 +63,9 @@ const Sidemenu = (props) => {
                         <Link to="/procurement"></Link>
                         Procurement
                     </Menu.Item>
-                    <Menu.Item key="/procurement/canvass">
-                        <Link to="/procurement/canvass"></Link>
-                        Canvass Form
+                    <Menu.Item key="/procurement/quotations">
+                        <Link to="/procurement/quotations"></Link>
+                        Quotations
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">

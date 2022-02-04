@@ -56,7 +56,6 @@ const CreatePurchaseRequest = (props) => {
             data: {}
         });
         let formData = cloneDeep(props.formData);
-        formData.total_cost = total_cost();
         formData.requested_by_id = props.requestedBySignatory.id;
         formData.approved_by_id = props.approvedBySignatory.id;
         api.PurchaseRequest.save(formData,props.formType)
@@ -97,7 +96,6 @@ const CreatePurchaseRequest = (props) => {
             data: {}
         });
         let formData = cloneDeep(props.formData);
-        formData.total_cost = total_cost();
         formData.requested_by_id = props.requestedBySignatory.id;
         formData.approved_by_id = props.approvedBySignatory.id;
         api.PurchaseRequest.preview(formData,"create")
