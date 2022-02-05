@@ -22,7 +22,7 @@ window.Echo = new Echo({
     key: "12345",
     cluster: "mt1",
     forceTLS: false,
-    wsHost: "pmr-api.test",
+    wsHost: "pmr-api.kantobogs.com",
     wsPort: 6001,
 });
 const auth = {
