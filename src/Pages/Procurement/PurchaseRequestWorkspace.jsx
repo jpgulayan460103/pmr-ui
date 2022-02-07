@@ -51,9 +51,9 @@ function mapStateToProps(state) {
 const Pruchaserequestworkspace = (props) => {
     const formRef = React.useRef();
     useEffect(() => {
-        if(props.purchaseRequestTab == "edit-form"){
-            setFormData()
-        }
+        // if(props.purchaseRequestTab == "edit-form"){
+        //     setFormData()
+        // }
         if(props.purchaseRequestTab == "audit-trail"){
             loadAuditTrail()
         }
@@ -160,7 +160,7 @@ const Pruchaserequestworkspace = (props) => {
             <TabPane tab="Generated File" key="pdf" style={{height: "60vh"}}>
                 {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="100%"></iframe> : ""}
             </TabPane>
-            <TabPane tab="Edit Form" key="edit-form">
+            {/* <TabPane tab="Edit Form" key="edit-form">
                 <Form
                     ref={formRef}
                     name="normal_login"
@@ -196,34 +196,8 @@ const Pruchaserequestworkspace = (props) => {
                         <Input placeholder="Responsibility Center Code" />
                     </Form.Item>
 
-                    <Form.Item
-                        name="purchase_request_type_id"
-                        label="Procurement Type"
-                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
-                        { ...showErrorMessage() }
-                    >
-                        <Select placeholder='Select Procurement Type'>
-                            { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                        </Select>
-                    </Form.Item>
-
-                    <Form.Item
-                        name="mode_of_procurement_id"
-                        label="Procurement Type"
-                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
-                        { ...showErrorMessage() }
-                    >
-                        <Select placeholder='Select Mode of Procurement'>
-                            { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                        </Select>
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button" disabled={submit} loading={submit}>
-                            Save
-                        </Button>                    
-                    </Form.Item>
                 </Form>
-            </TabPane>
+            </TabPane> */}
             <TabPane tab="BAC Task" key="bac-task">
                 BAC FORMS
             </TabPane>

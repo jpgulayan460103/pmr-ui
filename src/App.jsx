@@ -13,7 +13,7 @@ import User from './Pages/User/User'
 import Echo from 'laravel-echo';
 import ListForApproval from './Pages/Forms/ListForApproval';
 import Procurement from './Pages/Procurement/Procurement'
-import Pmr from './Pmr'
+import Quotation from './Pages/Quotation/Quotation';
 
 window.Pusher = require('pusher-js');
 
@@ -48,7 +48,10 @@ const App = (props) => {
       <Routes>
         <Route path="/" element={<PrivateRoute><Layout></Layout></PrivateRoute>} />
         <Route path="/procurement" element={<PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>} />
-        <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>} />
+        <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
+        <Route path="/procurement/quotations/form" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
+        <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
+        <Route path="/procurement/quotations/suppliers" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
         <Route path="/forms/requests" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
         <Route path="/forms/approved" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
         <Route path="/forms/disapproved" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />

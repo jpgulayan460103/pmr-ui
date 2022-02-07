@@ -5,6 +5,7 @@ import Icon, {
     UserOutlined,
     UploadOutlined,
     FormOutlined,
+    MessageOutlined,
     ShoppingCartOutlined ,
   } from '@ant-design/icons';
 import { useLocation, Link  } from 'react-router-dom'
@@ -63,10 +64,20 @@ const Sidemenu = (props) => {
                         <Link to="/procurement"></Link>
                         Procurement
                     </Menu.Item>
-                    <Menu.Item key="/procurement/quotations">
-                        <Link to="/procurement/quotations"></Link>
-                        Quotations
-                    </Menu.Item>
+                    <SubMenu key="submenu-quotation" title="Quotations" icon={<MessageOutlined />}>
+                        <Menu.Item key="/procurement/quotations/form">
+                            <Link to="/procurement/quotations/form"></Link>
+                            Create Quotation Form
+                        </Menu.Item>
+                        <Menu.Item key="/procurement/quotations">
+                            <Link to="/procurement/quotations"></Link>
+                            View Quotation Forms
+                        </Menu.Item>
+                        <Menu.Item key="/procurement/quotations/suppliers">
+                            <Link to="/procurement/quotations/suppliers"></Link>
+                            Suppliers
+                        </Menu.Item>
+                    </SubMenu>
                 </SubMenu>
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
                     <Menu.Item key="/forms/requests">
@@ -85,7 +96,7 @@ const Sidemenu = (props) => {
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">
                     <Menu.Item key="/purchase-requests/form">
                         <Link to="/purchase-requests/form"></Link>
-                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Requests
+                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
                     </Menu.Item>
                     <Menu.Item key="/purchase-requests">
                         <Link to="/purchase-requests"></Link>

@@ -67,3 +67,15 @@
   position: relative;
   top: -0.1em;
 }
+.ant-back-top-icon .anticon{
+  position: relative;
+  top: -0.25em;
+}
+.ant-menu-item .anticon{
+  position: relative;
+  top: -0.30em;
+}
+.ant-dropdown-trigger .anticon{
+  position: relative;
+  top: -0.1em;
+}

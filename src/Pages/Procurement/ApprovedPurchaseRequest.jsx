@@ -29,6 +29,7 @@ import {
     FormOutlined,
     MessageOutlined,
 } from '@ant-design/icons';
+import { useLocation, useNavigate } from 'react-router-dom'
 
 
 const { Option } = Select;
@@ -76,6 +77,7 @@ const Settings = ({columns, toggleColumn}) => {
 }
 
 const ApprovedPurchaseRequest = (props) => {
+    let navigate = useNavigate();
     useEffect(() => {
         if(isEmpty(props.purchaseRequests)){
             getPurchaseRequests();
@@ -99,11 +101,7 @@ const ApprovedPurchaseRequest = (props) => {
             data: {...props.filterData, ...data()}
         });
     }
-    const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
     const [tableLoading, setTableLoading] = useState(false);
-    const [showPurchaseRequestModal, setShowPurchaseRequestModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [submit, setSubmit] = useState(false);
 
     const handleTableChange = (pagination, filters, sorter) => {
         console.log(sorter);
@@ -129,7 +127,6 @@ const ApprovedPurchaseRequest = (props) => {
                 type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_PAGINATION",
                 data: meta.pagination
             });
-            // setPaginationMeta(meta.pagination);
         })
         .catch(res => {
             setTableLoading(false);
@@ -164,17 +161,17 @@ const ApprovedPurchaseRequest = (props) => {
     }
 
     const editPurchaseRequest = (item, index) => {
-        setShowPurchaseRequestModal(true);
         selectPurchaseRequest(item);
         props.dispatch({
             type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
             data: "edit-form"
         });
-      }
+    }
 
-      const submitForm = () => {
-        setShowPurchaseRequestModal(false);
-      }
+    const makeQuotation = (item, index) => {
+        selectPurchaseRequest(item);
+        navigate("/procurement/quotations");
+    }
 
     const toggleColumn = (index, prop) => {
         let prev = cloneDeep(props.columns);
@@ -429,10 +426,7 @@ const ApprovedPurchaseRequest = (props) => {
             <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
                 View
             </Menu.Item>
-            <Menu.Item key="menu-edit" icon={<EditOutlined />} onClick={() => { editPurchaseRequest(item, index) }}>
-                Edit
-            </Menu.Item>
-            <Menu.Item key="menu-quotation" icon={<MessageOutlined />}>
+            <Menu.Item key="menu-quotation" icon={<MessageOutlined />} onClick={() => { makeQuotation(item, index) }}>
                 Make Quotation
             </Menu.Item>
         </Menu>

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select } from 'antd';
 import api from '../../api';
 import { CloseOutlined, SelectOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { debounce } from 'lodash';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -11,7 +12,9 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-        user: state.user.data
+        user: state.user.data,
+        procurementTypes: state.library.procurement_types,
+        modeOfProcurements: state.library.mode_of_procurements,
     };
 }
 
@@ -19,6 +22,7 @@ const ListForApproval = (props) => {
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
     const budgetFormRef = React.useRef();
+    const procurementFormRef = React.useRef();
     useEffect(() => {
         getForm();
 
@@ -33,6 +37,7 @@ const ListForApproval = (props) => {
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
+    const [modalProcurementForm, setModalProcurementForm] = useState(false);
     const [routeOptions, setRouteOptions] = useState([]);
     const [formRoute, setFormRoute] = useState({});
 
@@ -154,11 +159,31 @@ const ListForApproval = (props) => {
         }
         // console.log(selectedForm);
     }
-
-    const confirm = (item) => {
+    
+    const cancelProcurementForm = () => {
+        setModalProcurementForm(false);
+    }
+    const submitProcurementForm = debounce(async (e) => {
+        let formData = {
+            ...e,
+            id: selectedForm.form_routable.id
+        };
+        if(selectedForm.route_type == "purchase_request"){
+            await api.PurchaseRequest.save(formData, 'update');
+            await approve(selectedForm);
+            setModalProcurementForm(false);
+        }
+        // console.log(selectedForm);
+    }, 150);
+    const confirm = debounce((item) => {
         setSelectedForm(item);
+
+        let procurement_signatory = props.user.signatories.filter(i => i.office.title == "PS");
         let budget_signatory = props.user.signatories.filter(i => i.office.title == "BS");
-        if(budget_signatory.length != 0){
+
+        if(procurement_signatory.length != 0){
+            setModalProcurementForm(true);
+        }else if(budget_signatory.length != 0){
             setModalBudgetForm(true);
             setTimeout(() => {
                 budgetFormRef.current.setFieldsValue({
@@ -168,9 +193,9 @@ const ListForApproval = (props) => {
         }else{
             approve(item);
         }
-    }
+    }, 150)
 
-    const approve = async (item) => {
+    const approve = debounce(async (item) => {
         api.Forms.approve(item.id)
         .then(res => {
             notification.success({
@@ -184,7 +209,7 @@ const ListForApproval = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
-    }
+    }, 150);
 
     const dataSource = forms
       
@@ -335,6 +360,24 @@ const ListForApproval = (props) => {
                     layout='vertical'
                     id="budgetForm"
                 >
+
+                    <Form.Item
+                        name="fund_cluster"
+                        label="Fund Cluster"
+                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
+                        // { ...showErrorMessage() }
+                    >
+                        <Input placeholder="Fund Cluster" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="center_code"
+                        label="Responsibility Center Code"
+                        // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
+                        // { ...showErrorMessage() }
+                    >
+                        <Input placeholder="Responsibility Center Code" />
+                    </Form.Item>
                     <Form.Item
                         name="charge_to"
                         label="Charge To"
@@ -362,6 +405,48 @@ const ListForApproval = (props) => {
                         rules={[{ required: true, message: 'Please enter SA/OR' }]}
                     >
                         <Input placeholder='SA/OR' />
+                    </Form.Item>
+
+                </Form>
+            </Modal>
+
+
+            <Modal title="Procurement Approval Form" visible={modalProcurementForm} 
+                footer={[
+                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit">
+                        Submit
+                    </Button>,
+                    <Button form="budgetForm" key="cancel" onClick={() => cancelProcurementForm()}>
+                        Cancel
+                    </Button>
+                    ]}>
+                <Form
+                    ref={procurementFormRef}
+                    name="normal_login"
+                    className="login-form"
+                    onFinish={(e) => submitProcurementForm(e)}
+                    layout='vertical'
+                    id="budgetForm"
+                >
+                    
+                    <Form.Item
+                        name="purchase_request_type_id"
+                        label="Procurement Type"
+                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                    >
+                        <Select placeholder='Select Procurement Type'>
+                            { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        name="mode_of_procurement_id"
+                        label="Procurement Type"
+                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                    >
+                        <Select placeholder='Select Mode of Procurement'>
+                            { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                        </Select>
                     </Form.Item>
 
                 </Form>
