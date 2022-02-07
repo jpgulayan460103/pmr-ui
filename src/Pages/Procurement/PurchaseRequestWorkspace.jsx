@@ -5,11 +5,13 @@ import {
     Table,
     Space,
     Pagination,
-    Popover,
+    Timeline,
     Select,
     Button,
     List,
     Menu,
+    Row,
+    PageHeader,
     notification,
     Tabs,
     Form,
@@ -28,6 +30,7 @@ import {
     EditOutlined,
     FormOutlined,
     MessageOutlined,
+    CloseOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -38,8 +41,8 @@ const { TabPane } = Tabs;
 function mapStateToProps(state) {
     return {
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
-        procurement_types: state.library.procurement_types,
-        mode_of_procurements: state.library.mode_of_procurements,
+        procurementTypes: state.library.procurement_types,
+        modeOfProcurements: state.library.mode_of_procurements,
         purchaseRequestTab: state.procurement.purchaseRequestTab,
         purchaseRequests: state.procurement.purchaseRequests,
     };
@@ -48,23 +51,19 @@ function mapStateToProps(state) {
 const Pruchaserequestworkspace = (props) => {
     const formRef = React.useRef();
     useEffect(() => {
-        setFormData()
-    }, [props.purchaseRequestTab && props.selectedPurchaseRequest]);
-
-    const setFormData = () => {
         if(props.purchaseRequestTab == "edit-form"){
-            setTimeout(() => {
-                formRef.current.setFieldsValue({
-                    purchase_request_number: props.selectedPurchaseRequest.purchase_request_number,
-                    purchase_request_type_id: props.selectedPurchaseRequest.purchase_request_type_id,
-                    mode_of_procurement_id: props.selectedPurchaseRequest.mode_of_procurement_id,
-                })
-            }, 150);
+            setFormData()
         }
-    }
+        if(props.purchaseRequestTab == "audit-trail"){
+            loadAuditTrail()
+        }
+    }, [props.purchaseRequestTab || props.selectedPurchaseRequest]);
     const [prAddOn, setPrAddOn] = useState(dayjs().format("YY-MM-"));
     const [submit, setSubmit] = useState(false);
     const [errorMessage, setErrorMessage] = useState([]);
+    const [logger, setLogger] = useState([]);
+    const [showLoggerDetails, setShowLoggerDetails] = useState(false);
+    const [selectedLogger, setSelectedLogger] = useState([]);
     const showErrorMessage = () => {
         if(!isEmpty(errorMessage)){
             return {
@@ -72,6 +71,25 @@ const Pruchaserequestworkspace = (props) => {
                 help: errorMessage
             }
         }
+    }
+    const setFormData = () => {
+        setTimeout(() => {
+            formRef.current.setFieldsValue({
+                purchase_request_number: props.selectedPurchaseRequest.purchase_request_number,
+                purchase_request_type_id: props.selectedPurchaseRequest.purchase_request_type_id,
+                mode_of_procurement_id: props.selectedPurchaseRequest.mode_of_procurement_id,
+                fund_cluster: props.selectedPurchaseRequest.fund_cluster,
+                center_code: props.selectedPurchaseRequest.center_code,
+            })
+        }, 150);
+    }
+    const loadAuditTrail = () => {
+        api.PurchaseRequest.logger(props.selectedPurchaseRequest.id)
+        .then(res => {
+            setLogger(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
     }
     
     const onFinish = (values) => {
@@ -96,6 +114,9 @@ const Pruchaserequestworkspace = (props) => {
                 message: `Successfully Saved.`,
                 description: `Purchase Request # ${formData.purchase_request_number} has been updated.`,
             });
+            if(props.purchaseRequestTab == 'audit-trail'){
+                loadAuditTrail();
+            }
         })
         .catch(err => {
             
@@ -110,6 +131,28 @@ const Pruchaserequestworkspace = (props) => {
             data: key
         });
     }
+
+    const selectLogger = (item) => {
+        setSelectedLogger(item);
+        setShowLoggerDetails(true);
+    }
+    const columns = [
+        {
+          title: 'Field',
+          dataIndex: 'label',
+          key: 'label',
+        },
+        {
+          title: 'Old',
+          dataIndex: 'old',
+          key: 'old',
+        },
+        {
+          title: 'New',
+          dataIndex: 'new',
+          key: 'new',
+        },
+      ];
     return (
         <div>
 
@@ -129,31 +172,49 @@ const Pruchaserequestworkspace = (props) => {
                     <Form.Item
                         name="purchase_request_number"
                         label="Purchase Request Number"
-                        rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
+                        // rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
                         { ...showErrorMessage() }
                     >
                         <Input placeholder="Purchase Request Number" />
                     </Form.Item>
 
                     <Form.Item
+                        name="fund_cluster"
+                        label="Fund Cluster"
+                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
+                        { ...showErrorMessage() }
+                    >
+                        <Input placeholder="Fund Cluster" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="center_code"
+                        label="Responsibility Center Code"
+                        // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
+                        { ...showErrorMessage() }
+                    >
+                        <Input placeholder="Responsibility Center Code" />
+                    </Form.Item>
+
+                    <Form.Item
                         name="purchase_request_type_id"
                         label="Procurement Type"
-                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                         { ...showErrorMessage() }
                     >
                         <Select placeholder='Select Procurement Type'>
-                            { props.procurement_types.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                            { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                         </Select>
                     </Form.Item>
 
                     <Form.Item
                         name="mode_of_procurement_id"
                         label="Procurement Type"
-                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                         { ...showErrorMessage() }
                     >
                         <Select placeholder='Select Mode of Procurement'>
-                            { props.mode_of_procurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                            { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                         </Select>
                     </Form.Item>
                     <Form.Item>
@@ -167,7 +228,33 @@ const Pruchaserequestworkspace = (props) => {
                 BAC FORMS
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
-            Audit Trail
+                <div>
+                { showLoggerDetails ? (
+                    <>
+                    <span>{selectedLogger.description} by: <b>{selectedLogger.user?.user_information?.fullname}</b></span> on <b>{selectedLogger.created_at}</b>
+                        <Button className='float-right mb-1' size='small' type='danger' onClick={() => setShowLoggerDetails(false) }>
+                            <CloseOutlined />
+                        </Button>
+                    </>
+                ) : <span className='mb-2'>&nbsp;</span> }
+                </div>
+                { showLoggerDetails ? (
+                    <>
+                    <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} />
+                    </>
+                ) : (
+                    <div>
+                        <Timeline>
+                            { logger.map(i => (
+                            <Timeline.Item key={i.key}>
+                                {i.created_at} <span className='custom-pointer' onClick={() => selectLogger(i)}>View Changes</span><br />
+                                {i.description} by: <b>{i.user.user_information.fullname}</b>
+                            </Timeline.Item>
+                            )) }
+                        </Timeline>
+                    </div>
+                ) }
+                
             </TabPane>
         </Tabs>
         </div>

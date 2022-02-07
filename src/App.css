@@ -62,3 +62,8 @@
   padding-left: 0;
   margin-left: -20px;
 }
+
+.ant-btn .anticon{
+  position: relative;
+  top: -0.1em;
+}

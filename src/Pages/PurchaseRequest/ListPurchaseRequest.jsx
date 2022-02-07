@@ -83,34 +83,45 @@ const Listpurchaserequest = (props) => {
     const openPurchaseRequest = (item, index) => {
         setPurchaseRequestOutput(item.file);
         setSelectedItem(item)
-        let form_routes = item.form_routes.data;
-        let form_routes_process = item.form_process.form_routes;
-        let new_route = [];
-        for (let index = 0; index < form_routes.length; index++) {
-            if(form_routes[index]['status'] != "pending"){
-                new_route.push({
-                    status: "pending",
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['created_at'],
-                });
+        loadPurchaseRequestData(item.id);
+    }
 
-                new_route.push({
-                    status: form_routes[index]['status'],
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['updated_at'],
-                });
-            }else{
-                new_route.push({
-                    status: form_routes[index]['status'],
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['created_at'],
-                });
-            }
-        }
-        setTimelines(form_routes);
+    const loadPurchaseRequestData = (id) => {
+        api.PurchaseRequest.get(id)
+        .then(res => {
+            let item = res.data;
+            let form_routes = item.form_routes.data;
+            // let form_routes_process = item.form_process.form_routes;
+            // let new_route = [];
+            // for (let index = 0; index < form_routes.length; index++) {
+            //     if(form_routes[index]['status'] != "pending"){
+            //         new_route.push({
+            //             status: "pending",
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['created_at'],
+            //         });
+    
+            //         new_route.push({
+            //             status: form_routes[index]['status'],
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['updated_at'],
+            //         });
+            //     }else{
+            //         new_route.push({
+            //             status: form_routes[index]['status'],
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['created_at'],
+            //         });
+            //     }
+            // }
+            setTimelines(form_routes);
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
     const closePurchaseRequest = () => {
         setPurchaseRequestOutput("");

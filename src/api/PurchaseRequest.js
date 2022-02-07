@@ -39,4 +39,7 @@ export default {
   approve(id){
     return axios.post(`api/purchase-requests/${id}/approve`);
   },
+  logger(id){
+    return axios.get(`api/logger/purchase-request/${id}`);
+  },
 }

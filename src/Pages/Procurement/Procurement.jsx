@@ -4,7 +4,7 @@ import api from '../../api';
 import { Tabs, Typography  } from 'antd';
 import AppletContainer from './AppletContainer';
 import ApprovedPurchaseRequest from './ApprovedPurchaseRequest';
-import PruchaseRequestWorkspace from './PruchaseRequestWorkspace';
+import PurchaseRequestWorkspace from './PurchaseRequestWorkspace';
 
 
 
@@ -31,7 +31,7 @@ const Procurement = (props) => {
                     <AppletContainer title="Purchase Request Workspace">
                         
                         {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? (
-                            <PruchaseRequestWorkspace />
+                            <PurchaseRequestWorkspace />
                         ) : ""}
                     </AppletContainer>
                 </div>
