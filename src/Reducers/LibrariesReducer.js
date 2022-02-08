@@ -11,6 +11,7 @@ const initialState = () => {
       signatories: [],
       procurement_types: [],
       mode_of_procurements: [],
+      technical_working_groups: [],
       isLibrariesLoaded: false,
     }
   }
@@ -71,6 +72,11 @@ const initialState = () => {
         return {
           ...state,
           mode_of_procurements: action.data,
+        };
+      case 'SET_LIBRARY_TECHNICAL_WORKING_GROUPS':
+        return {
+          ...state,
+          technical_working_groups: action.data,
         };
       case 'LOAD_LIBRARIES':
         return {

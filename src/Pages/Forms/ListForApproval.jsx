@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select } from 'antd';
 import api from '../../api';
 import { CloseOutlined, SelectOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
-import { debounce } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -15,6 +15,7 @@ function mapStateToProps(state) {
         user: state.user.data,
         procurementTypes: state.library.procurement_types,
         modeOfProcurements: state.library.mode_of_procurements,
+        technicalWorkingGroups: state.library.technical_working_groups,
     };
 }
 
@@ -40,6 +41,7 @@ const ListForApproval = (props) => {
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
     const [routeOptions, setRouteOptions] = useState([]);
     const [formRoute, setFormRoute] = useState({});
+    const [procurementFormType, setProcurementFormType] = useState("");
 
     const showRejectForm = (formRouteItem) => {
         setFormRoute(formRouteItem)
@@ -164,26 +166,37 @@ const ListForApproval = (props) => {
         setModalProcurementForm(false);
     }
     const submitProcurementForm = debounce(async (e) => {
-        let formData = {
-            ...e,
-            id: selectedForm.form_routable.id
-        };
         if(selectedForm.route_type == "purchase_request"){
-            await api.PurchaseRequest.save(formData, 'update');
-            await approve(selectedForm);
+            if(procurementFormType == "approve"){
+                let formData = {
+                    ...e,
+                    id: selectedForm.form_routable.id
+                };
+                await api.PurchaseRequest.save(formData, 'update');
+                await approve(selectedForm);
+            }else if(procurementFormType == "twg"){
+                let formData = {
+                    ...e,
+                    id: selectedForm.form_process.id,
+                    type: procurementFormType,
+                }
+                await api.Forms.updateProcess(formData);
+                await approve(selectedForm);
+            }
             setModalProcurementForm(false);
         }
         // console.log(selectedForm);
     }, 150);
     const confirm = debounce((item) => {
         setSelectedForm(item);
+        let current_route = item.form_process.form_routes.filter(i => i.status == "pending");
 
         let procurement_signatory = props.user.signatories.filter(i => i.office.title == "PS");
         let budget_signatory = props.user.signatories.filter(i => i.office.title == "BS");
 
-        if(procurement_signatory.length != 0){
+        if(procurement_signatory.length != 0 && current_route[0].description_code == "select_action"){
             setModalProcurementForm(true);
-        }else if(budget_signatory.length != 0){
+        }else if(budget_signatory.length != 0  && current_route[0].description_code == "aprroval_from_budget"){
             setModalBudgetForm(true);
             setTimeout(() => {
                 budgetFormRef.current.setFieldsValue({
@@ -210,6 +223,10 @@ const ListForApproval = (props) => {
         .then(res => {})
         ;
     }, 150);
+
+    const actionTypeProcurement = (e) => {
+        setProcurementFormType(e);
+    }
 
     const dataSource = forms
       
@@ -413,10 +430,11 @@ const ListForApproval = (props) => {
 
             <Modal title="Procurement Approval Form" visible={modalProcurementForm} 
                 footer={[
-                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit">
+                    procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit">
                         Submit
-                    </Button>,
-                    <Button form="budgetForm" key="cancel" onClick={() => cancelProcurementForm()}>
+                    </Button>) : ""
+                    ,
+                    <Button form="procurementForm" key="cancel" onClick={() => cancelProcurementForm()}>
                         Cancel
                     </Button>
                     ]}>
@@ -426,29 +444,55 @@ const ListForApproval = (props) => {
                     className="login-form"
                     onFinish={(e) => submitProcurementForm(e)}
                     layout='vertical'
-                    id="budgetForm"
+                    id="procurementForm"
                 >
-                    
+
                     <Form.Item
-                        name="purchase_request_type_id"
-                        label="Procurement Type"
-                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                        name="action_type"
+                        label="Action"
+                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                     >
-                        <Select placeholder='Select Procurement Type'>
-                            { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                        <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
+                            <Option value="twg">Forward to Technical Working Group</Option>
+                            <Option value="approve">Proceed to Approval</Option>
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
-                        name="mode_of_procurement_id"
-                        label="Procurement Type"
-                        // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
-                    >
-                        <Select placeholder='Select Mode of Procurement'>
-                            { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                        </Select>
-                    </Form.Item>
+                    { procurementFormType == "twg" ? (
+                        <Form.Item
+                            name="technical_working_group_id"
+                            label="Technical Working Groups"
+                            // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                        >
+                            <Select placeholder='Select Technical Working Groups'>
+                                { props.technicalWorkingGroups.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                            </Select>
+                        </Form.Item>
+                    ) : "" }
+                    { procurementFormType == "approve" ? (
+                        <>
+                            <Form.Item
+                                name="purchase_request_type_id"
+                                label="Procurement Type"
+                                // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                            >
+                                <Select placeholder='Select Procurement Type'>
+                                    { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                </Select>
+                            </Form.Item>
 
+                            <Form.Item
+                                name="mode_of_procurement_id"
+                                label="Procurement Type"
+                                // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                            >
+                                <Select placeholder='Select Mode of Procurement'>
+                                    { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                </Select>
+                            </Form.Item>
+                        </>
+                    ) : "" }
+                                        
                 </Form>
             </Modal>
 

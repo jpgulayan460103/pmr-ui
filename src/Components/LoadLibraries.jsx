@@ -85,6 +85,11 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES",
                 data: libraries.filter(library => library.library_type == "mode_of_procurement")
             });
+
+            props.dispatch({
+                type: "SET_LIBRARY_TECHNICAL_WORKING_GROUPS",
+                data: libraries.filter(library => library.library_type == "technical_working_group")
+            });
             
         })
         .catch(err => {})

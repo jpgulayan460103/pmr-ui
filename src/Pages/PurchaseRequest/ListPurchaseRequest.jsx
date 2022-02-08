@@ -2,7 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker  } from 'antd';
 import api from '../../api';
-import Icon, { CloseOutlined, HeartTwoTone, SearchOutlined } from '@ant-design/icons';
+import Icon, {
+    CloseOutlined,
+    HeartTwoTone,
+    SearchOutlined,
+    CheckCircleOutlined,
+    ExclamationCircleOutlined,
+    QuestionCircleOutlined,
+    InfoCircleOutlined,
+    LoadingOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
@@ -160,6 +169,40 @@ const Listpurchaserequest = (props) => {
         getPurchaseRequests({...filterData, page: e})
     }
 
+    const timelineContent = (timeline) => {
+        // `${timeline.status_str} by the [${timeline.to_office?.name}]`
+        let label = (<span>
+            {timeline.status_str} <br />
+            <b>{timeline.to_office?.name}</b> <br />
+            {timeline.remarks}
+        </span>)
+        let color =""
+        let logo =""
+        switch (timeline.status) {
+            case "approved":
+                color = "green";
+                logo = <CheckCircleOutlined />;
+                break;
+            case "rejected":
+                color = "red";
+                logo = <ExclamationCircleOutlined />;
+                break;
+            case "with_issues":
+                color = "blue";
+                logo = <QuestionCircleOutlined />;
+                break;
+            case "resolved":
+                color = "green";
+                logo = <InfoCircleOutlined />;
+                break;
+            default:
+                color = "gray";
+                logo = <LoadingOutlined />
+                break;
+        }
+        return { label, color, logo }
+    }
+
     const dataSource = purchaseRequests
       
     const columns = [
@@ -251,25 +294,7 @@ const Listpurchaserequest = (props) => {
                     <TabPane tab="Routing" key="2">
                         <Timeline mode="left">
                             { timelines.map((timeline, index) => {
-                                let color;
-                                let label;
-                                if(timeline.status == "approved"){
-                                    color = "green";
-                                    label = `${timeline.status_str} by the [${timeline.to_office?.name}]`;
-                                }else if(timeline.status == "rejected"){
-                                    color = "red";
-                                    label = `Disapproved by the [${timeline.to_office?.name}] remarks: ${timeline.remarks}`;
-                                }else if(timeline.status == "with_issues"){
-                                    color = "gray";
-                                    label = `Returned from the [${timeline.from_office?.name}] to the [${timeline.to_office?.name}]`;
-                                }else if(timeline.status == "resolved"){
-                                    color = "green";
-                                    label = `Resolved issues and returned to the [${timeline.from_office?.name}]  remarks: ${timeline.remarks}`;
-                                }else{
-                                    color = "gray";
-                                    label = `For approval of the [${timeline.to_office?.name}]`;
-                                }
-                                return <Timeline.Item color={color} label={timeline.updated_at} key={index}>{label}</Timeline.Item>
+                                return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} label={timeline.updated_at} key={index}>{timelineContent(timeline).label}</Timeline.Item>
                             }) }
                         </Timeline>
                     </TabPane>
