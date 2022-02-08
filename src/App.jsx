@@ -19,10 +19,10 @@ window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: "12345",
-    cluster: "mt1",
+    key: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_PUSHER_APP_KEY_PRODUCTION : process.env.REACT_APP_PUSHER_APP_KEY_DEVEOPMENT),
+    cluster: process.env.REACT_APP_PUSHER_APP_CLUSTER,
     forceTLS: false,
-    wsHost: "pmr-api.test",
+    wsHost: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_WS_HOST : process.env.REACT_APP_PRODUCTION_WS_HOST),
     wsPort: 6001,
 });
 const auth = {

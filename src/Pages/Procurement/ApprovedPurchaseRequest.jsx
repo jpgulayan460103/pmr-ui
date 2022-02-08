@@ -465,6 +465,7 @@ const ApprovedPurchaseRequest = (props) => {
                 }}
             />
             <div className="flex justify-end mt-2">
+            <b>{process.env.REACT_APP_PRODUCTION_URL_LOCAL}</b>
             <Pagination
                     current={props.purchaseRequestsPagination?.current_page || 1}
                     total={props.purchaseRequestsPagination?.total || 1}

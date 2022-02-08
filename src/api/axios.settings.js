@@ -1,9 +1,8 @@
 import axios from 'axios'
 
 
-// baseURL: (process.env.NODE_ENV == "development" ? process.env.DEVELOPMENT_URL : process.env.PRODUCTION_URL)
 const customAxios = axios.create({
-  baseURL: "http://pmr-api.test"
+  baseURL: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_URL : process.env.REACT_APP_PRODUCTION_URL)
 });
 if(sessionStorage.getItem("session")){
   let token = JSON.parse(sessionStorage.getItem("session"));

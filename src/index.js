@@ -10,8 +10,8 @@ import store from './store'
 
 ReactDOM.render(
   <Provider store={store}>
-    {/* <BrowserRouter basename='/fms'> */}
-    <BrowserRouter>
+    <BrowserRouter basename={(process.env.NODE_ENV == "development" ? '' : process.env.PUBLIC_URL)}>
+    {/* <BrowserRouter> */}
       <App />
     </BrowserRouter>
   </Provider>,
