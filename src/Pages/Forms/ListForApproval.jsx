@@ -44,6 +44,7 @@ const ListForApproval = (props) => {
     const [formRoute, setFormRoute] = useState({});
     const [procurementFormType, setProcurementFormType] = useState("");
     const [currentRoute, setCurrentRoute] = useState({});
+    const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
 
     const showRejectForm = (formRouteItem) => {
         setFormRoute(formRouteItem)
@@ -154,7 +155,8 @@ const ListForApproval = (props) => {
     const submitBudgetForm = async (e) => {
         let formData = {
             ...e,
-            id: selectedForm.form_routable.id
+            id: selectedForm.form_routable.id,
+            purchase_request_number: `${addOn}${e.purchase_request_number_last}`
         };
         if(selectedForm.route_type == "purchase_request"){
             await api.PurchaseRequest.save(formData, 'update');
@@ -207,7 +209,7 @@ const ListForApproval = (props) => {
             setModalBudgetForm(true);
             setTimeout(() => {
                 budgetFormRef.current.setFieldsValue({
-                    purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
+                    // purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
                     alloted_amount: item.form_routable.common_amount,
                 });
             }, 150);
@@ -387,12 +389,12 @@ const ListForApproval = (props) => {
                 >
 
                     <Form.Item
-                        name="purchase_request_number"
+                        name="purchase_request_number_last"
                         label="Purchase Request Number"
                         rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
                         // { ...showErrorMessage() }
                     >
-                        <Input placeholder="Purchase Request Number" />
+                        <Input addonBefore={addOn} placeholder="Purchase Request Number" />
                     </Form.Item>
 
                     <Form.Item

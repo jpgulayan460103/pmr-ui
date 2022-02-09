@@ -9,6 +9,7 @@ const initialState = () => {
         fund_cluster: "",
         purchase_request_number: "",
         center_code: "",
+        end_user_id: null,
         pr_date: customDayJs().format('YYYY-MM-DD')
       },
       formErrors: {},

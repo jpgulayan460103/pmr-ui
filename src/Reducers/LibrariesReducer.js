@@ -12,6 +12,8 @@ const initialState = () => {
       procurement_types: [],
       mode_of_procurements: [],
       technical_working_groups: [],
+      user_signatory_designations: [],
+      user_signatory_names: [],
       isLibrariesLoaded: false,
     }
   }
@@ -77,6 +79,16 @@ const initialState = () => {
         return {
           ...state,
           technical_working_groups: action.data,
+        };
+      case 'SET_LIBRARY_SIGNATORY_DESIGNATION':
+        return {
+          ...state,
+          user_signatory_designations: action.data,
+        };
+      case 'SET_LIBRARY_SIGNATORY_NAME':
+        return {
+          ...state,
+          user_signatory_names: action.data,
         };
       case 'LOAD_LIBRARIES':
         return {

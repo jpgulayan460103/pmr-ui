@@ -51,15 +51,13 @@ const Loadlibraries = (props) => {
         return api.Library.all()
         .then(res => {
             let libraries = res.data.data;
-            let user_division = libraries.filter(library => library.library_type == "user_division");
-            let user_section = libraries.filter(library => library.library_type == "user_section");
             props.dispatch({
                 type: "SET_LIBRARY_USER_DIVISIONS",
-                data: user_division
+                data: libraries.filter(library => library.library_type == "user_division")
             });
             props.dispatch({
                 type: "SET_LIBRARY_USER_SECTION",
-                data: user_section
+                data: libraries.filter(library => library.library_type == "user_section")
             });
             props.dispatch({
                 type: "SET_LIBRARY_UNIT_OF_MEASURES",
@@ -90,6 +88,15 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_TECHNICAL_WORKING_GROUPS",
                 data: libraries.filter(library => library.library_type == "technical_working_group")
             });
+
+            props.dispatch({
+                type: "SET_LIBRARY_SIGNATORY_DESIGNATION",
+                data: libraries.filter(library => library.library_type == "user_signatory_designation")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_SIGNATORY_NAME",
+                data: libraries.filter(library => library.library_type == "user_signatory_name")
+            });
             
         })
         .catch(err => {})
@@ -118,7 +125,7 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_SIGNATORIES",
                 data: signatory
             });
-            setDefualtPrSignatories(signatory);
+            // setDefualtPrSignatories(signatory);
         })
         .catch(err => {})
         .then(res => {})

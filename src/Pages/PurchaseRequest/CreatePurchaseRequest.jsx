@@ -14,12 +14,13 @@ function mapStateToProps(state) {
         items: state.library.items,
         user_sections: state.library.user_sections,
         user_divisions: state.library.user_divisions,
+        user_signatory_designations: state.library.user_signatory_designations,
+        user_signatory_names: state.library.user_signatory_names,
         isLibrariesLoaded: state.library.isLibrariesLoaded,
         formData: state.purchaseRequest.formData,
         formType: state.purchaseRequest.formType,
         formErrors: state.purchaseRequest.formErrors,
         formProccess: state.purchaseRequest.formProccess,
-        signatories: state.library.signatories,
         requestedBySignatory: state.purchaseRequest.requestedBySignatory,
         approvedBySignatory: state.purchaseRequest.approvedBySignatory,
         user: state.user.data,
@@ -38,7 +39,14 @@ const CreatePurchaseRequest = (props) => {
         if(props.isLibrariesLoaded){
             if(props.formData.end_user_id){
             }else{
+                console.log("asdnasjkdnjkasdnjkasdjkn");
                 changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+            }
+            if(isEmpty(props.requestedBySignatory)){
+                setSignatory("OARDA",'requestedBy')
+            }
+            if(isEmpty(props.approvedBySignatory)){
+                setSignatory("ORD", 'approvedBy')
             }
         }
     }, [props.isLibrariesLoaded]);
@@ -157,6 +165,7 @@ const CreatePurchaseRequest = (props) => {
     }
 
     const changeFieldValue = (e, field, target = true) => {
+        console.log(e, field);
         let value = e;
         if(target){
             value = e.target.value;
@@ -234,11 +243,16 @@ const CreatePurchaseRequest = (props) => {
 
 
     const setSignatory = (e, type) => {
-        changeFieldValue(e, type, false)
         if(type == "requestedBy"){
-            let signatory = props.signatories.filter(i => i.signatory_type == e);
+            let signatory = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
+                data: signatory[0]
+            });
+        }else{
+            let signatory = props.user_signatory_names.filter(i => i.title == e);
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
                 data: signatory[0]
             });
         }
@@ -413,34 +427,34 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
                         <td style={{borderBottom: 0}}>Requested By:
-                            <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e,'requestedBy') }} value={props.formData.requestedBy}>
-                                { props.signatories.filter(i => i.signatory_type == "OARDA" || i.signatory_type == "OARDO").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
+                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
+                                { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
                             </Select>
                         <br /><br />&nbsp;</td>
                         <td colSpan={4} style={{borderBottom: 0}}>Approved by:
-                        <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy}>
-                            { props.signatories.filter(i => i.signatory_type == "ORD").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
+                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
+                            { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
                         </Select>
                         <br /><br />&nbsp;</td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0, borderBottom: 0}}>Printed Name:</td>
                         <td style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.requestedBySignatory?.user?.user_information.fullname }
+                            { props.requestedBySignatory?.name }
                         </td>
                         <td colSpan={4} style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.approvedBySignatory?.user?.user_information.fullname }
+                            { props.approvedBySignatory?.name }
                         </td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0}}>Designation:</td>
                         <td style={{ textAlign: "center", borderTop: 0}}>
                             {/* { props.formData.requestedBy_designation } */}
-                            { props.requestedBySignatory?.title } { props.requestedBySignatory?.designation }
+                            { props.requestedBySignatory?.parent?.name }
                         </td>
                         <td colSpan={4} style={{ textAlign: "center", borderTop: 0}}>
                             {/* { props.formData.approvedBy_designation } */}
-                            { props.approvedBySignatory?.title } { props.approvedBySignatory?.designation }
+                            { props.approvedBySignatory?.parent?.name }
                         </td>
                     </tr>
                 </tbody>
