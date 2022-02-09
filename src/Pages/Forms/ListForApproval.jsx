@@ -4,6 +4,7 @@ import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Mo
 import api from '../../api';
 import { CloseOutlined, SelectOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce } from 'lodash';
+import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -42,6 +43,7 @@ const ListForApproval = (props) => {
     const [routeOptions, setRouteOptions] = useState([]);
     const [formRoute, setFormRoute] = useState({});
     const [procurementFormType, setProcurementFormType] = useState("");
+    const [currentRoute, setCurrentRoute] = useState({});
 
     const showRejectForm = (formRouteItem) => {
         setFormRoute(formRouteItem)
@@ -193,13 +195,19 @@ const ListForApproval = (props) => {
 
         let procurement_signatory = props.user.signatories.filter(i => i.office.title == "PS");
         let budget_signatory = props.user.signatories.filter(i => i.office.title == "BS");
-
-        if(procurement_signatory.length != 0 && current_route[0].description_code == "select_action"){
-            setModalProcurementForm(true);
+        setCurrentRoute(current_route[0]);
+        if(procurement_signatory.length != 0){
+            if(current_route[0].description_code == "select_action" || current_route[0].description_code == "aprroval_from_proc"){
+                setModalProcurementForm(true);
+                if(current_route[0].description_code == "aprroval_from_proc"){
+                    setProcurementFormType("approve");
+                }
+            }
         }else if(budget_signatory.length != 0  && current_route[0].description_code == "aprroval_from_budget"){
             setModalBudgetForm(true);
             setTimeout(() => {
                 budgetFormRef.current.setFieldsValue({
+                    purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
                     alloted_amount: item.form_routable.common_amount,
                 });
             }, 150);
@@ -379,6 +387,15 @@ const ListForApproval = (props) => {
                 >
 
                     <Form.Item
+                        name="purchase_request_number"
+                        label="Purchase Request Number"
+                        rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
+                        // { ...showErrorMessage() }
+                    >
+                        <Input placeholder="Purchase Request Number" />
+                    </Form.Item>
+
+                    <Form.Item
                         name="fund_cluster"
                         label="Fund Cluster"
                         // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
@@ -447,16 +464,18 @@ const ListForApproval = (props) => {
                     id="procurementForm"
                 >
 
-                    <Form.Item
-                        name="action_type"
-                        label="Action"
-                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
-                    >
-                        <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
-                            <Option value="twg">Forward to Technical Working Group</Option>
-                            <Option value="approve">Proceed to Approval</Option>
-                        </Select>
-                    </Form.Item>
+                    { currentRoute.description_code != "aprroval_from_proc" ? (
+                        <Form.Item
+                            name="action_type"
+                            label="Action"
+                            rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                        >
+                            <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
+                                <Option value="twg">Forward to Technical Working Group</Option>
+                                <Option value="approve">Proceed to Approval</Option>
+                            </Select>
+                        </Form.Item>
+                    ) : "" }
 
                     { procurementFormType == "twg" ? (
                         <Form.Item
