@@ -16,4 +16,7 @@ export default {
   updateProcess(formData){
     return axios.put(`api/forms/process/${formData.id}`, formData);
   },
+  getRoute(id){
+    return axios.get(`api/forms/routes/${id}`);
+  },
 }

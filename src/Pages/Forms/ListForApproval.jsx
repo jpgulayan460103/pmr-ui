@@ -35,13 +35,12 @@ const ListForApproval = (props) => {
     const [forms, setForms] = useState([]);
     const [formOutput, setFormOutput] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [selectedForm, setSelectedForm] = useState({});
+    const [selectedFormRoute, setSelectedFormRoute] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
     const [routeOptions, setRouteOptions] = useState([]);
-    const [formRoute, setFormRoute] = useState({});
     const [procurementFormType, setProcurementFormType] = useState("");
     const [currentRoute, setCurrentRoute] = useState({});
     const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
@@ -57,7 +56,7 @@ const ListForApproval = (props) => {
     }
 
     const showRejectForm = (formRouteItem) => {
-        setFormRoute(formRouteItem)
+        setSelectedFormRoute(formRouteItem)
         setModalRejectForm(true);
         let options = formRouteItem.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
         setRouteOptions(options);
@@ -70,19 +69,40 @@ const ListForApproval = (props) => {
        
     }
 
-    const submitRejectForm = (val) => {
+    const proceedReject = (e) => {
+        setErrorMessage({});
         let formData = {
-            ...val,
+            ...e,
         };
-        api.Forms.reject(formRoute.id, formData)
+        api.Forms.reject(selectedFormRoute.id, formData)
         .then(res => {
+            setErrorMessage({});
             setModalRejectForm(false);
             getForm();
         })
         .catch(err => {})
         .then(res => {})
         ;
-        // setModalRejectForm(false);
+    }
+
+    const submitRejectForm = (e) => {
+        api.Forms.getRoute(selectedFormRoute.id)
+        .then(res => {
+            if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setModalRejectForm(false);
+                notification.error({
+                    message: 'Purchase Request has been amended.',
+                    description:
+                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    }
+                );
+                getForm();
+                return false;
+            }else{
+                proceedReject(e);
+            }
+        })
+        .catch(err => {})
     };
     const cancelRejectForm = () => {
         setModalRejectForm(false);
@@ -90,7 +110,7 @@ const ListForApproval = (props) => {
 
 
     const showResolveForm = (formRouteItem) => {
-        setFormRoute(formRouteItem)
+        setSelectedFormRoute(formRouteItem)
         setModalResolveForm(true);
         let options = formRouteItem.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
         setRouteOptions(options);
@@ -103,20 +123,41 @@ const ListForApproval = (props) => {
        
     }
 
-    const submitResolveForm = (val) => {
+    const proceedResolve = (e) => {
+        setErrorMessage({});
         let formData = {
-            ...val,
+            ...e,
 
         };
-        api.Forms.resolve(formRoute.id, formData)
+        api.Forms.resolve(selectedFormRoute.id, formData)
         .then(res => {
+            setErrorMessage({});
             setModalResolveForm(false);
             getForm();
         })
         .catch(err => {})
         .then(res => {})
         ;
-        // setModalResolveForm(false);
+    }
+
+    const submitResolveForm = (e) => {
+        api.Forms.getRoute(selectedFormRoute.id)
+        .then(res => {
+            if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setModalResolveForm(false);
+                notification.error({
+                    message: 'Purchase Request has been amended.',
+                    description:
+                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    }
+                );
+                getForm();
+                return false;
+            }else{
+                proceedResolve(e);
+            }
+        })
+        .catch(err => {})
     };
     const cancelResolveForm = () => {
         setModalResolveForm(false);
@@ -162,17 +203,25 @@ const ListForApproval = (props) => {
     const cancelBudgetForm = () => {
         setModalBudgetForm(false);
     }
-    const submitBudgetForm = async (e) => {
+
+
+    const updatePurchaseRequest = (formData) => {
+        return api.PurchaseRequest.save(formData, 'update');
+    }
+
+    const proceedBudget = (e) => {
+        setErrorMessage({});
         let formData = {
             ...e,
-            id: selectedForm.form_routable.id,
+            id: selectedFormRoute.form_routable.id,
             purchase_request_number: `${addOn}${e.purchase_request_number_last}`,
             updater: "budget",
         };
-        if(selectedForm.route_type == "purchase_request"){
+        if(selectedFormRoute.route_type == "purchase_request"){
             api.PurchaseRequest.save(formData, 'update')
             .then(res => {
-                approve(selectedForm);
+                setErrorMessage({});
+                approve(selectedFormRoute);
                 setModalBudgetForm(false);
             })
             .catch(err => {
@@ -181,25 +230,45 @@ const ListForApproval = (props) => {
             })
             .then(res => {});
         }
-        // console.log(selectedForm);
+    }
+    const submitBudgetForm = async (e) => {
+        api.Forms.getRoute(selectedFormRoute.id)
+        .then(res => {
+            if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setModalBudgetForm(false);
+                notification.error({
+                    message: 'Purchase Request has been amended.',
+                    description:
+                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    }
+                );
+                getForm();
+                return false;
+            }else{
+                proceedBudget(e);
+            }
+        })
+        .catch(err => {})
     }
     
     const cancelProcurementForm = () => {
         setModalProcurementForm(false);
     }
-    const submitProcurementForm = debounce(async (e) => {
+
+    const proceedProcurement = (e) => {
         setErrorMessage({});
-        if(selectedForm.route_type == "purchase_request"){
+        if(selectedFormRoute.route_type == "purchase_request"){
             if(procurementFormType == "approve"){
                 let formData = {
                     ...e,
-                    id: selectedForm.form_routable.id,
+                    id: selectedFormRoute.form_routable.id,
                     updater: "procurement",
                 };
 
                 api.PurchaseRequest.save(formData, 'update')
                 .then(res => {
-                    approve(selectedForm);
+                    setErrorMessage({});
+                    approve(selectedFormRoute);
                     setModalProcurementForm(false);
                 })
                 .catch(err => {
@@ -209,13 +278,13 @@ const ListForApproval = (props) => {
             }else if(procurementFormType == "twg"){
                 let formData = {
                     ...e,
-                    id: selectedForm.form_process.id,
+                    id: selectedFormRoute.form_process.id,
                     type: procurementFormType,
-                }
-
-                api.PurchaseRequest.save(formData, 'update')
+                    updater: "procurement",
+                }                
+                api.Forms.updateProcess(formData)
                 .then(res => {
-                    approve(selectedForm);
+                    approve(selectedFormRoute);
                     setModalProcurementForm(false);
                 })
                 .catch(err => {
@@ -224,10 +293,30 @@ const ListForApproval = (props) => {
                 })
             }
         }
-        // console.log(selectedForm);
+    }
+    const submitProcurementForm = debounce(async (e) => {
+        api.Forms.getRoute(selectedFormRoute.id)
+        .then(res => {
+            if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setModalProcurementForm(false);
+                notification.error({
+                    message: 'Purchase Request has been amended.',
+                    description:
+                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    }
+                );
+                getForm();
+                return false;
+            }else{
+                proceedProcurement(e);
+            }
+        })
+        .catch(err => {})
     }, 150);
+
+
     const confirm = debounce((item) => {
-        setSelectedForm(item);
+        setSelectedFormRoute(item);
         let current_route = item.form_process.form_routes.filter(i => i.status == "pending");
 
         let procurement_signatory = props.user.signatories.filter(i => i.office.title == "PS");
@@ -254,19 +343,34 @@ const ListForApproval = (props) => {
     }, 150)
 
     const approve = debounce(async (item) => {
-        api.Forms.approve(item.id)
+        api.Forms.getRoute(item.id)
         .then(res => {
-            notification.success({
-                message: 'Purchase Request is approved.',
-                description:
-                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-                }
-            );
-            getForm();
+            if(res.data.status != "pending" && res.data.status != "with_issues"){
+                notification.error({
+                    message: 'Purchase Request has been amended.',
+                    description:
+                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    }
+                );
+                getForm();
+                return false;
+            }else{
+                api.Forms.approve(item.id)
+                .then(res => {
+                    notification.success({
+                        message: 'Purchase Request is approved.',
+                        description:
+                            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        }
+                    );
+                    getForm();
+                })
+                .catch(err => {})
+                .then(res => {})
+                ;
+            }
         })
         .catch(err => {})
-        .then(res => {})
-        ;
     }, 150);
 
     const actionTypeProcurement = (e) => {
