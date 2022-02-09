@@ -45,6 +45,16 @@ const ListForApproval = (props) => {
     const [procurementFormType, setProcurementFormType] = useState("");
     const [currentRoute, setCurrentRoute] = useState({});
     const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
+    const [errorMessage, setErrorMessage] = useState({});
+
+    const showErrorMessage = (field) => {
+        if(errorMessage && errorMessage[field]){
+            return {
+                validateStatus: 'error',
+                help: errorMessage[field]
+            }
+        }
+    }
 
     const showRejectForm = (formRouteItem) => {
         setFormRoute(formRouteItem)
@@ -156,12 +166,20 @@ const ListForApproval = (props) => {
         let formData = {
             ...e,
             id: selectedForm.form_routable.id,
-            purchase_request_number: `${addOn}${e.purchase_request_number_last}`
+            purchase_request_number: `${addOn}${e.purchase_request_number_last}`,
+            updater: "budget",
         };
         if(selectedForm.route_type == "purchase_request"){
-            await api.PurchaseRequest.save(formData, 'update');
-            await approve(selectedForm);
-            setModalBudgetForm(false);
+            api.PurchaseRequest.save(formData, 'update')
+            .then(res => {
+                approve(selectedForm);
+                setModalBudgetForm(false);
+            })
+            .catch(err => {
+                setErrorMessage(err.response.data.errors)
+                
+            })
+            .then(res => {});
         }
         // console.log(selectedForm);
     }
@@ -170,24 +188,41 @@ const ListForApproval = (props) => {
         setModalProcurementForm(false);
     }
     const submitProcurementForm = debounce(async (e) => {
+        setErrorMessage({});
         if(selectedForm.route_type == "purchase_request"){
             if(procurementFormType == "approve"){
                 let formData = {
                     ...e,
-                    id: selectedForm.form_routable.id
+                    id: selectedForm.form_routable.id,
+                    updater: "procurement",
                 };
-                await api.PurchaseRequest.save(formData, 'update');
-                await approve(selectedForm);
+
+                api.PurchaseRequest.save(formData, 'update')
+                .then(res => {
+                    approve(selectedForm);
+                    setModalProcurementForm(false);
+                })
+                .catch(err => {
+                    setErrorMessage(err.response.data.errors)
+                    
+                })
             }else if(procurementFormType == "twg"){
                 let formData = {
                     ...e,
                     id: selectedForm.form_process.id,
                     type: procurementFormType,
                 }
-                await api.Forms.updateProcess(formData);
-                await approve(selectedForm);
+
+                api.PurchaseRequest.save(formData, 'update')
+                .then(res => {
+                    approve(selectedForm);
+                    setModalProcurementForm(false);
+                })
+                .catch(err => {
+                    setErrorMessage(err.response.data.errors)
+                    
+                })
             }
-            setModalProcurementForm(false);
         }
         // console.log(selectedForm);
     }, 150);
@@ -392,7 +427,7 @@ const ListForApproval = (props) => {
                         name="purchase_request_number_last"
                         label="Purchase Request Number"
                         rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        // { ...showErrorMessage() }
+                        { ...showErrorMessage('purchase_request_number_last') }
                     >
                         <Input addonBefore={addOn} placeholder="Purchase Request Number" />
                     </Form.Item>
@@ -495,6 +530,7 @@ const ListForApproval = (props) => {
                             <Form.Item
                                 name="purchase_request_type_id"
                                 label="Procurement Type"
+                                { ...showErrorMessage('purchase_request_type_id') }
                                 // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                             >
                                 <Select placeholder='Select Procurement Type'>
@@ -505,6 +541,7 @@ const ListForApproval = (props) => {
                             <Form.Item
                                 name="mode_of_procurement_id"
                                 label="Procurement Type"
+                                { ...showErrorMessage('mode_of_procurement_id') }
                                 // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                             >
                                 <Select placeholder='Select Mode of Procurement'>
