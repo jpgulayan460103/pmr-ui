@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select } from 'antd';
+import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
 import api from '../../api';
-import { CloseOutlined, SelectOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
-import { cloneDeep, debounce } from 'lodash';
+import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
+import filter from '../../Shared/filter';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -17,8 +18,15 @@ function mapStateToProps(state) {
         procurementTypes: state.library.procurement_types,
         modeOfProcurements: state.library.mode_of_procurements,
         technicalWorkingGroups: state.library.technical_working_groups,
+        user_sections: state.library.user_sections,
     };
 }
+
+const MaximizeSvg = () => (
+    <svg width="1em" height="1em" fill="currentColor" viewBox="0 0 1024 1024">
+        <path d="M794.432 983.552H51.2a25.6 25.6 0 0 1-25.6-25.6V214.784a25.6 25.6 0 0 1 25.6-25.6h152.768V66.112a25.6 25.6 0 0 1 25.6-25.6H972.8a25.6 25.6 0 0 1 25.6 25.6v743.232a25.6 25.6 0 0 1-25.6 25.6h-152.768v123.008a25.6 25.6 0 0 1-25.6 25.6z m-717.632-51.2h692.032V240.384H76.8v691.968z m743.232-148.672H947.2V91.648H255.168v97.472h539.264a25.6 25.6 0 0 1 25.6 25.6v568.96z" p-id="2528"></path>
+    </svg>
+);  
 
 const ListForApproval = (props) => {
     const rejectFormRef = React.useRef();
@@ -33,8 +41,6 @@ const ListForApproval = (props) => {
           });
     }, []);
     const [forms, setForms] = useState([]);
-    const [formOutput, setFormOutput] = useState("");
-    const [selectedIndex, setSelectedIndex] = useState(null);
     const [selectedFormRoute, setSelectedFormRoute] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
@@ -45,6 +51,8 @@ const ListForApproval = (props) => {
     const [currentRoute, setCurrentRoute] = useState({});
     const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
     const [errorMessage, setErrorMessage] = useState({});
+    const [filterData, setFilterData] = useState({});
+    
 
     const showErrorMessage = (field) => {
         if(errorMessage && errorMessage[field]){
@@ -79,6 +87,8 @@ const ListForApproval = (props) => {
             setErrorMessage({});
             setModalRejectForm(false);
             getForm();
+            setSelectedFormRoute({});
+            setCurrentRoute({});
         })
         .catch(err => {})
         .then(res => {})
@@ -97,6 +107,8 @@ const ListForApproval = (props) => {
                     }
                 );
                 getForm();
+                setSelectedFormRoute({});
+                setCurrentRoute({});
                 return false;
             }else{
                 proceedReject(e);
@@ -134,6 +146,8 @@ const ListForApproval = (props) => {
             setErrorMessage({});
             setModalResolveForm(false);
             getForm();
+            setSelectedFormRoute({});
+            setCurrentRoute({});
         })
         .catch(err => {})
         .then(res => {})
@@ -152,6 +166,8 @@ const ListForApproval = (props) => {
                     }
                 );
                 getForm();
+                setSelectedFormRoute({});
+                setCurrentRoute({});
                 return false;
             }else{
                 proceedResolve(e);
@@ -176,33 +192,34 @@ const ListForApproval = (props) => {
     }
     
     const openInFull = () => {
-        window.open(`${formOutput}?view=1`,
+        window.open(`${selectedFormRoute.form_routable?.file}?view=1`,
                 'newwindow',
                 'width=960,height=1080');
             return false;
     }
 
     const viewForm = (item, index) => {
-        setFormOutput(item.form_routable.file);
-        setSelectedIndex(index)
+        setSelectedFormRoute(item)
     }
     const respondForm = (item, index) => {
-        // setFormOutput(item.form_routable.file);
-        setSelectedIndex(index)
+        setSelectedFormRoute(item)
     }
     const resolveForm = (item, index) => {
-        // setFormOutput(item.form_routable.file);
-        setSelectedIndex(index);
+        setSelectedFormRoute(item);
         showResolveForm(item);
     }
     const closeForm = () => {
-        setFormOutput("");
-        setSelectedIndex(null);
+        setSelectedFormRoute({});
     }
 
     const cancelBudgetForm = () => {
         setModalBudgetForm(false);
     }
+
+    const endUserFilter = cloneDeep(props.user_sections).map(i => {
+        i.value = i.id;
+        return i;
+    });
 
 
     const updatePurchaseRequest = (formData) => {
@@ -243,6 +260,8 @@ const ListForApproval = (props) => {
                     }
                 );
                 getForm();
+                setSelectedFormRoute({});
+                setCurrentRoute({});
                 return false;
             }else{
                 proceedBudget(e);
@@ -306,6 +325,8 @@ const ListForApproval = (props) => {
                     }
                 );
                 getForm();
+                setSelectedFormRoute({});
+                setCurrentRoute({});
                 return false;
             }else{
                 proceedProcurement(e);
@@ -353,6 +374,8 @@ const ListForApproval = (props) => {
                     }
                 );
                 getForm();
+                setSelectedFormRoute({});
+                setCurrentRoute({});
                 return false;
             }else{
                 api.Forms.approve(item.id)
@@ -364,6 +387,8 @@ const ListForApproval = (props) => {
                         }
                     );
                     getForm();
+                    setSelectedFormRoute({});
+                    setCurrentRoute({});
                 })
                 .catch(err => {})
                 .then(res => {})
@@ -384,6 +409,7 @@ const ListForApproval = (props) => {
             title: 'Form Type',
             dataIndex: 'route_type_str',
             key: 'route_type_str',
+            width: 150,
         },
         {
             title: 'Particulars',
@@ -392,11 +418,26 @@ const ListForApproval = (props) => {
                 <span>
                     { item.form_routable?.particulars }
                 </span>
-            )
+            ),
+            ...filter.search('particulars','text', setFilterData, filterData, getForm),
+        },
+        {
+            title: 'Amount',
+            key: 'amount',
+            render: (text, item, index) => (
+                <span>
+                    { item.form_routable?.total_cost_formatted }
+                </span>
+            ),
+            ...filter.search('total_cost','text', setFilterData, filterData, getForm),
         },
         {
             title: 'End User',
             key: 'end_user',
+            ellipsis: true,
+            width: 250,
+            filters: endUserFilter,
+            ...filter.list('end_user_id','text', setFilterData, filterData, getForm),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -409,39 +450,63 @@ const ListForApproval = (props) => {
             render: (text, item, index) => (
                 <span>
                     { item.status != "pending" ? (
-                        <span>
-                            <span>Status: <b>Disapproved</b></span><br />
-                            <span>Disapproved by: <b>{item.user?.user_information?.fullname}</b></span><br />
-                            <span>From: <b>{item.from_office.name}</b></span><br />
-                            <span>Remarks: <b>{item.remarks}</b></span><br />
-                        </span>
+                        <span> Disapproved</span>
                     ) : (
-                        <span>
-                            <span>Status: <b>Pending</b></span><br />
-                            <span>Remarks: <b>{item.remarks}</b></span><br />
-                        </span>
+                        <span>Pending</span>
                     ) }
                 </span>
-            )
+            ),
+            filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
+            ...filter.list('status','text', setFilterData, filterData, getForm),
         },
         {
-            title: 'Actions',
-            key: 'actions',
+            title: 'Remarks',
+            key: 'remarks',
             render: (text, item, index) => (
-                <Space size={2}>
-                    <span className='custom-pointer' onClick={() => { viewForm(item, index) }}>View</span>
-                    <Divider type="vertical" />
-                    { item.status == "with_issues" ? (
-                        <span className='custom-pointer' onClick={() => { resolveForm(item, index) }}>Resolve</span>
-                    ) : (
-                        <Popconfirm icon="" title="" okText="Approve" cancelText="Disapprove" onConfirm={() => confirm(item) } onCancel={() => { showRejectForm(item, index) }}>
-                            <span className='custom-pointer' onClick={() => { respondForm(item, index) }}>Respond</span>
-                        </Popconfirm>
-                    ) }
-                </Space>
-            )
+                <span>
+                    <span>{item.remarks}</span>
+                </span>
+            ),
+            ...filter.search('remarks','text', setFilterData, filterData, getForm),
+        },
+
+        {
+            title: "Action",
+            key: "action",
+            fixed: 'right',
+            width: 60,
+            align: "center",
+            render: (text, item, index) => (
+                <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                </Dropdown>
+              )
         },
     ];
+
+    const menu = (item, index) => (
+        <Menu onClick={() => setSelectedFormRoute(item) }>
+            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
+                View
+            </Menu.Item>
+            { item.status == "with_issues" ? (
+                    <Menu.Item key="menu-resolve" icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
+                        Resolve
+                    </Menu.Item>
+            ) : (
+                <>
+                    <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }}>
+                        Approve
+                    </Menu.Item>
+                    { item.from_office_id == item.to_office_id ? "" : (
+                        <Menu.Item key="menu-reject" icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
+                            Disapprove
+                        </Menu.Item>
+                    ) }
+                </>
+            ) }
+        </Menu>
+      );
     
     return (
         <div className='row' style={{minHeight: "50vh"}}>
@@ -659,30 +724,56 @@ const ListForApproval = (props) => {
             </Modal>
 
 
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col md={24} lg={16} xl={18}>
+                    <Card size="small" title="Forwarded Forms" bordered={false}  className="list-purchase-request-applet-container">
+                            <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
+                                if(selectedFormRoute.id == record.id){
+                                    return "selected-row";
+                                }
+                            }}
+                            size={"small"}
+                            />
+                    </Card>
+                </Col>
+                { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+                    <Col md={24} lg={8} xl={6}>
+                        <Card size="small" title="Puchase Request Details" bodyStyle={{ height: "inherit", overflowY: "auto", overflowX: "hidden", paddingBottom: "30px" }} bordered={false} extra={(
+                            <div className='text-right flex space-x-0.5'>
+                                <div className='space-x-0.5 mr-2'>
+                                    { selectedFormRoute.status == "with_issues" ? (
+                                            <Button size='small' type='default' onClick={() => { resolveForm(selectedFormRoute, 0) }}><SendOutlined /></Button>
+                                    ) : (
+                                        <>
+                                            <Button size='small' type='default' onClick={() => { confirm(selectedFormRoute, 0) }}><LikeTwoTone twoToneColor="#0000FF" /></Button>
+                                            
+                                            { selectedFormRoute.from_office_id == selectedFormRoute.to_office_id ? "" : (
+                                                <Button size='small' type='default' onClick={() => { showRejectForm(selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
+                                            ) }
+                                        </>
+                                    ) }
+                                </div>
+                                <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                <Button size='small' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
+                            </div>
+                        )} className="list-purchase-request-applet-container">
+                            <span>Forwarded by: <b><i>{selectedFormRoute.from_office?.name}</i></b></span><br />
+                            <span>Forwarded to: <b><i>{selectedFormRoute.to_office?.name}</i></b></span><br />
+                            <span>Remarks: <b><i>{selectedFormRoute.remarks}</i></b></span><br />
+                            <span>Status: <b><i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></b></span><br />
+                            { selectedFormRoute.status != "pending" ? <span>Disapproved by: <b><i>{selectedFormRoute.user?.user_information?.fullname}</i></b><br /></span> : ""}
+                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "70vh", width: "100%"}}></iframe>
+                        </Card>
+                    </Col>
+                )  }
+            </Row>
+
+
             <div className='col-md-8'>
-                <Title level={2} className='text-center'>Forms</Title>
-                <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                    if(selectedIndex == index){
-                        return "selected-row";
-                    }
-                }}
-                size={"small"}
-                />
+
             </div>
             <div className='col-md-4'>
-                { formOutput == "" ? "" : 
-                    (
-                        <div>
-                            <div className='text-right'>
-                                <Button size='large' type='primary' onClick={() => openInFull() }><SelectOutlined /></Button>
-                                <Button size='large' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
-                            </div>
-                        </div>
-                    )
-                }
-                {
-                    formOutput == "" ? "" : (<iframe src={`${formOutput}?view=1`} width="100%" height="100%"></iframe>) 
-                }
+                
             </div>
         </div>
     );

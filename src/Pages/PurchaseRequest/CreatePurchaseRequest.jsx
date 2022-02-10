@@ -39,7 +39,6 @@ const CreatePurchaseRequest = (props) => {
         if(props.isLibrariesLoaded){
             if(props.formData.end_user_id){
             }else{
-                console.log("asdnasjkdnjkasdnjkasdjkn");
                 changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
             }
             if(isEmpty(props.requestedBySignatory)){
@@ -92,10 +91,12 @@ const CreatePurchaseRequest = (props) => {
         ;
     }, 200);
 
-    const clearForm = () => {
+    const clearForm = async () => {
         props.dispatch({
             type: "RESET_PURCHASE_REQUEST_FORM_DATA",
-            data: {}
+            data: {
+                end_user_id: props.user.signatories[0].office_id
+            }
         });
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_TYPE",
@@ -165,7 +166,7 @@ const CreatePurchaseRequest = (props) => {
     }
 
     const changeFieldValue = (e, field, target = true) => {
-        console.log(e, field);
+        // console.log(e, field);
         let value = e;
         if(target){
             value = e.target.value;
@@ -259,7 +260,7 @@ const CreatePurchaseRequest = (props) => {
     }
     
     return (
-        <div id="pr-container" className='container'>
+        <div id="pr-container" className='container-fuild bg-white p-16'>
             <p className="text-right ...">Appendix 60</p>
             <p className="text-center ..."><b>PURCHASE REQUEST</b></p>
             <Form>

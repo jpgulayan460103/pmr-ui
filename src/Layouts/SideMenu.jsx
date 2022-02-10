@@ -64,7 +64,7 @@ const Sidemenu = (props) => {
                         <Link to="/procurement"></Link>
                         Procurement
                     </Menu.Item>
-                    <SubMenu key="submenu-quotation" title="Quotations" icon={<MessageOutlined />}>
+                    <SubMenu key="submenu-quotation" title="Quotations">
                         <Menu.Item key="/procurement/quotations/form">
                             <Link to="/procurement/quotations/form"></Link>
                             Create Quotation Form

@@ -27,10 +27,6 @@ body{
 #login-container{
     background-color: whitesmoke;
     box-shadow: 1px 1px 18px #888888;
-    height: auto;
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
     padding: 50px
 }
 

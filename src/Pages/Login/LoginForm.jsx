@@ -5,6 +5,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import { useLocation, useNavigate } from "react-router-dom";
+import logo from './../../Images/logo.png'
 
 const { Title } = Typography;
 
@@ -57,7 +58,8 @@ const Loginform = (props) => {
     };
     return (
         <div>
-            <Title level={2} className='text-center'>User Login</Title>
+            {/* <Title level={2} className='text-center'>User Login</Title> */}
+            <img src={logo} alt="" className='px-3 pt-2' />
             <Form
                 name="normal_login"
                 className="login-form"

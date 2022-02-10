@@ -16,16 +16,12 @@
     background: rgba(255, 255, 255, 0.3);
   }
   
-  .site-layout .site-layout-background {
-    background: #fff;
-  }
-
   .site-layout-sub-header-background {
     background-image: linear-gradient(to left, #30336b, #4834d4, #686de0);
   }
   
   .site-layout-background {
-    background: #fff;
+    /* background: #fff; */
   }
 
   #main-content{
@@ -78,4 +74,40 @@
 .ant-dropdown-trigger .anticon{
   position: relative;
   top: -0.1em;
+}
+
+.ant-dropdown{
+  /* border: 1px solid black; */
+  -moz-box-shadow: 0 0 3px #ccc;
+  -webkit-box-shadow: 0 0 3px #ccc;
+  box-shadow: 0 0 3px #ccc;
+} 
+
+.header-items{
+  position: relative;
+  top: -10px;
+}
+
+/* .ant-card-head{
+  height: 40px;
+  min-height: 40px;
+}
+.ant-card-head-wrapper{
+  height: 40px;
+}
+.ant-card-head-title{
+  height: 40px;
+  padding: 5px;
+} */
+
+.procurement-applet-container{
+  height: 70vh;
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+
+.list-purchase-request-applet-container{
+  height: 95vh;
+  padding-bottom: 20px;
+  overflow: hidden;
 }

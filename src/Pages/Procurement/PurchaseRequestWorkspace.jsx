@@ -157,8 +157,8 @@ const Pruchaserequestworkspace = (props) => {
         <div>
 
         <Tabs activeKey={props.purchaseRequestTab} type="card" size="small" onChange={(key) => changeTab(key)}>
-            <TabPane tab="Generated File" key="pdf" style={{height: "60vh"}}>
-                {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="100%"></iframe> : ""}
+            <TabPane tab="File" key="pdf" style={{height: "60vh"}}>
+                {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="95%"></iframe> : ""}
             </TabPane>
             {/* <TabPane tab="Edit Form" key="edit-form">
                 <Form

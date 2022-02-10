@@ -28,6 +28,7 @@ import {
     EditOutlined,
     FormOutlined,
     MessageOutlined,
+    LeftOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -402,21 +403,17 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
         },
         {
-            title: "",
+            title: "Action",
             key: "action",
             fixed: 'right',
-            width: 100,
+            width: 60,
             shown: true,
+            align: "center",
             filterable: false,
             render: (text, item, index) => (
-                <Space  size={2}>
-
                 <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <Button>
-                        Actions
-                    </Button>
+                    <EllipsisOutlined style={{ fontSize: '24px' }} />
                 </Dropdown>
-                </Space>
               )
         },
     ];

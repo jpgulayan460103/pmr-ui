@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker  } from 'antd';
+import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
 import api from '../../api';
 import Icon, {
     CloseOutlined,
-    HeartTwoTone,
+    EllipsisOutlined,
     SearchOutlined,
     CheckCircleOutlined,
     ExclamationCircleOutlined,
     QuestionCircleOutlined,
     InfoCircleOutlined,
     LoadingOutlined,
+    FormOutlined,
+    EditOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
@@ -171,11 +173,11 @@ const Listpurchaserequest = (props) => {
 
     const timelineContent = (timeline) => {
         // `${timeline.status_str} by the [${timeline.to_office?.name}]`
-        let label = (<span>
-            {timeline.status_str} <br />
+        let label = (<>
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
             <b>{timeline.to_office?.name}</b> <br />
             {timeline.remarks}
-        </span>)
+        </>)
         let color =""
         let logo =""
         switch (timeline.status) {
@@ -215,6 +217,8 @@ const Listpurchaserequest = (props) => {
         {
             title: 'Total Cost',
             key: 'total_cost',
+            width: 150,
+            align: "center",
             ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
@@ -227,11 +231,14 @@ const Listpurchaserequest = (props) => {
             title: 'PR Date',
             dataIndex: 'pr_date',
             key: 'pr_date',
+            width: 120,
+            align: "center",
             ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Status',
             key: 'status',
+            align: "center",
             render: (text, item, index) => (
                 <span>
                     { item.status }
@@ -244,64 +251,85 @@ const Listpurchaserequest = (props) => {
             ...filter.list('status','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
-            title: 'Actions',
-            key: 'actions',
+            title: "Action",
+            key: "action",
+            fixed: 'right',
+            width: 60,
+            align: "center",
             render: (text, item, index) => (
-                <Space size={2}>
-                    <span className='custom-pointer' onClick={() => { editPurchaseRequest(item, index) }}>Edit</span> |
-                    <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
-                </Space>
-            )
+                <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                </Dropdown>
+              )
         },
     ];
     
-    return (
-        <div className='row' style={{minHeight: "50vh"}}>
-            <div className='col-md-8'>
-                <Title level={2} className='text-center'>Purchase Request</Title>
-                <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                    if(selectedItem?.id == record.id){
-                        return "selected-row";
-                    }
-                }}
-                onChange={handleTableChange}
-                size={"small"}
-                pagination={false}
-                loading={tableLoading}
-                />
-                <Pagination
-                    current={paginationMeta.current_page}
-                    total={paginationMeta.total}
-                    pageSize={paginationMeta.per_page}
-                    className='mt-2'
-                    onChange={paginationChange}
-                />
-            </div>
-            
-            <div className='col-md-4'>
-                { purchaseRequestOutput == "" ? "" : 
-                <>
-                    <div className='text-right'>
-                        <Button size='large' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                        <Button size='large' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
-                    </div>
-                    
+    const menu = (item, index) => (
+        <Menu>
+            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { openPurchaseRequest(item, index) }}>
+                View
+            </Menu.Item>
+            <Menu.Item key="menu-edit" icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+                Edit
+            </Menu.Item>
+        </Menu>
+      );
 
-                    <Tabs defaultActiveKey="1" type="card" size="small">
-                    <TabPane tab="File" key="1" style={{minHeight: "50vh"}}>
-                        <iframe src={`${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>
-                    </TabPane>
-                    <TabPane tab="Routing" key="2">
-                        <Timeline mode="left">
-                            { timelines.map((timeline, index) => {
-                                return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} label={timeline.updated_at} key={index}>{timelineContent(timeline).label}</Timeline.Item>
-                            }) }
-                        </Timeline>
-                    </TabPane>
-                    </Tabs>
-                </>
+
+    return (
+        <div>
+
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col md={24} lg={14} xl={16}>
+                    <Card size="small" title="Created Puchase Requests" bordered={false} className="list-purchase-request-applet-container">
+                        <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
+                            if(selectedItem?.id == record.id){
+                                return "selected-row";
+                            }
+                        }}
+                        onChange={handleTableChange}
+                        size={"small"}
+                        pagination={false}
+                        loading={tableLoading}
+                        />
+                        <Pagination
+                            current={paginationMeta.current_page}
+                            total={paginationMeta.total}
+                            pageSize={paginationMeta.per_page}
+                            className='mt-2'
+                            onChange={paginationChange}
+                        />
+                    </Card>
+                </Col>
+                { purchaseRequestOutput == "" ? "" : (
+                    <Col md={24} lg={10} xl={8}>
+                        <Card size="small" title="Puchase Request Details" bordered={false} bodyStyle={{height: "95vh"}} className="list-purchase-request-applet-container" extra={(
+                            <div className='text-right space-x-0.5'>
+                                <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                            </div>
+                        )}>
+                            <div style={{ height: "inherit" }}>
+                            <Tabs defaultActiveKey="1" type="card" size="small">
+                                <TabPane tab="File" key="1" style={{padding: "20px"}}>
+                                    <iframe src={`${purchaseRequestOutput}?view=1`}  style={{height: "70vh", width: "100%"}}></iframe>
+                                </TabPane>
+                                <TabPane tab="Routing" key="2" style={{padding: "5px", paddingBottom: "50px"}}>
+                                    <Timeline style={{ height: "70vh", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
+                                        { timelines.map((timeline, index) => {
+                                            return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
+                                        }) }
+                                    </Timeline>
+                                </TabPane>
+                            </Tabs>
+                            </div>
+                            
+                        </Card>
+                    </Col>
+                    )
                 }
-            </div>
+            </Row>
+            
         </div>
     );
 }

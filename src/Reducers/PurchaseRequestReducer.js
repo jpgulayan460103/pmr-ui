@@ -55,7 +55,7 @@ const initialState = () => {
       case 'RESET_PURCHASE_REQUEST_FORM_DATA':
         return {
           ...state,
-          formData: initialState().formData,
+          formData: {...initialState().formData, ...action.data},
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

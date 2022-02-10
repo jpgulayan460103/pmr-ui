@@ -168,7 +168,7 @@ const RegistrationFormActive = (props) => {
                         Register
                         </Button>
                         &nbsp;&nbsp;&nbsp;
-                        <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
+                        <Button type="danger" onClick={() => {props.setRegisterStep(0); props.setShowRegister(false)}  }>
                         Cancel
                         </Button>
                     </Form.Item>

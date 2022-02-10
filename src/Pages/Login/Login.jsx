@@ -43,28 +43,17 @@ const Login = () => {
         api.User.all();
     }
     return (
-        <div style={style} id="container">
+        <div style={style} id="container" className='flex justify-center'>
             <LoadLibraries />
-            {/* <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button> */}
-            {/* <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button> */}
-            {/* <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button> */}
-            <div id="login-container">
-                <div className='row'>
-                    <div className='col-md-6 col-sm-12'>
-                        { showRegister ? (
-                            <>
-                                <Title level={2} className='text-center'>User Registration</Title>
-                                <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} type="create" />
-                            </>
-                        ) : (
-                            <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
-                        ) }
-                    </div>
-                    <div className='col-md-6 col-sm-12'>
-                        {/* { showRegister ? (<RegistrationFormActive firstname={formData.firstname} middlename={formData.middlename} lastname={formData.lastname} />) : "" } */}
-                    </div>
-                    
-                </div>
+            <div id='login-container' className='h-full'>
+                { showRegister ? (
+                    <>
+                        {/* <Title level={2} className='text-center'>User Registration</Title> */}
+                        <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
+                    </>
+                ) : (
+                    <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
+                ) }
             </div>
         </div>
     );
