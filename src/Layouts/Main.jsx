@@ -62,7 +62,7 @@ const Main = (props) => {
         </Content>
         {/* <Footers/> */}
         </Layout>
-        <BackTop />
+          <BackTop  className='animate-bounce' />
       </Layout>
       </div>
     );

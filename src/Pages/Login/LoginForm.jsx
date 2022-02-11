@@ -5,7 +5,6 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from './../../Images/logo.png'
 
 const { Title } = Typography;
 
@@ -58,8 +57,6 @@ const Loginform = (props) => {
     };
     return (
         <div>
-            {/* <Title level={2} className='text-center'>User Login</Title> */}
-            <img src={logo} alt="" className='px-3 pt-2' />
             <Form
                 name="normal_login"
                 className="login-form"
@@ -90,12 +87,12 @@ const Loginform = (props) => {
                     <Button type="primary" htmlType="submit" className="login-form-button" block disabled={submit} loading={submit}>
                         { submit ? "Logging in" : "Log in" }
                     </Button>                  
-                    &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
+                    {/* &nbsp;<span className='custom-pointer' href=""> Forgot password?</span> */}
                 </Form.Item>
             </Form>
             <Divider>or</Divider>
             <Button type="ghost" block onClick={() => { props.setShowRegister(true) }  }>
-                Register using Active Directory Account
+                Request password reset
             </Button>
         </div>
     );

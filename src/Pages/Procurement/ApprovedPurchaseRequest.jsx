@@ -454,7 +454,7 @@ const ApprovedPurchaseRequest = (props) => {
                 loading={tableLoading}
                 pagination={false}
                 onChange={handleTableChange}
-                scroll={{ y: "50vh" }}
+                scroll={{ y: "45vh" }}
                 rowClassName={(record, index) => {
                     if(props.selectedPurchaseRequest?.id == record.id){
                         return "selected-row";
@@ -462,7 +462,7 @@ const ApprovedPurchaseRequest = (props) => {
                 }}
             />
             <div className="flex justify-end mt-2">
-            <b>{process.env.REACT_APP_PRODUCTION_URL_LOCAL}</b>
+            {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
             <Pagination
                     current={props.purchaseRequestsPagination?.current_page || 1}
                     total={props.purchaseRequestsPagination?.total || 1}

@@ -157,8 +157,10 @@ const Pruchaserequestworkspace = (props) => {
         <div>
 
         <Tabs activeKey={props.purchaseRequestTab} type="card" size="small" onChange={(key) => changeTab(key)}>
-            <TabPane tab="File" key="pdf" style={{height: "60vh"}}>
-                {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="95%"></iframe> : ""}
+            <TabPane tab="File" key="pdf">
+                <div style={{height: "55vh", minHeight: "55vh", maxHeight: "550px"}}>
+                    {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="95%"></iframe> : ""}
+                </div>
             </TabPane>
             {/* <TabPane tab="Edit Form" key="edit-form">
                 <Form
@@ -217,7 +219,7 @@ const Pruchaserequestworkspace = (props) => {
                     <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} />
                     </>
                 ) : (
-                    <div>
+                    <div style={{ height: "50vh", minHeight: "50vh", maxHeight: "500px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
                         <Timeline>
                             { logger.map(i => (
                             <Timeline.Item key={i.key}>

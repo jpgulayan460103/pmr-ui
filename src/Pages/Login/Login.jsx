@@ -10,6 +10,7 @@ import LoginFormActive from './LoginFormActive'
 import api from '../../api';
 import { Steps, Typography, PageHeader } from 'antd';
 import LoadLibraries from '../../Components/LoadLibraries';
+import logo from './../../Images/logo.png'
 
 
 const { Title } = Typography;
@@ -46,9 +47,13 @@ const Login = () => {
         <div style={style} id="container" className='flex justify-center'>
             <LoadLibraries />
             <div id='login-container' className='h-full'>
+                <div className="flex justify-center w-fit mb-6">
+                    <div className='w-60'>
+                        <img src={logo} alt="" />
+                    </div>
+                </div>
                 { showRegister ? (
                     <>
-                        {/* <Title level={2} className='text-center'>User Registration</Title> */}
                         <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
                     </>
                 ) : (

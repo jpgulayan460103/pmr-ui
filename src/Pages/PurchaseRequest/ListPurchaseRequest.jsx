@@ -175,6 +175,21 @@ const Listpurchaserequest = (props) => {
         // `${timeline.status_str} by the [${timeline.to_office?.name}]`
         let label = (<>
             {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
             <b>{timeline.to_office?.name}</b> <br />
             {timeline.remarks}
         </>)
@@ -212,6 +227,7 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
+            width: 450,
             ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
@@ -282,49 +298,56 @@ const Listpurchaserequest = (props) => {
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Puchase Requests" bordered={false} className="list-purchase-request-applet-container">
-                        <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                            if(selectedItem?.id == record.id){
-                                return "selected-row";
-                            }
-                        }}
-                        onChange={handleTableChange}
-                        size={"small"}
-                        pagination={false}
-                        loading={tableLoading}
-                        />
-                        <Pagination
-                            current={paginationMeta.current_page}
-                            total={paginationMeta.total}
-                            pageSize={paginationMeta.per_page}
-                            className='mt-2'
-                            onChange={paginationChange}
-                        />
+                        <div style={{height: "inherit"}}>
+                            <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
+                                    if(selectedItem?.id == record.id){
+                                        return "selected-row";
+                                    }
+                                }}
+                                onChange={handleTableChange}
+                                size={"small"}
+                                pagination={false}
+                                scroll={{ y: "75vh" }}
+                                loading={tableLoading}
+                                />
+                                <Pagination
+                                    current={paginationMeta.current_page}
+                                    total={paginationMeta.total}
+                                    pageSize={paginationMeta.per_page}
+                                    className='mt-2'
+                                    onChange={paginationChange}
+                                />
+                        </div>
                     </Card>
                 </Col>
                 { purchaseRequestOutput == "" ? "" : (
                     <Col md={24} lg={10} xl={8}>
-                        <Card size="small" title="Puchase Request Details" bordered={false} bodyStyle={{height: "95vh"}} className="list-purchase-request-applet-container" extra={(
-                            <div className='text-right space-x-0.5'>
-                                <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                                <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
-                            </div>
-                        )}>
-                            <div style={{ height: "inherit" }}>
-                            <Tabs defaultActiveKey="1" type="card" size="small">
-                                <TabPane tab="File" key="1" style={{padding: "20px"}}>
-                                    <iframe src={`${purchaseRequestOutput}?view=1`}  style={{height: "70vh", width: "100%"}}></iframe>
-                                </TabPane>
-                                <TabPane tab="Routing" key="2" style={{padding: "5px", paddingBottom: "50px"}}>
-                                    <Timeline style={{ height: "70vh", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
-                                        { timelines.map((timeline, index) => {
-                                            return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
-                                        }) }
-                                    </Timeline>
-                                </TabPane>
-                            </Tabs>
-                            </div>
-                            
-                        </Card>
+                            <Card size="small" title="Puchase Request Details" bordered={false}  className='list-purchase-request-applet-container' extra={(
+                                <div className='text-right space-x-0.5'>
+                                    <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                </div>
+                            )}>
+                                <div style={{ height: "inherit" }}>
+                                <Tabs defaultActiveKey="1" type="card" size="small">
+                                    <TabPane tab="File" key="1" style={{padding: "20px"}}>
+                                        <div style={{height: "75vh", minHeight: "75vh", maxHeight: "550px"}}>
+                                            <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                                        </div>
+                                    </TabPane>
+                                    <TabPane tab="Routing" key="2" style={{padding: "5px", paddingBottom: "50px"}}>
+                                        <div style={{ height: "80vh", minHeight: "80vh", maxHeight: "700px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
+                                            <Timeline>
+                                                { timelines.map((timeline, index) => {
+                                                    return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
+                                                }) }
+                                            </Timeline>
+                                        </div>
+                                    </TabPane>
+                                </Tabs>
+                                </div>
+                                
+                            </Card>
                     </Col>
                     )
                 }
