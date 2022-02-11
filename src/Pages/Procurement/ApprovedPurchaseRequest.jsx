@@ -137,7 +137,6 @@ const ApprovedPurchaseRequest = (props) => {
     }, 200);
 
     const paginationChange = async (e) => {
-        console.log(e);
         setFilterData(prev => ({...prev, page: e}));
         getPurchaseRequests({...props.filterData, page: e})
     }
@@ -203,6 +202,16 @@ const ApprovedPurchaseRequest = (props) => {
     const dataSource = props.purchaseRequests
 
     const columns = [
+        {
+            title: 'PR Date',
+            dataIndex: 'pr_date',
+            key: 'pr_date',
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].shown : true,
+            filterable: true,
+            ...filter.search('pr_date','date_range', setFilterData, props.filterData, getPurchaseRequests),
+        },
         {
             title: 'SA/OR',
             dataIndex: 'sa_or',

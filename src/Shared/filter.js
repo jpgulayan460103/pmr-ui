@@ -2,6 +2,8 @@ import React from 'react';
 import { Input, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import ListOptions from './ListOptions';
+import moment from 'moment';
+import { isEmpty } from 'lodash';
 
 
 const { Search } = Input;
@@ -15,6 +17,9 @@ const handleSearch = (event, getData) => {
 }
 const searchInput = (e, dataIndex, type, setFilters) => {
     if(type == "date_range"){
+        if(!isEmpty(e)){
+            e = e.map(i => moment(i).format("YYYY-MM-DD"))
+        }
         setFilters(prev => ({...prev, [dataIndex]: e}));
     }else{
         setFilters(prev => ({...prev, [dataIndex]: e.target.value}));
@@ -31,6 +36,11 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
     ),
     filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     filteredValue: filterData[dataIndex] || null,
+    onFilterDropdownVisibleChange: visible => {
+        if (!visible && type=='date_range') {
+            getData();
+        }
+      },
 });
 
 const list = (dataIndex, type, setFilters, filterData, getData) => ({

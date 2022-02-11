@@ -1,8 +1,10 @@
 import axios from './axios.settings'
 
 export default {
-  getForApproval(){
-    return axios.get(`api/forms/routes/requests/pending`);
+  getForApproval(formData){
+    return axios.get(`api/forms/routes/requests/pending`,{
+      params: formData
+    });
   },
   approve(id){
     return axios.post(`api/forms/routes/requests/pending/${id}/approve`);

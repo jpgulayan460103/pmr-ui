@@ -40,6 +40,7 @@ const MaximizeSvg = () => (
 const Listpurchaserequest = (props) => {
     let navigate = useNavigate()
     useEffect(() => {
+        document.title = "List of Purchase Request";
         getPurchaseRequests();
     }, []);
     
@@ -175,21 +176,6 @@ const Listpurchaserequest = (props) => {
         // `${timeline.status_str} by the [${timeline.to_office?.name}]`
         let label = (<>
             {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
             <b>{timeline.to_office?.name}</b> <br />
             {timeline.remarks}
         </>)
@@ -310,13 +296,19 @@ const Listpurchaserequest = (props) => {
                                 scroll={{ y: "75vh" }}
                                 loading={tableLoading}
                                 />
+
+                                <div className="flex justify-end mt-2">
                                 <Pagination
-                                    current={paginationMeta.current_page}
-                                    total={paginationMeta.total}
-                                    pageSize={paginationMeta.per_page}
-                                    className='mt-2'
-                                    onChange={paginationChange}
-                                />
+                                        current={paginationMeta?.current_page || 1}
+                                        total={paginationMeta?.total || 1}
+                                        pageSize={paginationMeta?.per_page || 1}
+                                        onChange={paginationChange}
+                                        // showSizeChanger
+                                        showQuickJumper
+                                        size="small"
+                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                    />
+                                </div>
                         </div>
                     </Card>
                 </Col>

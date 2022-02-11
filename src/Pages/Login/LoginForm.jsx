@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Divider, Typography  } from 'antd';
+import { Form, Input, Button, Divider, Typography, Checkbox  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
@@ -60,7 +60,7 @@ const Loginform = (props) => {
             <Form
                 name="normal_login"
                 className="login-form"
-                initialValues={{ remember: true, username: "ict", password: "admin123" }}
+                initialValues={{ remember: false, username: "ict", password: "admin123" }}
                 onFinish={onFinish}
                 layout='vertical'
             >
@@ -83,6 +83,11 @@ const Loginform = (props) => {
                     placeholder="Password"
                     />
                 </Form.Item>
+
+                <Form.Item name="remember" valuePropName="checked">
+                    <Checkbox>Remember me</Checkbox>
+                </Form.Item>
+
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="login-form-button" block disabled={submit} loading={submit}>
                         { submit ? "Logging in" : "Log in" }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
+import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu, Pagination } from 'antd';
 import api from '../../api';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
@@ -35,7 +35,7 @@ const ListForApproval = (props) => {
     const procurementFormRef = React.useRef();
     useEffect(() => {
         getForm();
-
+        document.title = "Forwarded Forms";
         window.Echo.channel('home').listen('NewMessage', (e) => {
             getForm();
           });
@@ -52,6 +52,8 @@ const ListForApproval = (props) => {
     const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
     const [errorMessage, setErrorMessage] = useState({});
     const [filterData, setFilterData] = useState({});
+    const [tableLoading, setTableLoading] = useState(false);
+    const [paginationMeta, setPaginationMeta] = useState({});
     
 
     const showErrorMessage = (field) => {
@@ -180,16 +182,26 @@ const ListForApproval = (props) => {
     };
     
 
-    const getForm = () => {
-        api.Forms.getForApproval()
+    const getForm = debounce((filters) => {
+        if(filters == null){
+            filters = filterData
+        }
+        setTableLoading(true);
+        api.Forms.getForApproval(filters)
         .then(res => {
-            let response = res.data.data;
-            setForms(response);
+            setTableLoading(false);
+            let data = res.data.data;
+            let meta = res.data.meta;
+            setForms(data);
+            setPaginationMeta(meta.pagination);
+            
         })
-        .catch(res => {})
+        .catch(res => {
+            setTableLoading(false);
+        })
         .then(res => {})
         ;
-    }
+    },150);
     
     const openInFull = () => {
         window.open(`${selectedFormRoute.form_routable?.file}?view=1`,
@@ -484,6 +496,19 @@ const ListForApproval = (props) => {
         },
     ];
 
+    const handleTableChange = (pagination, filters, sorter) => {
+        console.log(sorter);
+        console.log(filters);
+        getForm({...filterData, ...filters})
+    };
+
+    const paginationChange = async (e) => {
+        console.log(e);
+        setFilterData(prev => ({...prev, page: e}));
+        getForm({...filterData, page: e})
+    }
+
+
     const menu = (item, index) => (
         <Menu onClick={() => setSelectedFormRoute(item) }>
             <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
@@ -727,13 +752,33 @@ const ListForApproval = (props) => {
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
                     <Card size="small" title="Forwarded Forms" bordered={false}  className="list-purchase-request-applet-container">
-                            <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                                if(selectedFormRoute.id == record.id){
-                                    return "selected-row";
-                                }
-                            }}
-                            size={"small"}
+                            <Table
+                                dataSource={dataSource}
+                                columns={columns}
+                                size={"small"}
+                                loading={tableLoading}
+                                pagination={false}
+                                onChange={handleTableChange}
+                                scroll={{ y: "45vh" }}
+                                rowClassName={(record, index) => {
+                                    if(selectedFormRoute.id == record.id){
+                                        return "selected-row";
+                                    }
+                                }}
                             />
+                            <div className="flex justify-end mt-2">
+                                {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
+                                <Pagination
+                                        current={paginationMeta?.current_page || 1}
+                                        total={paginationMeta?.total || 1}
+                                        pageSize={paginationMeta?.per_page || 1}
+                                        onChange={paginationChange}
+                                        // showSizeChanger
+                                        showQuickJumper
+                                        size="small"
+                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                    />
+                                </div>
                     </Card>
                 </Col>
                 { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (

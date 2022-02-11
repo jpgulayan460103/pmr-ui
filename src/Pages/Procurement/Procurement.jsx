@@ -22,6 +22,10 @@ const MaximizeSvg = () => (
 
 const Procurement = (props) => {
 
+    useEffect(() => {
+        document.title = "Procurement";
+    }, []);
+
     const openInFull = () => {
         window.open(`${props.selectedPurchaseRequest.file}?view=1`,
                 'newwindow',

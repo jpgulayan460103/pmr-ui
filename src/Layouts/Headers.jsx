@@ -68,7 +68,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             data: {}
         });
         sessionStorage.removeItem('session');
-        navigate("/logout");
+        navigate("/login");
     }
     return (
         <React.Fragment>

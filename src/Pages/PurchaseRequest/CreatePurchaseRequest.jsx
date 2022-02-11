@@ -50,6 +50,7 @@ const CreatePurchaseRequest = (props) => {
         }
     }, [props.isLibrariesLoaded]);
     useEffect(() => {
+        document.title = "Create Purchase Request";
         return function cleanup() {
             if(props.formType == "update"){
                 clearForm();
