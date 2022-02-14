@@ -2,39 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import {
-    Table,
-    Space,
-    Pagination,
-    Timeline,
-    Select,
-    Button,
-    List,
-    Menu,
-    Row,
-    PageHeader,
     notification,
     Tabs,
-    Form,
-    Input,
 } from 'antd';
-import filter from '../../Shared/filter';
 import api from '../../api';
-import { cloneDeep, debounce, isEmpty, map } from 'lodash';
-import {
-    SettingOutlined,
-    EyeOutlined,
-    EyeInvisibleOutlined,
-    MoreOutlined,
-    EllipsisOutlined,
-    UserOutlined,
-    EditOutlined,
-    FormOutlined,
-    MessageOutlined,
-    CloseOutlined,
-} from '@ant-design/icons';
+import { cloneDeep, isEmpty,  } from 'lodash';
 import dayjs from 'dayjs';
+import AuditTrail from '../../Components/AuditTrail';
 
-const { Option } = Select;
 const { TabPane } = Tabs;
 
 
@@ -58,12 +33,8 @@ const Pruchaserequestworkspace = (props) => {
             loadAuditTrail()
         }
     }, [props.purchaseRequestTab || props.selectedPurchaseRequest]);
-    const [prAddOn, setPrAddOn] = useState(dayjs().format("YY-MM-"));
-    const [submit, setSubmit] = useState(false);
     const [errorMessage, setErrorMessage] = useState([]);
     const [logger, setLogger] = useState([]);
-    const [showLoggerDetails, setShowLoggerDetails] = useState(false);
-    const [selectedLogger, setSelectedLogger] = useState([]);
     const showErrorMessage = () => {
         if(!isEmpty(errorMessage)){
             return {
@@ -132,10 +103,6 @@ const Pruchaserequestworkspace = (props) => {
         });
     }
 
-    const selectLogger = (item) => {
-        setSelectedLogger(item);
-        setShowLoggerDetails(true);
-    }
     const columns = [
         {
           title: 'Field',
@@ -204,33 +171,7 @@ const Pruchaserequestworkspace = (props) => {
                 BAC FORMS
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
-                <div>
-                { showLoggerDetails ? (
-                    <>
-                    <span>{selectedLogger.description} by: <b>{selectedLogger.user?.user_information?.fullname}</b></span> on <b>{selectedLogger.created_at}</b>
-                        <Button className='float-right mb-1' size='small' type='danger' onClick={() => setShowLoggerDetails(false) }>
-                            <CloseOutlined />
-                        </Button>
-                    </>
-                ) : <span className='mb-2'>&nbsp;</span> }
-                </div>
-                { showLoggerDetails ? (
-                    <>
-                    <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} />
-                    </>
-                ) : (
-                    <div style={{ height: "50vh", minHeight: "50vh", maxHeight: "500px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
-                        <Timeline>
-                            { logger.map(i => (
-                            <Timeline.Item key={i.key}>
-                                {i.created_at} <span className='custom-pointer' onClick={() => selectLogger(i)}>View Changes</span><br />
-                                {i.description} by: <b>{i.user.user_information.fullname}</b>
-                            </Timeline.Item>
-                            )) }
-                        </Timeline>
-                    </div>
-                ) }
-                
+                <AuditTrail logger={logger} timelineCss={{height: "50vh", minHeight: "50vh", maxHeight: "500px"}} tableScroll="45vh" />
             </TabPane>
         </Tabs>
         </div>

@@ -102,8 +102,6 @@ const Sidemenu = (props) => {
                         <Link to="/purchase-requests"></Link>
                         View Purchase Requests
                     </Menu.Item>
-                    <Menu.Item key="7">Option 7</Menu.Item>
-                    <Menu.Item key="8">Option 8</Menu.Item>
                 </SubMenu>
                 <Menu.Item key="/users" icon={<UserOutlined />}>
                     <Link to="/users"></Link>

@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
 import filter from '../../Shared/filter';
+import AuditTrail from '../../Components/AuditTrail';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -57,6 +58,8 @@ const Listpurchaserequest = (props) => {
     const [filterData, setFilterData] = useState({
         page: 1,
     });
+    const [loggerItems, setLoggerItems] = useState([]);
+    const [logger, setLogger] = useState([]);
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
@@ -92,14 +95,16 @@ const Listpurchaserequest = (props) => {
     }
 
 
-    const openPurchaseRequest = (item, index) => {
+    const openPurchaseRequest = async (item, index) => {
         setPurchaseRequestOutput(item.file);
         setSelectedItem(item)
-        loadPurchaseRequestData(item.id);
+        await loadPurchaseRequestData(item.id);
+        await loadAuditTrail(item.id);
+        await loadItemsAuditTrail(item.id);
     }
 
-    const loadPurchaseRequestData = (id) => {
-        api.PurchaseRequest.get(id)
+    const loadPurchaseRequestData = async (id) => {
+        await api.PurchaseRequest.get(id)
         .then(res => {
             let item = res.data;
             let form_routes = item.form_routes.data;
@@ -145,7 +150,8 @@ const Listpurchaserequest = (props) => {
         .then(res => {
             let purchaseRequest = res.data;
             purchaseRequest.items = res.data.items.data;
-            console.log(purchaseRequest);
+            purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
+            purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_FORM_DATA",
                 data: purchaseRequest
@@ -159,6 +165,24 @@ const Listpurchaserequest = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
+    }
+
+    const loadAuditTrail = async (id) => {
+        await api.PurchaseRequest.logger(id)
+        .then(res => {
+            setLogger(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
+    }
+
+    const loadItemsAuditTrail = async (id) => {
+        await api.PurchaseRequest.loggerItems(id)
+        .then(res => {
+            setLoggerItems(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -321,13 +345,13 @@ const Listpurchaserequest = (props) => {
                                 </div>
                             )}>
                                 <div style={{ height: "inherit" }}>
-                                <Tabs defaultActiveKey="1" type="card" size="small">
-                                    <TabPane tab="File" key="1" style={{padding: "20px"}}>
+                                <Tabs defaultActiveKey="file" type="card" size="small">
+                                    <TabPane tab="File" key="file" style={{padding: "20px"}}>
                                         <div style={{height: "75vh", minHeight: "75vh", maxHeight: "550px"}}>
                                             <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                                         </div>
                                     </TabPane>
-                                    <TabPane tab="Routing" key="2" style={{padding: "5px", paddingBottom: "50px"}}>
+                                    <TabPane tab="Routing" key="routing" style={{padding: "5px", paddingBottom: "50px"}}>
                                         <div style={{ height: "80vh", minHeight: "80vh", maxHeight: "700px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
                                             <Timeline>
                                                 { timelines.map((timeline, index) => {
@@ -335,6 +359,12 @@ const Listpurchaserequest = (props) => {
                                                 }) }
                                             </Timeline>
                                         </div>
+                                    </TabPane>
+                                    <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
+                                        <AuditTrail logger={logger} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" />
+                                    </TabPane>
+                                    <TabPane tab="Items Audit Trail" key="items-audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
+                                        <AuditTrail logger={loggerItems} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" />
                                     </TabPane>
                                 </Tabs>
                                 </div>

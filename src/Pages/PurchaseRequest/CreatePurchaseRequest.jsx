@@ -39,13 +39,19 @@ const CreatePurchaseRequest = (props) => {
         if(props.isLibrariesLoaded){
             if(props.formData.end_user_id){
             }else{
-                changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+                if(!isEmpty(props.user)){
+                    changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+                }
             }
             if(isEmpty(props.requestedBySignatory)){
-                setSignatory("OARDA",'requestedBy')
+                setSignatory("OARDA",'requestedBy');
             }
             if(isEmpty(props.approvedBySignatory)){
-                setSignatory("ORD", 'approvedBy')
+                setSignatory("ORD", 'approvedBy');
+            }
+            if(props.formType == "update"){
+                setSignatory(props.formData.requestedBy, 'requestedBy');
+                setSignatory(props.formData.approvedBy, 'approvedBy');
             }
         }
     }, [props.isLibrariesLoaded]);
@@ -103,6 +109,9 @@ const CreatePurchaseRequest = (props) => {
             type: "SET_PURCHASE_REQUEST_FORM_TYPE",
             data: "create"
         });
+
+        setSignatory("OARDA",'requestedBy');
+        setSignatory("ORD", 'approvedBy');
     }
 
     const previewPurchaseRequest = debounce(() => {
@@ -429,14 +438,18 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
                         <td style={{borderBottom: 0}}>Requested By:
+                        <Form.Item { ...displayError(`requested_by_id`) }>
                             <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
                                 { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
                             </Select>
+                        </Form.Item>
                         <br /><br />&nbsp;</td>
                         <td colSpan={4} style={{borderBottom: 0}}>Approved by:
-                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
-                            { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
-                        </Select>
+                        <Form.Item { ...displayError(`approved_by_id`) }>
+                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
+                                { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
+                            </Select>
+                        </Form.Item>
                         <br /><br />&nbsp;</td>
                     </tr>
                     <tr>

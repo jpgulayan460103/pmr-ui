@@ -24,7 +24,7 @@ function mapStateToProps(state) {
 const Login = () => {
     const location = useLocation();
     useEffect(() => {
-        
+        document.title = "Login";
     }, []);
 
     const [formData, setFormData] = useState({

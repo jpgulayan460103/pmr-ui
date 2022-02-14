@@ -42,4 +42,7 @@ export default {
   logger(id){
     return axios.get(`api/logger/purchase-request/${id}`);
   },
+  loggerItems(id){
+    return axios.get(`api/logger/purchase-request/${id}/items`);
+  },
 }
