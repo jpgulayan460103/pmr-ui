@@ -9,7 +9,7 @@ function mapStateToProps(state) {
         items: state.library.items,
         libraries: state.library.libraries,
         isLibrariesLoaded: state.library.isLibrariesLoaded,
-        signatories: state.library.signatories,
+        user_offices: state.library.user_offices,
         user: state.user.data,
     };
 }
@@ -22,8 +22,8 @@ const Loadlibraries = (props) => {
         if(!props.isLibrariesLoaded){
             await getLibraries();
         }
-        if(isEmpty(props.signatories)){
-            await getSignatories();
+        if(isEmpty(props.user_offices)){
+            await getUserOffice();
         }
         if(isEmpty(props.user)){
             if (sessionStorage.getItem("session") !== null) {
@@ -117,25 +117,25 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getSignatories = async () => {
-        return api.Signatories.all()
+    const getUserOffice = async () => {
+        return api.UserOffice.all()
         .then(res => {
-            let signatory = res.data.data;
+            let user_office = res.data.data;
             props.dispatch({
                 type: "SET_LIBRARY_SIGNATORIES",
-                data: signatory
+                data: user_office
             });
-            // setDefualtPrSignatories(signatory);
+            // setDefualtPrUserOffice(user_office);
         })
         .catch(err => {})
         .then(res => {})
         ;
     }
 
-    const setDefualtPrSignatories = (signatory) => {
-        let ord = signatory.filter(i => i.signatory_type == "ORD");
+    const setDefualtPrUserOffice = (user_office) => {
+        let ord = user_office.filter(i => i.user_office_type == "ORD");
         ord = ord[0];
-        let oarda = signatory.filter(i => i.signatory_type == "OARDA");
+        let oarda = user_office.filter(i => i.user_office_type == "OARDA");
         oarda = oarda[0];
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",

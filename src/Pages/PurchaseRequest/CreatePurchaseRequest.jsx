@@ -40,7 +40,7 @@ const CreatePurchaseRequest = (props) => {
             if(props.formData.end_user_id){
             }else{
                 if(!isEmpty(props.user)){
-                    changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+                    changeFieldValue(props.user.user_offices[0].office_id, 'end_user_id', false);
                 }
             }
             if(isEmpty(props.requestedBySignatory)){
@@ -102,7 +102,7 @@ const CreatePurchaseRequest = (props) => {
         props.dispatch({
             type: "RESET_PURCHASE_REQUEST_FORM_DATA",
             data: {
-                end_user_id: props.user.signatories[0].office_id
+                end_user_id: props.user.user_offices[0].office_id
             }
         });
         props.dispatch({
@@ -255,16 +255,16 @@ const CreatePurchaseRequest = (props) => {
 
     const setSignatory = (e, type) => {
         if(type == "requestedBy"){
-            let signatory = props.user_signatory_names.filter(i => i.title == e);
+            let user_office = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
-                data: signatory[0]
+                data: user_office[0]
             });
         }else{
-            let signatory = props.user_signatory_names.filter(i => i.title == e);
+            let user_office = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
-                data: signatory[0]
+                data: user_office[0]
             });
         }
     }

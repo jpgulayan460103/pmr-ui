@@ -29,9 +29,9 @@ const User = () => {
     const selectUser = (selected, type) => {
         setSelectedUser(selected);
         selected.user_information.username = selected.username;
-        selected.user_information.office_id = map(selected.signatories.data, 'office_id');
+        selected.user_information.office_id = map(selected.user_offices.data, 'office_id');
         selected.user_information.group_id = map(selected.groups.data, 'group_id');
-        selected.user_information.position_id = selected.signatories.data[0].position_id;
+        selected.user_information.position_id = selected.user_offices.data[0].position_id;
         setFormData(selected.user_information);
         setEditType(type);
     }

@@ -8,7 +8,7 @@ const initialState = () => {
       divisions_sections_tree: [],
       user_positions: [],
       user_area_of_assignments: [],
-      signatories: [],
+      user_offices: [],
       procurement_types: [],
       mode_of_procurements: [],
       technical_working_groups: [],
@@ -63,7 +63,7 @@ const initialState = () => {
       case 'SET_LIBRARY_SIGNATORIES':
         return {
           ...state,
-          signatories: action.data,
+          user_offices: action.data,
         };
       case 'SET_LIBRARY_PROCUREMENT_TYPES':
         return {

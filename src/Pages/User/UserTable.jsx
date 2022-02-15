@@ -53,7 +53,7 @@ const UserTable = (props) => {
             width: 250,
             render: (text, record, index) => (
                 <span>
-                    { record.signatories.data.map(i => <span key={i.key}>{i.office.name}</span>) }
+                    { record.user_offices.data.map(i => <span key={i.key}>{i.office.name}</span>) }
                 </span>
             ),
         },
@@ -63,7 +63,7 @@ const UserTable = (props) => {
             width: 150,
             render: (text, record, index) => (
                 <span>
-                    { record.signatories.data.map(i => <span key={i.key}>{i.position.name}</span>) }
+                    { record.user_offices.data.map(i => <span key={i.key}>{i.position.name}</span>) }
                 </span>
             ),
         },

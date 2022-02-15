@@ -63,8 +63,8 @@ const App = (props) => {
         <Route path="/libraries/items/measures" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/offices/divisions" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
         <Route path="/libraries/offices/sections" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/signatories/administrators" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/signatories/purchase-requests" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} /> */}
+        <Route path="/libraries/user_offices/administrators" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
+        <Route path="/libraries/user_offices/purchase-requests" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} /> */}
         <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Login />} />

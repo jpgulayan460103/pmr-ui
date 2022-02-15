@@ -129,13 +129,13 @@ const Sidemenu = (props) => {
                         Office Sections
                     </Menu.Item>
                 </SubMenu>
-                <SubMenu key="submenu-signatories" icon={<Icon component={SignatureSvg} />} title="Signatories">
-                    <Menu.Item key="/libraries/signatories/administrators">
-                        <Link to="/libraries/signatories/administrators"></Link>
+                <SubMenu key="submenu-user_offices" icon={<Icon component={SignatureSvg} />} title="UserOffice">
+                    <Menu.Item key="/libraries/user_offices/administrators">
+                        <Link to="/libraries/user_offices/administrators"></Link>
                         Admininstrators
                     </Menu.Item>
-                    <Menu.Item key="/libraries/signatories/purchase-requests">
-                        <Link to="/libraries/signatories/purchase-requests"></Link>
+                    <Menu.Item key="/libraries/user_offices/purchase-requests">
+                        <Link to="/libraries/user_offices/purchase-requests"></Link>
                         Purchase Request
                     </Menu.Item>
                 </SubMenu>
