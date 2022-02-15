@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
 import api from '../../api';
 import Icon, {
     CloseOutlined,
@@ -16,7 +16,7 @@ import Icon, {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import filter from '../../Shared/filter';
 import AuditTrail from '../../Components/AuditTrail';
 
@@ -98,6 +98,9 @@ const Listpurchaserequest = (props) => {
     const openPurchaseRequest = async (item, index) => {
         setPurchaseRequestOutput(item.file);
         setSelectedItem(item)
+        setTimelines([]);
+        setLogger([]);
+        setLoggerItems([]);
         await loadPurchaseRequestData(item.id);
         await loadAuditTrail(item.id);
         await loadItemsAuditTrail(item.id);
@@ -352,6 +355,7 @@ const Listpurchaserequest = (props) => {
                                         </div>
                                     </TabPane>
                                     <TabPane tab="Routing" key="routing" style={{padding: "5px", paddingBottom: "50px"}}>
+                                        { !isEmpty(timelines) ? (
                                         <div style={{ height: "80vh", minHeight: "80vh", maxHeight: "700px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
                                             <Timeline>
                                                 { timelines.map((timeline, index) => {
@@ -359,12 +363,17 @@ const Listpurchaserequest = (props) => {
                                                 }) }
                                             </Timeline>
                                         </div>
+                                        ) : <Skeleton active />  }
                                     </TabPane>
                                     <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
-                                        <AuditTrail logger={logger} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" />
+                                        { !isEmpty(logger) ? (
+                                            <AuditTrail logger={logger} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" displayProp={ selectedItem.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
+                                        ) : <Skeleton active /> }
                                     </TabPane>
                                     <TabPane tab="Items Audit Trail" key="items-audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
-                                        <AuditTrail logger={loggerItems} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" />
+                                        { !isEmpty(loggerItems) ? (
+                                            <AuditTrail logger={loggerItems} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" displayProp="item_name" />
+                                        ) : <Skeleton active /> }
                                     </TabPane>
                                 </Tabs>
                                 </div>

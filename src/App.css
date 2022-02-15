@@ -75,6 +75,10 @@
   position: relative;
   top: -0.1em;
 }
+.ant-select-selection-item-remove .anticon{
+  position: relative;
+  top: -0.30em;
+}
 
 .ant-dropdown{
   /* border: 1px solid black; */
@@ -111,6 +115,14 @@
   padding-bottom: 40px;
 }
 .list-purchase-request-applet-container .ant-card-body{
+  height: 90vh;
+  max-height: 900px;
+  overflow: hidden;
+}
+.list-user-applet-container{
+  padding-bottom: 40px;
+}
+.list-user-applet-container .ant-card-body{
   height: 90vh;
   max-height: 900px;
   overflow: hidden;

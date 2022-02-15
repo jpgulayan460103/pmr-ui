@@ -53,9 +53,9 @@ const Login = () => {
                     </div>
                 </div>
                 { showRegister ? (
-                    <>
+                    <div style={{width: "450px"}}>
                         <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
-                    </>
+                    </div>
                 ) : (
                     <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
                 ) }

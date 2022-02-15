@@ -12,6 +12,8 @@ function mapStateToProps(state) {
     return {
         user_sections: state.library.user_sections,
         user_divisions: state.library.user_divisions,
+        user_positions: state.library.user_positions,
+        technical_working_groups: state.library.technical_working_groups,
         libraries: state.library.libraries,
     };
 }
@@ -29,17 +31,27 @@ const RegistrationFormActive = (props) => {
             cellphone_number: props.userInfo.cellphone_number,
             email_address: props.userInfo.email_address,
             office_id: props.userInfo.office_id,
+            group_id: props.userInfo.group_id,
+            position_id: props.userInfo.position_id,
         })
     }, [props.userInfo.username]);
     
     const [formErrors, setFormErrors] = useState({});
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         values.username = props.userInfo.username;
         values.user_dn = props.userInfo.user_dn;
         values.password = "ad_account";
         values.account_type = "ad_account";
+        if(props.type == "update"){
+            values.id = props.userInfo.user_id;
+            updateUser(values);
+        }else{
+            createUser(values);
+        }
+    };
+
+    const createUser = (values) => {
         api.User.registerAd(values)
         .then(res => {
             sessionStorage.setItem('session',JSON.stringify(res.data));
@@ -51,7 +63,19 @@ const RegistrationFormActive = (props) => {
         })
         .then(res => {})
         ;
-    };
+    }
+
+    const updateUser = (values) => {
+        api.User.save(values, 'update')
+        .then(res => {
+
+        })
+        .catch(err => {
+            setFormErrors(err.response.data.errors);
+        })
+        .then(res => {})
+        ;
+    }
 
     const displayError = (field) => {
         if(formErrors && formErrors[field]){
@@ -123,6 +147,7 @@ const RegistrationFormActive = (props) => {
                         placeholder="Section/Unit/Office"
                         optionFilterProp="children"
                         showSearch
+                        mode={props.type == "update" ? "multiple" : ""}
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -138,13 +163,60 @@ const RegistrationFormActive = (props) => {
                         }) }
                     </Select>
                 </Form.Item>
+                {props.type == "update" ? (
+                    <Form.Item
+                        name="group_id"
+                        label="Techinical Working Group"
+                        { ...displayError(`group_id`) }
+                        // rules={[{ required: true, message: 'Please select Techinical Working Group' }]}
+                    >
+                        <Select
+                            placeholder="Techinical Working Group"
+                            optionFilterProp="children"
+                            showSearch
+                            mode='multiple'
+                            filterOption={(input, option) =>
+                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            { props.technical_working_groups.map(group =>  {
+                                return (
+                                    <Option value={group.id} key={group.id}>{group.name}</Option>
+                                );
+                            }) }
+                        </Select>
+                    </Form.Item>
+                ) : ""}
+
+                <Form.Item
+                    name="position_id"
+                    label="Position"
+                    { ...displayError(`position_id`) }
+                    rules={[{ required: true, message: 'Please select Position' }]}
+                >
+                    <Select
+                        placeholder="Position"
+                        optionFilterProp="children"
+                        showSearch
+                        filterOption={(input, option) =>
+                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                    >
+                        { props.user_positions.map(position =>  {
+                            return (
+                                <Option value={position.id} key={position.id}>{position.name}</Option>
+                            );
+                        }) }
+                    </Select>
+                </Form.Item>
+                
                 <Form.Item
                     name="designation"
                     label="Designation"
                     { ...displayError(`designation`) }
-                    rules={[{ required: true, message: 'Please input your Designation!' }]}
+                    // rules={[{ required: true, message: 'Please input your Designation!' }]}
                 >
-                    <Input prefix={<PhoneOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
+                    <Input placeholder="Designation" />
                 </Form.Item>
                 <Form.Item
                     name="cellphone_number"

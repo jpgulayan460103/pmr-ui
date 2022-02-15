@@ -9,7 +9,7 @@ import {
     CloseOutlined,
 } from '@ant-design/icons';
 
-const AuditTrail = ({logger, timelineCss, tableScroll, showSubject}) => {
+const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}) => {
     const [showLoggerDetails, setShowLoggerDetails] = useState(false);
     const [selectedLogger, setSelectedLogger] = useState([]);
     const columns = [
@@ -39,10 +39,9 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject}) => {
         <div>
             { showLoggerDetails ? (
                 <div>
-                {showSubject ? <span>ID: <b>{selectedLogger.subject.uuid_last}</b><br /></span> : ""}
-                <span>{selectedLogger.description} by: <b>{selectedLogger.user?.user_information?.fullname}</b><br /></span>
-                <span>{selectedLogger.description} by: <b>{selectedLogger.user?.user_information?.fullname}</b><br /></span>
-                <span>on <b>{selectedLogger.created_at_time}</b></span>
+                {showSubject ? <div className="flex"><div className='truncate' style={{width: "90%"}}><b>{selectedLogger.subject[displayProp]}</b> </div><br /></div> : ""}
+                <i>{selectedLogger.created_at_time}</i><br />
+                {selectedLogger.description} by: <b>{selectedLogger.user.user_information.fullname}</b>
                     <Button className='float-right mb-1' size='small' type='danger' onClick={() => setShowLoggerDetails(false) }>
                         <CloseOutlined />
                     </Button>
@@ -57,7 +56,7 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject}) => {
                     <Timeline>
                         { logger.map(i => (
                         <Timeline.Item key={i.key}>
-                            {showSubject ? <span><b>{i.subject.uuid_last}</b> <span className='custom-pointer' onClick={() => selectLogger(i)}>View Changes</span><br /></span> : ""}
+                            {showSubject ? <div className="flex"><div className='truncate' style={{width: "53%"}}><b>{i.subject[displayProp]}</b> </div><div className='custom-pointer' onClick={() => selectLogger(i)}>View Changes</div><br /></div> : ""}
                             <i>{i.created_at_time}</i><br />
                             {i.description} by: <b>{i.user.user_information.fullname}</b>
                         </Timeline.Item>
@@ -70,7 +69,8 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject}) => {
 }
 
 AuditTrail.defaultProps = {
-    showSubject: true
+    showSubject: true,
+    displayProp: 'uuid_last',
 }
 
 export default AuditTrail;

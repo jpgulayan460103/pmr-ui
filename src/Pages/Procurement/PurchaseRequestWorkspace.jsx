@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import {
     notification,
     Tabs,
+    Skeleton,
 } from 'antd';
 import api from '../../api';
 import { cloneDeep, isEmpty,  } from 'lodash';
@@ -55,6 +56,7 @@ const Pruchaserequestworkspace = (props) => {
         }, 150);
     }
     const loadAuditTrail = () => {
+        setLogger([]);
         api.PurchaseRequest.logger(props.selectedPurchaseRequest.id)
         .then(res => {
             setLogger(res.data.data);
@@ -171,7 +173,9 @@ const Pruchaserequestworkspace = (props) => {
                 BAC FORMS
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
-                <AuditTrail logger={logger} timelineCss={{height: "50vh", minHeight: "50vh", maxHeight: "500px"}} tableScroll="45vh" />
+                { !isEmpty(logger) ? (
+                    <AuditTrail logger={logger} timelineCss={{height: "50vh", minHeight: "50vh", maxHeight: "500px"}} tableScroll="45vh" displayProp="purchase_request_number" />
+                ) : <Skeleton active />  }
             </TabPane>
         </Tabs>
         </div>
