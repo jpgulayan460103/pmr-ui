@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Select } from 'antd';
+import { Form, Input, Button, Select, notification } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from "react-router-dom";
 import api from '../../api';
@@ -41,12 +41,12 @@ const RegistrationFormActive = (props) => {
     const onFinish = (values) => {
         values.username = props.userInfo.username;
         values.user_dn = props.userInfo.user_dn;
-        values.password = "ad_account";
-        values.account_type = "ad_account";
         if(props.type == "update"){
             values.id = props.userInfo.user_id;
             updateUser(values);
         }else{
+            values.password = "ad_account";
+            values.account_type = "ad_account";
             createUser(values);
         }
     };
@@ -68,7 +68,13 @@ const RegistrationFormActive = (props) => {
     const updateUser = (values) => {
         api.User.save(values, 'update')
         .then(res => {
-
+            props.getUsers();
+            notification.success({
+                message: 'User has been updated.',
+                description:
+                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                }
+            );
         })
         .catch(err => {
             setFormErrors(err.response.data.errors);
@@ -106,14 +112,6 @@ const RegistrationFormActive = (props) => {
                 layout="vertical"
                 onFinish={onFinish}
             >
-                <Form.Item
-                    name="username"
-                    label="Username"
-                    { ...displayError(`username`) }
-                    rules={[{ required: true, message: 'Please input your Firstname!' }]}
-                >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" readOnly />
-                </Form.Item>
                 <Form.Item
                     name="firstname"
                     label="Firstname"

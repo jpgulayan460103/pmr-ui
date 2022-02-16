@@ -53,7 +53,7 @@ const UserTable = (props) => {
             width: 250,
             render: (text, record, index) => (
                 <span>
-                    { record.user_offices.data.map(i => <span key={i.key}>{i.office.name}</span>) }
+                    { record.user_offices?.data.map(i => <span key={i.key}>{i.office.name} <br /> </span>) }
                 </span>
             ),
         },
@@ -63,7 +63,7 @@ const UserTable = (props) => {
             width: 150,
             render: (text, record, index) => (
                 <span>
-                    { record.user_offices.data.map(i => <span key={i.key}>{i.position.name}</span>) }
+                    { record.user_information?.position?.name }
                 </span>
             ),
         },
@@ -73,7 +73,7 @@ const UserTable = (props) => {
             width: 150,
             render: (text, record, index) => (
                 <span>
-                    { record.groups.data.map(i => <span key={i.key}>{i.group.name}</span>) }
+                    { record.user_groups?.data.map(i => <span key={i.key}>{i.group.name} <br /> </span>) }
                 </span>
             ),
         },
@@ -83,7 +83,7 @@ const UserTable = (props) => {
             width: 150,
             render: (text, record, index) => (
                 <span>
-                    { record.user_information.cellphone_number }
+                    { record.user_information?.cellphone_number }
                 </span>
             ),
         },
@@ -93,7 +93,7 @@ const UserTable = (props) => {
             width: 150,
             render: (text, record, index) => (
                 <span>
-                    { record.user_information.email_address }
+                    { record.user_information?.email_address }
                 </span>
             ),
         },

@@ -30,8 +30,8 @@ const User = () => {
         setSelectedUser(selected);
         selected.user_information.username = selected.username;
         selected.user_information.office_id = map(selected.user_offices.data, 'office_id');
-        selected.user_information.group_id = map(selected.groups.data, 'group_id');
-        selected.user_information.position_id = selected.user_offices.data[0].position_id;
+        selected.user_information.group_id = map(selected.user_groups.data, 'group_id');
+        // selected.user_information.position_id = selected.user_offices.data[0].position_id;
         setFormData(selected.user_information);
         setEditType(type);
     }
@@ -59,7 +59,7 @@ const User = () => {
                     { editType=="edit" ?  (
                         <Card size="small" title="Edit User" bordered={false}  bodyStyle={{padding: "20px"}} className='list-user-applet-container' >
                             <div style={{height: "inherit", overflowY: "auto", overflowX: "hidden", paddingRight: "10px" }}>
-                            <RegistrationFormActive userInfo={formData} type="update" />
+                            <RegistrationFormActive userInfo={formData} type="update" getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
