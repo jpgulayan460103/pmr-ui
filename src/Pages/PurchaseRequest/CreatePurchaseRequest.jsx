@@ -102,7 +102,7 @@ const CreatePurchaseRequest = (props) => {
         props.dispatch({
             type: "RESET_PURCHASE_REQUEST_FORM_DATA",
             data: {
-                end_user_id: props.user.user_offices[0].office_id
+                end_user_id: props.user.user_offices[0].office_id,
             }
         });
         props.dispatch({

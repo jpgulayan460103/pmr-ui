@@ -204,7 +204,7 @@ const Listpurchaserequest = (props) => {
         let label = (<>
             {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
             <b>{timeline.to_office?.name}</b> <br />
-            {timeline.remarks}
+            {timeline.status == 'with_issues' ? "For resolution" : timeline.remarks}
         </>)
         let color =""
         let logo =""
@@ -222,8 +222,8 @@ const Listpurchaserequest = (props) => {
                 logo = <QuestionCircleOutlined />;
                 break;
             case "resolved":
-                color = "green";
-                logo = <InfoCircleOutlined />;
+                color = "blue";
+                logo = <CheckCircleOutlined />;
                 break;
             default:
                 color = "gray";

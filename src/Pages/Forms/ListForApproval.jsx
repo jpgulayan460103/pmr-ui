@@ -476,7 +476,7 @@ const ListForApproval = (props) => {
             key: 'remarks',
             render: (text, item, index) => (
                 <span>
-                    <span>{item.remarks}</span>
+                    <span>{item.forwarded_remarks === null ? item.remarks : item.forwarded_remarks }</span>
                 </span>
             ),
             ...filter.search('remarks','text', setFilterData, filterData, getForm),

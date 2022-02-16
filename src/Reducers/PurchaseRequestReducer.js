@@ -4,6 +4,7 @@ const initialState = () => {
     return {
       formData: {
         items: [],
+        updater: "end_user",
         requestedBy: "OARDA",
         approvedBy: "ORD",
         fund_cluster: "",
