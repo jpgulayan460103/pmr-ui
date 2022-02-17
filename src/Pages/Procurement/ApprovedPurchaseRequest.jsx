@@ -37,6 +37,7 @@ function mapStateToProps(state) {
         purchaseRequestsPagination: state.procurement.purchaseRequestsPagination,
         filterData: state.procurement.purchaseRequestsTableFilter,
         tableLoading: state.procurement.purchaseRequestsTableLoading,
+        isInitialized: state.user.isInitialized,
     };
 }
 
@@ -71,23 +72,26 @@ const Settings = ({columns, toggleColumn}) => {
 
 const ApprovedPurchaseRequest = (props) => {
     let navigate = useNavigate();
+
     useEffect(() => {
-        if(isEmpty(props.purchaseRequests)){
-            props.getPurchaseRequests();
+        if(props.isInitialized){
+            if(isEmpty(props.purchaseRequests)){
+                props.getPurchaseRequests();
+            }
+            props.dispatch({
+                type: "SET_PROCUREMENT_COLUMNS",
+                data: columns.map(i => (
+                    {
+                        'key': i.key,
+                        'title': i.title,
+                        'shown':i.shown,
+                        'filterable': i.filterable,
+                        'ellipsis': i.ellipsis,
+                    }
+                ))
+            })
         }
-        props.dispatch({
-            type: "SET_PROCUREMENT_COLUMNS",
-            data: columns.map(i => (
-                {
-                    'key': i.key,
-                    'title': i.title,
-                    'shown':i.shown,
-                    'filterable': i.filterable,
-                    'ellipsis': i.ellipsis,
-                }
-            ))
-        })
-    }, []);
+    }, [props.isInitialized]);
     const setFilterData = (data) => {
         props.dispatch({
             type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
@@ -486,7 +490,7 @@ const ApprovedPurchaseRequest = (props) => {
                 dataSource={dataSource}
                 columns={columns.filter(i => i.shown == true)}
                 size={"small"}
-                loading={props.tableLoading}
+                loading={{spinning: props.tableLoading, tip: "Loading..."}}
                 pagination={false}
                 onChange={handleTableChange}
                 scroll={{ y: "45vh" }}

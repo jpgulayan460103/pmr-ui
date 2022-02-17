@@ -130,6 +130,7 @@ const UserTable = (props) => {
                     }
                 }}
                 size={"small"}
+                loading={{spinning: props.loading, tip: "Loading Users..."}}
                 />
         </div>
     );

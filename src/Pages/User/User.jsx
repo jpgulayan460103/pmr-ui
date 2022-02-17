@@ -4,27 +4,31 @@ import UserTable from './UserTable'
 import UserPermissions from './UserPermissions'
 import RegistrationFormActive from '../Login/RegistrationFormActive';
 import api from '../../api';
-import { map } from 'lodash'
+import { debounce, map } from 'lodash'
 import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
 
 
 
 function mapStateToProps(state) {
     return {
-
+        isInitialized: state.user.isInitialized
     };
 }
 
-const User = () => {
+const User = (props) => {
 
     useEffect(() => {
-        getUsers()
-    }, []);
+        document.title = "List of Purchase Request";
+        if(props.isInitialized){
+            getUsers();
+        }
+    }, [props.isInitialized]);
 
     const [formData, setFormData] = useState({});
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState({});
     const [editType, setEditType] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const selectUser = (selected, type) => {
         setSelectedUser(selected);
@@ -36,15 +40,19 @@ const User = () => {
         setEditType(type);
     }
 
-    const getUsers = () => {
+    const getUsers = debounce(() => {
+        setLoading(true);
         api.User.all()
         .then(res => {
+            setLoading(false);
             setUsers(res.data.data);
         })
-        .catch(err => {})
+        .catch(err => {
+            setLoading(false);
+        })
         .then(res => {})
         ;
-    }
+    }, 150)
     
     return (
         <div>
@@ -53,7 +61,7 @@ const User = () => {
                 <Col sm={24} md={16} lg={14} xl={14}>
                     <Card size="small" title="Users" bordered={false}  >
                         <div className='user-card-content'>
-                            <UserTable users={users} selectUser={selectUser} />
+                            <UserTable loading={loading} users={users} selectUser={selectUser} />
                         </div>
                     </Card>
                 </Col>

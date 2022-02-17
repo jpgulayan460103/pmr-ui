@@ -11,40 +11,56 @@ function mapStateToProps(state) {
         isLibrariesLoaded: state.library.isLibrariesLoaded,
         user_offices: state.library.user_offices,
         user: state.user.data,
+        mainLoading: state.user.mainLoading,
+        isInitialized: state.user.isInitialized,
     };
 }
 
 const Loadlibraries = (props) => {
     useEffect(async () => {
-        if(isEmpty(props.unit_of_measures)){
-            await getItems();
-        }
-        if(!props.isLibrariesLoaded){
-            await getLibraries();
-        }
-        if(isEmpty(props.user_offices)){
-            await getUserOffice();
-        }
-        if(isEmpty(props.user)){
-            if (sessionStorage.getItem("session") !== null) {
-                await getUser();
-            }
-        }
-        
-        await props.dispatch({
-            type: "LOAD_LIBRARIES",
-            data: []
-        });
-
-        window.Echo.channel('home').listen('NewMessage', (e) => {
-            console.log(e);
-            // var notification = new Notification(e.message);
-            // console.log(notification);
+        if(!props.isInitialized){
             props.dispatch({
-                type: "ADD_NOTIFICATION",
-                data: 0
+                type: "SET_MAIN_LOADING_MESSAGE",
+                data: "Loading Libraries..."
             });
-          });
+            if(!props.isLibrariesLoaded){
+                await getLibraries();
+            }
+            if(isEmpty(props.user)){
+                if (sessionStorage.getItem("session") !== null) {
+                    props.dispatch({
+                        type: "SET_MAIN_LOADING_MESSAGE",
+                        data: "Loading User Data..."
+                    });
+                    await getUser();
+                }
+            }
+            
+            await props.dispatch({
+                type: "LOAD_LIBRARIES",
+                data: []
+            });
+    
+            await props.dispatch({
+                type: "SET_MAIN_LOADING",
+                data: false
+            });
+
+            await props.dispatch({
+                type: "SET_INITIALIZED",
+                data: true
+            });
+    
+            window.Echo.channel('home').listen('NewMessage', (e) => {
+                console.log(e);
+                // var notification = new Notification(e.message);
+                // console.log(notification);
+                props.dispatch({
+                    type: "ADD_NOTIFICATION",
+                    data: 0
+                });
+              });
+        }
     }, []);
 
     const getLibraries = async () => {
@@ -104,49 +120,6 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getItems = async () => {
-        return api.Library.getLibraries('items')
-        .then(res => {
-            props.dispatch({
-                type: "SET_LIBRARY_ITEMS",
-                data: res.data.data
-            });
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-    const getUserOffice = async () => {
-        return api.UserOffice.all()
-        .then(res => {
-            let user_office = res.data.data;
-            props.dispatch({
-                type: "SET_LIBRARY_SIGNATORIES",
-                data: user_office
-            });
-            // setDefualtPrUserOffice(user_office);
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-    const setDefualtPrUserOffice = (user_office) => {
-        let ord = user_office.filter(i => i.user_office_type == "ORD");
-        ord = ord[0];
-        let oarda = user_office.filter(i => i.user_office_type == "OARDA");
-        oarda = oarda[0];
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
-            data: oarda
-        });
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
-            data: ord
-        });
-    }
-
     const getUser = async () => {
         return api.User.auth()
         .then(res => {
@@ -155,7 +128,9 @@ const Loadlibraries = (props) => {
                 data: res.data
             });
         })
-        .catch(err => {})
+        .catch(err => {
+            console.log("session");
+        })
         .then(res => {})
     }
     return (

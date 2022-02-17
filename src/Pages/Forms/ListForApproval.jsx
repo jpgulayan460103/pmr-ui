@@ -19,6 +19,7 @@ function mapStateToProps(state) {
         modeOfProcurements: state.library.mode_of_procurements,
         technicalWorkingGroups: state.library.technical_working_groups,
         user_sections: state.library.user_sections,
+        isInitialized: state.user.isInitialized,
     };
 }
 
@@ -34,12 +35,14 @@ const ListForApproval = (props) => {
     const budgetFormRef = React.useRef();
     const procurementFormRef = React.useRef();
     useEffect(() => {
-        getForm();
         document.title = "Forwarded Forms";
-        window.Echo.channel('home').listen('NewMessage', (e) => {
+        if(props.isInitialized){
             getForm();
-          });
-    }, []);
+            window.Echo.channel('home').listen('NewMessage', (e) => {
+                getForm();
+            });
+        }
+    }, [props.isInitialized]);
     const [forms, setForms] = useState([]);
     const [selectedFormRoute, setSelectedFormRoute] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
@@ -757,7 +760,7 @@ const ListForApproval = (props) => {
                                 dataSource={dataSource}
                                 columns={columns}
                                 size={"small"}
-                                loading={tableLoading}
+                                loading={{spinning: tableLoading, tip: "Loading..."}}
                                 pagination={false}
                                 onChange={handleTableChange}
                                 scroll={{ y: "45vh" }}

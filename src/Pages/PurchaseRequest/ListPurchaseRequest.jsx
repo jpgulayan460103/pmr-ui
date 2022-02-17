@@ -28,7 +28,7 @@ const { RangePicker } = DatePicker;
 
 function mapStateToProps(state) {
     return {
-
+        isInitialized: state.user.isInitialized
     };
 }
 
@@ -42,8 +42,11 @@ const Listpurchaserequest = (props) => {
     let navigate = useNavigate()
     useEffect(() => {
         document.title = "List of Purchase Request";
-        getPurchaseRequests();
-    }, []);
+        if(props.isInitialized){
+            getPurchaseRequests();
+        }
+    }, [props.isInitialized]);
+    
     
     const [purchaseRequests, setPurchaseRequests] = useState([]);
     const [paginationMeta, setPaginationMeta] = useState({
@@ -321,7 +324,7 @@ const Listpurchaserequest = (props) => {
                                 size={"small"}
                                 pagination={false}
                                 scroll={{ y: "75vh" }}
-                                loading={tableLoading}
+                                loading={{spinning: tableLoading, tip: "Loading..."}}
                                 />
 
                                 <div className="flex justify-end mt-2">

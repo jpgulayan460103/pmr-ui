@@ -4,6 +4,9 @@ const initialState = () => {
     notifications: 0,
     collapsed: true,
     collapsedWidth: 80,
+    mainLoading: true,
+    mainLoadingMessage: "",
+    isInitialized: false,
   }
 }
 
@@ -23,6 +26,21 @@ export default function reducer(state = initialState(), action) {
       return {
         ...state,
         collapsedWidth: action.data,
+      };    
+    case 'SET_MAIN_LOADING':
+      return {
+        ...state,
+        mainLoading: action.data,
+      };    
+    case 'SET_MAIN_LOADING_MESSAGE':
+      return {
+        ...state,
+        mainLoadingMessage: action.data,
+      };    
+    case 'SET_INITIALIZED':
+      return {
+        ...state,
+        isInitialized: action.data,
       };    
     case 'SET_USER_DATA':
       return {

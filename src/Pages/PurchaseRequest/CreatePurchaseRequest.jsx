@@ -16,7 +16,6 @@ function mapStateToProps(state) {
         user_divisions: state.library.user_divisions,
         user_signatory_designations: state.library.user_signatory_designations,
         user_signatory_names: state.library.user_signatory_names,
-        isLibrariesLoaded: state.library.isLibrariesLoaded,
         formData: state.purchaseRequest.formData,
         formType: state.purchaseRequest.formType,
         formErrors: state.purchaseRequest.formErrors,
@@ -24,19 +23,16 @@ function mapStateToProps(state) {
         requestedBySignatory: state.purchaseRequest.requestedBySignatory,
         approvedBySignatory: state.purchaseRequest.approvedBySignatory,
         user: state.user.data,
+        isInitialized: state.user.isInitialized,
     };
 }
 
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
-
-
-
 const CreatePurchaseRequest = (props) => {
-
     useEffect(() => {
-        if(props.isLibrariesLoaded){
+        if(props.isInitialized){
             if(props.formData.end_user_id){
             }else{
                 if(!isEmpty(props.user)){
@@ -53,8 +49,11 @@ const CreatePurchaseRequest = (props) => {
                 setSignatory(props.formData.requestedBy, 'requestedBy');
                 setSignatory(props.formData.approvedBy, 'approvedBy');
             }
+            if(isEmpty(props.items)){
+                getItems();
+            }
         }
-    }, [props.isLibrariesLoaded]);
+    }, [props.isInitialized]);
     useEffect(() => {
         document.title = "Create Purchase Request";
         return function cleanup() {
@@ -66,6 +65,20 @@ const CreatePurchaseRequest = (props) => {
     
     const [tableKey, setTableKey] = useState(0);
     const [submit, setSubmit] = useState(false);
+
+    const getItems = async () => {
+        return api.Library.getLibraries('items')
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_ITEMS",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
     const savePurchaseRequest = debounce(() => {
         setSubmit(true);
         props.dispatch({

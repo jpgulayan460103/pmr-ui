@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import style from './style.less'
 
@@ -13,7 +14,7 @@ const Quotation = () => {
         <div className='container'>
             <p className="text-right">Appendix A: RFQ</p>
             RFQ No.: <br />
-            Date: <br />
+            Date: { moment().format('MM/DD/YYYY') } <br />
             Company Name: <br />
             Company Address: <br />
             Contact Person: <br />
