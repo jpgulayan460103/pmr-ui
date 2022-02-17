@@ -13,7 +13,8 @@ const initialState = () => {
         page: 1,
         type: 'procurement',
       },
-  }
+      purchaseRequestsTableLoading: false,
+    }
   }
   
   export default function reducer(state = initialState(), action) {
@@ -50,6 +51,11 @@ const initialState = () => {
         return {
           ...state,
           purchaseRequestsTableFilter: action.data,
+        };
+      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_LOADING':
+        return {
+          ...state,
+          purchaseRequestsTableLoading: action.data,
         };
       case 'SET_PROCUREMENT_INITIAL_STATE':
         state = initialState();

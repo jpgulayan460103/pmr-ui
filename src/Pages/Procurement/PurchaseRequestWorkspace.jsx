@@ -58,7 +58,7 @@ const Pruchaserequestworkspace = (props) => {
     }
     const loadAuditTrail = () => {
         setLogger([]);
-        api.PurchaseRequest.logger(props.selectedPurchaseRequest.id)
+        api.PurchaseRequest.loggerProcurement(props.selectedPurchaseRequest.id)
         .then(res => {
             setLogger(res.data.data);
         })
@@ -122,7 +122,15 @@ const Pruchaserequestworkspace = (props) => {
           dataIndex: 'new',
           key: 'new',
         },
-      ];
+    ];
+
+    const saveBacForm = (value) => {
+        api.PurchaseRequest.saveBacData(value)
+        .then(res => {
+            props.getPurchaseRequests();
+        })
+        ;
+    }
     return (
         <div>
 
@@ -168,12 +176,12 @@ const Pruchaserequestworkspace = (props) => {
 
                 </Form>
             </TabPane> */}
-            <TabPane tab="BAC Task" key="bac-task">
-                    <Bacform />
+            <TabPane tab="BAC Data" key="bac-task">
+                    <Bacform saveBacForm={saveBacForm}/>
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
                 { !isEmpty(logger) ? (
-                    <AuditTrail logger={logger} tableScroll="45vh" displayProp="purchase_request_number" />
+                    <AuditTrail logger={logger} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="purchase_request_number" />
                 ) : <Skeleton active />  }
             </TabPane>
         </Tabs>

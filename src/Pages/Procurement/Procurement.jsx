@@ -6,10 +6,13 @@ import PurchaseRequestWorkspace from './PurchaseRequestWorkspace';
 import Icon, {
     CloseOutlined,
 } from '@ant-design/icons'
+import api from '../../api';
+import { debounce } from 'lodash';
 
 function mapStateToProps(state) {
     return {
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
+        purchaseRequestsTableFilter: state.procurement.purchaseRequestsTableFilter,
     };
 }
 
@@ -32,6 +35,42 @@ const Procurement = (props) => {
                 'width=960,height=1080');
             return false;
     }
+
+
+    const getPurchaseRequests = debounce((filters) => {
+        if(filters == null){
+            filters = props.purchaseRequestsTableFilter
+        }
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_LOADING",
+            data: true
+        });
+        api.PurchaseRequest.all(filters)
+        .then(res => {
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_LOADING",
+                data: false
+            });
+            let data = res.data.data;
+            let meta = res.data.meta;
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS",
+                data: data
+            });
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_PAGINATION",
+                data: meta.pagination
+            });
+        })
+        .catch(res => {
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_LOADING",
+                data: false
+            });
+        })
+        .then(res => {})
+        ;
+    }, 200);
     
     const closePurchaseRequest = () => {
         props.dispatch({
@@ -45,7 +84,7 @@ const Procurement = (props) => {
                 <Col xs={24} sm={24} md={24} lg={16} xl={18}>
                     <Card size="small" title="Approved Puchase Requests" bordered={false}>
                         <div className="procurement-card-container">
-                            <ApprovedPurchaseRequest />
+                            <ApprovedPurchaseRequest getPurchaseRequests={getPurchaseRequests} />
                         </div>
                     </Card>
                 </Col>
@@ -59,7 +98,7 @@ const Procurement = (props) => {
                         )}
                         >
                         <div className="procurement-card-container">
-                            <PurchaseRequestWorkspace />
+                            <PurchaseRequestWorkspace getPurchaseRequests={getPurchaseRequests} />
                         </div>
                     </Card>
                 </Col>

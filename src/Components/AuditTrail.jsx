@@ -9,7 +9,7 @@ import {
     CloseOutlined,
 } from '@ant-design/icons';
 
-const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}) => {
+const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp, hasChild, childProp }) => {
     const [showLoggerDetails, setShowLoggerDetails] = useState(false);
     const [selectedLogger, setSelectedLogger] = useState([]);
     const columns = [
@@ -39,9 +39,15 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}
         <div>
             { showLoggerDetails ? (
                 <div>
-                {showSubject ? <div className="flex"><div className='truncate' style={{width: "90%"}}><b>{selectedLogger.subject[displayProp]}</b> </div><br /></div> : ""}
-                <i>{selectedLogger.created_at_time}</i><br />
-                {selectedLogger.description} by: <b>{selectedLogger.user.user_information.fullname}</b>
+                    <div className="flex">
+                        <div className='truncate' style={{width: "90%"}}>
+                            <b>
+                                { hasChild && selectedLogger.subject[childProp] ? selectedLogger.subject[childProp][displayProp] : selectedLogger.subject[displayProp] }
+                            </b>
+                        </div>
+                    </div>
+                    <i>{selectedLogger.created_at_time}</i><br />
+                    {selectedLogger.description} by: <b>{selectedLogger.user.user_information.fullname}</b>
                     <Button className='float-right mb-1' size='small' type='danger' onClick={() => setShowLoggerDetails(false) }>
                         <CloseOutlined />
                     </Button>
@@ -56,7 +62,16 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}
                     <Timeline>
                         { logger.map(i => (
                         <Timeline.Item key={i.key}>
-                            {showSubject ? <div className="flex"><div className='truncate' style={{width: "53%"}}><b>{i.subject[displayProp]}</b> </div><div className='custom-pointer' onClick={() => selectLogger(i)}>View Changes</div><br /></div> : ""}
+                            <div className="flex">
+                                <div className='truncate' style={{width: "53%"}}>
+                                    <b>
+                                        { hasChild && i.subject[childProp] ? i.subject[childProp][displayProp] : i.subject[displayProp] }
+                                    </b>
+                                </div>
+                                <div className='custom-pointer' onClick={() => selectLogger(i)}>
+                                    <span>View Changes</span>
+                                </div>
+                            </div>
                             <i>{i.created_at_time}</i><br />
                             {i.description} by: <b>{i.user.user_information.fullname}</b>
                         </Timeline.Item>
@@ -70,6 +85,8 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}
 
 AuditTrail.defaultProps = {
     showSubject: true,
+    hasChild: false,
+    childProp: '',
     displayProp: 'uuid_last',
 }
 

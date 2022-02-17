@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import {
@@ -8,11 +8,13 @@ import {
     Form,
     Input,
     Button,
+    DatePicker,
 } from 'antd';
 import api from '../../api';
 import { cloneDeep, isEmpty,  } from 'lodash';
 import dayjs from 'dayjs';
 import AuditTrail from '../../Components/AuditTrail';
+import moment from 'moment';
 
 function mapStateToProps(state) {
     return {
@@ -28,6 +30,26 @@ const Bacform = (props) => {
     const [errorMessage, setErrorMessage] = useState([]);
     const [logger, setLogger] = useState([]);
     const formRef = React.useRef();
+    useEffect(() => {
+        formRef.current.setFieldsValue({
+            preproc_conference: props.selectedPurchaseRequest.bac_task?.preproc_conference,
+            post_of_ib: props.selectedPurchaseRequest.bac_task?.post_of_ib,
+            prebid_conf: props.selectedPurchaseRequest.bac_task?.prebid_conf,
+            eligibility_check: props.selectedPurchaseRequest.bac_task?.eligibility_check,
+            open_of_bids: props.selectedPurchaseRequest.bac_task?.open_of_bids,
+            bid_evaluation: props.selectedPurchaseRequest.bac_task?.bid_evaluation,
+            post_qual: props.selectedPurchaseRequest.bac_task?.post_qual,
+            notice_of_award: props.selectedPurchaseRequest.bac_task?.notice_of_award ? moment(props.selectedPurchaseRequest.bac_task.notice_of_award) : null,
+            contract_signing: props.selectedPurchaseRequest.bac_task?.contract_signing ? moment(props.selectedPurchaseRequest.bac_task.contract_signing) : null,
+            notice_to_proceed: props.selectedPurchaseRequest.bac_task?.notice_to_proceed ? moment(props.selectedPurchaseRequest.bac_task.notice_to_proceed) : null,
+            estimated_ldd: props.selectedPurchaseRequest.bac_task?.estimated_ldd,
+            abstract_of_qoutations: props.selectedPurchaseRequest.bac_task?.abstract_of_qoutations,
+        })
+        return () => {
+
+        };
+    }, [props.selectedPurchaseRequest]);
+
     const showErrorMessage = () => {
         if(!isEmpty(errorMessage)){
             return {
@@ -38,7 +60,10 @@ const Bacform = (props) => {
     }
     const onFinish = (value) => {
         value.purchase_request_id = props.selectedPurchaseRequest.id;
-        console.log(value);
+        value.notice_of_award = value.notice_of_award ? moment(value.notice_of_award).format('YYYY-MM-DD') : "";
+        value.contract_signing = value.contract_signing ? moment(value.contract_signing).format('YYYY-MM-DD') : "";
+        value.notice_to_proceed = value.notice_to_proceed ? moment(value.notice_to_proceed).format('YYYY-MM-DD') : "";
+        props.saveBacForm(value);
     }
     return (
         <div>
@@ -118,7 +143,8 @@ const Bacform = (props) => {
                     // rules={[{ required: true, message: 'Please input Notice of Award.' }]}
                     { ...showErrorMessage('notice_of_award') }
                 >
-                    <Input placeholder="Notice of Award" />
+                    <DatePicker format={'YYYY-MM-DD'} style={{width: "100%"}}/>
+                    {/* <Input placeholder="Notice of Award" /> */}
                 </Form.Item>
 
 
@@ -128,7 +154,8 @@ const Bacform = (props) => {
                     // rules={[{ required: true, message: 'Please input Contract Signing.' }]}
                     { ...showErrorMessage('contract_signing') }
                 >
-                    <Input placeholder="Contract Signing" />
+                    <DatePicker format={'YYYY-MM-DD'} style={{width: "100%"}}/>
+                    {/* <Input placeholder="Contract Signing" /> */}
                 </Form.Item>
 
                 <Form.Item
@@ -137,7 +164,8 @@ const Bacform = (props) => {
                     // rules={[{ required: true, message: 'Please input Notice to Proceed.' }]}
                     { ...showErrorMessage('notice_to_proceed') }
                 >
-                    <Input placeholder="Notice to Proceed" />
+                    <DatePicker format={'YYYY-MM-DD'} style={{width: "100%"}}/>
+                    {/* <Input placeholder="Notice to Proceed" /> */}
                 </Form.Item>
 
                 <Form.Item
@@ -159,14 +187,16 @@ const Bacform = (props) => {
                 </Form.Item>
 
                 <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
-                            Save
-                        </Button>
-                    </Form.Item>
+                    <Button type="primary" htmlType="submit" className="login-form-button">
+                        Save
+                    </Button>
+                </Form.Item>
 
             </Form>
         </div>
     );
 }
 
-export default Bacform;
+export default connect(
+    mapStateToProps,
+  )(Bacform);
