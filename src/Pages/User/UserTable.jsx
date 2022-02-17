@@ -123,8 +123,8 @@ const UserTable = (props) => {
       );
 
     return (
-        <div style={{height: "inherit"}}>
-            <Table dataSource={dataSource} columns={columns} scroll={{ y: "73vh" }} rowClassName={(record, index) => {
+        <div>
+            <Table dataSource={dataSource} columns={columns} scroll={{ y: "70vh" }} rowClassName={(record, index) => {
                     if(selectedIndex == index){
                         return "selected-row";
                     }

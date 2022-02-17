@@ -751,7 +751,8 @@ const ListForApproval = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Forwarded Forms" bordered={false}  className="list-purchase-request-applet-container">
+                    <Card size="small" title="Forwarded Forms" bordered={false}>
+                        <div className='forms-card-content'>
                             <Table
                                 dataSource={dataSource}
                                 columns={columns}
@@ -778,12 +779,13 @@ const ListForApproval = (props) => {
                                         size="small"
                                         // onShowSizeChange={(current, size) => changePageSize(current, size)}
                                     />
-                                </div>
+                            </div>
+                        </div>
                     </Card>
                 </Col>
                 { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
                     <Col md={24} lg={8} xl={6}>
-                        <Card size="small" title="Puchase Request Details" bodyStyle={{ height: "inherit", overflowY: "auto", overflowX: "hidden", paddingBottom: "30px" }} bordered={false} extra={(
+                        <Card size="small" title="Puchase Request Details" bordered={false} extra={(
                             <div className='text-right flex space-x-0.5'>
                                 <div className='space-x-0.5 mr-2'>
                                     { selectedFormRoute.status == "with_issues" ? (
@@ -801,13 +803,15 @@ const ListForApproval = (props) => {
                                 <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
                                 <Button size='small' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
                             </div>
-                        )} className="list-purchase-request-applet-container">
-                            <span>Forwarded by: <b><i>{selectedFormRoute.from_office?.name}</i></b></span><br />
-                            <span>Forwarded to: <b><i>{selectedFormRoute.to_office?.name}</i></b></span><br />
-                            <span>Remarks: <b><i>{selectedFormRoute.remarks}</i></b></span><br />
-                            <span>Status: <b><i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></b></span><br />
-                            { selectedFormRoute.status != "pending" ? <span>Disapproved by: <b><i>{selectedFormRoute.user?.user_information?.fullname}</i></b><br /></span> : ""}
-                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "70vh", width: "100%"}}></iframe>
+                        )}>
+                            <div className='forms-card-content'>
+                                <span>Forwarded by: <b><i>{selectedFormRoute.from_office?.name}</i></b></span><br />
+                                <span>Forwarded to: <b><i>{selectedFormRoute.to_office?.name}</i></b></span><br />
+                                <span>Remarks: <b><i>{selectedFormRoute.remarks}</i></b></span><br />
+                                <span>Status: <b><i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></b></span><br />
+                                { selectedFormRoute.status != "pending" ? <span>Disapproved by: <b><i>{selectedFormRoute.user?.user_information?.fullname}</i></b><br /></span> : ""}
+                                <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "70vh", width: "100%"}}></iframe>
+                            </div>
                         </Card>
                     </Col>
                 )  }

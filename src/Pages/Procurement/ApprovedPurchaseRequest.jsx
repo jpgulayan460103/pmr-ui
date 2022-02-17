@@ -432,6 +432,9 @@ const ApprovedPurchaseRequest = (props) => {
             <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
                 View
             </Menu.Item>
+            <Menu.Item key="menu-bac-task" icon={<MessageOutlined />} onClick={() => { viewBacForm(item, index) }}>
+                BAC Task
+            </Menu.Item>
             <Menu.Item key="menu-quotation" icon={<MessageOutlined />} onClick={() => { makeQuotation(item, index) }}>
                 Make Quotation
             </Menu.Item>
@@ -440,6 +443,14 @@ const ApprovedPurchaseRequest = (props) => {
 
     const handleMenuClick =() => {
 
+    }
+    
+    const viewBacForm = (item, index) => {
+        selectPurchaseRequest(item)
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
+            data: "bac-task"
+        });
     }
 
 

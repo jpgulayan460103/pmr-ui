@@ -310,8 +310,8 @@ const Listpurchaserequest = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
-                    <Card size="small" title="Created Puchase Requests" bordered={false} className="list-purchase-request-applet-container">
-                        <div style={{height: "inherit"}}>
+                    <Card size="small" title="Created Puchase Requests" bordered={false} className="purchase-request-card-container">
+                        <div className='purchase-request-card-content'>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
                                     if(selectedItem?.id == record.id){
                                         return "selected-row";
@@ -341,43 +341,43 @@ const Listpurchaserequest = (props) => {
                 </Col>
                 { purchaseRequestOutput == "" ? "" : (
                     <Col md={24} lg={10} xl={8}>
-                            <Card size="small" title="Puchase Request Details" bordered={false}  className='list-purchase-request-applet-container' extra={(
+                            <Card size="small" bordered={false} title="Puchase Request Details" extra={(
                                 <div className='text-right space-x-0.5'>
                                     <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
                                     <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
                                 </div>
-                            )}>
-                                <div style={{ height: "inherit" }}>
-                                <Tabs defaultActiveKey="file" type="card" size="small">
-                                    <TabPane tab="File" key="file" style={{padding: "20px"}}>
-                                        <div style={{height: "75vh", minHeight: "75vh", maxHeight: "550px"}}>
-                                            <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
-                                        </div>
-                                    </TabPane>
-                                    <TabPane tab="Routing" key="routing" style={{padding: "5px", paddingBottom: "50px"}}>
-                                        { !isEmpty(timelines) ? (
-                                        <div style={{ height: "80vh", minHeight: "80vh", maxHeight: "700px", overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
-                                            <Timeline>
-                                                { timelines.map((timeline, index) => {
-                                                    return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
-                                                }) }
-                                            </Timeline>
-                                        </div>
-                                        ) : <Skeleton active />  }
-                                    </TabPane>
-                                    <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
-                                        { !isEmpty(logger) ? (
-                                            <AuditTrail logger={logger} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" displayProp={ selectedItem.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
-                                        ) : <Skeleton active /> }
-                                    </TabPane>
-                                    <TabPane tab="Items Audit Trail" key="items-audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
-                                        { !isEmpty(loggerItems) ? (
-                                            <AuditTrail logger={loggerItems} timelineCss={{height: "80vh", minHeight: "80vh", maxHeight: "700px"}} tableScroll="70vh" displayProp="item_name" />
-                                        ) : <Skeleton active /> }
-                                    </TabPane>
-                                </Tabs>
+                            )}
+                            >
+                                <div className='purchase-request-card-content'>
+                                    <Tabs defaultActiveKey="file" type="card" size="small">
+                                        <TabPane tab="File" key="file">
+                                            <div style={{ height: "75vh" }}>
+                                                <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                                            </div>
+                                        </TabPane>
+                                        <TabPane tab="Routing" key="routing">
+                                            { !isEmpty(timelines) ? (
+                                                <div className='pt-4'>
+                                                    <Timeline>
+                                                        { timelines.map((timeline, index) => {
+                                                            return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
+                                                        }) }
+                                                    </Timeline>
+                                                </div>
+                                            ) : <Skeleton active />  }
+                                        </TabPane>
+                                        <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
+                                            { !isEmpty(logger) ? (
+                                                <AuditTrail logger={logger} tableScroll="65vh" displayProp={ selectedItem.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
+                                            ) : <Skeleton active /> }
+                                        </TabPane>
+                                        <TabPane tab="Items Audit Trail" key="items-audit-trail">
+                                            { !isEmpty(loggerItems) ? (
+                                                <AuditTrail logger={loggerItems} tableScroll="65vh" displayProp="item_name" />
+                                            ) : <Skeleton active /> }
+                                        </TabPane>
+                                    </Tabs>
                                 </div>
-                                
                             </Card>
                     </Col>
                     )

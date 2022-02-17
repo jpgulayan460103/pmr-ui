@@ -51,21 +51,25 @@ const User = () => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col sm={24} md={16} lg={14} xl={14}>
-                    <Card size="small" title="Users" bordered={false}  className='list-user-applet-container' >
-                        <UserTable users={users} selectUser={selectUser} />
+                    <Card size="small" title="Users" bordered={false}  >
+                        <div className='user-card-content'>
+                            <UserTable users={users} selectUser={selectUser} />
+                        </div>
                     </Card>
                 </Col>
                 <Col sm={24} md={8} lg={10} xl={10}>
                     { editType=="edit" ?  (
-                        <Card size="small" title="Edit User" bordered={false}  bodyStyle={{padding: "20px"}} className='list-user-applet-container' >
-                            <div style={{height: "inherit", overflowY: "auto", overflowX: "hidden", paddingRight: "10px" }}>
-                            <RegistrationFormActive userInfo={formData} type="update" getUsers={getUsers} />
+                        <Card size="small" title="Edit User" bordered={false}>
+                            <div className='user-card-content'>
+                                <RegistrationFormActive userInfo={formData} type="update" getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
                     { editType=="permissions" ?  (
-                        <Card size="small" title="Edit Permissions" bordered={false}  className='list-user-applet-container' >
-                            <UserPermissions />
+                        <Card size="small" title="Edit Permissions" bordered={false}  >
+                            <div className='user-card-content'>
+                                <UserPermissions />
+                            </div>
                         </Card>
                     ) : "" }
                 </Col>

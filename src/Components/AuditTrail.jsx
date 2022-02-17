@@ -52,7 +52,7 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp}
                 <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} scroll={{ y: tableScroll }} />
                 </>
             ) : (
-                <div style={{ ...timelineCss, overflowY: "auto", overflowX: "hidden", padding: "5px" }}>
+                <div>
                     <Timeline>
                         { logger.map(i => (
                         <Timeline.Item key={i.key}>

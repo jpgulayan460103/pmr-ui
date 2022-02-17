@@ -43,20 +43,24 @@ const Procurement = (props) => {
         <div>
             <Row gutter={[16, 16]} className="mb-3">
                 <Col xs={24} sm={24} md={24} lg={16} xl={18}>
-                    <Card size="small" title="Approved Puchase Requests" bordered={false}  className="procurement-applet-container">
-                        <ApprovedPurchaseRequest />
+                    <Card size="small" title="Approved Puchase Requests" bordered={false}>
+                        <div className="procurement-card-container">
+                            <ApprovedPurchaseRequest />
+                        </div>
                     </Card>
                 </Col>
                 {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? (
                 <Col xs={24} sm={24} md={24} lg={8} xl={6}>
-                    <Card size="small" title="Puchase Request Details" bordered={false} className="procurement-applet-container" extra={(
+                    <Card title="Puchase Request Details" size="small" bordered={false} extra={(
                             <div className='text-right space-x-0.5'>
                                 <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
                                 <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
                             </div>
-                        )}>
-                        
+                        )}
+                        >
+                        <div className="procurement-card-container">
                             <PurchaseRequestWorkspace />
+                        </div>
                     </Card>
                 </Col>
                 ) : ""}
@@ -64,7 +68,10 @@ const Procurement = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col span={24}>
-                    <Card size="small" title="Section 3" bordered={false}  className="procurement-applet-container">
+                    <Card size="small" title="Section 3" bordered={false} >
+                        <div className="procurement-card-container">
+
+                        </div>
                         {/* <ApprovedPurchaseRequest /> */}
                     </Card>
                 </Col>
@@ -72,12 +79,12 @@ const Procurement = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col xs={24} sm={24} md={24} lg={16} xl={18}>
-                    <Card size="small" title="Section 4" bordered={false}  className="procurement-applet-container">
+                    <Card size="small" title="Section 4" bordered={false} >
 
                     </Card>
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={8} xl={6}>
-                    <Card size="small" title="Section 5" bordered={false} className="procurement-applet-container">
+                    <Card size="small" title="Section 5" bordered={false}>
 
                     </Card>
                 </Col>

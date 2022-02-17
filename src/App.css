@@ -104,26 +104,30 @@
   padding: 5px;
 } */
 
-.procurement-applet-container .ant-card-body{
-  max-height: 600px;
-  height: 70vh;
-  padding-bottom: 20px;
-  overflow: hidden;
+.procurement-card-container{
+  height: 75vh;
+  overflow: auto;
+  padding-right: 5px;
+
+}
+.purchase-request-card-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
 }
 
-.list-purchase-request-applet-container{
-  padding-bottom: 40px;
-}
-.list-purchase-request-applet-container .ant-card-body{
+.forms-card-content{
   height: 90vh;
-  max-height: 900px;
-  overflow: hidden;
+  overflow: auto;
+  padding-right: 5px;
 }
-.list-user-applet-container{
-  padding-bottom: 40px;
-}
-.list-user-applet-container .ant-card-body{
+
+.user-card-content{
   height: 90vh;
-  max-height: 900px;
-  overflow: hidden;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.ant-tabs-tabpane .ant-timeline{
+  padding-left: 10px;
 }

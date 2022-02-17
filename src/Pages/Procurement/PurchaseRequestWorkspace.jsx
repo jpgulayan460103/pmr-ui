@@ -10,6 +10,7 @@ import api from '../../api';
 import { cloneDeep, isEmpty,  } from 'lodash';
 import dayjs from 'dayjs';
 import AuditTrail from '../../Components/AuditTrail';
+import Bacform from './BacForm';
 
 const { TabPane } = Tabs;
 
@@ -127,9 +128,7 @@ const Pruchaserequestworkspace = (props) => {
 
         <Tabs activeKey={props.purchaseRequestTab} type="card" size="small" onChange={(key) => changeTab(key)}>
             <TabPane tab="File" key="pdf">
-                <div style={{height: "55vh", minHeight: "55vh", maxHeight: "550px"}}>
-                    {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} width="100%" height="95%"></iframe> : ""}
-                </div>
+                    {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} style={{height: "65vh", width: "100%"}}></iframe> : ""}
             </TabPane>
             {/* <TabPane tab="Edit Form" key="edit-form">
                 <Form
@@ -170,11 +169,11 @@ const Pruchaserequestworkspace = (props) => {
                 </Form>
             </TabPane> */}
             <TabPane tab="BAC Task" key="bac-task">
-                BAC FORMS
+                    <Bacform />
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
                 { !isEmpty(logger) ? (
-                    <AuditTrail logger={logger} timelineCss={{height: "50vh", minHeight: "50vh", maxHeight: "500px"}} tableScroll="45vh" displayProp="purchase_request_number" />
+                    <AuditTrail logger={logger} tableScroll="45vh" displayProp="purchase_request_number" />
                 ) : <Skeleton active />  }
             </TabPane>
         </Tabs>
