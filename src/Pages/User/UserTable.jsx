@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { Table, Dropdown, Space, Menu } from 'antd';
+import { Table, Dropdown, Tag, Menu } from 'antd';
 
 import Icon, {
     CloseOutlined,
@@ -48,32 +48,12 @@ const UserTable = (props) => {
             ),
         },
         {
-            title: 'Section/Unit/Office',
-            key: 'office',
-            width: 250,
-            render: (text, record, index) => (
-                <span>
-                    { record.user_offices?.data.map(i => <span key={i.key}>{i.office.name} <br /> </span>) }
-                </span>
-            ),
-        },
-        {
             title: 'Position',
             key: 'position',
             width: 150,
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.position?.name }
-                </span>
-            ),
-        },
-        {
-            title: 'Groups',
-            key: 'groups',
-            width: 150,
-            render: (text, record, index) => (
-                <span>
-                    { record.user_groups?.data.map(i => <span key={i.key}>{i.group.name} <br /> </span>) }
                 </span>
             ),
         },
@@ -94,6 +74,26 @@ const UserTable = (props) => {
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.email_address }
+                </span>
+            ),
+        },
+        {
+            title: 'Section/Unit/Office',
+            key: 'office',
+            width: 450,
+            render: (text, record, index) => (
+                <span>
+                    { record.user_offices?.data.map(i => <Tag key={i.key}>{i.office.name} <br /> </Tag>) }
+                </span>
+            ),
+        },
+        {
+            title: 'Technical Working Group',
+            key: 'groups',
+            width: 250,
+            render: (text, record, index) => (
+                <span>
+                    { record.user_groups?.data.map(i => <Tag key={i.key}>{i.group.name} <br /> </Tag>) }
                 </span>
             ),
         },

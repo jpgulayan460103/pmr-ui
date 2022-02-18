@@ -52,7 +52,7 @@ const ListForApproval = (props) => {
     const [routeOptions, setRouteOptions] = useState([]);
     const [procurementFormType, setProcurementFormType] = useState("");
     const [currentRoute, setCurrentRoute] = useState({});
-    const [addOn, setAddOn] = useState("BUDRP-PR-"+dayjs().format("YYYY-MM-"));
+    const [addOn, setAddOn] = useState(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
     const [errorMessage, setErrorMessage] = useState({});
     const [filterData, setFilterData] = useState({});
     const [tableLoading, setTableLoading] = useState(false);
@@ -511,6 +511,15 @@ const ListForApproval = (props) => {
         getForm({...filterData, page: e})
     }
 
+    const formatPrNumber = (e) => {
+        let pr_last = e.target.value;
+        let padded_pr_last = pr_last.padStart(5, '0');
+        budgetFormRef.current.setFieldsValue({
+            // purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
+            purchase_request_number_last: padded_pr_last,
+        });
+    }
+
 
     const menu = (item, index) => (
         <Menu onClick={() => setSelectedFormRoute(item) }>
@@ -626,26 +635,31 @@ const ListForApproval = (props) => {
                         rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
                         { ...showErrorMessage('purchase_request_number_last') }
                     >
-                        <Input addonBefore={addOn} placeholder="Purchase Request Number" />
+                        <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
+                            <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
+                                <Option value={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` }>{ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` }</Option>
+                                <Option value={ `BUDSP-PR-${dayjs().format("YYYY-MM-")}` }>{ `BUDSP-PR-${dayjs().format("YYYY-MM-")}` }</Option>
+                            </Select>
+                        )} placeholder="Purchase Request Number" />
                     </Form.Item>
 
                     <Form.Item
                         name="fund_cluster"
                         label="Fund Cluster"
-                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
-                        // { ...showErrorMessage() }
+                        rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
+                        { ...showErrorMessage('fund_cluster') }
                     >
                         <Input placeholder="Fund Cluster" />
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         name="center_code"
                         label="Responsibility Center Code"
                         // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
-                        // { ...showErrorMessage() }
+                        { ...showErrorMessage('center_code') }
                     >
                         <Input placeholder="Responsibility Center Code" />
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item
                         name="charge_to"
                         label="Charge To"
@@ -769,6 +783,17 @@ const ListForApproval = (props) => {
                                         return "selected-row";
                                     }
                                 }}
+                                onRow={(record, rowIndex) => {
+                                    return {
+                                      onClick: event => {
+                                        viewForm(record, 0)
+                                      }, // click row
+                                      onDoubleClick: event => {}, // double click row
+                                      onContextMenu: event => {}, // right button click row
+                                      onMouseEnter: event => {}, // mouse enter row
+                                      onMouseLeave: event => {}, // mouse leave row
+                                    };
+                                  }}
                             />
                             <div className="flex justify-end mt-2">
                                 {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
@@ -788,7 +813,7 @@ const ListForApproval = (props) => {
                 </Col>
                 { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
                     <Col md={24} lg={8} xl={6}>
-                        <Card size="small" title="Puchase Request Details" bordered={false} extra={(
+                        <Card size="small" title="Puchase Request Information" bordered={false} extra={(
                             <div className='text-right flex space-x-0.5'>
                                 <div className='space-x-0.5 mr-2'>
                                     { selectedFormRoute.status == "with_issues" ? (
@@ -808,17 +833,30 @@ const ListForApproval = (props) => {
                             </div>
                         )}>
                             <div className='forms-card-content'>
-                                <span>Forwarded by: <b><i>{selectedFormRoute.from_office?.name}</i></b></span><br />
-                                <span>Forwarded to: <b><i>{selectedFormRoute.to_office?.name}</i></b></span><br />
-                                <span>Remarks: <b><i>{selectedFormRoute.remarks}</i></b></span><br />
-                                <span>Status: <b><i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></b></span><br />
+                                <p>
+                                    <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.name}</i></span><br />
+                                    <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.name}</i></span><br />
+                                    <span><b>Remarks:</b> <i>{selectedFormRoute.remarks}</i></span><br />
+                                    <span><b>Status:</b> <i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></span><br />
+                                </p>
                                 { selectedFormRoute.status != "pending" ? <span>Disapproved by: <b><i>{selectedFormRoute.user?.user_information?.fullname}</i></b><br /></span> : ""}
-                                <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "70vh", width: "100%"}}></iframe>
+                                
                             </div>
                         </Card>
                     </Col>
                 )  }
             </Row>
+            { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col span={24}>
+                    <Card size="small" title="Forwarded Forms" bordered={false}>
+                        <div className='forms-card-form-content'>
+                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "80vh", width: "100%"}}></iframe>
+                        </div>
+                    </Card>
+                </Col>
+            </Row>
+            )  }
 
 
             <div className='col-md-8'>

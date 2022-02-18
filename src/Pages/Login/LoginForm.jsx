@@ -42,6 +42,10 @@ const Loginform = (props) => {
             }else{
                 sessionStorage.setItem('session',JSON.stringify(res.data));
                 customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+                props.dispatch({
+                    type: "SET_INITIALIZED",
+                    data: false
+                });
                 navigate("/");
             }
         })

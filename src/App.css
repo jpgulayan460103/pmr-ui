@@ -117,6 +117,11 @@
 }
 
 .forms-card-content{
+  height: 45vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+.forms-card-form-content{
   height: 90vh;
   overflow: auto;
   padding-right: 5px;
@@ -124,6 +129,18 @@
 
 .user-card-content{
   height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.quotation-main-card-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.quotation-side-card-content{
+  height: 40.8vh;
   overflow: auto;
   padding-right: 5px;
 }

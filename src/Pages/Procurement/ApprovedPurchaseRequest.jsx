@@ -22,6 +22,7 @@ import {
     MessageOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
+import api from '../../api';
 
 
 const { Option } = Select;
@@ -140,8 +141,14 @@ const ApprovedPurchaseRequest = (props) => {
     }
 
     const makeQuotation = (item, index) => {
-        selectPurchaseRequest(item);
-        navigate("/procurement/quotations");
+        api.PurchaseRequest.get(item.id)
+        .then(res => {
+            selectPurchaseRequest(res.data);
+            navigate("/procurement/quotations");
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
 
     const toggleColumn = (index, prop) => {

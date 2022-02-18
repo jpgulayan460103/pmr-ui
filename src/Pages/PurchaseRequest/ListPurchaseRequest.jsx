@@ -313,7 +313,7 @@ const Listpurchaserequest = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
-                    <Card size="small" title="Created Puchase Requests" bordered={false} className="purchase-request-card-container">
+                    <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
                                     if(selectedItem?.id == record.id){

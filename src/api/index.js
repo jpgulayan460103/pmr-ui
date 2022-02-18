@@ -3,6 +3,7 @@ import Library from './Library'
 import PurchaseRequest from './PurchaseRequest'
 import UserOffice from './UserOffice'
 import Forms from './Forms'
+import Supplier from './Supplier'
 
 
 export default {
@@ -11,4 +12,5 @@ export default {
   PurchaseRequest,
   UserOffice,
   Forms,
+  Supplier,
 }
