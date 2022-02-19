@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
+import moment from 'moment';
 
 function mapStateToProps(state) {
     return {
@@ -13,35 +14,48 @@ function mapStateToProps(state) {
         items: state.library.items,
         user_sections: state.library.user_sections,
         user_divisions: state.library.user_divisions,
-        isLibrariesLoaded: state.library.isLibrariesLoaded,
+        user_signatory_designations: state.library.user_signatory_designations,
+        user_signatory_names: state.library.user_signatory_names,
         formData: state.purchaseRequest.formData,
         formType: state.purchaseRequest.formType,
         formErrors: state.purchaseRequest.formErrors,
         formProccess: state.purchaseRequest.formProccess,
-        signatories: state.library.signatories,
         requestedBySignatory: state.purchaseRequest.requestedBySignatory,
         approvedBySignatory: state.purchaseRequest.approvedBySignatory,
         user: state.user.data,
+        isInitialized: state.user.isInitialized,
     };
 }
 
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
-
-
-
 const CreatePurchaseRequest = (props) => {
-
     useEffect(() => {
-        if(props.isLibrariesLoaded){
+        if(props.isInitialized){
             if(props.formData.end_user_id){
             }else{
-                changeFieldValue(props.user.signatories[0].office_id, 'end_user_id', false);
+                if(!isEmpty(props.user)){
+                    changeFieldValue(props.user.user_offices[0].office_id, 'end_user_id', false);
+                }
+            }
+            if(isEmpty(props.requestedBySignatory)){
+                setSignatory("OARDA",'requestedBy');
+            }
+            if(isEmpty(props.approvedBySignatory)){
+                setSignatory("ORD", 'approvedBy');
+            }
+            if(props.formType == "update"){
+                setSignatory(props.formData.requestedBy, 'requestedBy');
+                setSignatory(props.formData.approvedBy, 'approvedBy');
+            }
+            if(isEmpty(props.items)){
+                getItems();
             }
         }
-    }, [props.isLibrariesLoaded]);
+    }, [props.isInitialized]);
     useEffect(() => {
+        document.title = "Create Purchase Request";
         return function cleanup() {
             if(props.formType == "update"){
                 clearForm();
@@ -50,7 +64,23 @@ const CreatePurchaseRequest = (props) => {
     }, []);
     
     const [tableKey, setTableKey] = useState(0);
+    const [submit, setSubmit] = useState(false);
+
+    const getItems = async () => {
+        return api.Library.getLibraries('items')
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_ITEMS",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
     const savePurchaseRequest = debounce(() => {
+        setSubmit(true);
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
             data: {}
@@ -60,6 +90,7 @@ const CreatePurchaseRequest = (props) => {
         formData.approved_by_id = props.approvedBySignatory.id;
         api.PurchaseRequest.save(formData,props.formType)
         .then(res => {
+            setSubmit(false);
             notification.success({
                 message: 'Purchase Request is successfully saved.',
                 description:
@@ -70,6 +101,7 @@ const CreatePurchaseRequest = (props) => {
             clearForm();
         })
         .catch(err => {
+            setSubmit(false);
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
                 data: err.response.data.errors
@@ -79,15 +111,20 @@ const CreatePurchaseRequest = (props) => {
         ;
     }, 200);
 
-    const clearForm = () => {
+    const clearForm = async () => {
         props.dispatch({
             type: "RESET_PURCHASE_REQUEST_FORM_DATA",
-            data: {}
+            data: {
+                end_user_id: props.user.user_offices[0].office_id,
+            }
         });
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_TYPE",
             data: "create"
         });
+
+        setSignatory("OARDA",'requestedBy');
+        setSignatory("ORD", 'approvedBy');
     }
 
     const previewPurchaseRequest = debounce(() => {
@@ -122,6 +159,7 @@ const CreatePurchaseRequest = (props) => {
         let newValue = {
             key: tableKey + 1,
             item_code: null,
+            // item_code: props.formData.items.length + 1,
             unit_of_measure_id: null,
             item_name: null,
             quantity: 1,
@@ -130,11 +168,6 @@ const CreatePurchaseRequest = (props) => {
             is_ppmp: false,
             item_id: null,
         };
-        // setFormData(oldArray => ({
-        //     ...oldArray,
-        //     items: [...oldArray.items, newValue]
-        // }));
-
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_DATA",
             data: {
@@ -146,10 +179,6 @@ const CreatePurchaseRequest = (props) => {
 
     const deleteItem = (key) => {
         let newValue = props.formData.items.filter(item => item.key !== key)
-        // setFormData(oldArray => ({
-        //     ...oldArray,
-        //     items: newValue
-        // }));
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_DATA",
             data: {
@@ -160,14 +189,11 @@ const CreatePurchaseRequest = (props) => {
     }
 
     const changeFieldValue = (e, field, target = true) => {
+        // console.log(e, field);
         let value = e;
         if(target){
             value = e.target.value;
         }
-        // setFormData(oldArray => ({
-        //     ...oldArray,
-        //     [field]: value
-        // }));
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_DATA",
             data: {
@@ -194,10 +220,6 @@ const CreatePurchaseRequest = (props) => {
                 break;
         }
         newValue[index][field] = value;
-        // setFormData(oldArray => ({
-        //     ...oldArray,
-        //     items: newValue
-        // }));
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_DATA",
             data: {
@@ -245,32 +267,43 @@ const CreatePurchaseRequest = (props) => {
 
 
     const setSignatory = (e, type) => {
-        changeFieldValue(e, type, false)
         if(type == "requestedBy"){
-            let signatory = props.signatories.filter(i => i.signatory_type == e);
+            let user_office = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
-                data: signatory[0]
+                data: user_office[0]
+            });
+        }else{
+            let user_office = props.user_signatory_names.filter(i => i.title == e);
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
+                data: user_office[0]
             });
         }
     }
     
     return (
-        <div id="pr-container" className='container'>
+        <div id="pr-container" className='container-fuild bg-white p-16'>
             <p className="text-right ...">Appendix 60</p>
             <p className="text-center ..."><b>PURCHASE REQUEST</b></p>
             <Form>
             <table id="pr-table" style={style}>
                 <thead>
                     <tr>
-                        <td colSpan={3}><b>Entity Name:</b> <Input placeholder="Type here..." value="DSWD FO XI" /></td>
-                        <td colSpan={3}><b>Fund Cluster:</b> <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} /></td>
+                        <td colSpan={3}><b>Entity Name:</b><br />
+                        Department of Social Welfare and Development Field Office XI
+                        {/* <Input placeholder="Type here..." value="Department of Social Welfare and Development Field Office XI" disabled /> */}
+                        </td>
+                        <td colSpan={3}><b>Fund Cluster:</b>
+                        {/* <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} disabled /> */}
+                        </td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <b>Office/Section:</b>
-                            <Form.Item { ...displayError(`end_user_id`) }>
+                            <b>Office/Section:</b><br />
+                            { props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name }
+                            {/* <Form.Item { ...displayError(`end_user_id`) }>
 
                                 <Select
                                     showSearch
@@ -282,6 +315,7 @@ const CreatePurchaseRequest = (props) => {
                                     filterOption={(input, option) =>
                                         option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
+                                    disabled
                                 >
                                     { props.user_divisions.map(division =>  {
                                         return (
@@ -293,12 +327,12 @@ const CreatePurchaseRequest = (props) => {
                                         );
                                     }) }
                                 </Select>
-                            </Form.Item>
+                            </Form.Item> */}
                         </td>
                         <td colSpan={2}><b>PR No.:</b>
-                            <Form.Item { ...displayError(`purchase_request_number`) }>
-                                <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} />
-                            </Form.Item>
+                            {/* <Form.Item { ...displayError(`purchase_request_number`) }> */}
+                                {/* <Input disabled placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} /> */}
+                            {/* </Form.Item> */}
                         </td>
                         <td colSpan={2}></td>
                         <td></td>
@@ -306,14 +340,15 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2}></td>
                         <td colSpan={2}><b>Responsibility Center Code:</b>
-                            <Form.Item { ...displayError(`center_code`) }>
-                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} />
-                            </Form.Item>
+                            {/* <Form.Item { ...displayError(`center_code`) }> */}
+                                {/* <Input disabled placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} /> */}
+                            {/* </Form.Item> */}
                         </td>
-                        <td colSpan={2}><b>Date:</b>
-                        <Form.Item { ...displayError(`pr_date`) }>
-                            <DatePicker defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} />
-                        </Form.Item>
+                        <td colSpan={2}><b>Date:</b><br />
+                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
+                            { moment().format('MM/DD/YYYY') }
+                            {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
+                        {/* </Form.Item> */}
                         </td>
                         <td></td>
                     </tr>
@@ -333,19 +368,20 @@ const CreatePurchaseRequest = (props) => {
                             <tr key={item.key}>
                                 <td className='text-center'>
                                     <Form.Item { ...displayError(`items.${index}.item_code`) }>
-                                        <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled={ item.is_ppmp } />
+                                        { item.item_code }
+                                        {/* <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled /> */}
                                     </Form.Item>
                                 </td>
                                 <td className='text-center'>
                                     <Form.Item { ...displayError(`items.${index}.unit_of_measure_id`) }>
-                                        <Select
+                                        { item.is_ppmp ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                             showSearch
                                             value={item.unit_of_measure_id}
                                             placeholder="Select a Unit"
                                             optionFilterProp="children"
                                             onChange={(e) => selectUnit(e, index)}
                                             style={{ width: "100%" }}
-                                            disabled={ item.is_ppmp }
+                                            // disabled={  }/*  */
                                             filterOption={(input, option) =>
                                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                             }
@@ -353,28 +389,29 @@ const CreatePurchaseRequest = (props) => {
                                             { props.unit_of_measures.map((option, index) => (
                                                 <Option value={option.id} key={option.id}>{option.name}</Option>
                                             )) }
-                                        </Select>
+                                        </Select>) }
                                     </Form.Item>
                                 </td>
                                 <td>
                                     <Form.Item { ...displayError(`items.${index}.item_name`) }>
-                                        <AutoComplete
-                                            style={{ width: "100%" }}
-                                            allowClear
-                                            options={props.items}
-                                            onSelect={(val, item) => selectItem(val, item, index)}
-                                            placeholder="Type here..."
-                                            filterOption={(input, option) =>
-                                                option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                            }
-                                            onChange={(e) => {
-                                                changeTableFieldValue(e, {}, 'item_name', index);
-                                            }}
-                                            value={item.item_name}
-                                            disabled={ item.is_ppmp }
-                                        >
-                                            <TextArea autoSize />
-                                        </AutoComplete>
+                                        { item.is_ppmp ? item.item_name : (
+                                            <AutoComplete
+                                                style={{ width: "100%" }}
+                                                allowClear
+                                                options={props.items}
+                                                onSelect={(val, item) => selectItem(val, item, index)}
+                                                placeholder="Type here..."
+                                                filterOption={(input, option) =>
+                                                    option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                }
+                                                onChange={(e) => {
+                                                    changeTableFieldValue(e, {}, 'item_name', index);
+                                                }}
+                                                value={item.item_name}
+                                            >
+                                                <TextArea autoSize />
+                                            </AutoComplete>
+                                        ) }
                                     </Form.Item>
                                     {/* <Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } value={item.description} /> */}
                                 </td>
@@ -414,34 +451,38 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
                         <td style={{borderBottom: 0}}>Requested By:
-                            <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e,'requestedBy') }} value={props.formData.requestedBy}>
-                                { props.signatories.filter(i => i.signatory_type == "OARDA" || i.signatory_type == "OARDO").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
+                        <Form.Item { ...displayError(`requested_by_id`) }>
+                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
+                                { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
                             </Select>
+                        </Form.Item>
                         <br /><br />&nbsp;</td>
                         <td colSpan={4} style={{borderBottom: 0}}>Approved by:
-                        <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy}>
-                            { props.signatories.filter(i => i.signatory_type == "ORD").map(i => <Option value={i.signatory_type} key={i.key}>{ i.designation }</Option>) }
-                        </Select>
+                        <Form.Item { ...displayError(`approved_by_id`) }>
+                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
+                                { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
+                            </Select>
+                        </Form.Item>
                         <br /><br />&nbsp;</td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0, borderBottom: 0}}>Printed Name:</td>
                         <td style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.requestedBySignatory?.user?.user_information.fullname }
+                            { props.requestedBySignatory?.name }
                         </td>
                         <td colSpan={4} style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.approvedBySignatory?.user?.user_information.fullname }
+                            { props.approvedBySignatory?.name }
                         </td>
                     </tr>
                     <tr>
                         <td colSpan={2} style={{borderTop: 0}}>Designation:</td>
                         <td style={{ textAlign: "center", borderTop: 0}}>
                             {/* { props.formData.requestedBy_designation } */}
-                            { props.requestedBySignatory?.title } { props.requestedBySignatory?.designation }
+                            { props.requestedBySignatory?.parent?.name }
                         </td>
                         <td colSpan={4} style={{ textAlign: "center", borderTop: 0}}>
                             {/* { props.formData.approvedBy_designation } */}
-                            { props.approvedBySignatory?.title } { props.approvedBySignatory?.designation }
+                            { props.approvedBySignatory?.parent?.name }
                         </td>
                     </tr>
                 </tbody>
@@ -450,7 +491,7 @@ const CreatePurchaseRequest = (props) => {
             <div className='text-center'>
                 <br />
                 <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
-                <Button type="primary" onClick={() => savePurchaseRequest()}><SaveOutlined /> Save</Button>
+                <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />Cancel</Button>
             </div>
         </div>

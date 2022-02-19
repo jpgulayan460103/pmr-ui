@@ -16,16 +16,12 @@
     background: rgba(255, 255, 255, 0.3);
   }
   
-  .site-layout .site-layout-background {
-    background: #fff;
-  }
-
   .site-layout-sub-header-background {
     background-image: linear-gradient(to left, #30336b, #4834d4, #686de0);
   }
   
   .site-layout-background {
-    background: #fff;
+    /* background: #fff; */
   }
 
   #main-content{
@@ -61,4 +57,94 @@
   /* border: 1px solid rgb(235, 237, 240); */
   padding-left: 0;
   margin-left: -20px;
+}
+
+.ant-btn .anticon{
+  position: relative;
+  top: -0.1em;
+}
+.ant-back-top-icon .anticon{
+  position: relative;
+  top: -0.25em;
+}
+.ant-menu-item .anticon{
+  position: relative;
+  top: -0.30em;
+}
+.ant-dropdown-trigger .anticon{
+  position: relative;
+  top: -0.1em;
+}
+.ant-select-selection-item-remove .anticon{
+  position: relative;
+  top: -0.30em;
+}
+
+.ant-dropdown{
+  /* border: 1px solid black; */
+  -moz-box-shadow: 0 0 3px #ccc;
+  -webkit-box-shadow: 0 0 3px #ccc;
+  box-shadow: 0 0 3px #ccc;
+} 
+
+.header-items{
+  position: relative;
+  top: -10px;
+}
+
+/* .ant-card-head{
+  height: 40px;
+  min-height: 40px;
+}
+.ant-card-head-wrapper{
+  height: 40px;
+}
+.ant-card-head-title{
+  height: 40px;
+  padding: 5px;
+} */
+
+.procurement-card-container{
+  height: 75vh;
+  overflow: auto;
+  padding-right: 5px;
+
+}
+.purchase-request-card-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.forms-card-content{
+  height: 45vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+.forms-card-form-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.user-card-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.quotation-main-card-content{
+  height: 90vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.quotation-side-card-content{
+  height: 40.8vh;
+  overflow: auto;
+  padding-right: 5px;
+}
+
+.ant-tabs-tabpane .ant-timeline{
+  padding-left: 10px;
 }

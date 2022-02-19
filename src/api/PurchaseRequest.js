@@ -39,4 +39,19 @@ export default {
   approve(id){
     return axios.post(`api/purchase-requests/${id}/approve`);
   },
+  logger(id){
+    return axios.get(`api/logger/purchase-request/${id}`);
+  },
+  loggerProcurement(id){
+    return axios.get(`api/logger/purchase-request/${id}?type=procurement`);
+  },
+  loggerItems(id){
+    return axios.get(`api/logger/purchase-request/${id}/items`);
+  },
+  getBacData(id){
+    return axios.get(`api/purchase-requests/${id}/bac-tasks`);
+  },
+  saveBacData(formdata){
+    return axios.post(`api/purchase-requests/${formdata.purchase_request_id}/bac-tasks`, formdata);
+  },
 }

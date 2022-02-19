@@ -28,9 +28,9 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "deploy": "set PUBLIC_URL=/fms&&craco build",
+    "start": "set PUBLIC_URL=/&&craco start",
+    "build": "set PUBLIC_URL=/&&craco build",
+    "deploy": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

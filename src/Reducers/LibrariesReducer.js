@@ -8,9 +8,12 @@ const initialState = () => {
       divisions_sections_tree: [],
       user_positions: [],
       user_area_of_assignments: [],
-      signatories: [],
+      user_offices: [],
       procurement_types: [],
       mode_of_procurements: [],
+      technical_working_groups: [],
+      user_signatory_designations: [],
+      user_signatory_names: [],
       isLibrariesLoaded: false,
     }
   }
@@ -60,7 +63,7 @@ const initialState = () => {
       case 'SET_LIBRARY_SIGNATORIES':
         return {
           ...state,
-          signatories: action.data,
+          user_offices: action.data,
         };
       case 'SET_LIBRARY_PROCUREMENT_TYPES':
         return {
@@ -71,6 +74,21 @@ const initialState = () => {
         return {
           ...state,
           mode_of_procurements: action.data,
+        };
+      case 'SET_LIBRARY_TECHNICAL_WORKING_GROUPS':
+        return {
+          ...state,
+          technical_working_groups: action.data,
+        };
+      case 'SET_LIBRARY_SIGNATORY_DESIGNATION':
+        return {
+          ...state,
+          user_signatory_designations: action.data,
+        };
+      case 'SET_LIBRARY_SIGNATORY_NAME':
+        return {
+          ...state,
+          user_signatory_names: action.data,
         };
       case 'LOAD_LIBRARIES':
         return {

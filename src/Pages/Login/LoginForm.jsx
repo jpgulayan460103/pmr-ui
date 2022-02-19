@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Divider, Typography  } from 'antd';
+import { Form, Input, Button, Divider, Typography, Checkbox  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
@@ -42,6 +42,10 @@ const Loginform = (props) => {
             }else{
                 sessionStorage.setItem('session',JSON.stringify(res.data));
                 customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+                props.dispatch({
+                    type: "SET_INITIALIZED",
+                    data: false
+                });
                 navigate("/");
             }
         })
@@ -57,11 +61,10 @@ const Loginform = (props) => {
     };
     return (
         <div>
-            <Title level={2} className='text-center'>User Login</Title>
             <Form
                 name="normal_login"
                 className="login-form"
-                initialValues={{ remember: true, username: "ict", password: "admin123" }}
+                initialValues={{ remember: false, username: "ict", password: "admin123" }}
                 onFinish={onFinish}
                 layout='vertical'
             >
@@ -84,16 +87,21 @@ const Loginform = (props) => {
                     placeholder="Password"
                     />
                 </Form.Item>
+
+                <Form.Item name="remember" valuePropName="checked">
+                    <Checkbox>Remember me</Checkbox>
+                </Form.Item>
+
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="login-form-button" block disabled={submit} loading={submit}>
                         { submit ? "Logging in" : "Log in" }
                     </Button>                  
-                    &nbsp;<span className='custom-pointer' href=""> Forgot password?</span>
+                    {/* &nbsp;<span className='custom-pointer' href=""> Forgot password?</span> */}
                 </Form.Item>
             </Form>
             <Divider>or</Divider>
             <Button type="ghost" block onClick={() => { props.setShowRegister(true) }  }>
-                Register using Active Directory Account
+                Request password reset
             </Button>
         </div>
     );

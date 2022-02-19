@@ -10,6 +10,7 @@ import LoginFormActive from './LoginFormActive'
 import api from '../../api';
 import { Steps, Typography, PageHeader } from 'antd';
 import LoadLibraries from '../../Components/LoadLibraries';
+import logo from './../../Images/logo.png'
 
 
 const { Title } = Typography;
@@ -23,7 +24,7 @@ function mapStateToProps(state) {
 const Login = () => {
     const location = useLocation();
     useEffect(() => {
-        
+        document.title = "Login";
     }, []);
 
     const [formData, setFormData] = useState({
@@ -43,28 +44,21 @@ const Login = () => {
         api.User.all();
     }
     return (
-        <div style={style} id="container">
+        <div style={style} id="container" className='flex justify-center'>
             <LoadLibraries />
-            {/* <button className='btn btn-primary' onClick={() => { loginTest() }}>Login</button> */}
-            {/* <button className='btn btn-primary' onClick={() => { itemsTest() }}>Items</button> */}
-            {/* <button className='btn btn-primary' onClick={() => { docuTest() }}>Docu</button> */}
-            <div id="login-container">
-                <div className='row'>
-                    <div className='col-md-6 col-sm-12'>
-                        { showRegister ? (
-                            <>
-                                <Title level={2} className='text-center'>User Registration</Title>
-                                <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} type="create" />
-                            </>
-                        ) : (
-                            <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
-                        ) }
+            <div id='login-container' className='h-full'>
+                <div className="flex justify-center w-fit mb-6">
+                    <div className='w-60'>
+                        <img src={logo} alt="" />
                     </div>
-                    <div className='col-md-6 col-sm-12'>
-                        {/* { showRegister ? (<RegistrationFormActive firstname={formData.firstname} middlename={formData.middlename} lastname={formData.lastname} />) : "" } */}
-                    </div>
-                    
                 </div>
+                { showRegister ? (
+                    <div style={{width: "450px"}}>
+                        <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
+                    </div>
+                ) : (
+                    <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />
+                ) }
             </div>
         </div>
     );

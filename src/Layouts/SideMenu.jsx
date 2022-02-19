@@ -5,6 +5,7 @@ import Icon, {
     UserOutlined,
     UploadOutlined,
     FormOutlined,
+    MessageOutlined,
     ShoppingCartOutlined ,
   } from '@ant-design/icons';
 import { useLocation, Link  } from 'react-router-dom'
@@ -63,10 +64,20 @@ const Sidemenu = (props) => {
                         <Link to="/procurement"></Link>
                         Procurement
                     </Menu.Item>
-                    <Menu.Item key="/procurement/quotations">
-                        <Link to="/procurement/quotations"></Link>
-                        Quotations
-                    </Menu.Item>
+                    <SubMenu key="submenu-quotation" title="Quotations">
+                        <Menu.Item key="/procurement/quotations/form">
+                            <Link to="/procurement/quotations/form"></Link>
+                            Create Quotation Form
+                        </Menu.Item>
+                        <Menu.Item key="/procurement/quotations">
+                            <Link to="/procurement/quotations"></Link>
+                            View Quotation Forms
+                        </Menu.Item>
+                        <Menu.Item key="/procurement/quotations/suppliers">
+                            <Link to="/procurement/quotations/suppliers"></Link>
+                            Suppliers
+                        </Menu.Item>
+                    </SubMenu>
                 </SubMenu>
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
                     <Menu.Item key="/forms/requests">
@@ -85,14 +96,12 @@ const Sidemenu = (props) => {
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">
                     <Menu.Item key="/purchase-requests/form">
                         <Link to="/purchase-requests/form"></Link>
-                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Requests
+                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
                     </Menu.Item>
                     <Menu.Item key="/purchase-requests">
                         <Link to="/purchase-requests"></Link>
                         View Purchase Requests
                     </Menu.Item>
-                    <Menu.Item key="7">Option 7</Menu.Item>
-                    <Menu.Item key="8">Option 8</Menu.Item>
                 </SubMenu>
                 <Menu.Item key="/users" icon={<UserOutlined />}>
                     <Link to="/users"></Link>
@@ -120,13 +129,13 @@ const Sidemenu = (props) => {
                         Office Sections
                     </Menu.Item>
                 </SubMenu>
-                <SubMenu key="submenu-signatories" icon={<Icon component={SignatureSvg} />} title="Signatories">
-                    <Menu.Item key="/libraries/signatories/administrators">
-                        <Link to="/libraries/signatories/administrators"></Link>
+                <SubMenu key="submenu-user_offices" icon={<Icon component={SignatureSvg} />} title="UserOffice">
+                    <Menu.Item key="/libraries/user_offices/administrators">
+                        <Link to="/libraries/user_offices/administrators"></Link>
                         Admininstrators
                     </Menu.Item>
-                    <Menu.Item key="/libraries/signatories/purchase-requests">
-                        <Link to="/libraries/signatories/purchase-requests"></Link>
+                    <Menu.Item key="/libraries/user_offices/purchase-requests">
+                        <Link to="/libraries/user_offices/purchase-requests"></Link>
                         Purchase Request
                     </Menu.Item>
                 </SubMenu>

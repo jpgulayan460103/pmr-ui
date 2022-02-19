@@ -4,11 +4,13 @@ const initialState = () => {
     return {
       formData: {
         items: [],
+        updater: "end_user",
         requestedBy: "OARDA",
         approvedBy: "ORD",
         fund_cluster: "",
         purchase_request_number: "",
         center_code: "",
+        end_user_id: null,
         pr_date: customDayJs().format('YYYY-MM-DD')
       },
       formErrors: {},
@@ -54,7 +56,7 @@ const initialState = () => {
       case 'RESET_PURCHASE_REQUEST_FORM_DATA':
         return {
           ...state,
-          formData: initialState().formData,
+          formData: {...initialState().formData, ...action.data},
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

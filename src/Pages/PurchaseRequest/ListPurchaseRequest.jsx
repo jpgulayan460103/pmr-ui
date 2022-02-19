@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker  } from 'antd';
+import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
 import api from '../../api';
-import Icon, { CloseOutlined, HeartTwoTone, SearchOutlined } from '@ant-design/icons';
+import Icon, {
+    CloseOutlined,
+    EllipsisOutlined,
+    SearchOutlined,
+    CheckCircleOutlined,
+    ExclamationCircleOutlined,
+    QuestionCircleOutlined,
+    InfoCircleOutlined,
+    LoadingOutlined,
+    FormOutlined,
+    EditOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import filter from '../../Shared/filter';
+import AuditTrail from '../../Components/AuditTrail';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -16,7 +28,7 @@ const { RangePicker } = DatePicker;
 
 function mapStateToProps(state) {
     return {
-
+        isInitialized: state.user.isInitialized
     };
 }
 
@@ -29,8 +41,12 @@ const MaximizeSvg = () => (
 const Listpurchaserequest = (props) => {
     let navigate = useNavigate()
     useEffect(() => {
-        getPurchaseRequests();
-    }, []);
+        document.title = "List of Purchase Request";
+        if(props.isInitialized){
+            getPurchaseRequests();
+        }
+    }, [props.isInitialized]);
+    
     
     const [purchaseRequests, setPurchaseRequests] = useState([]);
     const [paginationMeta, setPaginationMeta] = useState({
@@ -45,6 +61,8 @@ const Listpurchaserequest = (props) => {
     const [filterData, setFilterData] = useState({
         page: 1,
     });
+    const [loggerItems, setLoggerItems] = useState([]);
+    const [logger, setLogger] = useState([]);
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
@@ -80,37 +98,53 @@ const Listpurchaserequest = (props) => {
     }
 
 
-    const openPurchaseRequest = (item, index) => {
+    const openPurchaseRequest = async (item, index) => {
         setPurchaseRequestOutput(item.file);
         setSelectedItem(item)
-        let form_routes = item.form_routes.data;
-        let form_routes_process = item.form_process.form_routes;
-        let new_route = [];
-        for (let index = 0; index < form_routes.length; index++) {
-            if(form_routes[index]['status'] != "pending"){
-                new_route.push({
-                    status: "pending",
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['created_at'],
-                });
+        setTimelines([]);
+        setLogger([]);
+        setLoggerItems([]);
+        await loadPurchaseRequestData(item.id);
+        await loadAuditTrail(item.id);
+        await loadItemsAuditTrail(item.id);
+    }
 
-                new_route.push({
-                    status: form_routes[index]['status'],
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['updated_at'],
-                });
-            }else{
-                new_route.push({
-                    status: form_routes[index]['status'],
-                    status_str: form_routes[index]['status_str'],
-                    to_office: form_routes[index]['to_office'],
-                    created_at: form_routes[index]['created_at'],
-                });
-            }
-        }
-        setTimelines(form_routes);
+    const loadPurchaseRequestData = async (id) => {
+        await api.PurchaseRequest.get(id)
+        .then(res => {
+            let item = res.data;
+            let form_routes = item.form_routes.data;
+            // let form_routes_process = item.form_process.form_routes;
+            // let new_route = [];
+            // for (let index = 0; index < form_routes.length; index++) {
+            //     if(form_routes[index]['status'] != "pending"){
+            //         new_route.push({
+            //             status: "pending",
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['created_at'],
+            //         });
+    
+            //         new_route.push({
+            //             status: form_routes[index]['status'],
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['updated_at'],
+            //         });
+            //     }else{
+            //         new_route.push({
+            //             status: form_routes[index]['status'],
+            //             status_str: form_routes[index]['status_str'],
+            //             to_office: form_routes[index]['to_office'],
+            //             created_at: form_routes[index]['created_at'],
+            //         });
+            //     }
+            // }
+            setTimelines(form_routes);
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
     const closePurchaseRequest = () => {
         setPurchaseRequestOutput("");
@@ -122,7 +156,8 @@ const Listpurchaserequest = (props) => {
         .then(res => {
             let purchaseRequest = res.data;
             purchaseRequest.items = res.data.items.data;
-            console.log(purchaseRequest);
+            purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
+            purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_FORM_DATA",
                 data: purchaseRequest
@@ -138,6 +173,24 @@ const Listpurchaserequest = (props) => {
         ;
     }
 
+    const loadAuditTrail = async (id) => {
+        await api.PurchaseRequest.logger(id)
+        .then(res => {
+            setLogger(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
+    }
+
+    const loadItemsAuditTrail = async (id) => {
+        await api.PurchaseRequest.loggerItems(id)
+        .then(res => {
+            setLoggerItems(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
+    }
+
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
         // console.log(filters);
@@ -149,6 +202,40 @@ const Listpurchaserequest = (props) => {
         getPurchaseRequests({...filterData, page: e})
     }
 
+    const timelineContent = (timeline) => {
+        // `${timeline.status_str} by the [${timeline.to_office?.name}]`
+        let label = (<>
+            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
+            <b>{timeline.to_office?.name}</b> <br />
+            {timeline.status == 'with_issues' ? "For resolution" : timeline.remarks}
+        </>)
+        let color =""
+        let logo =""
+        switch (timeline.status) {
+            case "approved":
+                color = "green";
+                logo = <CheckCircleOutlined />;
+                break;
+            case "rejected":
+                color = "red";
+                logo = <ExclamationCircleOutlined />;
+                break;
+            case "with_issues":
+                color = "blue";
+                logo = <QuestionCircleOutlined />;
+                break;
+            case "resolved":
+                color = "blue";
+                logo = <CheckCircleOutlined />;
+                break;
+            default:
+                color = "gray";
+                logo = <LoadingOutlined />
+                break;
+        }
+        return { label, color, logo }
+    }
+
     const dataSource = purchaseRequests
       
     const columns = [
@@ -156,11 +243,14 @@ const Listpurchaserequest = (props) => {
             title: 'Particulars',
             dataIndex: 'purpose',
             key: 'purpose',
+            width: 450,
             ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Total Cost',
             key: 'total_cost',
+            width: 150,
+            align: "center",
             ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
@@ -173,11 +263,14 @@ const Listpurchaserequest = (props) => {
             title: 'PR Date',
             dataIndex: 'pr_date',
             key: 'pr_date',
+            width: 120,
+            align: "center",
             ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
         },
         {
             title: 'Status',
             key: 'status',
+            align: "center",
             render: (text, item, index) => (
                 <span>
                     { item.status }
@@ -190,82 +283,110 @@ const Listpurchaserequest = (props) => {
             ...filter.list('status','text', setFilterData, filterData, getPurchaseRequests),
         },
         {
-            title: 'Actions',
-            key: 'actions',
+            title: "Action",
+            key: "action",
+            fixed: 'right',
+            width: 60,
+            align: "center",
             render: (text, item, index) => (
-                <Space size={2}>
-                    <span className='custom-pointer' onClick={() => { editPurchaseRequest(item, index) }}>Edit</span> |
-                    <span className='custom-pointer' onClick={() => { openPurchaseRequest(item, index) }}>View</span>
-                </Space>
-            )
+                <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                </Dropdown>
+              )
         },
     ];
     
-    return (
-        <div className='row' style={{minHeight: "50vh"}}>
-            <div className='col-md-8'>
-                <Title level={2} className='text-center'>Purchase Request</Title>
-                <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                    if(selectedItem?.id == record.id){
-                        return "selected-row";
-                    }
-                }}
-                onChange={handleTableChange}
-                size={"small"}
-                pagination={false}
-                loading={tableLoading}
-                />
-                <Pagination
-                    current={paginationMeta.current_page}
-                    total={paginationMeta.total}
-                    pageSize={paginationMeta.per_page}
-                    className='mt-2'
-                    onChange={paginationChange}
-                />
-            </div>
-            
-            <div className='col-md-4'>
-                { purchaseRequestOutput == "" ? "" : 
-                <>
-                    <div className='text-right'>
-                        <Button size='large' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                        <Button size='large' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
-                    </div>
-                    
+    const menu = (item, index) => (
+        <Menu>
+            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { openPurchaseRequest(item, index) }}>
+                View
+            </Menu.Item>
+            <Menu.Item key="menu-edit" icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+                Edit
+            </Menu.Item>
+        </Menu>
+      );
 
-                    <Tabs defaultActiveKey="1" type="card" size="small">
-                    <TabPane tab="File" key="1" style={{minHeight: "50vh"}}>
-                        <iframe src={`${purchaseRequestOutput}?view=1`} width="100%" height="100%"></iframe>
-                    </TabPane>
-                    <TabPane tab="Routing" key="2">
-                        <Timeline mode="left">
-                            { timelines.map((timeline, index) => {
-                                let color;
-                                let label;
-                                if(timeline.status == "approved"){
-                                    color = "green";
-                                    label = `${timeline.status_str} by the [${timeline.to_office?.name}]`;
-                                }else if(timeline.status == "rejected"){
-                                    color = "red";
-                                    label = `Disapproved by the [${timeline.to_office?.name}] remarks: ${timeline.remarks}`;
-                                }else if(timeline.status == "with_issues"){
-                                    color = "gray";
-                                    label = `Returned from the [${timeline.from_office?.name}] to the [${timeline.to_office?.name}]`;
-                                }else if(timeline.status == "resolved"){
-                                    color = "green";
-                                    label = `Resolved issues and returned to the [${timeline.from_office?.name}]  remarks: ${timeline.remarks}`;
-                                }else{
-                                    color = "gray";
-                                    label = `For approval of the [${timeline.to_office?.name}]`;
-                                }
-                                return <Timeline.Item color={color} label={timeline.updated_at} key={index}>{label}</Timeline.Item>
-                            }) }
-                        </Timeline>
-                    </TabPane>
-                    </Tabs>
-                </>
+
+    return (
+        <div>
+
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col md={24} lg={14} xl={16}>
+                    <Card size="small" title="Created Puchase Requests" bordered={false}>
+                        <div className='purchase-request-card-content'>
+                            <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
+                                    if(selectedItem?.id == record.id){
+                                        return "selected-row";
+                                    }
+                                }}
+                                onChange={handleTableChange}
+                                size={"small"}
+                                pagination={false}
+                                scroll={{ y: "75vh" }}
+                                loading={{spinning: tableLoading, tip: "Loading..."}}
+                                />
+
+                                <div className="flex justify-end mt-2">
+                                <Pagination
+                                        current={paginationMeta?.current_page || 1}
+                                        total={paginationMeta?.total || 1}
+                                        pageSize={paginationMeta?.per_page || 1}
+                                        onChange={paginationChange}
+                                        // showSizeChanger
+                                        showQuickJumper
+                                        size="small"
+                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                    />
+                                </div>
+                        </div>
+                    </Card>
+                </Col>
+                { purchaseRequestOutput == "" ? "" : (
+                    <Col md={24} lg={10} xl={8}>
+                            <Card size="small" bordered={false} title="Puchase Request Details" extra={(
+                                <div className='text-right space-x-0.5'>
+                                    <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                </div>
+                            )}
+                            >
+                                <div className='purchase-request-card-content'>
+                                    <Tabs defaultActiveKey="file" type="card" size="small">
+                                        <TabPane tab="File" key="file">
+                                            <div style={{ height: "75vh" }}>
+                                                <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                                            </div>
+                                        </TabPane>
+                                        <TabPane tab="Routing" key="routing">
+                                            { !isEmpty(timelines) ? (
+                                                <div className='pt-4'>
+                                                    <Timeline>
+                                                        { timelines.map((timeline, index) => {
+                                                            return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
+                                                        }) }
+                                                    </Timeline>
+                                                </div>
+                                            ) : <Skeleton active />  }
+                                        </TabPane>
+                                        <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
+                                            { !isEmpty(logger) ? (
+                                                <AuditTrail logger={logger} tableScroll="65vh" displayProp={ selectedItem.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
+                                            ) : <Skeleton active /> }
+                                        </TabPane>
+                                        <TabPane tab="Items Audit Trail" key="items-audit-trail">
+                                            { !isEmpty(loggerItems) ? (
+                                                <AuditTrail logger={loggerItems} tableScroll="65vh" displayProp="item_name" />
+                                            ) : <Skeleton active /> }
+                                        </TabPane>
+                                    </Tabs>
+                                </div>
+                            </Card>
+                    </Col>
+                    )
                 }
-            </div>
+            </Row>
+            
         </div>
     );
 }
