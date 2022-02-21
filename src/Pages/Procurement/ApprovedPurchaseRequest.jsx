@@ -233,7 +233,7 @@ const ApprovedPurchaseRequest = (props) => {
             ...onCell,
         },
         {
-            title: 'Particulars',
+            title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
             width: 150,

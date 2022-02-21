@@ -438,15 +438,16 @@ const ListForApproval = (props) => {
             ...onCell,
         },
         {
-            title: 'Particulars',
-            key: 'particulars',
+            title: 'Purpose',
+            key: 'purpose',
             render: (text, item, index) => (
                 <span>
-                    { item.form_routable?.particulars }
+                    { item.form_routable?.purpose }
                 </span>
             ),
-            ...filter.search('particulars','text', setFilterData, filterData, getForm),
+            ...filter.search('purpose','text', setFilterData, filterData, getForm),
             ...onCell,
+            width: 150,
         },
         {
             title: 'Amount',
@@ -458,6 +459,7 @@ const ListForApproval = (props) => {
             ),
             ...filter.search('total_cost','text', setFilterData, filterData, getForm),
             ...onCell,
+            width: 150,
         },
         {
             title: 'End User',
@@ -476,6 +478,7 @@ const ListForApproval = (props) => {
         {
             title: 'Status',
             key: 'status',
+            width: 250,
             render: (text, item, index) => (
                 <span>
                     { item.status != "pending" ? (
@@ -492,6 +495,7 @@ const ListForApproval = (props) => {
         {
             title: 'Remarks',
             key: 'remarks',
+            width: 250,
             render: (text, item, index) => (
                 <span>
                     <span>{item.forwarded_remarks === null ? item.remarks : item.forwarded_remarks }</span>
@@ -843,7 +847,7 @@ const ListForApproval = (props) => {
                                 <p>
                                     <span><b>Form type:</b> <i>{selectedFormRoute.route_type_str}</i></span><br />
                                     <span><b>End User:</b> <i>{selectedFormRoute.end_user.name}</i></span><br />
-                                    <span><b>Particulars:</b> <i>{selectedFormRoute.form_routable?.particulars}</i></span><br />
+                                    <span><b>Purpose:</b> <i>{selectedFormRoute.form_routable?.purpose}</i></span><br />
                                     <span><b>Amount:</b> <i>{selectedFormRoute.form_routable?.total_cost_formatted}</i></span><br />
                                     <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.name}</i></span><br />
                                     <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.name}</i></span><br />

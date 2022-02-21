@@ -259,7 +259,7 @@ const Listpurchaserequest = (props) => {
       
     const columns = [
         {
-            title: 'Particulars',
+            title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
             width: 450,
