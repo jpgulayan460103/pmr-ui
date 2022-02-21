@@ -22,9 +22,6 @@ const MenuItems = ({userLogout}) => {
             <Menu.Item icon={<UserOutlined />} key="1">
                 <span style={{fontSize: 18}}>Profile</span>
             </Menu.Item>
-            <Menu.Item icon={<DownOutlined />} key="2">
-                <span style={{fontSize: 18}}>1st menu item</span>
-            </Menu.Item>
             <Menu.Item icon={<SettingOutlined />} key="3">
                 <span style={{fontSize: 18}}>Settings</span>
             </Menu.Item>

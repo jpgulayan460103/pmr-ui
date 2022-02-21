@@ -5,6 +5,7 @@ import ApprovedPurchaseRequest from './ApprovedPurchaseRequest';
 import PurchaseRequestWorkspace from './PurchaseRequestWorkspace';
 import Icon, {
     CloseOutlined,
+    VerticalAlignTopOutlined,
 } from '@ant-design/icons'
 import api from '../../api';
 import { debounce } from 'lodash';
@@ -28,6 +29,9 @@ const Procurement = (props) => {
     useEffect(() => {
         document.title = "Procurement";
     }, []);
+
+    const [fRow1, setfRow1] = useState(14);
+    const [fRow2, setfRow2] = useState(10);
 
     const openInFull = () => {
         window.open(`${props.selectedPurchaseRequest.file}?view=1`,
@@ -81,7 +85,7 @@ const Procurement = (props) => {
     return (
         <div>
             <Row gutter={[16, 16]} className="mb-3">
-                <Col xs={24} sm={24} md={24} lg={16} xl={18}>
+                <Col xs={24} sm={24} md={24} lg={fRow1} xl={fRow1+2}>
                     <Card size="small" title="Approved Puchase Requests" bordered={false}>
                         <div className="procurement-card-container">
                             <ApprovedPurchaseRequest getPurchaseRequests={getPurchaseRequests} />
@@ -89,9 +93,21 @@ const Procurement = (props) => {
                     </Card>
                 </Col>
                 {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? (
-                <Col xs={24} sm={24} md={24} lg={8} xl={6}>
+                <Col xs={24} sm={24} md={24} lg={fRow2} xl={fRow2-2}>
                     <Card title="Puchase Request Details" size="small" bordered={false} extra={(
                             <div className='text-right space-x-0.5'>
+                                <Button size='small' onClick={() => {
+                                    if(fRow1 == 14){
+                                        setfRow2(14);
+                                        setfRow1(10);
+                                    }else{
+                                        setfRow2(10);
+                                        setfRow1(14);
+
+                                    }
+                                } }>
+                                    <VerticalAlignTopOutlined rotate={fRow1 == 14 ? -90 : 90} />
+                                </Button>
                                 <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
                                 <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
                             </div>

@@ -106,23 +106,6 @@ const Pruchaserequestworkspace = (props) => {
         });
     }
 
-    const columns = [
-        {
-          title: 'Field',
-          dataIndex: 'label',
-          key: 'label',
-        },
-        {
-          title: 'Old',
-          dataIndex: 'old',
-          key: 'old',
-        },
-        {
-          title: 'New',
-          dataIndex: 'new',
-          key: 'new',
-        },
-    ];
 
     const saveBacForm = (value) => {
         api.PurchaseRequest.saveBacData(value)

@@ -63,6 +63,8 @@ const Listpurchaserequest = (props) => {
     });
     const [loggerItems, setLoggerItems] = useState([]);
     const [logger, setLogger] = useState([]);
+    const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState({});
+    const [tabKey, setTabKey] = useState('information');
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
@@ -237,6 +239,23 @@ const Listpurchaserequest = (props) => {
     }
 
     const dataSource = purchaseRequests
+
+    const onCell = {
+        onCell: (record, colIndex) => {
+            return {
+                onClick: event => {
+                    setSelectedPurchaseRequest(record)
+                    if(isEmpty(selectedPurchaseRequest)){
+                        openPurchaseRequest(record, colIndex);
+                    }else{
+                        if(selectedPurchaseRequest.id != record.id){
+                            openPurchaseRequest(record, colIndex);
+                        }
+                    }
+                },
+            };
+          }
+    }
       
     const columns = [
         {
@@ -245,6 +264,7 @@ const Listpurchaserequest = (props) => {
             key: 'purpose',
             width: 450,
             ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
+            ...onCell
         },
         {
             title: 'Total Cost',
@@ -257,7 +277,7 @@ const Listpurchaserequest = (props) => {
                     { item.total_cost_formatted }
                 </span>
             ),
-            
+            ...onCell,
         },
         {
             title: 'PR Date',
@@ -266,6 +286,7 @@ const Listpurchaserequest = (props) => {
             width: 120,
             align: "center",
             ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'Status',
@@ -281,6 +302,7 @@ const Listpurchaserequest = (props) => {
                 { text: 'Pending', value: "Pending" },
             ],
             ...filter.list('status','text', setFilterData, filterData, getPurchaseRequests),
+            ...onCell,
         },
         {
             title: "Action",
@@ -290,7 +312,9 @@ const Listpurchaserequest = (props) => {
             align: "center",
             render: (text, item, index) => (
                 <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                    <Button size='small'>
+                        <EllipsisOutlined />
+                    </Button>
                 </Dropdown>
               )
         },
@@ -298,11 +322,20 @@ const Listpurchaserequest = (props) => {
     
     const menu = (item, index) => (
         <Menu>
-            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { openPurchaseRequest(item, index) }}>
-                View
+            <Menu.Item key="menu-information" icon={<FormOutlined />}  onClick={() => { setTabKey('information');openPurchaseRequest(item, 0) }}>
+                View Information
+            </Menu.Item>
+            <Menu.Item key="menu-route" icon={<FormOutlined />}  onClick={() => { setTabKey('routing');openPurchaseRequest(item, 0) }}>
+                View Routing
+            </Menu.Item>
+            <Menu.Item key="menu-audit" icon={<FormOutlined />}  onClick={() => { setTabKey('audit-trail');openPurchaseRequest(item, 0) }}>
+                View Audit Trail
+            </Menu.Item>
+            <Menu.Item key="menu-items-audit" icon={<FormOutlined />}  onClick={() => { setTabKey('items-audit-trail');openPurchaseRequest(item, 0) }}>
+                View Items Audit Trail
             </Menu.Item>
             <Menu.Item key="menu-edit" icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
-                Edit
+                Edit Purchase Request
             </Menu.Item>
         </Menu>
       );
@@ -323,22 +356,22 @@ const Listpurchaserequest = (props) => {
                                 onChange={handleTableChange}
                                 size={"small"}
                                 pagination={false}
-                                scroll={{ y: "75vh" }}
+                                scroll={{ y: "50vh" }}
                                 loading={{spinning: tableLoading, tip: "Loading..."}}
-                                />
+                            />
 
-                                <div className="flex justify-end mt-2">
+                            <div className="flex justify-end mt-2">
                                 <Pagination
-                                        current={paginationMeta?.current_page || 1}
-                                        total={paginationMeta?.total || 1}
-                                        pageSize={paginationMeta?.per_page || 1}
-                                        onChange={paginationChange}
-                                        // showSizeChanger
-                                        showQuickJumper
-                                        size="small"
-                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
-                                    />
-                                </div>
+                                    current={paginationMeta?.current_page || 1}
+                                    total={paginationMeta?.total || 1}
+                                    pageSize={paginationMeta?.per_page || 1}
+                                    onChange={paginationChange}
+                                    // showSizeChanger
+                                    showQuickJumper
+                                    size="small"
+                                    // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                />
+                            </div>
                         </div>
                     </Card>
                 </Col>
@@ -352,10 +385,24 @@ const Listpurchaserequest = (props) => {
                             )}
                             >
                                 <div className='purchase-request-card-content'>
-                                    <Tabs defaultActiveKey="file" type="card" size="small">
-                                        <TabPane tab="File" key="file">
-                                            <div style={{ height: "75vh" }}>
-                                                <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                                    <Tabs activeKey={tabKey} type="card" size="small" onChange={setTabKey}>
+                                        <TabPane tab="Information" key="information">
+                                            <div className='p-2'>
+                                                <p>
+                                                    <b>PR No.:</b> {selectedPurchaseRequest?.purchase_request_number || ""} <br />
+                                                    <b>PR Date:</b> {selectedPurchaseRequest?.pr_date || ""} <br />
+                                                    <b>Procurement Type:</b> {selectedPurchaseRequest.purchase_request_type?.name || ""} <br />
+                                                    <b>Mode of Procurement:</b> {selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
+                                                    <b>End User:</b> {selectedPurchaseRequest?.end_user?.name || ""} <br />
+                                                    <b>Fund Cluster:</b> {selectedPurchaseRequest?.fund_cluster || ""} <br />
+                                                    <b>Responsibility Center Code:</b> {selectedPurchaseRequest?.center_code || ""} <br />
+                                                    <b>Total Unit Cost:</b> {selectedPurchaseRequest?.total_cost_formatted || ""} <br />
+                                                    <b>Purpose:</b> {selectedPurchaseRequest?.purpose || ""} <br />
+                                                    <b>Charge To:</b> {selectedPurchaseRequest?.charge_to || ""} <br />
+                                                    <b>Alloted Amount:</b> {selectedPurchaseRequest?.alloted_amount || ""} <br />
+                                                    <b>UACS Code:</b> {selectedPurchaseRequest?.uacs_code || ""} <br />
+                                                    <b>SA/OR:</b> {selectedPurchaseRequest?.sa_or || ""} <br />
+                                                </p>
                                             </div>
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
@@ -385,6 +432,15 @@ const Listpurchaserequest = (props) => {
                     </Col>
                     )
                 }
+            </Row>
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col span={24}>
+                    <div className='purchase-request-card-content'>
+                        { isEmpty(selectedPurchaseRequest) ? "" : (
+                            <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                        ) }
+                    </div>
+                </Col>
             </Row>
             
         </div>

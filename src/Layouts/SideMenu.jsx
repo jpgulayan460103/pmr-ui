@@ -82,15 +82,15 @@ const Sidemenu = (props) => {
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
                     <Menu.Item key="/forms/requests">
                         <Link to="/forms/requests"></Link>
-                        Requests
+                        Forwarded Forms
                     </Menu.Item>
                     <Menu.Item key="/forms/approved">
                         <Link to="/forms/approved"></Link>
-                        Approved
+                        Approved Forms
                     </Menu.Item>
                     <Menu.Item key="/forms/disapproved">
                         <Link to="/forms/disapproved"></Link>
-                        Disapproved
+                        Disapproved Forms
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">

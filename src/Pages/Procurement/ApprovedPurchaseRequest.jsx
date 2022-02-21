@@ -9,6 +9,7 @@ import {
     Menu,
     Dropdown,
     Tooltip,
+    Button,
 } from 'antd';
 import filter from '../../Shared/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
@@ -176,6 +177,24 @@ const ApprovedPurchaseRequest = (props) => {
         i.value = i.id;
         return i;
     });
+
+
+    const onCell = {
+        onCell: (record, colIndex) => {
+            return {
+                onClick: event => {
+                    // setSelectedPurchaseRequest(record)
+                    if(isEmpty(props.selectedPurchaseRequest)){
+                        viewPurchaseRequest(record, colIndex);
+                    }else{
+                        if(props.selectedPurchaseRequest.id != record.id){
+                            viewPurchaseRequest(record, colIndex);
+                        }
+                    }
+                },
+            };
+          }
+    }
     
     const dataSource = props.purchaseRequests
 
@@ -189,6 +208,7 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].shown : true,
             filterable: true,
             ...filter.search('pr_date','date_range', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'SA/OR',
@@ -199,6 +219,7 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].shown : true,
             filterable: true,
             ...filter.search('sa_or','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'PR Number',
@@ -209,6 +230,7 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
             ...filter.search('purchase_request_number','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'Particulars',
@@ -219,6 +241,7 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].shown : true,
             filterable: true,
             ...filter.search('purpose','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'PMO/End-User',
@@ -235,6 +258,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...filter.list('end_user_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
         },
         {
             title: 'Total Cost',
@@ -249,6 +273,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item.total_cost_formatted }
                 </span>
             ),
+            ...onCell,
             
         },
         {
@@ -265,6 +290,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.purchase_request_type?.name }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Mode of Procurement',
@@ -279,7 +305,8 @@ const ApprovedPurchaseRequest = (props) => {
                 <span>
                     { item?.mode_of_procurement?.name }
                 </span>
-            )
+            ),
+            ...onCell,
         },
         {
             title: 'Pre-Proc Conference',
@@ -293,6 +320,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.preproc_conference }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Ads/Post of IB',
@@ -306,6 +334,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.adspost_of_ib }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Pre-bid Conf',
@@ -319,6 +348,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.prebid_conf }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Eligibility Check',
@@ -332,6 +362,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.eligibility_check }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Sub/Open of Bids',
@@ -345,6 +376,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.subopen_of_bids }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Bid Evaluation',
@@ -358,6 +390,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.bid_evaluation }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Post Qual',
@@ -371,6 +404,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.post_qual }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Notice of Award',
@@ -384,6 +418,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_of_award }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Contract Signing',
@@ -397,6 +432,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.contract_signing }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Notice to Proceed',
@@ -410,6 +446,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_to_proceed }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Estimated LDD',
@@ -423,6 +460,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.estimated_ldd }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Abstract of Quotations',
@@ -436,6 +474,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.abstract_of_quotations }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: "Action",
@@ -447,7 +486,9 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: false,
             render: (text, item, index) => (
                 <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                    <Button size='small'>
+                        <EllipsisOutlined />
+                    </Button>
                 </Dropdown>
               )
         },
@@ -455,9 +496,9 @@ const ApprovedPurchaseRequest = (props) => {
 
     const menu = (item, index) => (
         <Menu onClick={() => handleMenuClick()}>
-            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
+            {/* <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
                 View
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item key="menu-bac-task" icon={<MessageOutlined />} onClick={() => { viewBacForm(item, index) }}>
                 BAC Data
             </Menu.Item>

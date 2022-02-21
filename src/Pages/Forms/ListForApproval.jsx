@@ -417,6 +417,16 @@ const ListForApproval = (props) => {
         setProcurementFormType(e);
     }
 
+    const onCell = {
+        onCell: (record, colIndex) => {
+            return {
+                onClick: event => {
+                    viewForm(record, colIndex);
+                },
+            };
+          }
+    }
+
     const dataSource = forms
       
     const columns = [
@@ -425,6 +435,7 @@ const ListForApproval = (props) => {
             dataIndex: 'route_type_str',
             key: 'route_type_str',
             width: 150,
+            ...onCell,
         },
         {
             title: 'Particulars',
@@ -435,6 +446,7 @@ const ListForApproval = (props) => {
                 </span>
             ),
             ...filter.search('particulars','text', setFilterData, filterData, getForm),
+            ...onCell,
         },
         {
             title: 'Amount',
@@ -445,6 +457,7 @@ const ListForApproval = (props) => {
                 </span>
             ),
             ...filter.search('total_cost','text', setFilterData, filterData, getForm),
+            ...onCell,
         },
         {
             title: 'End User',
@@ -457,7 +470,8 @@ const ListForApproval = (props) => {
                 <span>
                     <span>{ item.end_user.name }</span>
                 </span>
-            )
+            ),
+            ...onCell,
         },
         {
             title: 'Status',
@@ -473,6 +487,7 @@ const ListForApproval = (props) => {
             ),
             filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
             ...filter.list('status','text', setFilterData, filterData, getForm),
+            ...onCell,
         },
         {
             title: 'Remarks',
@@ -483,6 +498,7 @@ const ListForApproval = (props) => {
                 </span>
             ),
             ...filter.search('remarks','text', setFilterData, filterData, getForm),
+            ...onCell,
         },
 
         {
@@ -493,9 +509,11 @@ const ListForApproval = (props) => {
             align: "center",
             render: (text, item, index) => (
                 <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <EllipsisOutlined style={{ fontSize: '24px' }} />
+                    <Button size='small'>
+                        <EllipsisOutlined />
+                    </Button>
                 </Dropdown>
-              )
+            ),
         },
     ];
 
@@ -783,17 +801,6 @@ const ListForApproval = (props) => {
                                         return "selected-row";
                                     }
                                 }}
-                                onRow={(record, rowIndex) => {
-                                    return {
-                                      onClick: event => {
-                                        viewForm(record, 0)
-                                      }, // click row
-                                      onDoubleClick: event => {}, // double click row
-                                      onContextMenu: event => {}, // right button click row
-                                      onMouseEnter: event => {}, // mouse enter row
-                                      onMouseLeave: event => {}, // mouse leave row
-                                    };
-                                  }}
                             />
                             <div className="flex justify-end mt-2">
                                 {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
@@ -813,7 +820,7 @@ const ListForApproval = (props) => {
                 </Col>
                 { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
                     <Col md={24} lg={8} xl={6}>
-                        <Card size="small" title="Puchase Request Information" bordered={false} extra={(
+                        <Card size="small" title="Form Information" bordered={false} extra={(
                             <div className='text-right flex space-x-0.5'>
                                 <div className='space-x-0.5 mr-2'>
                                     { selectedFormRoute.status == "with_issues" ? (
@@ -834,12 +841,16 @@ const ListForApproval = (props) => {
                         )}>
                             <div className='forms-card-content'>
                                 <p>
+                                    <span><b>Form type:</b> <i>{selectedFormRoute.route_type_str}</i></span><br />
+                                    <span><b>End User:</b> <i>{selectedFormRoute.end_user.name}</i></span><br />
+                                    <span><b>Particulars:</b> <i>{selectedFormRoute.form_routable?.particulars}</i></span><br />
+                                    <span><b>Amount:</b> <i>{selectedFormRoute.form_routable?.total_cost_formatted}</i></span><br />
                                     <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.name}</i></span><br />
                                     <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.name}</i></span><br />
                                     <span><b>Remarks:</b> <i>{selectedFormRoute.remarks}</i></span><br />
                                     <span><b>Status:</b> <i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></span><br />
+                                    { selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b><i>{selectedFormRoute.user?.user_information?.fullname}</i><br /></span> : ""}
                                 </p>
-                                { selectedFormRoute.status != "pending" ? <span>Disapproved by: <b><i>{selectedFormRoute.user?.user_information?.fullname}</i></b><br /></span> : ""}
                                 
                             </div>
                         </Card>
@@ -851,7 +862,7 @@ const ListForApproval = (props) => {
                 <Col span={24}>
                     <Card size="small" title="Forwarded Forms" bordered={false}>
                         <div className='forms-card-form-content'>
-                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "80vh", width: "100%"}}></iframe>
+                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
