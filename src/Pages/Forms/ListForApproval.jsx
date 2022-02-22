@@ -849,11 +849,12 @@ const ListForApproval = (props) => {
                                     <span><b>End User:</b> <i>{selectedFormRoute.end_user.name}</i></span><br />
                                     <span><b>Purpose:</b> <i>{selectedFormRoute.form_routable?.purpose}</i></span><br />
                                     <span><b>Amount:</b> <i>{selectedFormRoute.form_routable?.total_cost_formatted}</i></span><br />
-                                    <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.name}</i></span><br />
-                                    <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.name}</i></span><br />
+                                    <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</i></span><br />
+                                    <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</i></span><br />
                                     <span><b>Remarks:</b> <i>{selectedFormRoute.remarks}</i></span><br />
+                                    { selectedFormRoute.forwarded_remarks ? <span><b>Resolution Remarks:</b> <i>{selectedFormRoute.forwarded_remarks}</i><br /></span> : ""}
                                     <span><b>Status:</b> <i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></span><br />
-                                    { selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b><i>{selectedFormRoute.user?.user_information?.fullname}</i><br /></span> : ""}
+                                    { selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <i>{selectedFormRoute.user?.user_information?.fullname}</i><br /></span> : ""}
                                 </p>
                                 
                             </div>
