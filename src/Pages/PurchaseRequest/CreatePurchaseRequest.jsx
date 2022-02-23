@@ -88,6 +88,11 @@ const CreatePurchaseRequest = (props) => {
         let formData = cloneDeep(props.formData);
         formData.requested_by_id = props.requestedBySignatory.id;
         formData.approved_by_id = props.approvedBySignatory.id;
+        if(props.formType == "update"){
+
+        }else{
+            formData.purpose = `For the implementation of ${props.formData.purpose}`;
+        }
         api.PurchaseRequest.save(formData,props.formType)
         .then(res => {
             setSubmit(false);
@@ -121,6 +126,10 @@ const CreatePurchaseRequest = (props) => {
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_FORM_TYPE",
             data: "create"
+        });
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            data: {}
         });
 
         setSignatory("OARDA",'requestedBy');
@@ -284,21 +293,21 @@ const CreatePurchaseRequest = (props) => {
     
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
-            <p className="text-right ...">Appendix 60</p>
+            {/* <p className="text-right ...">Appendix 60</p> */}
             <p className="text-center ..."><b>PURCHASE REQUEST</b></p>
             <Form>
             <table id="pr-table" style={style}>
                 <thead>
-                    <tr>
+                    {/* <tr>
                         <td colSpan={3}><b>Entity Name:</b><br />
                         Department of Social Welfare and Development Field Office XI
-                        {/* <Input placeholder="Type here..." value="Department of Social Welfare and Development Field Office XI" disabled /> */}
+                        <Input placeholder="Type here..." value="Department of Social Welfare and Development Field Office XI" disabled />
                         </td>
                         <td colSpan={3}><b>Fund Cluster:</b>
-                        {/* <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} disabled /> */}
+                        <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} disabled />
                         </td>
                         <td></td>
-                    </tr>
+                    </tr> */}
                     <tr>
                         <td colSpan={2}>
                             <b>Office/Section:</b><br />
@@ -329,29 +338,41 @@ const CreatePurchaseRequest = (props) => {
                                 </Select>
                             </Form.Item> */}
                         </td>
-                        <td colSpan={2}><b>PR No.:</b>
+                        <td colSpan={2}>
+                            <b>Title:</b>
+                            <Form.Item { ...displayError(`title`) }>
+                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
+                            </Form.Item>
+                            {/* <b>PR No.:</b> */}
                             {/* <Form.Item { ...displayError(`purchase_request_number`) }> */}
                                 {/* <Input disabled placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} /> */}
                             {/* </Form.Item> */}
                         </td>
-                        <td colSpan={2}></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}></td>
-                        <td colSpan={2}><b>Responsibility Center Code:</b>
-                            {/* <Form.Item { ...displayError(`center_code`) }> */}
-                                {/* <Input disabled placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} /> */}
-                            {/* </Form.Item> */}
-                        </td>
-                        <td colSpan={2}><b>Date:</b><br />
-                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
+                        <td colSpan={2}>
+                        <b>Date:</b><br />
                             { moment().format('MM/DD/YYYY') }
+                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
                             {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
                         {/* </Form.Item> */}
                         </td>
                         <td></td>
                     </tr>
+                    {/* <tr> */}
+                        {/* <td colSpan={2}></td> */}
+                        {/* <td colSpan={2}><b>Responsibility Center Code:</b> */}
+                            {/* <Form.Item { ...displayError(`center_code`) }> */}
+                                {/* <Input disabled placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} /> */}
+                            {/* </Form.Item> */}
+                        {/* </td> */}
+                        {/* <td colSpan={2}> */}
+                            {/* <b>Date:</b><br /> */}
+                            {/* { moment().format('MM/DD/YYYY') } */}
+                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
+                            {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
+                        {/* </Form.Item> */}
+                        {/* </td> */}
+                        {/* <td></td> */}
+                    {/* </tr> */}
                     <tr>
                         <td className='text-center'><b>Stock/ Property No.</b></td>
                         <td className='text-center' style={{ width: 120}}><b>Unit</b></td>
@@ -444,7 +465,7 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={7}><b>Purpose:</b>
                             <Form.Item { ...displayError(`purpose`) }>
-                                <Input addonBefore="For the implementation of " onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                                <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
                                 {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                             </Form.Item>
                         </td>
@@ -490,10 +511,15 @@ const CreatePurchaseRequest = (props) => {
             </table>
             </Form>
             <div className='text-center'>
+                
                 <br />
+                <p style={{color: "red"}}>
+                    { displayError('items')?.help }
+                </p>
                 <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />Cancel</Button>
+
             </div>
         </div>
     );

@@ -56,7 +56,6 @@ const Listpurchaserequest = (props) => {
     });
     const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
     const [tableLoading, setTableLoading] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
     const [timelines, setTimelines] = useState([]);
     const [filterData, setFilterData] = useState({
         page: 1,
@@ -102,7 +101,7 @@ const Listpurchaserequest = (props) => {
 
     const openPurchaseRequest = async (item, index) => {
         setPurchaseRequestOutput(item.file);
-        setSelectedItem(item)
+        setSelectedPurchaseRequest(item)
         setTimelines([]);
         setLogger([]);
         setLoggerItems([]);
@@ -150,7 +149,7 @@ const Listpurchaserequest = (props) => {
     }
     const closePurchaseRequest = () => {
         setPurchaseRequestOutput("");
-        setSelectedItem(null);
+        setSelectedPurchaseRequest({});
     }
 
     const editPurchaseRequest = (item, index) => {
@@ -349,7 +348,7 @@ const Listpurchaserequest = (props) => {
                     <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                                    if(selectedItem?.id == record.id){
+                                    if(selectedPurchaseRequest?.id == record.id){
                                         return "selected-row";
                                     }
                                 }}
@@ -395,6 +394,7 @@ const Listpurchaserequest = (props) => {
                                                 <p>
                                                     <b>PR No.:</b> {selectedPurchaseRequest?.purchase_request_number || ""} <br />
                                                     <b>PR Date:</b> {selectedPurchaseRequest?.pr_date || ""} <br />
+                                                    <b>Procurement Category:</b> {selectedPurchaseRequest.procurement_type?.parent?.name || ""} <br />
                                                     <b>Procurement Type:</b> {selectedPurchaseRequest.procurement_type?.name || ""} <br />
                                                     <b>Mode of Procurement:</b> {selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
                                                     <b>End User:</b> {selectedPurchaseRequest?.end_user?.name || ""} <br />
@@ -422,7 +422,7 @@ const Listpurchaserequest = (props) => {
                                         </TabPane>
                                         <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
                                             { !isEmpty(logger) ? (
-                                                <AuditTrail logger={logger} tableScroll="65vh" displayProp={ selectedItem.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
+                                                <AuditTrail logger={logger} tableScroll="65vh" displayProp={ selectedPurchaseRequest.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
                                             ) : <Skeleton active /> }
                                         </TabPane>
                                         <TabPane tab="Items Audit Trail" key="items-audit-trail">

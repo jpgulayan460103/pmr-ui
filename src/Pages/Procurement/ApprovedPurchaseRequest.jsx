@@ -268,6 +268,18 @@ const ApprovedPurchaseRequest = (props) => {
             sorter: (a, b) => {},
         },
         {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].shown : true,
+            filterable: true,
+            ...filter.search('title','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
+        {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
