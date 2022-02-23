@@ -10,6 +10,7 @@ const initialState = () => {
       user_area_of_assignments: [],
       user_offices: [],
       procurement_types: [],
+      procurement_type_categories: [],
       mode_of_procurements: [],
       technical_working_groups: [],
       user_signatory_designations: [],
@@ -69,6 +70,11 @@ const initialState = () => {
         return {
           ...state,
           procurement_types: action.data,
+        };
+      case 'SET_LIBRARY_PROCUREMENT_TYPE_CATEGORIES':
+        return {
+          ...state,
+          procurement_type_categories: action.data,
         };
       case 'SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES':
         return {

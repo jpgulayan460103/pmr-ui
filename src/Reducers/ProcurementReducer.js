@@ -12,6 +12,7 @@ const initialState = () => {
       purchaseRequestsTableFilter: {
         page: 1,
         type: 'procurement',
+        purchase_request_type_category: [],
       },
       purchaseRequestsTableLoading: false,
     }

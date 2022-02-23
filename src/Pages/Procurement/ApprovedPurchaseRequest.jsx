@@ -31,7 +31,7 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user_sections: state.library.user_sections,
-        procurement_types: state.library.procurement_types,
+        procurement_type_categories: state.library.procurement_type_categories,
         mode_of_procurements: state.library.mode_of_procurements,
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
         columns: state.procurement.columns,
@@ -92,6 +92,7 @@ const ApprovedPurchaseRequest = (props) => {
                     }
                 ))
             })
+            console.log(purchaseRequestTypeFilter());
         }
     }, [props.isInitialized]);
     const setFilterData = (data) => {
@@ -168,10 +169,33 @@ const ApprovedPurchaseRequest = (props) => {
         return i;
     });
 
-    const purchaseRequestTypeFilter = cloneDeep(props.procurement_types).map(i => {
+    const purchaseRequestTypeCategoryFilter = cloneDeep(props.procurement_type_categories).map(i => {
         i.value = i.id;
         return i;
     });
+
+    const purchaseRequestTypeFilter = () => {
+        let filteredCategory = cloneDeep(props.procurement_type_categories);
+        if(!isEmpty(props.filterData.purchase_request_type_category)){
+            filteredCategory = filteredCategory.filter(i => props.filterData.purchase_request_type_category.includes(i.id));
+        }
+        return filteredCategory.map(i => {
+            let newI = [];
+            for (let index = 0; index < i.children.data.length; index++) {
+                let element = i.children.data[index];
+                newI.push({
+                    id: element.id,
+                    key: element.key,
+                    library_type: element.library_type,
+                    name: element.name,
+                    text: `${element.parent.name} - ${element.text}`,
+                    title: element.title,
+                    value: element.id,
+                });
+            }
+            return newI;
+        }).flat(1);
+    };
 
     const modeOfProcurementFilter = cloneDeep(props.mode_of_procurements).map(i => {
         i.value = i.id;
@@ -277,10 +301,26 @@ const ApprovedPurchaseRequest = (props) => {
             
         },
         {
+            title: 'Category',
+            key: 'purchase_request_type_category',
+            filters: purchaseRequestTypeCategoryFilter,
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].shown : true,
+            filterable: true,
+            ...filter.list('purchase_request_type_category','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    {item?.purchase_request_type?.parent?.name}
+                </span>
+            ),
+            ...onCell,
+        },
+        {
             title: 'Type',
             key: 'purchase_request_type_id',
-            filters: purchaseRequestTypeFilter,
-            width: 150,
+            filters: purchaseRequestTypeFilter(),
+            width: 200,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
             filterable: true,
@@ -296,7 +336,7 @@ const ApprovedPurchaseRequest = (props) => {
             title: 'Mode of Procurement',
             key: 'mode_of_procurement_id',
             filters: modeOfProcurementFilter,
-            width: 150,
+            width: 250,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].shown : true,
             filterable: true,

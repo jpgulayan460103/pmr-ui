@@ -96,6 +96,10 @@ const Loadlibraries = (props) => {
                 data: libraries.filter(library => library.library_type == "procurement_type")
             });
             props.dispatch({
+                type: "SET_LIBRARY_PROCUREMENT_TYPE_CATEGORIES",
+                data: libraries.filter(library => library.library_type == "procurement_type_category")
+            });
+            props.dispatch({
                 type: "SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES",
                 data: libraries.filter(library => library.library_type == "mode_of_procurement")
             });
