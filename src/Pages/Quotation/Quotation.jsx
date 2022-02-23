@@ -173,7 +173,7 @@ const Quotation = (props) => {
                                             <p>
                                                 <b>PR No.:</b> {props.selectedPurchaseRequest?.purchase_request_number || ""} <br />
                                                 <b>PR Date:</b> {props.selectedPurchaseRequest?.pr_date || ""} <br />
-                                                <b>Procurement Type:</b> {props.selectedPurchaseRequest.purchase_request_type?.name || ""} <br />
+                                                <b>Procurement Type:</b> {props.selectedPurchaseRequest.procurement_type?.name || ""} <br />
                                                 <b>Mode of Procurement:</b> {props.selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
                                                 <b>End User:</b> {props.selectedPurchaseRequest?.end_user?.name || ""} <br />
                                                 <b>Fund Cluster:</b> {props.selectedPurchaseRequest?.fund_cluster || ""} <br />

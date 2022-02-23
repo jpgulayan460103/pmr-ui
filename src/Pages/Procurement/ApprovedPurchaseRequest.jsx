@@ -249,7 +249,7 @@ const ApprovedPurchaseRequest = (props) => {
             title: 'PR Number',
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
-            width: 150,
+            width: 200,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
@@ -288,6 +288,7 @@ const ApprovedPurchaseRequest = (props) => {
             title: 'Total Cost',
             key: 'total_cost',
             width: 150,
+            align: "right",
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
             ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
@@ -311,23 +312,23 @@ const ApprovedPurchaseRequest = (props) => {
             ...filter.list('purchase_request_type_category','text', setFilterData, props.filterData, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    {item?.purchase_request_type?.parent?.name}
+                    {item?.procurement_type?.parent?.name}
                 </span>
             ),
             ...onCell,
         },
         {
             title: 'Type',
-            key: 'purchase_request_type_id',
+            key: 'procurement_type_id',
             filters: purchaseRequestTypeFilter(),
             width: 200,
-            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].shown : true,
             filterable: true,
-            ...filter.list('purchase_request_type_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('procurement_type_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    { item?.purchase_request_type?.name }
+                    { item?.procurement_type?.name }
                 </span>
             ),
             ...onCell,

@@ -391,7 +391,7 @@ const Listpurchaserequest = (props) => {
                                                 <p>
                                                     <b>PR No.:</b> {selectedPurchaseRequest?.purchase_request_number || ""} <br />
                                                     <b>PR Date:</b> {selectedPurchaseRequest?.pr_date || ""} <br />
-                                                    <b>Procurement Type:</b> {selectedPurchaseRequest.purchase_request_type?.name || ""} <br />
+                                                    <b>Procurement Type:</b> {selectedPurchaseRequest.procurement_type?.name || ""} <br />
                                                     <b>Mode of Procurement:</b> {selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
                                                     <b>End User:</b> {selectedPurchaseRequest?.end_user?.name || ""} <br />
                                                     <b>Fund Cluster:</b> {selectedPurchaseRequest?.fund_cluster || ""} <br />

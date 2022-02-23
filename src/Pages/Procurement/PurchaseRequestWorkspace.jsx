@@ -49,7 +49,7 @@ const Pruchaserequestworkspace = (props) => {
         setTimeout(() => {
             formRef.current.setFieldsValue({
                 purchase_request_number: props.selectedPurchaseRequest.purchase_request_number,
-                purchase_request_type_id: props.selectedPurchaseRequest.purchase_request_type_id,
+                procurement_type_id: props.selectedPurchaseRequest.procurement_type_id,
                 mode_of_procurement_id: props.selectedPurchaseRequest.mode_of_procurement_id,
                 fund_cluster: props.selectedPurchaseRequest.fund_cluster,
                 center_code: props.selectedPurchaseRequest.center_code,

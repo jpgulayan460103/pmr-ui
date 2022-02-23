@@ -761,9 +761,9 @@ const ListForApproval = (props) => {
                     { procurementFormType == "approve" ? (
                         <>
                             <Form.Item
-                                name="purchase_request_type_id"
+                                name="procurement_type_id"
                                 label="Procurement Type"
-                                { ...showErrorMessage('purchase_request_type_id') }
+                                { ...showErrorMessage('procurement_type_id') }
                                 // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                             >
                                 <Select placeholder='Select Procurement Type'>
