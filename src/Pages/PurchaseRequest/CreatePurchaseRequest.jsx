@@ -444,7 +444,8 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={7}><b>Purpose:</b>
                             <Form.Item { ...displayError(`purpose`) }>
-                                <TextArea autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                                <Input addonBefore="For the implementation of " onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                                {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                             </Form.Item>
                         </td>
                     </tr>

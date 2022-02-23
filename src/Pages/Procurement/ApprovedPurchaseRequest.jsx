@@ -45,7 +45,7 @@ function mapStateToProps(state) {
 
 const Settings = ({columns, toggleColumn}) => {
     useEffect(() => {
-        console.log("render");
+        // console.log("render");
     }, []);
     return (
 
@@ -92,7 +92,7 @@ const ApprovedPurchaseRequest = (props) => {
                     }
                 ))
             })
-            console.log(purchaseRequestTypeFilter());
+            // console.log(purchaseRequestTypeFilter());
         }
     }, [props.isInitialized]);
     const setFilterData = (data) => {
@@ -103,8 +103,16 @@ const ApprovedPurchaseRequest = (props) => {
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(sorter);
-        console.log(filters);
+        // console.log(sorter);
+        // console.log(filters);
+        if(!isEmpty(sorter)){
+            filters.sortColumn = sorter.columnKey
+            filters.sortOrder = sorter.order
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
+                data: {...props.filterData, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
+            });
+        }
         props.getPurchaseRequests({...props.filterData, ...filters})
     };
 
@@ -233,6 +241,7 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
             ...filter.search('pr_date','date_range', setFilterData, props.filterData, props.getPurchaseRequests),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'SA/OR',
@@ -244,6 +253,7 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
             ...filter.search('sa_or','text', setFilterData, props.filterData, props.getPurchaseRequests),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'PR Number',
@@ -255,6 +265,7 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
             ...filter.search('purchase_request_number','text', setFilterData, props.filterData, props.getPurchaseRequests),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Purpose',
@@ -266,6 +277,7 @@ const ApprovedPurchaseRequest = (props) => {
             filterable: true,
             ...filter.search('purpose','text', setFilterData, props.filterData, props.getPurchaseRequests),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'PMO/End-User',
@@ -283,6 +295,7 @@ const ApprovedPurchaseRequest = (props) => {
             ),
             ...filter.list('end_user_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Total Cost',
@@ -291,7 +304,7 @@ const ApprovedPurchaseRequest = (props) => {
             align: "right",
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
-            ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
+            // ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
             filterable: true,
             render: (text, item, index) => (
                 <span>
@@ -299,6 +312,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            sorter: (a, b) => {},
             
         },
         {
@@ -316,6 +330,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Type',
@@ -332,6 +347,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Mode of Procurement',
@@ -348,6 +364,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Pre-Proc Conference',
@@ -362,6 +379,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Ads/Post of IB',
@@ -376,6 +394,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Pre-bid Conf',
@@ -390,6 +409,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Eligibility Check',
@@ -404,6 +424,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Sub/Open of Bids',
@@ -418,6 +439,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Bid Evaluation',
@@ -432,6 +454,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Post Qual',
@@ -445,7 +468,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.post_qual }
                 </span>
             ),
-            ...onCell,
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Notice of Award',
@@ -459,7 +483,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_of_award }
                 </span>
             ),
-            ...onCell,
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Contract Signing',
@@ -473,7 +498,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.contract_signing }
                 </span>
             ),
-            ...onCell,
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Notice to Proceed',
@@ -487,7 +513,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_to_proceed }
                 </span>
             ),
-            ...onCell,
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Estimated LDD',
@@ -502,6 +529,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Abstract of Quotations',
@@ -516,6 +544,7 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: "Action",

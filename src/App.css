@@ -48,6 +48,10 @@
 }
 .ant-table-thead > tr >th{
   color: white;
+  background-image: linear-gradient(to top, #4834d4, #686de0) !important;
+}
+.ant-table-column-sort > tr >th{
+  color: white;
   background-image: linear-gradient(to top, #4834d4, #686de0);
 }
 

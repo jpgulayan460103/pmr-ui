@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Card, Col, Row, Button  } from 'antd';
+import { Card, Col, Row, Button, Tooltip  } from 'antd';
 import ApprovedPurchaseRequest from './ApprovedPurchaseRequest';
 import PurchaseRequestWorkspace from './PurchaseRequestWorkspace';
 import Icon, {
@@ -96,20 +96,26 @@ const Procurement = (props) => {
                 <Col xs={24} sm={24} md={24} lg={fRow2} xl={fRow2-2}>
                     <Card title="Puchase Request Details" size="small" bordered={false} extra={(
                             <div className='text-right space-x-0.5'>
-                                <Button size='small' onClick={() => {
-                                    if(fRow1 == 14){
-                                        setfRow2(14);
-                                        setfRow1(10);
-                                    }else{
-                                        setfRow2(10);
-                                        setfRow1(14);
+                                <Tooltip placement="top" title={fRow1 == 14 ? "Larger window" : "Normal window"}>
+                                    <Button size='small' onClick={() => {
+                                        if(fRow1 == 14){
+                                            setfRow2(14);
+                                            setfRow1(10);
+                                        }else{
+                                            setfRow2(10);
+                                            setfRow1(14);
 
-                                    }
-                                } }>
-                                    <VerticalAlignTopOutlined rotate={fRow1 == 14 ? -90 : 90} />
-                                </Button>
-                                <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                                <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                        }
+                                    } }>
+                                        <VerticalAlignTopOutlined rotate={fRow1 == 14 ? -90 : 90} />
+                                    </Button>
+                                </Tooltip>
+                                <Tooltip placement="top" title={"Open in new window"}>
+                                    <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                </Tooltip>
+                                <Tooltip placement="top" title={"Close window"}>
+                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                </Tooltip>
                             </div>
                         )}
                         >

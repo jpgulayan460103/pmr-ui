@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Popconfirm, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu, Pagination } from 'antd';
+import { Table, Space, Divider, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu, Pagination } from 'antd';
 import api from '../../api';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
@@ -16,6 +16,7 @@ function mapStateToProps(state) {
     return {
         user: state.user.data,
         procurementTypes: state.library.procurement_types,
+        procurementTypeCategories: state.library.procurement_type_categories,
         modeOfProcurements: state.library.mode_of_procurements,
         technicalWorkingGroups: state.library.technical_working_groups,
         user_sections: state.library.user_sections,
@@ -57,6 +58,8 @@ const ListForApproval = (props) => {
     const [filterData, setFilterData] = useState({});
     const [tableLoading, setTableLoading] = useState(false);
     const [paginationMeta, setPaginationMeta] = useState({});
+    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
+    const [submit, setSubmit] = useState(false);
     
 
     const showErrorMessage = (field) => {
@@ -89,21 +92,28 @@ const ListForApproval = (props) => {
         };
         api.Forms.reject(selectedFormRoute.id, formData)
         .then(res => {
+            setSubmit(false);
             setErrorMessage({});
             setModalRejectForm(false);
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
         })
-        .catch(err => {})
-        .then(res => {})
+        .catch(err => {
+            setSubmit(false);
+        })
+        .then(res => {
+            setSubmit(false);
+        })
         ;
     }
 
     const submitRejectForm = (e) => {
+        setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
             if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setSubmit(false);
                 setModalRejectForm(false);
                 notification.error({
                     message: 'Purchase Request has been amended.',
@@ -119,9 +129,15 @@ const ListForApproval = (props) => {
                 proceedReject(e);
             }
         })
-        .catch(err => {})
+        .catch(err => {
+            setSubmit(false);
+        })
     };
     const cancelRejectForm = () => {
+        rejectFormRef.current.setFieldsValue({
+            remarks: null,
+            to_office_id: null,
+        });
         setModalRejectForm(false);
     };
 
@@ -148,21 +164,28 @@ const ListForApproval = (props) => {
         };
         api.Forms.resolve(selectedFormRoute.id, formData)
         .then(res => {
+            setSubmit(false);
             setErrorMessage({});
             setModalResolveForm(false);
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
         })
-        .catch(err => {})
-        .then(res => {})
+        .catch(err => {
+            setSubmit(false);
+        })
+        .then(res => {
+            setSubmit(false);
+        })
         ;
     }
 
     const submitResolveForm = (e) => {
+        setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
             if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setSubmit(false);
                 setModalResolveForm(false);
                 notification.error({
                     message: 'Purchase Request has been amended.',
@@ -178,9 +201,14 @@ const ListForApproval = (props) => {
                 proceedResolve(e);
             }
         })
-        .catch(err => {})
+        .catch(err => {
+            setSubmit(false);
+        })
     };
     const cancelResolveForm = () => {
+        resolveFormRef.current.setFieldsValue({
+            remarks: null
+        });
         setModalResolveForm(false);
     };
     
@@ -228,6 +256,15 @@ const ListForApproval = (props) => {
     }
 
     const cancelBudgetForm = () => {
+        budgetFormRef.current.setFieldsValue({
+            purchase_request_number_last: null,
+            fund_cluster: null,
+            center_code: null,
+            charge_to: null,
+            alloted_amount: null,
+            uacs_code: null,
+            sa_or: null,
+        });
         setModalBudgetForm(false);
     }
 
@@ -235,11 +272,6 @@ const ListForApproval = (props) => {
         i.value = i.id;
         return i;
     });
-
-
-    const updatePurchaseRequest = (formData) => {
-        return api.PurchaseRequest.save(formData, 'update');
-    }
 
     const proceedBudget = (e) => {
         setErrorMessage({});
@@ -252,11 +284,13 @@ const ListForApproval = (props) => {
         if(selectedFormRoute.route_type == "purchase_request"){
             api.PurchaseRequest.save(formData, 'update')
             .then(res => {
+                setSubmit(false);
                 setErrorMessage({});
                 approve(selectedFormRoute);
                 setModalBudgetForm(false);
             })
             .catch(err => {
+                setSubmit(false);
                 setErrorMessage(err.response.data.errors)
                 
             })
@@ -264,9 +298,11 @@ const ListForApproval = (props) => {
         }
     }
     const submitBudgetForm = async (e) => {
+        setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
             if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setSubmit(false);
                 setModalBudgetForm(false);
                 notification.error({
                     message: 'Purchase Request has been amended.',
@@ -282,10 +318,20 @@ const ListForApproval = (props) => {
                 proceedBudget(e);
             }
         })
-        .catch(err => {})
+        .catch(err => {
+            setSubmit(false);
+        })
     }
     
     const cancelProcurementForm = () => {
+        procurementFormRef.current.setFieldsValue({
+            action_type: null,
+            technical_working_group_id: null,
+            procurement_type_category: null,
+            procurement_type_id: null,
+            mode_of_procurement_id: null,
+        });
+        setProcurementFormType("");
         setModalProcurementForm(false);
     }
 
@@ -301,11 +347,13 @@ const ListForApproval = (props) => {
 
                 api.PurchaseRequest.save(formData, 'update')
                 .then(res => {
+                    setSubmit(false);
                     setErrorMessage({});
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
                 })
                 .catch(err => {
+                    setSubmit(false);
                     setErrorMessage(err.response.data.errors)
                     
                 })
@@ -318,10 +366,12 @@ const ListForApproval = (props) => {
                 }                
                 api.Forms.updateProcess(formData)
                 .then(res => {
+                    setSubmit(false);
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
                 })
                 .catch(err => {
+                    setSubmit(false);
                     setErrorMessage(err.response.data.errors)
                     
                 })
@@ -329,9 +379,11 @@ const ListForApproval = (props) => {
         }
     }
     const submitProcurementForm = debounce(async (e) => {
+        setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
             if(res.data.status != "pending" && res.data.status != "with_issues"){
+                setSubmit(false);
                 setModalProcurementForm(false);
                 notification.error({
                     message: 'Purchase Request has been amended.',
@@ -347,7 +399,9 @@ const ListForApproval = (props) => {
                 proceedProcurement(e);
             }
         })
-        .catch(err => {})
+        .catch(err => {
+            setSubmit(false);
+        })
     }, 150);
 
 
@@ -369,7 +423,6 @@ const ListForApproval = (props) => {
             setModalBudgetForm(true);
             setTimeout(() => {
                 budgetFormRef.current.setFieldsValue({
-                    // purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
                     alloted_amount: item.form_routable.common_amount,
                 });
             }, 150);
@@ -571,13 +624,14 @@ const ListForApproval = (props) => {
         <div className='row' style={{minHeight: "50vh"}}>
             <Modal title="Disapproval Form" visible={modalRejectForm} 
                 footer={[
-                    <Button type='primary' form="rejectForm" key="submit" htmlType="submit">
+                    <Button type='primary' form="rejectForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
                         Submit
                     </Button>,
                     <Button form="rejectForm" key="cancel" onClick={() => cancelRejectForm()}>
                         Cancel
                     </Button>
-                    ]}>
+                    ]}
+                onCancel={cancelRejectForm}>
                 <Form
                     ref={rejectFormRef}
                     name="normal_login"
@@ -608,13 +662,14 @@ const ListForApproval = (props) => {
 
             <Modal title="Resolve Form" visible={modalResolveForm} 
                 footer={[
-                    <Button type='primary' form="resolveForm" key="submit" htmlType="submit">
+                    <Button type='primary' form="resolveForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
                         Submit
                     </Button>,
                     <Button form="resolveForm" key="cancel" onClick={() => cancelResolveForm()}>
                         Cancel
                     </Button>
-                    ]}>
+                    ]}
+                onCancel={cancelResolveForm}>
                 <Form
                     ref={resolveFormRef}
                     name="normal_login"
@@ -635,13 +690,14 @@ const ListForApproval = (props) => {
 
             <Modal title="Budget Approval Form" visible={modalBudgetForm} 
                 footer={[
-                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit">
+                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
                         Submit
                     </Button>,
                     <Button form="budgetForm" key="cancel" onClick={() => cancelBudgetForm()}>
                         Cancel
                     </Button>
-                    ]}>
+                    ]}
+                onCancel={cancelBudgetForm}>
                 <Form
                     ref={budgetFormRef}
                     name="normal_login"
@@ -717,14 +773,16 @@ const ListForApproval = (props) => {
 
             <Modal title="Procurement Approval Form" visible={modalProcurementForm} 
                 footer={[
-                    procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit">
+                    procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
                         Submit
                     </Button>) : ""
                     ,
                     <Button form="procurementForm" key="cancel" onClick={() => cancelProcurementForm()}>
                         Cancel
                     </Button>
-                    ]}>
+                    ]}
+                onCancel={cancelProcurementForm}
+                >
                 <Form
                     ref={procurementFormRef}
                     name="normal_login"
@@ -751,7 +809,7 @@ const ListForApproval = (props) => {
                         <Form.Item
                             name="technical_working_group_id"
                             label="Technical Working Groups"
-                            // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                            rules={[{ required: true, message: 'Please select Technical Working Group.' }]}
                         >
                             <Select placeholder='Select Technical Working Groups'>
                                 { props.technicalWorkingGroups.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
@@ -761,21 +819,41 @@ const ListForApproval = (props) => {
                     { procurementFormType == "approve" ? (
                         <>
                             <Form.Item
-                                name="procurement_type_id"
-                                label="Procurement Type"
-                                { ...showErrorMessage('procurement_type_id') }
-                                // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                name="procurement_type_category"
+                                label="Procurement Category"
+                                { ...showErrorMessage('procurement_type_category') }
+                                rules={[{ required: true, message: 'Please select Procurement Category.' }]}
                             >
-                                <Select placeholder='Select Procurement Type'>
-                                    { props.procurementTypes.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                <Select placeholder='Select Procurement Category' onSelect={(e) => {
+                                    procurementFormRef.current.setFieldsValue({
+                                        procurement_type_id: null,
+                                    });
+                                    setSelectedProcurementCategory(e);
+                                }}>
+                                    { props.procurementTypeCategories.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                 </Select>
                             </Form.Item>
 
+                            {
+                                selectedProcurementCategory != null ? (
+                                    <Form.Item
+                                        name="procurement_type_id"
+                                        label="Procurement Type"
+                                        { ...showErrorMessage('procurement_type_id') }
+                                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                    >
+                                        <Select placeholder='Select Procurement Category' allowClear > 
+                                            { props.procurementTypes.filter(i => i.parent.id == selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                        </Select>
+                                    </Form.Item>
+                                ) : ""
+                            }
+
                             <Form.Item
                                 name="mode_of_procurement_id"
-                                label="Procurement Type"
+                                label="Mode of Procurement"
                                 { ...showErrorMessage('mode_of_procurement_id') }
-                                // rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
                             >
                                 <Select placeholder='Select Mode of Procurement'>
                                     { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
@@ -828,19 +906,29 @@ const ListForApproval = (props) => {
                             <div className='text-right flex space-x-0.5'>
                                 <div className='space-x-0.5 mr-2'>
                                     { selectedFormRoute.status == "with_issues" ? (
+                                        <Tooltip placement="top" title={"Resolve"}>
                                             <Button size='small' type='default' onClick={() => { resolveForm(selectedFormRoute, 0) }}><SendOutlined /></Button>
+                                        </Tooltip>
                                     ) : (
                                         <>
+                                        <Tooltip placement="top" title={"Approve"}>
                                             <Button size='small' type='default' onClick={() => { confirm(selectedFormRoute, 0) }}><LikeTwoTone twoToneColor="#0000FF" /></Button>
+                                        </Tooltip>
                                             
                                             { selectedFormRoute.from_office_id == selectedFormRoute.to_office_id ? "" : (
-                                                <Button size='small' type='default' onClick={() => { showRejectForm(selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
+                                                <Tooltip placement="top" title={"Disapprove"}>
+                                                    <Button size='small' type='default' onClick={() => { showRejectForm(selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
+                                                </Tooltip>
                                             ) }
                                         </>
                                     ) }
                                 </div>
-                                <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                                <Button size='small' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
+                                <Tooltip placement="top" title={"Open in new window"}>
+                                    <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                </Tooltip>
+                                <Tooltip placement="top" title={"Close window"}>
+                                    <Button size='small' type='danger' onClick={() => closeForm() }><CloseOutlined /></Button>
+                                </Tooltip>
                             </div>
                         )}>
                             <div className='forms-card-content'>

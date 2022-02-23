@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu, Tooltip  } from 'antd';
 import api from '../../api';
 import Icon, {
     CloseOutlined,
@@ -379,8 +379,12 @@ const Listpurchaserequest = (props) => {
                     <Col md={24} lg={10} xl={8}>
                             <Card size="small" bordered={false} title="Puchase Request Details" extra={(
                                 <div className='text-right space-x-0.5'>
-                                    <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
-                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                    <Tooltip placement="top" title={"Open in new window"}>
+                                        <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
+                                    </Tooltip>
+                                    <Tooltip placement="top" title={"Close window"}>
+                                        <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                    </Tooltip>
                                 </div>
                             )}
                             >
