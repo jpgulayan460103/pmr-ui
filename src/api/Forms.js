@@ -6,6 +6,16 @@ export default {
       params: formData
     });
   },
+  getApproved(formData){
+    return axios.get(`api/forms/approved`,{
+      params: formData
+    });
+  },
+  getRejected(formData){
+    return axios.get(`api/forms/rejected`,{
+      params: formData
+    });
+  },
   approve(id){
     return axios.post(`api/forms/routes/requests/pending/${id}/approve`);
   },

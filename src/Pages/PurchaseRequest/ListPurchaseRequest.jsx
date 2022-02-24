@@ -258,6 +258,14 @@ const Listpurchaserequest = (props) => {
       
     const columns = [
         {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+            width: 450,
+            ...filter.search('title','text', setFilterData, filterData, getPurchaseRequests),
+            ...onCell
+        },
+        {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
@@ -270,7 +278,7 @@ const Listpurchaserequest = (props) => {
             key: 'total_cost',
             width: 150,
             align: "center",
-            ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            // ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
@@ -291,6 +299,7 @@ const Listpurchaserequest = (props) => {
             title: 'Status',
             key: 'status',
             align: "center",
+            width: 120,
             render: (text, item, index) => (
                 <span>
                     { item.status }

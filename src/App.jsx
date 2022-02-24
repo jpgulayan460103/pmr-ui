@@ -11,7 +11,9 @@ import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import User from './Pages/User/User'
 import Echo from 'laravel-echo';
-import ListForApproval from './Pages/Forms/ListForApproval';
+import ForwardedForm from './Pages/Forms/ForwardedForm';
+import ApprovedForm from './Pages/Forms/ApprovedForm';
+import DisapprovedForm from './Pages/Forms/DisapprovedForm';
 import Procurement from './Pages/Procurement/Procurement'
 import Quotation from './Pages/Quotation/Quotation';
 
@@ -52,9 +54,9 @@ const App = (props) => {
         <Route path="/procurement/quotations/form" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
         <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
         <Route path="/procurement/quotations/suppliers" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
-        <Route path="/forms/requests" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
-        <Route path="/forms/approved" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
-        <Route path="/forms/disapproved" element={<PrivateRoute><Layout><ListForApproval /></Layout></PrivateRoute>} />
+        <Route path="/forms/requests" element={<PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>} />
+        <Route path="/forms/approved" element={<PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>} />
+        <Route path="/forms/disapproved" element={<PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests/form" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
         <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
         {/* <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />

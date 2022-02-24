@@ -30,7 +30,7 @@ const MaximizeSvg = () => (
     </svg>
 );  
 
-const ListForApproval = (props) => {
+const ForwardedForm = (props) => {
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
     const budgetFormRef = React.useRef();
@@ -420,12 +420,18 @@ const ListForApproval = (props) => {
                 }
             }
         }else if(budget_user_office.length != 0  && current_route[0].description_code == "aprroval_from_budget"){
-            setModalBudgetForm(true);
-            setTimeout(() => {
-                budgetFormRef.current.setFieldsValue({
-                    alloted_amount: item.form_routable.common_amount,
-                });
-            }, 150);
+            api.PurchaseRequest.getNextNumber()
+            .then(res => {
+                setModalBudgetForm(true);
+                setTimeout(() => {
+                    budgetFormRef.current.setFieldsValue({
+                        purchase_request_number_last: res.data.next_number,
+                        alloted_amount: item.form_routable.common_amount,
+                    });
+                }, 150);
+            })
+            .catch(res => {})
+            .then(res => {})
         }else{
             approve(item);
         }
@@ -491,6 +497,18 @@ const ListForApproval = (props) => {
             ...onCell,
         },
         {
+            title: 'Title',
+            key: 'title',
+            render: (text, item, index) => (
+                <span>
+                    { item.form_routable?.title }
+                </span>
+            ),
+            ...filter.search('title','text', setFilterData, filterData, getForm),
+            ...onCell,
+            width: 150,
+        },
+        {
             title: 'Purpose',
             key: 'purpose',
             render: (text, item, index) => (
@@ -510,7 +528,6 @@ const ListForApproval = (props) => {
                     { item.form_routable?.total_cost_formatted }
                 </span>
             ),
-            ...filter.search('total_cost','text', setFilterData, filterData, getForm),
             ...onCell,
             width: 150,
         },
@@ -546,15 +563,27 @@ const ListForApproval = (props) => {
             ...onCell,
         },
         {
+            title: 'Description',
+            key: 'description',
+            width: 250,
+            render: (text, item, index) => (
+                <span>
+                    <span>{item.remarks }</span>
+                </span>
+            ),
+            ...filter.search('remarks','text', setFilterData, filterData, getForm),
+            ...onCell,
+        },
+        {
             title: 'Remarks',
             key: 'remarks',
             width: 250,
             render: (text, item, index) => (
                 <span>
-                    <span>{item.forwarded_remarks === null ? item.remarks : item.forwarded_remarks }</span>
+                    <span>{ item.forwarded_remarks }</span>
                 </span>
             ),
-            ...filter.search('remarks','text', setFilterData, filterData, getForm),
+            ...filter.search('forwarded_remarks','text', setFilterData, filterData, getForm),
             ...onCell,
         },
 
@@ -877,7 +906,7 @@ const ListForApproval = (props) => {
                                 loading={{spinning: tableLoading, tip: "Loading..."}}
                                 pagination={false}
                                 onChange={handleTableChange}
-                                scroll={{ y: "45vh" }}
+                                scroll={{ y: "60vh" }}
                                 rowClassName={(record, index) => {
                                     if(selectedFormRoute.id == record.id){
                                         return "selected-row";
@@ -934,13 +963,14 @@ const ListForApproval = (props) => {
                             <div className='forms-card-content'>
                                 <p>
                                     <span><b>Form type:</b> <i>{selectedFormRoute.route_type_str}</i></span><br />
+                                    <span><b>Title:</b> <i>{selectedFormRoute.form_routable?.title}</i></span><br />
                                     <span><b>End User:</b> <i>{selectedFormRoute.end_user.name}</i></span><br />
                                     <span><b>Purpose:</b> <i>{selectedFormRoute.form_routable?.purpose}</i></span><br />
                                     <span><b>Amount:</b> <i>{selectedFormRoute.form_routable?.total_cost_formatted}</i></span><br />
                                     <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</i></span><br />
                                     <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</i></span><br />
                                     <span><b>Remarks:</b> <i>{selectedFormRoute.remarks}</i></span><br />
-                                    { selectedFormRoute.forwarded_remarks ? <span><b>Resolution Remarks:</b> <i>{selectedFormRoute.forwarded_remarks}</i><br /></span> : ""}
+                                    { selectedFormRoute.forwarded_remarks ? <span><b>Remarks:</b> <i>{selectedFormRoute.forwarded_remarks}</i><br /></span> : ""}
                                     <span><b>Status:</b> <i>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</i></span><br />
                                     { selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <i>{selectedFormRoute.user?.user_information?.fullname}</i><br /></span> : ""}
                                 </p>
@@ -953,7 +983,7 @@ const ListForApproval = (props) => {
             { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col span={24}>
-                    <Card size="small" title="Forwarded Forms" bordered={false}>
+                    <Card size="small" title="Forwarded Form" bordered={false}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
@@ -975,4 +1005,4 @@ const ListForApproval = (props) => {
 
 export default connect(
     mapStateToProps,
-  )(ListForApproval);
+  )(ForwardedForm);
