@@ -779,7 +779,7 @@ const ForwardedForm = (props) => {
                         label="Amount"
                         rules={[{ required: true, message: 'Please enter amount' }]}
                     >
-                        <Input placeholder='Amount' type="number" min={1} />
+                        <Input placeholder='Amount' type="number" min={0.01} step={0.01} />
                     </Form.Item>
                     <Form.Item
                         name="uacs_code"
