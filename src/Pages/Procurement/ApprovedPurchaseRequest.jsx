@@ -10,6 +10,8 @@ import {
     Dropdown,
     Tooltip,
     Button,
+    Upload,
+    message,
 } from 'antd';
 import filter from '../../Shared/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
@@ -19,7 +21,7 @@ import {
     EyeInvisibleOutlined,
     MoreOutlined,
     EllipsisOutlined,
-    FormOutlined,
+    UploadOutlined,
     MessageOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
@@ -128,26 +130,30 @@ const ApprovedPurchaseRequest = (props) => {
         props.getPurchaseRequests({...props.filterData, page: page, size: size})
     }
 
-    const viewPurchaseRequest = (item, index) => {
-        selectPurchaseRequest(item)
-        props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
-            data: "pdf"
-        });
-    }
-    const selectPurchaseRequest = (item) => {
+    const viewPurchaseRequest = async (item, index) => {
         props.dispatch({
             type: "SELECT_PURCHASE_REQUEST",
             data: item
         });
+        await selectPurchaseRequest(item)
     }
-
-    const editPurchaseRequest = (item, index) => {
-        selectPurchaseRequest(item);
-        props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
-            data: "edit-form"
-        });
+    const selectPurchaseRequest = async (item) => {
+        await api.PurchaseRequest.get(item.id)
+        .then(res => {
+            let purchase_request = res.data;
+            api.PurchaseRequest.logger(item.id)
+            .then(res => {
+                props.dispatch({
+                    type: "SELECT_PURCHASE_REQUEST",
+                    data: {...purchase_request, audit_trail: res.data }
+                });
+            })
+            .catch(res => {})
+            .then(res => {})
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
 
     const makeQuotation = (item, index) => {
@@ -558,6 +564,22 @@ const ApprovedPurchaseRequest = (props) => {
             ...onCell,
             // sorter: (a, b) => {},
         },
+        // {
+        //     title: "",
+        //     key: "file",
+        //     fixed: 'right',
+        //     width: 45,
+        //     shown: true,
+        //     align: "center",
+        //     filterable: false,
+        //     render: (text, item, index) => (
+        //         <Upload {...uploadProps}>
+        //             <Button size='small'>
+        //                 <UploadOutlined  />
+        //             </Button>
+        //         </Upload>
+        //       )
+        // },
         {
             title: "Action",
             key: "action",
@@ -588,7 +610,30 @@ const ApprovedPurchaseRequest = (props) => {
                 Make Quotation
             </Menu.Item>
         </Menu>
-      );
+    );
+
+
+    let token = JSON.parse(sessionStorage.getItem("session"));
+    let access_token = token.access_token;
+    // customAxios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+    const uploadProps = {
+        name: 'file',
+        action: 'http://pmr-api.test/api/forms/uploads/purchase-request',
+        headers: {
+          authorization: `Bearer ${access_token}`,
+        },
+        onChange(info) {
+          if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+          }
+          if (info.file.status === 'done') {
+            message.success(`${info.file.name} file uploaded successfully`);
+          } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+          }
+        },
+      };
 
     const handleMenuClick =() => {
 
