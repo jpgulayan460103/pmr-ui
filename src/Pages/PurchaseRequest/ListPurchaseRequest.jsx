@@ -17,7 +17,7 @@ import Icon, {
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
-import filter from '../../Shared/filter';
+import filter from '../../Utilities/filter';
 import AuditTrail from '../../Components/AuditTrail';
 
 const { Title } = Typography;
@@ -121,32 +121,6 @@ const Listpurchaserequest = (props) => {
         .then(res => {
             let item = res.data;
             let form_routes = item.form_routes.data;
-            // let form_routes_process = item.form_process.form_routes;
-            // let new_route = [];
-            // for (let index = 0; index < form_routes.length; index++) {
-            //     if(form_routes[index]['status'] != "pending"){
-            //         new_route.push({
-            //             status: "pending",
-            //             status_str: form_routes[index]['status_str'],
-            //             to_office: form_routes[index]['to_office'],
-            //             created_at: form_routes[index]['created_at'],
-            //         });
-    
-            //         new_route.push({
-            //             status: form_routes[index]['status'],
-            //             status_str: form_routes[index]['status_str'],
-            //             to_office: form_routes[index]['to_office'],
-            //             created_at: form_routes[index]['updated_at'],
-            //         });
-            //     }else{
-            //         new_route.push({
-            //             status: form_routes[index]['status'],
-            //             status_str: form_routes[index]['status_str'],
-            //             to_office: form_routes[index]['to_office'],
-            //             created_at: form_routes[index]['created_at'],
-            //         });
-            //     }
-            // }
             setTimelines(form_routes);
         })
         .catch(err => {})
@@ -210,7 +184,6 @@ const Listpurchaserequest = (props) => {
     }
 
     const timelineContent = (timeline) => {
-        // `${timeline.status_str} by the [${timeline.to_office?.name}]`
         let label = (<>
             {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
             <b>{timeline.to_office?.name}</b> <br />

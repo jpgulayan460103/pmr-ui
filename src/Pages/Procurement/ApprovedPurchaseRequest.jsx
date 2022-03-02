@@ -13,7 +13,7 @@ import {
     Upload,
     message,
 } from 'antd';
-import filter from '../../Shared/filter';
+import filter from '../../Utilities/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
 import {
     SettingOutlined,
@@ -46,15 +46,9 @@ function mapStateToProps(state) {
 }
 
 const Settings = ({columns, toggleColumn}) => {
-    useEffect(() => {
-        // console.log("render");
-    }, []);
     return (
-
         <List
             style={{height: 250, overflowY: "scroll"}}
-            // header={<div>Header</div>}
-            // footer={<div>Footer</div>}
             size='small'
             bordered
             dataSource={columns.filter(i => i.filterable)}
@@ -94,7 +88,6 @@ const ApprovedPurchaseRequest = (props) => {
                     }
                 ))
             })
-            // console.log(purchaseRequestTypeFilter());
         }
     }, [props.isInitialized]);
     const setFilterData = (data) => {
@@ -221,7 +214,6 @@ const ApprovedPurchaseRequest = (props) => {
         onCell: (record, colIndex) => {
             return {
                 onClick: event => {
-                    // setSelectedPurchaseRequest(record)
                     if(isEmpty(props.selectedPurchaseRequest)){
                         viewPurchaseRequest(record, colIndex);
                     }else{
@@ -564,22 +556,6 @@ const ApprovedPurchaseRequest = (props) => {
             ...onCell,
             // sorter: (a, b) => {},
         },
-        // {
-        //     title: "",
-        //     key: "file",
-        //     fixed: 'right',
-        //     width: 45,
-        //     shown: true,
-        //     align: "center",
-        //     filterable: false,
-        //     render: (text, item, index) => (
-        //         <Upload {...uploadProps}>
-        //             <Button size='small'>
-        //                 <UploadOutlined  />
-        //             </Button>
-        //         </Upload>
-        //       )
-        // },
         {
             title: "Action",
             key: "action",
@@ -600,9 +576,6 @@ const ApprovedPurchaseRequest = (props) => {
 
     const menu = (item, index) => (
         <Menu onClick={() => handleMenuClick()}>
-            {/* <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
-                View
-            </Menu.Item> */}
             <Menu.Item key="menu-bac-task" icon={<MessageOutlined />} onClick={() => { viewBacForm(item, index) }}>
                 BAC Data
             </Menu.Item>
@@ -676,13 +649,11 @@ const ApprovedPurchaseRequest = (props) => {
                 }}
             />
             <div className="flex justify-end mt-2">
-            {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
             <Pagination
                     current={props.purchaseRequestsPagination?.current_page || 1}
                     total={props.purchaseRequestsPagination?.total || 1}
                     pageSize={props.purchaseRequestsPagination?.per_page || 1}
                     onChange={paginationChange}
-                    // showSizeChanger
                     showQuickJumper
                     size="small"
                     onShowSizeChange={(current, size) => changePageSize(current, size)}

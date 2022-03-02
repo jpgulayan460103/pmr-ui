@@ -29,7 +29,7 @@ import { cloneDeep, isEmpty,  } from 'lodash';
 import dayjs from 'dayjs';
 import AuditTrail from '../../Components/AuditTrail';
 import Bacform from './BacForm';
-import Attachments from '../../Shared/Attachments';
+import Attachments from '../../Components/Attachments';
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;

@@ -5,7 +5,7 @@ import api from '../../api';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
-import filter from '../../Shared/filter';
+import filter from '../../Utilities/filter';
 
 const { Title } = Typography;
 const { TextArea } = Input;

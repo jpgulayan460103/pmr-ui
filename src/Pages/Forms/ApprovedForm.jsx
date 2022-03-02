@@ -5,7 +5,7 @@ import api from '../../api';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
-import filter from '../../Shared/filter';
+import filter from '../../Utilities/filter';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -175,19 +175,6 @@ const ApprovedForm = (props) => {
             ...filter.search('updated_at','date_range', setFilterData, filterData, getForm),
             ...onCell,
         },
-        // {
-        //     title: 'Status',
-        //     key: 'status',
-        //     width: 250,
-        //     render: (text, item, index) => (
-        //         <span>
-        //             { item.status_str }
-        //         </span>
-        //     ),
-        //     filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
-        //     ...filter.list('status','text', setFilterData, filterData, getForm),
-        //     ...onCell,
-        // },
         {
             title: 'Description',
             key: 'description',
@@ -212,21 +199,6 @@ const ApprovedForm = (props) => {
             ...filter.search('forwarded_remarks','text', setFilterData, filterData, getForm),
             ...onCell,
         },
-
-        // {
-        //     title: "Action",
-        //     key: "action",
-        //     fixed: 'right',
-        //     width: 60,
-        //     align: "center",
-        //     render: (text, item, index) => (
-        //         <Dropdown overlay={menu(item, index)} trigger={['click']}>
-        //             <Button size='small'>
-        //                 <EllipsisOutlined />
-        //             </Button>
-        //         </Dropdown>
-        //     ),
-        // },
     ];
 
     const menu = (item, index) => (
@@ -285,16 +257,13 @@ const ApprovedForm = (props) => {
                                 }}
                             />
                             <div className="flex justify-end mt-2">
-                                {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
                                 <Pagination
                                         current={paginationMeta?.current_page || 1}
                                         total={paginationMeta?.total || 1}
                                         pageSize={paginationMeta?.per_page || 1}
                                         onChange={paginationChange}
-                                        // showSizeChanger
                                         showQuickJumper
                                         size="small"
-                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
                                     />
                             </div>
                         </div>
