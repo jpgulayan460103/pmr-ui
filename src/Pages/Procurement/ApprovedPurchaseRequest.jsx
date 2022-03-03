@@ -12,6 +12,7 @@ import {
     Button,
     Upload,
     message,
+    Modal,
 } from 'antd';
 import filter from '../../Utilities/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
@@ -24,7 +25,7 @@ import {
     UploadOutlined,
     MessageOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import api from '../../api';
 
 
@@ -42,6 +43,7 @@ function mapStateToProps(state) {
         filterData: state.procurement.purchaseRequestsTableFilter,
         tableLoading: state.procurement.purchaseRequestsTableLoading,
         isInitialized: state.user.isInitialized,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 
@@ -69,7 +71,7 @@ const Settings = ({columns, toggleColumn}) => {
 }
 
 const ApprovedPurchaseRequest = (props) => {
-    let navigate = useNavigate();
+    let history = useHistory();
 
     useEffect(() => {
         if(props.isInitialized){
@@ -124,11 +126,18 @@ const ApprovedPurchaseRequest = (props) => {
     }
 
     const viewPurchaseRequest = async (item, index) => {
-        props.dispatch({
-            type: "SELECT_PURCHASE_REQUEST",
-            data: item
-        });
-        await selectPurchaseRequest(item)
+        if(props.uploadingFiles){
+            Modal.warning({
+                title: "Uploading your files",
+                content: "Please wait for the system to finish uploading.",
+            });
+        }else{
+            props.dispatch({
+                type: "SELECT_PURCHASE_REQUEST",
+                data: item
+            });
+            await selectPurchaseRequest(item)
+        }
     }
     const selectPurchaseRequest = async (item) => {
         await api.PurchaseRequest.get(item.id)
@@ -153,7 +162,7 @@ const ApprovedPurchaseRequest = (props) => {
         api.PurchaseRequest.get(item.id)
         .then(res => {
             selectPurchaseRequest(res.data);
-            navigate("/procurement/quotations");
+            history.push("/procurement/quotations");
         })
         .catch(err => {})
         .then(res => {})
@@ -564,13 +573,22 @@ const ApprovedPurchaseRequest = (props) => {
             shown: true,
             align: "center",
             filterable: false,
-            render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <Button size='small'>
-                        <EllipsisOutlined />
-                    </Button>
-                </Dropdown>
-              )
+            render: (text, item, index) => {
+                if(props.uploadingFiles){
+                    return (
+                        <Button size='small'>
+                            <EllipsisOutlined />
+                        </Button>
+                    )
+                }
+                return(
+                    <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                        <Button size='small'>
+                            <EllipsisOutlined />
+                        </Button>
+                    </Dropdown>
+                )
+            }
         },
     ];
 

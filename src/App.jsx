@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useLocation,
+  Redirect,
+  BrowserRouter,
+} from "react-router-dom";
 import './App.less';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -36,43 +44,92 @@ const PrivateRoute  = ({ children, ...props }) => {
     auth.isAuthenticated = true;
   }
   if (!auth.isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Redirect to="/login" />;
   }
   return children;
 }
 const App = (props) => {
-  useEffect(async () => {
-    let permission = await Notification.requestPermission();
-    
-  }, []);
   return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<PrivateRoute><Layout></Layout></PrivateRoute>} />
-        <Route path="/procurement" element={<PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>} />
-        <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
-        <Route path="/procurement/quotations/form" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
-        <Route path="/procurement/quotations" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
-        <Route path="/procurement/quotations/suppliers" element={<PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>} />
-        <Route path="/forms/requests" element={<PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>} />
-        <Route path="/forms/approved" element={<PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>} />
-        <Route path="/forms/disapproved" element={<PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>} />
-        <Route path="/purchase-requests/form" element={<PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>} />
-        <Route path="/purchase-requests" element={<PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>} />
-        {/* <Route path="/libraries" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/items" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/items/categories" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/items/measures" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/offices/divisions" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/offices/sections" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/user_offices/administrators" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} />
-        <Route path="/libraries/user_offices/purchase-requests" element={<PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>} /> */}
-        <Route path="/users" element={<PrivateRoute><Layout><User /></Layout></PrivateRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Login />} />
-        <Route path="*" element={<Layout></Layout>} />
-      </Routes>
-    </div>
+    <Router>
+
+<BrowserRouter
+        getUserConfirmation={() => {
+          /* Empty callback to block the default browser prompt */
+        }}
+      >
+        <Switch>
+          <Route exact path="/"  >
+              <PrivateRoute><Layout></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement"  >
+              <PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement/quotations"  >
+              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement/quotations/form"  >
+              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement/quotations"  >
+              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement/quotations/suppliers"  >
+              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/forms/requests"  >
+              <PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/forms/approved"  >
+              <PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/forms/disapproved"  >
+              <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/purchase-requests/form"  >
+              <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/purchase-requests"  >
+              <PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/items"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/items/categories"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/items/measures"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/offices/divisions"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/offices/sections"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/user_offices/administrators"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/libraries/user_offices/purchase-requests"  >
+              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/users"  >
+              <PrivateRoute><Layout><User /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/login"  >
+              <Login />
+          </Route>
+          <Route exact path="/logout"  >
+              <Login />
+          </Route>
+          <Route exact path="*"  >
+            <PrivateRoute><Layout></Layout></PrivateRoute>
+          </Route>
+        </Switch>
+        </BrowserRouter>
+    </Router>
   );
 }
 

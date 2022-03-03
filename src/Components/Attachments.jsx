@@ -2,6 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link,
+    Prompt
+  } from "react-router-dom";
+
+import {
     notification,
     Tabs,
     Skeleton,
@@ -27,6 +35,7 @@ import {
 
 import { cloneDeep, isEmpty,  } from 'lodash';
 import api from '../api';
+import { RouterPrompt } from './RouterPrompt';
 
 
 const { TabPane } = Tabs;
@@ -193,6 +202,17 @@ const Attachments = (props) => {
     
     return (
         <div>
+
+        <RouterPrompt
+            when={props.uploadingFiles}
+            title="Uploading your files"
+            content="Please wait for the system to finish uploading."
+            cancelText="Cancel"
+            okText="Confirm"
+            onOK={() => true}
+            onCancel={() => false}
+            hasConfirm={false}
+        />
             <div className='mb-2'>
                 <Dragger
                     {...uploadProps}

@@ -4,7 +4,7 @@ import { Form, Input, Button, Divider, Typography, Checkbox  } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useHistory  } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -16,8 +16,8 @@ function mapStateToProps(state) {
 
 
 const Loginform = (props) => {
-    let location = useLocation();
-    let navigate = useNavigate();
+    const location = useLocation();
+    const history = useHistory()
     const [errorMessage, setErrorMessage] = useState("");
     const [submit, setSubmit] = useState(false);
     
@@ -46,7 +46,7 @@ const Loginform = (props) => {
                     type: "SET_INITIALIZED",
                     data: false
                 });
-                navigate("/");
+                history.push('/')
             }
         })
         .catch(err => {

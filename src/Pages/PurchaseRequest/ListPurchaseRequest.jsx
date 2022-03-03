@@ -14,7 +14,7 @@ import Icon, {
     FormOutlined,
     EditOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 import filter from '../../Utilities/filter';
@@ -45,7 +45,7 @@ const RouteSvg = () => (
 );
 
 const Listpurchaserequest = (props) => {
-    let navigate = useNavigate()
+    let history = useHistory()
     useEffect(() => {
         document.title = "List of Purchase Request";
         if(props.isInitialized){
@@ -147,7 +147,7 @@ const Listpurchaserequest = (props) => {
                 type: "SET_PURCHASE_REQUEST_FORM_TYPE",
                 data: "update"
             });
-            navigate("/purchase-requests/form");
+            history.push("/purchase-requests/form");
         })
         .catch(err => {})
         .then(res => {})

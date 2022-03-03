@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { connect } from 'react-redux';
 import { Layout, Menu, Dropdown, Badge } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
 
 const { Header } = Layout;
@@ -40,7 +40,7 @@ const MenuIcon = (props) => {
     );
 }
 const Headers = ({ notifications, dispatch, collapsed, user }) => {
-    let navigate = useNavigate();
+    let history = useHistory();
     const [showSide, setShowSide] = useState(false);
     const toggleSide = () => {
         setShowSide(!showSide);
@@ -65,7 +65,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             data: {}
         });
         sessionStorage.removeItem('session');
-        navigate("/login");
+        history.push("/login");
     }
     return (
         <React.Fragment>

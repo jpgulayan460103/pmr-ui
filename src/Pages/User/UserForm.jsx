@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Form, Input, Button, Select, notification } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import helpers from '../../Utilities/helpers';
@@ -22,7 +22,7 @@ function mapStateToProps(state) {
 
 const UserForm = (props) => {
     const formRef = React.useRef();
-    let navigate = useNavigate();
+    let history = useHistory();
     useEffect(() => {
         formRef.current.setFieldsValue({
             firstname: props.userInfo.firstname,
@@ -57,7 +57,7 @@ const UserForm = (props) => {
         .then(res => {
             sessionStorage.setItem('session',JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
-            navigate("/");
+            history.push("/");
         })
         .catch(err => {
             setFormErrors(err.response.data.errors);
