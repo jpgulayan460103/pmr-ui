@@ -21,6 +21,7 @@ import {
     DeleteOutlined,
     InboxOutlined,
     PaperClipOutlined,
+    WarningOutlined,
 } from '@ant-design/icons';
 
 
@@ -77,6 +78,13 @@ const Attachments = (props) => {
             type: "SET_UPLOADING_FILES",
             data: true,
         });
+        setfileList(prev => {
+            return prev.map(i => {
+                i.status = "";
+                i.uploading = "";
+                return i;
+            })
+        });
         for (let index = 0; index < fileList.length; index++) {
             let file = fileList[index];
             let formData = new FormData();
@@ -86,6 +94,7 @@ const Attachments = (props) => {
             
             updateFile(index, {
                 uploading: "uploading",
+                status: "",
             });
             await uploadFile(formData, index)
         }
@@ -167,11 +176,17 @@ const Attachments = (props) => {
         if(item.uploading == "done" && item.status == "done"){
             actions.push(<Progress type="circle" width={20} percent={item.progress} />)
         }
-        if(item.uploading == "done" && item.status == "error"){
+        if(item.uploading == "done" && item.status == "error" && !props.uploadingFiles){
             actions.push(<a key="list-loadmore-edit" onClick={() => deleteFile(index)}><DeleteOutlined /></a>)
         }
-        if(item.uploading == ""){
+        if(item.uploading == "done"  && item.status == "error" && props.uploadingFiles ){
+            actions.push(<span className='text-red-500'><WarningOutlined /></span>)
+        }
+        if(item.uploading == "" && !props.uploadingFiles){
             actions.push(<a key="list-loadmore-edit" onClick={() => deleteFile(index)}><DeleteOutlined /></a>)
+        }
+        if(item.uploading == "" && props.uploadingFiles){
+            actions.push(<Progress type="circle" width={20} percent={0} />)
         }
         return actions;
     }
@@ -213,7 +228,7 @@ const Attachments = (props) => {
                                 </Tooltip>
                             </div>
                             <div className="truncate" style={{width: "30%"}}>
-                                <Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} size="small" />
+                                { props.uploadingFiles ? (<>{item.description}</>) : (<Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} size="small" />) }
                             </div>
 
                         </List.Item>
