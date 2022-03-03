@@ -26,7 +26,6 @@ import {
 
 
 import { cloneDeep, isEmpty,  } from 'lodash';
-import dayjs from 'dayjs';
 import AuditTrail from '../../Components/AuditTrail';
 import Bacform from './BacForm';
 import Attachments from '../../Components/Attachments';
@@ -34,7 +33,6 @@ import Attachments from '../../Components/Attachments';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { Dragger } = Upload;
-
 const { Option } = Select;
 
 
@@ -59,26 +57,6 @@ const Pruchaserequestworkspace = (props) => {
                 help: errorMessage
             }
         }
-    }
-    const setFormData = () => {
-        setTimeout(() => {
-            formRef.current.setFieldsValue({
-                purchase_request_number: props.selectedPurchaseRequest.purchase_request_number,
-                procurement_type_id: props.selectedPurchaseRequest.procurement_type_id,
-                mode_of_procurement_id: props.selectedPurchaseRequest.mode_of_procurement_id,
-                fund_cluster: props.selectedPurchaseRequest.fund_cluster,
-                center_code: props.selectedPurchaseRequest.center_code,
-            })
-        }, 150);
-    }
-    const loadAuditTrail = () => {
-        setLogger([]);
-        api.PurchaseRequest.loggerProcurement(props.selectedPurchaseRequest.id)
-        .then(res => {
-            setLogger(res.data.data);
-        })
-        .catch(res => {})
-        .then(res => {})
     }
 
     const changeTab = (key) => {
@@ -122,7 +100,7 @@ const Pruchaserequestworkspace = (props) => {
                     {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} style={{height: "65vh", width: "100%"}}></iframe> : ""}
             </TabPane>
             <TabPane tab="Uploads" key="uploads">
-                <Attachments />
+                <Attachments selectedForm={props.selectedPurchaseRequest} />
             </TabPane>
 
             <TabPane tab="BAC Data" key="bac-task">

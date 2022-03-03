@@ -96,6 +96,22 @@
   top: -10px;
 }
 
+.filter-options:hover{
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.filter-options{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.form-upload-selected-files:hover{
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.form-upload-selected-files{
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+
 /* .ant-card-head{
   height: 40px;
   min-height: 40px;

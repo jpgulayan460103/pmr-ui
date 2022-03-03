@@ -37,15 +37,12 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
-        procurementTypes: state.library.procurement_types,
-        modeOfProcurements: state.library.mode_of_procurements,
-        purchaseRequestTab: state.procurement.purchaseRequestTab,
-        purchaseRequests: state.procurement.purchaseRequests,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 
 const Attachments = (props) => {
+
 
     const [fileList, setfileList] = useState([]);
 
@@ -76,6 +73,10 @@ const Attachments = (props) => {
         });
     }
     const handleUpload = async () => {
+        props.dispatch({
+            type: "SET_UPLOADING_FILES",
+            data: true,
+        });
         for (let index = 0; index < fileList.length; index++) {
             let file = fileList[index];
             let formData = new FormData();
@@ -89,6 +90,10 @@ const Attachments = (props) => {
             await uploadFile(formData, index)
         }
         setfileList(fileList.filter(i => i.status != 'done'));
+        props.dispatch({
+            type: "SET_UPLOADING_FILES",
+            data: false,
+        });
     }
 
     const uploadProgress = (progressEvent, index) => {
@@ -173,7 +178,7 @@ const Attachments = (props) => {
     
     return (
         <div>
-            <div>
+            <div className='mb-2'>
                 <Dragger
                     {...uploadProps}
                     maxCount={20}
@@ -189,33 +194,38 @@ const Attachments = (props) => {
                 </Dragger>
             </div>
 
-            <List
-                size="small"
-                header={<div>Selected Files</div>}
-                footer={<div>{ fileList.length } files</div>}
-                bordered
-                dataSource={fileList}
-                renderItem={(item, index) => (
-                    <List.Item
-                        actions={uploadingAction(item, index)}
-                    >
-                        <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "50%"}}>
-                            <Tooltip placement="top" title={item.response}>
-                                <PaperClipOutlined />
-                                <span className='ml-2'>{item.name}</span>
-                            </Tooltip>
-                        </div>
-                        <div className="truncate" style={{width: "30%"}}>
-                            <Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} />
-                        </div>
+            <div className='mb-2'>
+                <List
+                    size="small"
+                    header={<div>Selected Files</div>}
+                    footer={<div>{ fileList.length } files</div>}
+                    bordered
+                    dataSource={fileList}
+                    renderItem={(item, index) => (
+                        <List.Item
+                            actions={uploadingAction(item, index)}
+                            className="form-upload-selected-files"
+                        >
+                            <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "50%"}}>
+                                <Tooltip placement="top" title={item.response}>
+                                    <PaperClipOutlined />
+                                    <span className='ml-2'>{item.name}</span>
+                                </Tooltip>
+                            </div>
+                            <div className="truncate" style={{width: "30%"}}>
+                                <Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} size="small" />
+                            </div>
 
-                    </List.Item>
-                    )
-                }
-            />
+                        </List.Item>
+                        )
+                    }
+                />
+                </div>
             <Button
                 type="primary"
                 onClick={() => handleUpload()}
+                disabled={props.uploadingFiles}
+                loading={props.uploadingFiles}
             >
             Start Upload
             </Button>

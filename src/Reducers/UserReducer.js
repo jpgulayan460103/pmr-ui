@@ -7,6 +7,7 @@ const initialState = () => {
     mainLoading: true,
     mainLoadingMessage: "",
     isInitialized: false,
+    uploadingFiles: false,
   }
 }
 
@@ -46,6 +47,11 @@ export default function reducer(state = initialState(), action) {
       return {
         ...state,
         data: action.data,
+      };    
+    case 'SET_UPLOADING_FILES':
+      return {
+        ...state,
+        uploadingFiles: action.data,
       };    
     case 'SET_INITIAL_STATE':
       state = initialState();
