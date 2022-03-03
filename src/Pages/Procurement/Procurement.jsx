@@ -104,7 +104,6 @@ const Procurement = (props) => {
                                         }else{
                                             setfRow2(10);
                                             setfRow1(14);
-
                                         }
                                     } }>
                                         <VerticalAlignTopOutlined rotate={fRow1 == 14 ? -90 : 90} />

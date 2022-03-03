@@ -7,6 +7,7 @@ import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } 
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
+import helpers from '../../Utilities/helpers';
 
 function mapStateToProps(state) {
     return {
@@ -265,16 +266,6 @@ const CreatePurchaseRequest = (props) => {
         }, 0);
     }
 
-    const displayError = (field) => {
-        if(props.formErrors && props.formErrors[field]){
-            return {
-                validateStatus: 'error',
-                help: props.formErrors[field][0]
-            }
-        }
-    }
-
-
     const setSignatory = (e, type) => {
         if(type == "requestedBy"){
             let user_office = props.user_signatory_names.filter(i => i.title == e);
@@ -312,7 +303,7 @@ const CreatePurchaseRequest = (props) => {
                         <td colSpan={2}>
                             <b>Office/Section:</b><br />
                             { props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name }
-                            {/* <Form.Item { ...displayError(`end_user_id`) }>
+                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `end_user_id`) }>
 
                                 <Select
                                     showSearch
@@ -340,18 +331,18 @@ const CreatePurchaseRequest = (props) => {
                         </td>
                         <td colSpan={2}>
                             <b>Title:</b>
-                            <Form.Item { ...displayError(`title`) }>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `title`) }>
                                 <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
                             </Form.Item>
                             {/* <b>PR No.:</b> */}
-                            {/* <Form.Item { ...displayError(`purchase_request_number`) }> */}
+                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `purchase_request_number`) }> */}
                                 {/* <Input disabled placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} /> */}
                             {/* </Form.Item> */}
                         </td>
                         <td colSpan={2}>
                         <b>Date:</b><br />
                             { moment().format('MM/DD/YYYY') }
-                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
+                        {/* <Form.Item { ...helpers.displayError(props.formErrors, `pr_date`) }> */}
                             {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
                         {/* </Form.Item> */}
                         </td>
@@ -360,14 +351,14 @@ const CreatePurchaseRequest = (props) => {
                     {/* <tr> */}
                         {/* <td colSpan={2}></td> */}
                         {/* <td colSpan={2}><b>Responsibility Center Code:</b> */}
-                            {/* <Form.Item { ...displayError(`center_code`) }> */}
+                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `center_code`) }> */}
                                 {/* <Input disabled placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} /> */}
                             {/* </Form.Item> */}
                         {/* </td> */}
                         {/* <td colSpan={2}> */}
                             {/* <b>Date:</b><br /> */}
                             {/* { moment().format('MM/DD/YYYY') } */}
-                        {/* <Form.Item { ...displayError(`pr_date`) }> */}
+                        {/* <Form.Item { ...helpers.displayError(props.formErrors, `pr_date`) }> */}
                             {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
                         {/* </Form.Item> */}
                         {/* </td> */}
@@ -388,13 +379,13 @@ const CreatePurchaseRequest = (props) => {
                         props.formData.items.map((item, index) => (
                             <tr key={item.key}>
                                 <td className='text-center'>
-                                    <Form.Item { ...displayError(`items.${index}.item_code`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_code`) }>
                                         { item.item_code }
                                         {/* <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled /> */}
                                     </Form.Item>
                                 </td>
                                 <td className='text-center'>
-                                    <Form.Item { ...displayError(`items.${index}.unit_of_measure_id`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
                                         { item.is_ppmp ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                             showSearch
                                             value={item.unit_of_measure_id}
@@ -414,7 +405,7 @@ const CreatePurchaseRequest = (props) => {
                                     </Form.Item>
                                 </td>
                                 <td>
-                                    <Form.Item { ...displayError(`items.${index}.item_name`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
                                         { item.is_ppmp ? item.item_name : (
                                             <AutoComplete
                                                 style={{ width: "100%" }}
@@ -437,12 +428,12 @@ const CreatePurchaseRequest = (props) => {
                                     {/* <Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } value={item.description} /> */}
                                 </td>
                                 <td className='text-center'>
-                                    <Form.Item { ...displayError(`items.${index}.quantity`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
                                         <Input type="number" min={1} autoComplete='off' style={{ width: 100 }} placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
                                     </Form.Item>
                                     </td>
                                 <td className='text-right'>
-                                    <Form.Item { ...displayError(`items.${index}.unit_cost`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
                                         <Input type="number" autoComplete='off' style={{ width: 150 }} step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
                                     </Form.Item>
                                 </td>
@@ -464,7 +455,7 @@ const CreatePurchaseRequest = (props) => {
                     </tr>
                     <tr>
                         <td colSpan={7}><b>Purpose:</b>
-                            <Form.Item { ...displayError(`purpose`) }>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `purpose`) }>
                                 <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
                                 {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                             </Form.Item>
@@ -473,14 +464,14 @@ const CreatePurchaseRequest = (props) => {
                     <tr>
                         <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
                         <td style={{borderBottom: 0}}>Requested By:
-                        <Form.Item { ...displayError(`requested_by_id`) }>
+                        <Form.Item { ...helpers.displayError(props.formErrors, `requested_by_id`) }>
                             <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
                                 { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
                             </Select>
                         </Form.Item>
                         <br /><br />&nbsp;</td>
                         <td colSpan={4} style={{borderBottom: 0}}>Approved by:
-                        <Form.Item { ...displayError(`approved_by_id`) }>
+                        <Form.Item { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
                             <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
                                 { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
                             </Select>
@@ -514,7 +505,7 @@ const CreatePurchaseRequest = (props) => {
                 
                 <br />
                 <p style={{color: "red"}}>
-                    { displayError('items')?.help }
+                    { helpers.displayError(props.formErrors,'items')?.help }
                 </p>
                 <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined /> Save</Button>

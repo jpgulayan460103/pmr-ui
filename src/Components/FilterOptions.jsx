@@ -3,7 +3,7 @@ import { Input, Checkbox, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import _map from 'lodash/map'
 
-const ListOptions = (
+const FilterOptions = (
     {
         setSelectedKeys,
         selectedKeys,
@@ -66,4 +66,4 @@ const ListOptions = (
     );
 }
 
-export default ListOptions;
+export default FilterOptions;

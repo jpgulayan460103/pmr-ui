@@ -6,6 +6,7 @@ import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, Disli
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
+import helpers from '../../Utilities/helpers';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -61,15 +62,6 @@ const ForwardedForm = (props) => {
     const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
     const [submit, setSubmit] = useState(false);
     
-
-    const showErrorMessage = (field) => {
-        if(errorMessage && errorMessage[field]){
-            return {
-                validateStatus: 'error',
-                help: errorMessage[field]
-            }
-        }
-    }
 
     const showRejectForm = (formRouteItem) => {
         setSelectedFormRoute(formRouteItem)
@@ -740,7 +732,7 @@ const ForwardedForm = (props) => {
                         name="purchase_request_number_last"
                         label="Purchase Request Number"
                         rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...showErrorMessage('purchase_request_number_last') }
+                        { ...helpers.displayError(errorMessage, 'purchase_request_number_last') }
                     >
                         <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
                             <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
@@ -754,7 +746,7 @@ const ForwardedForm = (props) => {
                         name="fund_cluster"
                         label="Fund Cluster"
                         rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
-                        { ...showErrorMessage('fund_cluster') }
+                        { ...helpers.displayError(errorMessage, 'fund_cluster') }
                     >
                         <Input placeholder="Fund Cluster" />
                     </Form.Item>
@@ -763,7 +755,7 @@ const ForwardedForm = (props) => {
                         name="center_code"
                         label="Responsibility Center Code"
                         // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
-                        { ...showErrorMessage('center_code') }
+                        { ...helpers.displayError(errorMessage, 'center_code') }
                     >
                         <Input placeholder="Responsibility Center Code" />
                     </Form.Item> */}
@@ -850,7 +842,7 @@ const ForwardedForm = (props) => {
                             <Form.Item
                                 name="procurement_type_category"
                                 label="Procurement Category"
-                                { ...showErrorMessage('procurement_type_category') }
+                                { ...helpers.displayError(errorMessage, 'procurement_type_category') }
                                 rules={[{ required: true, message: 'Please select Procurement Category.' }]}
                             >
                                 <Select placeholder='Select Procurement Category' onSelect={(e) => {
@@ -868,7 +860,7 @@ const ForwardedForm = (props) => {
                                     <Form.Item
                                         name="procurement_type_id"
                                         label="Procurement Type"
-                                        { ...showErrorMessage('procurement_type_id') }
+                                        { ...helpers.displayError(errorMessage, 'procurement_type_id') }
                                         rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                                     >
                                         <Select placeholder='Select Procurement Category' allowClear > 
@@ -881,7 +873,7 @@ const ForwardedForm = (props) => {
                             <Form.Item
                                 name="mode_of_procurement_id"
                                 label="Mode of Procurement"
-                                { ...showErrorMessage('mode_of_procurement_id') }
+                                { ...helpers.displayError(errorMessage, 'mode_of_procurement_id') }
                                 rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
                             >
                                 <Select placeholder='Select Mode of Procurement'>
@@ -914,16 +906,13 @@ const ForwardedForm = (props) => {
                                 }}
                             />
                             <div className="flex justify-end mt-2">
-                                {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
                                 <Pagination
                                         current={paginationMeta?.current_page || 1}
                                         total={paginationMeta?.total || 1}
                                         pageSize={paginationMeta?.per_page || 1}
                                         onChange={paginationChange}
-                                        // showSizeChanger
                                         showQuickJumper
                                         size="small"
-                                        // onShowSizeChange={(current, size) => changePageSize(current, size)}
                                     />
                             </div>
                         </div>

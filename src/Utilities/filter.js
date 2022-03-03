@@ -3,7 +3,7 @@ import { Input, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
-import ListOptions from './../Components/ListOptions'
+import FilterOptions from './../Components/FilterOptions'
 
 
 const { Search } = Input;
@@ -46,7 +46,7 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
 
 const list = (dataIndex, type, setFilters, filterData, getData) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, filters }) => {
-        return <ListOptions 
+        return <FilterOptions 
             setSelectedKeys={setSelectedKeys}
             selectedKeys={selectedKeys}
             confirm={confirm}

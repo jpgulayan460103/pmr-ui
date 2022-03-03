@@ -2,7 +2,7 @@ const initialState = () => {
     return {
       selectedPurchaseRequest: {},
       columns: [],
-      purchaseRequestTab: "edit-form",
+      purchaseRequestTab: "information",
       purchaseRequests: [],
       purchaseRequestsPagination: {
         current_page: 1,

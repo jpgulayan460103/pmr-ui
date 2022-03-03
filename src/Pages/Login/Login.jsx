@@ -4,9 +4,7 @@ import axios from './../../api/axios.settings';
 import style from './style.css'
 import { useLocation } from 'react-router-dom'
 import LoginForm from './LoginForm'
-import RegistrationFormAccount from './RegistrationFormAccount'
-import RegistrationFormActive from './RegistrationFormActive'
-import LoginFormActive from './LoginFormActive'
+import UserForm from '../User/UserForm';
 import api from '../../api';
 import { Steps, Typography, PageHeader } from 'antd';
 import LoadLibraries from '../../Components/LoadLibraries';
@@ -54,7 +52,7 @@ const Login = () => {
                 </div>
                 { showRegister ? (
                     <div style={{width: "450px"}}>
-                        <RegistrationFormActive userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
+                        <UserForm userInfo={formData} setRegisterStep={setRegisterStep} setShowRegister={setShowRegister} type="create" />
                     </div>
                 ) : (
                     <LoginForm getAdInfo={getAdInfo} setShowRegister={setShowRegister} setRegisterStep={setRegisterStep} />

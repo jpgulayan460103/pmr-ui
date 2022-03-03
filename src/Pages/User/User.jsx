@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import UserTable from './UserTable'
 import UserPermissions from './UserPermissions'
-import RegistrationFormActive from '../Login/RegistrationFormActive';
+import UserForm from './UserForm';
 import api from '../../api';
 import { debounce, map } from 'lodash'
 import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
@@ -69,7 +69,7 @@ const User = (props) => {
                     { editType=="edit" ?  (
                         <Card size="small" title="Edit User" bordered={false}>
                             <div className='user-card-content'>
-                                <RegistrationFormActive userInfo={formData} type="update" getUsers={getUsers} />
+                                <UserForm userInfo={formData} type="update" getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
