@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { useBeforeunload } from 'react-beforeunload';
 
 import {
     BrowserRouter as Router,
@@ -36,6 +37,7 @@ import {
 import { cloneDeep, isEmpty,  } from 'lodash';
 import api from '../api';
 import { RouterPrompt } from './RouterPrompt';
+import helpers from '../Utilities/helpers';
 
 
 const { TabPane } = Tabs;
@@ -53,7 +55,16 @@ function mapStateToProps(state) {
 
 const Attachments = (props) => {
 
+    useBeforeunload((event) => {
+        if (props.uploadingFiles) {
+          event.preventDefault();
+          return 'You’ll lose your data!';
+        }
+    });
 
+    useEffect(() => {
+        setfileList([]);
+    }, [props['form-id']]);
     const [fileList, setfileList] = useState([]);
 
     const uploadProps = {
@@ -97,7 +108,7 @@ const Attachments = (props) => {
         for (let index = 0; index < fileList.length; index++) {
             let file = fileList[index];
             let formData = new FormData();
-            formData.append('files[]', file);
+            formData.append('file', file);
             formData.append('meta[uid]', file.uid);
             formData.append('meta[description]', file.description);
             
@@ -136,7 +147,7 @@ const Attachments = (props) => {
                     case 422:
                         updateFile(index, {
                             status: "error",
-                            response: error.response.data.message,
+                            response: error.response.data.errors['file'] || error.response.data.errors['meta.description'],
                             uploading: "done",
                         });
                         break;
@@ -149,7 +160,7 @@ const Attachments = (props) => {
                         break;
                 
                     default:
-                        break;
+                        break
                 }
             }
         })
@@ -168,7 +179,7 @@ const Attachments = (props) => {
         if(data.progress){
             clonedFileList[index].progress = data.progress
         }
-        if(data.description){
+        if(data.description || data.description === ""){
             clonedFileList[index].description = data.description
         }
         if(data.uploading){
@@ -179,6 +190,7 @@ const Attachments = (props) => {
 
     const uploadingAction = (item, index) => {
         let actions = [];
+        actions.push(<span>{ helpers.bytesToSize(item.size)}</span>)
         if(item.uploading == "uploading"){
             actions.push(<Progress type="circle" width={20} percent={item.progress} />)
         }
@@ -241,7 +253,7 @@ const Attachments = (props) => {
                             actions={uploadingAction(item, index)}
                             className="form-upload-selected-files"
                         >
-                            <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "50%"}}>
+                            <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "60%"}}>
                                 <Tooltip placement="top" title={item.response}>
                                     <PaperClipOutlined />
                                     <span className='ml-2'>{item.name}</span>

@@ -43,6 +43,7 @@ function mapStateToProps(state) {
         modeOfProcurements: state.library.mode_of_procurements,
         purchaseRequestTab: state.procurement.purchaseRequestTab,
         purchaseRequests: state.procurement.purchaseRequests,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 

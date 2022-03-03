@@ -14,6 +14,7 @@ function mapStateToProps(state) {
     return {
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
         purchaseRequestsTableFilter: state.procurement.purchaseRequestsTableFilter,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 
@@ -113,7 +114,7 @@ const Procurement = (props) => {
                                     <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
                                 </Tooltip>
                                 <Tooltip placement="top" title={"Close window"}>
-                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() }><CloseOutlined /></Button>
+                                    <Button size='small' type='danger' onClick={() => closePurchaseRequest() } disabled={props.uploadingFiles}><CloseOutlined /></Button>
                                 </Tooltip>
                             </div>
                         )}
