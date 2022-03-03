@@ -113,7 +113,7 @@ const Attachments = (props) => {
     }
 
     const uploadFile = async (formData, index) => {
-        return api.Forms.upload(formData, index, uploadProgress)
+        return api.Forms.upload(props['form-type'], props['form-id'], formData, index, uploadProgress)
         .then(res => {
             updateFile(index, {
                 status: "done",

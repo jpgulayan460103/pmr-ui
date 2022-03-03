@@ -31,8 +31,8 @@ export default {
   getRoute(id){
     return axios.get(`api/forms/routes/${id}`);
   },
-  upload(files, index, uploadProgress){
-    return axios.post(`api/forms/uploads/purchase-request`, files, {
+  upload(type, id, files, index, uploadProgress){
+    return axios.post(`api/forms/uploads/${type}/${id}`, files, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },

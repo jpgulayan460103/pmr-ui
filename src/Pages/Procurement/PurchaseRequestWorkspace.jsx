@@ -100,7 +100,7 @@ const Pruchaserequestworkspace = (props) => {
                     {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} style={{height: "65vh", width: "100%"}}></iframe> : ""}
             </TabPane>
             <TabPane tab="Uploads" key="uploads">
-                <Attachments selectedForm={props.selectedPurchaseRequest} />
+                <Attachments form-id={props.selectedPurchaseRequest.id} form-type="purchase-request" />
             </TabPane>
 
             <TabPane tab="BAC Data" key="bac-task">
