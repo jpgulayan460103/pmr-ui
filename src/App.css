@@ -63,6 +63,10 @@
   margin-left: -20px;
 }
 
+.custom-pointer .anticon{
+  position: relative;
+  top: -0.2em;
+}
 .ant-btn .anticon{
   position: relative;
   top: -0.1em;

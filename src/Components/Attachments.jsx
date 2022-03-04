@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { connect } from 'react-redux';
-import { useBeforeunload } from 'react-beforeunload';
-
 import {
     BrowserRouter as Router,
     Switch,
@@ -21,16 +19,18 @@ import {
     List,
     Progress,
     Select,
-    Input,
+    Popconfirm,
     Tooltip,
+    Popover,
 } from 'antd';
 
 import {
     UploadOutlined,
     DeleteOutlined,
     InboxOutlined,
-    PaperClipOutlined,
-    WarningOutlined,
+    DownloadOutlined,
+    CloudUploadOutlined,
+    QuestionCircleOutlined,
 } from '@ant-design/icons';
 
 
@@ -39,247 +39,110 @@ import api from '../api';
 import { RouterPrompt } from './RouterPrompt';
 import helpers from '../Utilities/helpers';
 
-
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { Dragger } = Upload;
 
 const { Option } = Select;
-
-
 function mapStateToProps(state) {
     return {
-        uploadingFiles: state.user.uploadingFiles,
+        user: state.user.data
     };
 }
 
+const handleDownload = (item) => {
+    window.open(item.file_directory); 
+}
+
 const Attachments = (props) => {
-
-    useBeforeunload((event) => {
-        if (props.uploadingFiles) {
-          event.preventDefault();
-          return 'You’ll lose your data!';
-        }
-    });
-
+    const [files, setFiles] = useState([]);
     useEffect(() => {
-        setfileList([]);
-    }, [props['form-id']]);
-    const [fileList, setfileList] = useState([]);
-
-    const uploadProps = {
-        multiple: true,
-        onRemove: file => {
-            setfileList(prev => {
-              const index = prev.indexOf(file);
-              const newFileList = prev.slice();
-              newFileList.splice(index, 1);
-              return newFileList;
-            });
-        },
-        beforeUpload: file => {
-            console.log(file);
-            file['description'] = "";
-            file['uploading'] = "";
-            setfileList(prev => [...prev, file]);
-            return false;
-        },
-    };
-
-    const deleteFile = (index) => {
-        setfileList(prev => {
-            const newFileList = prev.slice();
-            newFileList.splice(index, 1);
-            return newFileList;
-        });
-    }
-    const handleUpload = async () => {
-        props.dispatch({
-            type: "SET_UPLOADING_FILES",
-            data: true,
-        });
-        setfileList(prev => {
-            return prev.map(i => {
-                i.status = "";
-                i.uploading = "";
-                return i;
-            })
-        });
-        for (let index = 0; index < fileList.length; index++) {
-            let file = fileList[index];
-            let formData = new FormData();
-            formData.append('file', file);
-            formData.append('meta[uid]', file.uid);
-            formData.append('meta[description]', file.description);
-            
-            updateFile(index, {
-                uploading: "uploading",
-                status: "",
-            });
-            await uploadFile(formData, index)
-        }
-        setfileList(fileList.filter(i => i.status != 'done'));
-        props.dispatch({
-            type: "SET_UPLOADING_FILES",
-            data: false,
-        });
-    }
-
-    const uploadProgress = (progressEvent, index) => {
-        let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        updateFile(index, {
-            progress: percentCompleted,
-        });
-    }
-
-    const uploadFile = async (formData, index) => {
-        return api.Forms.upload(props['form-type'], props['form-id'], formData, index, uploadProgress)
+        setFiles(props.fileList);
+    }, [props.fileList]);
+    const handleConfirm = (item) => {
+        console.log(item);
+        api.Forms.deleteUpload(item.upload_type, item.id)
         .then(res => {
-            updateFile(index, {
-                status: "done",
-                response: "Uploaded",
-                uploading: "done",
-            });
+            setFiles(prev => prev.filter(i => i.id != item.id));
         })
-        .catch(error => {
-            if (error.response) {
-                switch (error.response.status) {
-                    case 422:
-                        updateFile(index, {
-                            status: "error",
-                            response: error.response.data.errors['file'] || error.response.data.errors['meta.description'],
-                            uploading: "done",
-                        });
-                        break;
-                    case 500:
-                        updateFile(index, {
-                            status: "error",
-                            response: "Upload error",
-                            uploading: "done",
-                        });
-                        break;
-                
-                    default:
-                        break
-                }
-            }
-        })
+        .catch(err => {})
         .then(res => {})
-        ;
     }
 
-    const updateFile = (index, data) => {
-        let clonedFileList = cloneDeep(fileList);
-        if(data.status){
-            clonedFileList[index].status = data.status
-        }
-        if(data.response){
-            clonedFileList[index].response = data.response
-        }
-        if(data.progress){
-            clonedFileList[index].progress = data.progress
-        }
-        if(data.description || data.description === ""){
-            clonedFileList[index].description = data.description
-        }
-        if(data.uploading){
-            clonedFileList[index].uploading = data.uploading
-        }
-        setfileList(clonedFileList);
-    }
-
-    const uploadingAction = (item, index) => {
+    const attachmentActions = (item, index) => {
         let actions = [];
-        actions.push(<span>{ helpers.bytesToSize(item.size)}</span>)
-        if(item.uploading == "uploading"){
-            actions.push(<Progress type="circle" width={20} percent={item.progress} />)
-        }
-        if(item.uploading == "done" && item.status == "done"){
-            actions.push(<Progress type="circle" width={20} percent={item.progress} />)
-        }
-        if(item.uploading == "done" && item.status == "error" && !props.uploadingFiles){
-            actions.push(<a key="list-loadmore-edit" onClick={() => deleteFile(index)}><DeleteOutlined /></a>)
-        }
-        if(item.uploading == "done"  && item.status == "error" && props.uploadingFiles ){
-            actions.push(<span className='text-red-500'><WarningOutlined /></span>)
-        }
-        if(item.uploading == "" && !props.uploadingFiles){
-            actions.push(<a key="list-loadmore-edit" onClick={() => deleteFile(index)}><DeleteOutlined /></a>)
-        }
-        if(item.uploading == "" && props.uploadingFiles){
-            actions.push(<Progress type="circle" width={20} percent={0} />)
+        actions.push(<Tooltip placement="top" title="Download">
+        <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
+    </Tooltip>);
+        if(props.user.id === item.user_id){
+            actions.push(
+                <Popconfirm
+                    title="Are you sure to delete this attachment?"
+                    onConfirm={() => handleConfirm(item) }
+                    // onCancel={cancel}
+                    okText="Yes"
+                    cancelText="No"
+                    placement='left'
+                >
+                    <Tooltip placement="top" title="Delete">
+                        <Button size='small' icon={<DeleteOutlined />} type="link" />
+                    </Tooltip>
+                </Popconfirm>
+            );
         }
         return actions;
     }
-    
+
+
+    const popOverContent = (item) => {
+        return (
+            <div>
+                <p>
+                    <b>Size:</b> <span>{helpers.bytesToSize(item.filesize)}</span><br />
+                    <b>Uploaded by:</b> <span>{item.uploader?.user_information?.fullname}</span><br />
+                    <b>Uploaded on:</b> <span>{item.created_at}</span><br />
+                </p>
+            </div>
+        )
+    }
     return (
         <div>
-
-        <RouterPrompt
-            when={props.uploadingFiles}
-            title="Uploading your files"
-            content="Please wait for the system to finish uploading."
-            cancelText="Cancel"
-            okText="Confirm"
-            onOK={() => true}
-            onCancel={() => false}
-            hasConfirm={false}
-        />
-            <div className='mb-2'>
-                <Dragger
-                    {...uploadProps}
-                    maxCount={20}
-                    itemRender={(originNode, file, currFileList) => (
-                        <></>
-                    )}
-                >
-                        <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        
-                </Dragger>
-            </div>
-
-            <div className='mb-2'>
-                <List
+            <List
                     size="small"
-                    header={<div>Selected Files</div>}
-                    footer={<div>{ fileList.length } files</div>}
+                    header={<div className='flex justify-between'>
+                        <div>Attached Files</div>
+                        <div>
+                            <span className='custom-pointer' onClick={() => props.setShowUpload(true)}>
+                                <CloudUploadOutlined /> Upload Files
+                            </span>
+                        </div>
+                    </div>}
+                    footer={<div>{ files?.length } files</div>}
                     bordered
-                    dataSource={fileList}
+                    dataSource={files}
                     renderItem={(item, index) => (
                         <List.Item
-                            actions={uploadingAction(item, index)}
+                            actions={attachmentActions(item, index)}
                             className="form-upload-selected-files"
                         >
-                            <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "60%"}}>
-                                <Tooltip placement="top" title={item.response}>
-                                    <PaperClipOutlined />
-                                    <span className='ml-2'>{item.name}</span>
-                                </Tooltip>
+                            <div className="truncate" style={{width: "60%"}}>
+                                <Popover placement="left" title={item.title} content={popOverContent(item)} trigger="click">
+                                    <Button size='small' icon={<QuestionCircleOutlined />} type="link" />
+                                </Popover>
+                                <span className='ml-2'>{item.title}</span>
                             </div>
                             <div className="truncate" style={{width: "30%"}}>
-                                { props.uploadingFiles ? (<>{item.description}</>) : (<Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} size="small" />) }
+
                             </div>
 
                         </List.Item>
                         )
                     }
                 />
-                </div>
-            <Button
-                type="primary"
-                onClick={() => handleUpload()}
-                disabled={props.uploadingFiles}
-                loading={props.uploadingFiles}
-            >
-            Start Upload
-            </Button>
         </div>
     );
 }
-
 export default connect(
     mapStateToProps,
 )(Attachments);
+

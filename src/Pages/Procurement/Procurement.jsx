@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Card, Col, Row, Button, Tooltip  } from 'antd';
+import { Card, Col, Row, Button, Tooltip, Breadcrumb  } from 'antd';
 import ApprovedPurchaseRequest from './ApprovedPurchaseRequest';
 import PurchaseRequestWorkspace from './PurchaseRequestWorkspace';
 import Icon, {
@@ -14,6 +14,7 @@ function mapStateToProps(state) {
     return {
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
         purchaseRequestsTableFilter: state.procurement.purchaseRequestsTableFilter,
+        purchaseRequestsWorkspaceLoading: state.procurement.purchaseRequestsWorkspaceLoading,
         uploadingFiles: state.user.uploadingFiles,
     };
 }
@@ -85,6 +86,20 @@ const Procurement = (props) => {
     }
     return (
         <div>
+{/*             <div className='mb-2'>
+                <Breadcrumb>
+                    <Breadcrumb.Item>
+                        <a href="">Application Center</a>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                    <a href="">Application Center</a>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                    <a href="">Application List</a>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>An Application</Breadcrumb.Item>
+                </Breadcrumb>
+            </div> */}
             <Row gutter={[16, 16]} className="mb-3">
                 <Col xs={24} sm={24} md={24} lg={fRow1} xl={fRow1+2}>
                     <Card size="small" title="Approved Puchase Requests" bordered={false}>
@@ -95,7 +110,7 @@ const Procurement = (props) => {
                 </Col>
                 {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? (
                 <Col xs={24} sm={24} md={24} lg={fRow2} xl={fRow2-2}>
-                    <Card title="Puchase Request Details" size="small" bordered={false} extra={(
+                    <Card title="Puchase Request Details" size="small" loading={props.purchaseRequestsWorkspaceLoading} bordered={false} extra={(
                             <div className='text-right space-x-0.5'>
                                 <Tooltip placement="top" title={fRow1 == 14 ? "Larger window" : "Normal window"}>
                                     <Button size='small' onClick={() => {

@@ -15,6 +15,7 @@ const initialState = () => {
         purchase_request_type_category: [],
       },
       purchaseRequestsTableLoading: false,
+      purchaseRequestsWorkspaceLoading: false,
     }
   }
   
@@ -57,6 +58,11 @@ const initialState = () => {
         return {
           ...state,
           purchaseRequestsTableLoading: action.data,
+        };
+      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING':
+        return {
+          ...state,
+          purchaseRequestsWorkspaceLoading: action.data,
         };
       case 'SET_PROCUREMENT_INITIAL_STATE':
         state = initialState();

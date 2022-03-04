@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 import filter from '../../Utilities/filter';
 import AuditTrail from '../../Components/AuditTrail';
+import AttachmentUpload from '../../Components/AttachmentUpload';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -122,6 +123,7 @@ const Listpurchaserequest = (props) => {
             let item = res.data;
             let form_routes = item.form_routes.data;
             setTimelines(form_routes);
+            setSelectedPurchaseRequest(item)
         })
         .catch(err => {})
         .then(res => {})
@@ -393,6 +395,9 @@ const Listpurchaserequest = (props) => {
                                                     <b>SA/OR:</b> {selectedPurchaseRequest?.sa_or || ""} <br />
                                                 </p>
                                             </div>
+                                        </TabPane>
+                                        <TabPane tab="Attachments" key="uploads">
+                                        <AttachmentUpload formId={selectedPurchaseRequest.id} formType="purchase_request" fileList={selectedPurchaseRequest.form_uploads?.data} />
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
                                             { !isEmpty(timelines) ? (

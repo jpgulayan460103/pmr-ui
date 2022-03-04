@@ -28,6 +28,7 @@ import {
 import { cloneDeep, isEmpty,  } from 'lodash';
 import AuditTrail from '../../Components/AuditTrail';
 import Bacform from './BacForm';
+import AttachmentUpload from '../../Components/AttachmentUpload';
 import Attachments from '../../Components/Attachments';
 
 const { TabPane } = Tabs;
@@ -100,8 +101,9 @@ const Pruchaserequestworkspace = (props) => {
             <TabPane tab="Form" key="pdf">
                     {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} style={{height: "65vh", width: "100%"}}></iframe> : ""}
             </TabPane>
-            <TabPane tab="Uploads" key="uploads">
-                <Attachments form-id={props.selectedPurchaseRequest.id} form-type="purchase-request" />
+            <TabPane tab="Attachments" key="uploads">
+                {/* <Attachments fileList={props.selectedPurchaseRequest.form_uploads?.data} /> */}
+                <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
             </TabPane>
 
             <TabPane tab="BAC Data" key="bac-task">

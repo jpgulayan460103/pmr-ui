@@ -140,6 +140,10 @@ const ApprovedPurchaseRequest = (props) => {
         }
     }
     const selectPurchaseRequest = async (item) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+            data: true
+        });
         await api.PurchaseRequest.get(item.id)
         .then(res => {
             let purchase_request = res.data;
@@ -149,9 +153,23 @@ const ApprovedPurchaseRequest = (props) => {
                     type: "SELECT_PURCHASE_REQUEST",
                     data: {...purchase_request, audit_trail: res.data }
                 });
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
             })
-            .catch(res => {})
-            .then(res => {})
+            .catch(res => {
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
+            })
+            .then(res => {
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
+            })
         })
         .catch(err => {})
         .then(res => {})

@@ -38,5 +38,8 @@ export default {
         },
         onUploadProgress: progressEvent => uploadProgress(progressEvent, index)
     });
+  },
+  deleteUpload(type, id){
+    return axios.delete(`api/forms/uploads/${type}/${id}`);
   }
 }
