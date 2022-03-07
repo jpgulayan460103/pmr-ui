@@ -126,7 +126,7 @@ const Attachments = (props) => {
                             className="form-upload-selected-files"
                         >
                             <div className="truncate" style={{width: "60%"}}>
-                                <Popover placement="left" title={item.title} content={popOverContent(item)} trigger="click">
+                                <Popover placement="left" title={item.title} content={popOverContent(item)} trigger="hover">
                                     <Button size='small' icon={<QuestionCircleOutlined />} type="link" />
                                 </Popover>
                                 <span className='ml-2'>{item.title}</span>

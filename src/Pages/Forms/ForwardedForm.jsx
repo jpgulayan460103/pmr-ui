@@ -7,6 +7,7 @@ import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
 import helpers from '../../Utilities/helpers';
+import AttachmentUpload from '../../Components/AttachmentUpload';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -61,6 +62,8 @@ const ForwardedForm = (props) => {
     const [paginationMeta, setPaginationMeta] = useState({});
     const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
     const [submit, setSubmit] = useState(false);
+    const [attachments, setAttachments] = useState([]);
+    const [formLoading, setFormLoading] = useState(false);
     
 
     const showRejectForm = (formRouteItem) => {
@@ -234,7 +237,15 @@ const ForwardedForm = (props) => {
     }
 
     const viewForm = (item, index) => {
-        setSelectedFormRoute(item)
+        setSelectedFormRoute(item);
+        switch (item.route_type) {
+            case "purchase_request":
+                viewPurchaseRequest(item.form_routable_id);
+                break;
+        
+            default:
+                break;
+        }
     }
     const respondForm = (item, index) => {
         setSelectedFormRoute(item)
@@ -246,6 +257,7 @@ const ForwardedForm = (props) => {
     const closeForm = () => {
         setSelectedFormRoute({});
     }
+    
 
     const cancelBudgetForm = () => {
         budgetFormRef.current.setFieldsValue({
@@ -466,6 +478,23 @@ const ForwardedForm = (props) => {
 
     const actionTypeProcurement = (e) => {
         setProcurementFormType(e);
+    }
+
+    const viewPurchaseRequest = (id) => {
+        setFormLoading(true);
+        api.PurchaseRequest.get(id)
+        .then(res => {
+            setAttachments(res.data.form_uploads.data)
+            setFormLoading(false);
+            // setSelectedForm();
+        })
+        .catch(err => {
+            setFormLoading(false);
+        })
+        .then(res => {
+            setFormLoading(false);
+        })
+        ;
     }
 
     const onCell = {
@@ -971,23 +1000,23 @@ const ForwardedForm = (props) => {
             </Row>
             { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
-                <Col span={24}>
-                    <Card size="small" title="Forwarded Form" bordered={false}>
+                <Col md={24} lg={16} xl={18}>
+                    <Card size="small" title="Forwarded Form" bordered={false} loading={formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
+
+                <Col md={24} lg={8} xl={6}>
+                        <Card size="small" title="Attachments" bordered={false} loading={formLoading}>
+                            <div className='forms-card-form-content'>
+                                <AttachmentUpload formId={selectedFormRoute.form_routable_id} formType={selectedFormRoute.route_type} fileList={attachments}></AttachmentUpload>
+                            </div>
+                        </Card>
+                    </Col>
             </Row>
             )  }
-
-
-            <div className='col-md-8'>
-
-            </div>
-            <div className='col-md-4'>
-                
-            </div>
         </div>
     );
 }
