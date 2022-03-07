@@ -412,12 +412,7 @@ const Listpurchaserequest = (props) => {
                                         </TabPane>
                                         <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
                                             { !isEmpty(logger) ? (
-                                                <AuditTrail logger={logger} tableScroll="65vh" displayProp={ selectedPurchaseRequest.purchase_request_number ? "purchase_request_number" : "uuid_last" } />
-                                            ) : <Skeleton active /> }
-                                        </TabPane>
-                                        <TabPane tab="Items Audit Trail" key="items-audit-trail">
-                                            { !isEmpty(loggerItems) ? (
-                                                <AuditTrail logger={loggerItems} tableScroll="65vh" displayProp="item_name" />
+                                                <AuditTrail logger={logger} tableScroll="65vh" hasChild childProp="purchase_request"  displayProp="display_log" />
                                             ) : <Skeleton active /> }
                                         </TabPane>
                                     </Tabs>

@@ -289,7 +289,7 @@ const AttachmentUpload = (props) => {
                             disabled={props.uploadingFiles}
                             loading={props.uploadingFiles}
                         >
-                        Start Upload
+                            { props.uploadingFiles ? "Uploading..." : "Start Upload" }
                         </Button>
                         { props.uploadingFiles ? "" : (
                             <Button

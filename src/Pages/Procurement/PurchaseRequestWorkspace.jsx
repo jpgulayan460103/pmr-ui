@@ -111,7 +111,7 @@ const Pruchaserequestworkspace = (props) => {
             </TabPane>
             <TabPane tab="Audit Trail" key="audit-trail">
                 { !isEmpty(props.selectedPurchaseRequest.audit_trail?.data) ? (
-                    <AuditTrail logger={props.selectedPurchaseRequest.audit_trail?.data} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="purchase_request_number" />
+                    <AuditTrail logger={props.selectedPurchaseRequest.audit_trail?.data} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="display_log" />
                 ) : <Skeleton active />  }
             </TabPane>
         </Tabs>

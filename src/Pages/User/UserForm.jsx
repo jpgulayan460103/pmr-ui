@@ -57,6 +57,10 @@ const UserForm = (props) => {
         .then(res => {
             sessionStorage.setItem('session',JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            props.dispatch({
+                type: "SET_INITIALIZED",
+                data: false
+            });
             history.push("/");
         })
         .catch(err => {

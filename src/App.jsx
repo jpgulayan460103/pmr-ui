@@ -24,6 +24,8 @@ import ApprovedForm from './Pages/Forms/ApprovedForm';
 import DisapprovedForm from './Pages/Forms/DisapprovedForm';
 import Procurement from './Pages/Procurement/Procurement'
 import Quotation from './Pages/Quotation/Quotation';
+import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
+
 
 window.Pusher = require('pusher-js');
 
@@ -117,6 +119,9 @@ const App = (props) => {
           </Route>
           <Route exact path="/users"  >
               <PrivateRoute><Layout><User /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/activity-logs"  >
+              <PrivateRoute><Layout><ActivityLogs /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/login"  >
               <Login />

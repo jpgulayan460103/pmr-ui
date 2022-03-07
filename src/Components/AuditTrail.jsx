@@ -55,7 +55,7 @@ const AuditTrail = ({logger, timelineCss, tableScroll, showSubject, displayProp,
             ) : <span className='mb-2'>&nbsp;</span> }
             { showLoggerDetails ? (
                 <>
-                <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} />
+                    <Table size='small' dataSource={selectedLogger.properties} columns={columns} pagination={false} />
                 </>
             ) : (
                 <div>

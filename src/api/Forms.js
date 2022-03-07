@@ -41,5 +41,8 @@ export default {
   },
   deleteUpload(type, id){
     return axios.delete(`api/forms/uploads/${type}/${id}`);
+  },
+  getLogs(){
+    return axios.get(`api/logger/all`);
   }
 }
