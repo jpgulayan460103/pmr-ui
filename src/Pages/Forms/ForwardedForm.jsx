@@ -292,6 +292,7 @@ const ForwardedForm = (props) => {
                 setErrorMessage({});
                 approve(selectedFormRoute);
                 setModalBudgetForm(false);
+                cancelBudgetForm();
             })
             .catch(err => {
                 setSubmit(false);
@@ -355,6 +356,7 @@ const ForwardedForm = (props) => {
                     setErrorMessage({});
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
+                    cancelProcurementForm();
                 })
                 .catch(err => {
                     setSubmit(false);
@@ -373,6 +375,7 @@ const ForwardedForm = (props) => {
                     setSubmit(false);
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
+                    cancelProcurementForm();
                 })
                 .catch(err => {
                     setSubmit(false);
@@ -458,10 +461,11 @@ const ForwardedForm = (props) => {
             }else{
                 api.Forms.approve(item.id)
                 .then(res => {
+                    let nextRoute = res.data.next_route;
                     notification.success({
                         message: 'Purchase Request is approved.',
                         description:
-                            'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                            `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
                         }
                     );
                     getForm();

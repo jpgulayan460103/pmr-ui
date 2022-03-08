@@ -4,6 +4,7 @@ import { Layout, Menu, Dropdown, Badge } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
 import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
+import api from '../api';
 
 const { Header } = Layout;
 
@@ -60,6 +61,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     }
 
     const userLogout = () => {
+        api.User.logout();
         dispatch({
             type: "SET_INITIAL_STATE",
             data: {}

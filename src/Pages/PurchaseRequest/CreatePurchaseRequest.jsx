@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, DatePicker, Form, notification  } from 'antd';
+import { Button, Input, Select, AutoComplete, DatePicker, Form, notification, Modal  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -37,11 +37,26 @@ const CreatePurchaseRequest = (props) => {
             if(props.formData.end_user_id){
             }else{
                 if(!isEmpty(props.user)){
-                    changeFieldValue(props.user.user_offices[0].office_id, 'end_user_id', false);
+                    let reqBy = "OARDA";
+                    if(props.user.user_offices[0].office.parent.title === "OARDA" || props.user.user_offices[0].office.parent.title === "OARDO"){
+                        reqBy = props.user.user_offices[0].office.parent.title;
+                    }
+                    props.dispatch({
+                        type: "SET_PURCHASE_REQUEST_FORM_DATA",
+                        data: {
+                            ...props.formData,
+                            end_user_id: props.user.user_offices[0].office_id,
+                            requestedBy: reqBy
+                        }
+                    });
                 }
             }
             if(isEmpty(props.requestedBySignatory)){
-                setSignatory("OARDA",'requestedBy');
+                let reqBy = "OARDA";
+                if(props.user.user_offices[0].office.parent.title === "OARDA" || props.user.user_offices[0].office.parent.title === "OARDO"){
+                    reqBy = props.user.user_offices[0].office.parent.title;
+                }
+                setSignatory(reqBy,'requestedBy');
             }
             if(isEmpty(props.approvedBySignatory)){
                 setSignatory("ORD", 'approvedBy');
@@ -100,7 +115,7 @@ const CreatePurchaseRequest = (props) => {
             notification.success({
                 message: 'Purchase Request is successfully saved.',
                 description:
-                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    'Please wait for approval from your unit/section head.',
                 }
             );
 
@@ -112,6 +127,28 @@ const CreatePurchaseRequest = (props) => {
                 type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
                 data: err.response.data.errors
             });
+
+            if(err.response.data.errors.items){
+                Modal.error({
+                    title: 'Purchase Request creation failed',
+                    content: (
+                      <div>
+                        <p>Please add items on the purchase request.</p>
+                      </div>
+                    ),
+                    onOk() {},
+                  });
+            }else{
+                Modal.error({
+                    title: 'Purchase Request creation failed',
+                    content: (
+                      <div>
+                        <p>Please review the form before saving.</p>
+                      </div>
+                    ),
+                    onOk() {},
+                  });
+            }
         })
         .then(res => {})
         ;
@@ -504,9 +541,9 @@ const CreatePurchaseRequest = (props) => {
             <div className='text-center'>
                 
                 <br />
-                <p style={{color: "red"}}>
+                {/* <p style={{color: "red"}}>
                     { helpers.displayError(props.formErrors,'items')?.help }
-                </p>
+                </p> */}
                 <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined /> Save</Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />Cancel</Button>
