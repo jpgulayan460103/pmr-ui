@@ -114,7 +114,7 @@ const Listpurchaserequest = (props) => {
         setLoggerItems([]);
         await loadPurchaseRequestData(item.id);
         await loadAuditTrail(item.id);
-        await loadItemsAuditTrail(item.id);
+        // await loadItemsAuditTrail(item.id);
     }
 
     const loadPurchaseRequestData = async (id) => {
@@ -238,6 +238,14 @@ const Listpurchaserequest = (props) => {
     }
       
     const columns = [
+        {
+            title: 'PR Number',
+            dataIndex: 'purchase_request_number',
+            key: 'purchase_request_number',
+            width: 450,
+            ...filter.search('purchase_request_number','text', setFilterData, filterData, getPurchaseRequests),
+            ...onCell
+        },
         {
             title: 'Title',
             dataIndex: 'title',

@@ -286,18 +286,18 @@ const DisapprovedForm = (props) => {
                         )}>
                             <div className='forms-card-content'>
                                 <p>
-                                    <span><b>Form type:</b> <i>{selectedFormRoute.route_type_str}</i></span><br />
-                                    <span><b>Title:</b> <i>{selectedFormRoute.form_routable?.title}</i></span><br />
-                                    <span><b>End User:</b> <i>{selectedFormRoute.end_user.name}</i></span><br />
-                                    <span><b>Purpose:</b> <i>{selectedFormRoute.form_routable?.purpose}</i></span><br />
-                                    <span><b>Amount:</b> <i>{selectedFormRoute.form_routable?.total_cost_formatted}</i></span><br />
-                                    <span><b>Forwarded by:</b> <i>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</i></span><br />
-                                    <span><b>Forwarded to:</b> <i>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</i></span><br />
-                                    <span><b>Description:</b> <i>{selectedFormRoute.remarks}</i><br /></span>
-                                    <span><b>Remarks:</b> <i>{selectedFormRoute.forwarded_remarks}</i><br /></span>
+                                    <span><b>Form type:</b> <span>{selectedFormRoute.route_type_str}</span></span><br />
+                                    <span><b>Title:</b> <span>{selectedFormRoute.form_routable?.title}</span></span><br />
+                                    <span><b>End User:</b> <span>{selectedFormRoute.end_user.name}</span></span><br />
+                                    <span><b>Purpose:</b> <span>{selectedFormRoute.form_routable?.purpose}</span></span><br />
+                                    <span><b>Amount:</b> <span>{selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
+                                    <span><b>Forwarded by:</b> <span>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</span></span><br />
+                                    <span><b>Forwarded to:</b> <span>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</span></span><br />
+                                    <span><b>Description:</b> <span>{selectedFormRoute.remarks}</span><br /></span>
+                                    <span><b>Remarks:</b> <span>{selectedFormRoute.forwarded_remarks}</span><br /></span>
                                     <br />
-                                    <span><b>Status:</b> <i>{ selectedFormRoute.status }</i></span><br />
-                                    <span><b>Action Taken:</b> <i>{ selectedFormRoute.action_taken }</i></span><br />
+                                    <span><b>Status:</b> <span>{ selectedFormRoute.status }</span></span><br />
+                                    <span><b>Action Taken:</b> <span>{ selectedFormRoute.action_taken }</span></span><br />
                                 </p>
                                 
                             </div>

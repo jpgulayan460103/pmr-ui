@@ -15,7 +15,7 @@ import api from '../../api';
 
 function mapStateToProps(state) {
     return {
-        
+        isInitialized: state.user.isInitialized
     };
 }
 
@@ -27,10 +27,12 @@ const ActivityLogs = (props) => {
     const [paginationMeta, setPaginationMeta] = useState([]);
     const [loading, setLoading] = useState(false);
 
-
     useEffect(() => {
-        getLogs();
-    }, []);
+        document.title = "List of Purchase Request";
+        if(props.isInitialized){
+            getLogs();
+        }
+    }, [props.isInitialized]);
 
     const getLogs = debounce((filters) => {
         if(filters == null){
@@ -189,7 +191,7 @@ const ActivityLogs = (props) => {
                                     onChange={paginationChange}
                                     showQuickJumper
                                     size="small"
-                                    // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                    showSizeChanger={false}
                                 />
                             </div>
                         </div>

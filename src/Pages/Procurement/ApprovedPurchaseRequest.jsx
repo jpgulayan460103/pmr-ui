@@ -691,8 +691,8 @@ const ApprovedPurchaseRequest = (props) => {
                     pageSize={props.purchaseRequestsPagination?.per_page || 1}
                     onChange={paginationChange}
                     showQuickJumper
+                    showSizeChanger={false}
                     size="small"
-                    onShowSizeChange={(current, size) => changePageSize(current, size)}
                 />
             </div>
         </>
