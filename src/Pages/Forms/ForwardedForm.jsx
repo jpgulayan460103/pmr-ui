@@ -416,8 +416,8 @@ const ForwardedForm = (props) => {
         setSelectedFormRoute(item);
         let current_route = item.form_process.form_routes.filter(i => i.status == "pending");
 
-        let procurement_user_office = props.user.user_offices.filter(i => i.office.title == "PS");
-        let budget_user_office = props.user.user_offices.filter(i => i.office.title == "BS");
+        let procurement_user_office = props.user.user_offices.data.filter(i => i.office.title == "PS");
+        let budget_user_office = props.user.user_offices.data.filter(i => i.office.title == "BS");
         setCurrentRoute(current_route[0]);
         if(procurement_user_office.length != 0){
             if(current_route[0].description_code == "select_action" || current_route[0].description_code == "aprroval_from_proc"){

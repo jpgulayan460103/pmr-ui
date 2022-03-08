@@ -76,7 +76,7 @@ const User = (props) => {
                     { editType=="permissions" ?  (
                         <Card size="small" title="Edit Permissions" bordered={false}  >
                             <div className='user-card-content'>
-                                <UserPermissions />
+                                <UserPermissions user={selectedUser} />
                             </div>
                         </Card>
                     ) : "" }
