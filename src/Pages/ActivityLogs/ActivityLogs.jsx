@@ -21,21 +21,44 @@ function mapStateToProps(state) {
 
 
 const ActivityLogs = (props) => {
+    const [filterData, setFilterData] = useState({});
+    const [selectedLogger, setSelectedLogger] = useState(null);
+    const [activityLogs, setActivityLogs] = useState([]);
+    const [paginationMeta, setPaginationMeta] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+
     useEffect(() => {
         getLogs();
     }, []);
 
-    const getLogs = () => {
-        api.Forms.getLogs()
+    const getLogs = debounce((filters) => {
+        if(filters == null){
+            filters = filterData
+        }
+        setLoading(true);
+        api.Forms.getLogs(filters)
         .then(res => {
-            setActivityLogs(res.data.data);
+            setLoading(false);
+            let data = res.data.data;
+            let meta = res.data.meta;
+            setActivityLogs(data);
+            setPaginationMeta(meta.pagination);
         })
-        .catch(res => {})
-        .then(res => {})
+        .catch(res => {
+            setLoading(false);
+        })
+        .then(res => {
+            setLoading(false);
+        })
         ;
+    }, 150)
+
+    const paginationChange = async (e) => {
+        setFilterData(prev => ({...prev, page: e}));
+        getLogs({...filterData, page: e})
     }
-    const [selectedLogger, setSelectedLogger] = useState(null);
-    const [activityLogs, setActivityLogs] = useState([]);
+
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -144,31 +167,31 @@ const ActivityLogs = (props) => {
                 <Col xs={24} sm={24} md={16} lg={14} xl={14}>
                     <Card size="small" title="Activity Logs" bordered={false}  >
                         <div className='forms-card-content'>
-                        <Table
-                            dataSource={logsDataSource}
-                            columns={logsColumns}
-                            size={"small"}
-                            // loading={{spinning: props.tableLoading, tip: "Loading..."}}
-                            pagination={false}
-                            // onChange={handleTableChange}
-                            scroll={{ y: "50vh" }}
-                            rowClassName={(record, index) => {
-                                if(selectedLogger?.id == record.id){
-                                    return "selected-row";
-                                }
-                            }}
-                        />
-                        <div className="flex justify-end mt-2">
-                        <Pagination
-                                current={props.purchaseRequestsPagination?.current_page || 1}
-                                total={props.purchaseRequestsPagination?.total || 1}
-                                pageSize={props.purchaseRequestsPagination?.per_page || 1}
-                                // onChange={paginationChange}
-                                showQuickJumper
-                                size="small"
-                                // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                            <Table
+                                dataSource={logsDataSource}
+                                columns={logsColumns}
+                                size={"small"}
+                                loading={{spinning: loading, tip: "Loading..."}}
+                                pagination={false}
+                                // onChange={handleTableChange}
+                                scroll={{ y: "50vh" }}
+                                rowClassName={(record, index) => {
+                                    if(selectedLogger?.id == record.id){
+                                        return "selected-row";
+                                    }
+                                }}
                             />
-                        </div>
+                            <div className="flex justify-end mt-2">
+                                <Pagination
+                                    current={paginationMeta?.current_page || 1}
+                                    total={paginationMeta?.total || 1}
+                                    pageSize={paginationMeta?.per_page || 1}
+                                    onChange={paginationChange}
+                                    showQuickJumper
+                                    size="small"
+                                    // onShowSizeChange={(current, size) => changePageSize(current, size)}
+                                />
+                            </div>
                         </div>
                     </Card>
                 </Col>
@@ -178,8 +201,8 @@ const ActivityLogs = (props) => {
                             <div>
                                 <p>
                                     <b>Action Taken:</b> <span>{ selectedLogger?.description_str }</span><br />
-                                    <b>Subject:</b> <span>{ selectedLogger?.subject?.parent ? selectedLogger?.subject?.parent?.display_log : selectedLogger?.subject?.display_log }</span><br />
-                                    <b>Content:</b> <span>{ selectedLogger?.subject?.parent ? selectedLogger?.subject?.display_log : "" }</span><br />
+                                    <b>Subject:</b> <span>{ ( selectedLogger?.subject?.parent ) ? selectedLogger?.subject?.parent?.display_log : selectedLogger?.subject?.display_log }</span><br />
+                                    <b>Content:</b> <span>{ ( selectedLogger?.subject?.parent ) ? selectedLogger?.subject?.display_log : "" }</span><br />
                                     <b>User:</b> <span>{ selectedLogger?.user.user_information.fullname }</span><br />
                                     <b>Date and Time:</b> <span>{selectedLogger?.created_at}</span><br />
                                 </p>
