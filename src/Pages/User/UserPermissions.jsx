@@ -7,186 +7,186 @@ const UserPermissions = (props) => {
 
     const treeData = [
         {
-          title: 'Users',
+          title: 'Users Module',
           key: 'users.all',
           children: [
             {
-              title: 'users.delete',
-              key: 'users.delete',
+              title: 'Permission to view the list of users.',
+              key: 'users.view',
             },
             {
-              title: 'users.permission.update',
-              key: 'users.permission.update',
-            },
-            {
-              title: 'users.permission.view',
-              key: 'users.permission.view',
-            },
-            {
-              title: 'users.update',
+              title: 'Permission to update a user.',
               key: 'users.update',
             },
             {
-              title: 'users.view',
-              key: 'users.view',
+              title: 'Permission to view the list of permissions of a user.',
+              key: 'users.permission.view',
+            },
+            {
+              title: 'Permission to update permissions a user.',
+              key: 'users.permission.update',
+            },
+            {
+              title: 'Permission to delete a user.',
+              key: 'users.delete',
             },
           ],
         },
         {
-            title: 'Purchase Requests',
+            title: 'Purchase Requests Module',
             key: 'purchase.requests.all',
             children: [
               {
-                title: 'purchase.requests.approve',
+                title: 'Permission to view the list of purchase requests.',
+                key: 'purchase.requests.view',
+              },
+              {
+                title: 'Permission to finalize and approve the created purchase request.',
                 key: 'purchase.requests.approve',
               },
               {
-                title: 'purchase.requests.attachments.create',
-                key: 'purchase.requests.attachments.create',
-              },
-              {
-                title: 'purchase.requests.attachments.delete',
-                key: 'purchase.requests.attachments.delete',
-              },
-              {
-                title: 'purchase.requests.attachments.view',
-                key: 'purchase.requests.attachments.view',
-              },
-              {
-                title: 'purchase.requests.create',
+                title: 'Permission to create a purchase request.',
                 key: 'purchase.requests.create',
               },
               {
-                title: 'purchase.requests.delete',
-                key: 'purchase.requests.delete',
-              },
-              {
-                title: 'purchase.requests.update',
+                title: 'Permission to update a purchase request.',
                 key: 'purchase.requests.update',
               },
               {
-                title: 'purchase.requests.view',
-                key: 'purchase.requests.view',
+                title: 'Permission to delete a purchase request.',
+                key: 'purchase.requests.delete',
+              },
+              {
+                title: 'Permission to view the list of purchase request.',
+                key: 'purchase.requests.attachments.view',
+              },
+              {
+                title: 'Permission to add attachments to a purchase request.',
+                key: 'purchase.requests.attachments.create',
+              },
+              {
+                title: 'Permission to remove attachments to a purchase request.',
+                key: 'purchase.requests.attachments.delete',
               },
             ],
           },
           {
-            title: 'Procurement',
+            title: 'Procurement Module',
             key: 'procurement.all',
             children: [
               {
-                title: 'procurement.attachment.create',
-                key: 'procurement.attachment.create',
+                title: 'Permission to view procument module.',
+                key: 'procurement.view',
               },
               {
-                title: 'procurement.attachment.delete',
-                key: 'procurement.attachment.delete',
-              },
-              {
-                title: 'procurement.attachment.view',
+                title: 'Permission to view the list of purchase request in the procurement module.',
                 key: 'procurement.attachment.view',
               },
               {
-                title: 'procurement.view',
-                key: 'procurement.view',
+                title: 'Permission to add attachments to a purchase request in the procurement module.',
+                key: 'procurement.attachment.create',
+              },
+              {
+                title: 'Permission to remove attachments to a purchase request in the procurement module.',
+                key: 'procurement.attachment.delete',
               },
             ],
           },
 
           {
-            title: 'Activity Logs',
+            title: 'Activity Logs Module',
             key: 'activitylogs.all',
             children: [
               {
-                title: 'activitylogs.view',
+                title: 'Permission to view activity logs of the users.',
                 key: 'activitylogs.view',
               },
             ],
           },
 
           {
-            title: 'Approved Forms',
+            title: 'Approved Forms Module',
             key: 'form.routing.approved.all',
             children: [
               {
-                title: 'form.routing.approved.update',
-                key: 'form.routing.approved.update',
+                title: 'Permission to view the list of approved forms.',
+                key: 'form.routing.approved.view',
               },
               {
-                title: 'form.routing.approved.view',
-                key: 'form.routing.approved.view',
+                title: 'Permission to update approved forms.',
+                key: 'form.routing.approved.update',
               },
             ],
           },
 
           {
-            title: 'Disapproved Forms',
+            title: 'Disapproved Forms Module',
             key: 'form.routing.disapproved.all',
             children: [
               {
-                title: 'form.routing.disapproved.view',
+                title: 'Permission to view the list of disapproved forms.',
                 key: 'form.routing.disapproved.view',
               },
             ],
           },
 
           {
-            title: 'Approved Forms',
+            title: 'Forwarded Forms Module',
             key: 'form.routing.pending.all',
             children: [
               {
-                title: 'form.routing.pending.approve',
+                title: 'Permission to view the list of forwarded forms.',
+                key: 'form.routing.pending.view',
+              },
+              {
+                title: 'Permission to approve forwarded forms.',
                 key: 'form.routing.pending.approve',
               },
               {
-                title: 'form.routing.pending.attachment.create',
-                key: 'form.routing.pending.attachment.create',
-              },
-              {
-                title: 'form.routing.pending.attachment.delete',
-                key: 'form.routing.pending.attachment.delete',
-              },
-              {
-                title: 'form.routing.pending.attachment.view',
-                key: 'form.routing.pending.attachment.view',
-              },
-              {
-                title: 'form.routing.pending.disapprove',
+                title: 'Permission to disapprove the forwarded form.',
                 key: 'form.routing.pending.disapprove',
               },
               {
-                title: 'form.routing.pending.view',
-                key: 'form.routing.pending.view',
+                title: 'Permission to view the attachments of the forwarded form.',
+                key: 'form.routing.pending.attachment.view',
+              },
+              {
+                title: 'Permission to add attachments to the forwarded form.',
+                key: 'form.routing.pending.attachment.create',
+              },
+              {
+                title: 'Permission to remove attachments to the forwarded form.',
+                key: 'form.routing.pending.attachment.delete',
               },
             ],
           },
 
           {
-            title: 'Libraries',
+            title: 'Libraries Module',
             key: 'libraries.all',
             children: [
               {
-                title: 'libraries.items.categories.view',
+                title: 'Permission to view the list of item categories.',
                 key: 'libraries.items.categories.view',
               },
               {
-                title: 'libraries.items.view',
+                title: 'Permission to view the list of items.',
                 key: 'libraries.items.view',
               },
               {
-                title: 'libraries.office.divisions.view',
+                title: 'Permission to view the list of office divisions.',
                 key: 'libraries.office.divisions.view',
               },
               {
-                title: 'libraries.office.sections.view',
+                title: 'Permission to view the list of office sections.',
                 key: 'libraries.office.sections.view',
               },
               {
-                title: 'libraries.signatories.administrators.view',
+                title: 'Permission to view the list of administrators signatories',
                 key: 'libraries.signatories.administrators.view',
               },
               {
-                title: 'libraries.uom.view',
+                title: 'Permission to view the list of unit of measures.',
                 key: 'libraries.uom.view',
               },
             ],
