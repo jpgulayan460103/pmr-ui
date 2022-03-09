@@ -123,31 +123,33 @@ const CreatePurchaseRequest = (props) => {
         })
         .catch(err => {
             setSubmit(false);
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
-                data: err.response.data.errors
-            });
-
-            if(err.response.data.errors.items){
-                Modal.error({
-                    title: 'Purchase Request creation failed',
-                    content: (
-                      <div>
-                        <p>Please add items on the purchase request.</p>
-                      </div>
-                    ),
-                    onOk() {},
-                  });
-            }else{
-                Modal.error({
-                    title: 'Purchase Request creation failed',
-                    content: (
-                      <div>
-                        <p>Please review the form before saving.</p>
-                      </div>
-                    ),
-                    onOk() {},
-                  });
+            if(err.response.status == "422"){
+                props.dispatch({
+                    type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                    data: err.response.data.errors
+                });
+    
+                if(err.response.data.errors.items){
+                    Modal.error({
+                        title: 'Purchase Request creation failed',
+                        content: (
+                          <div>
+                            <p>Please add items on the purchase request.</p>
+                          </div>
+                        ),
+                        onOk() {},
+                      });
+                }else{
+                    Modal.error({
+                        title: 'Purchase Request creation failed',
+                        content: (
+                          <div>
+                            <p>Please review the form before saving.</p>
+                          </div>
+                        ),
+                        onOk() {},
+                      });
+                }
             }
         })
         .then(res => {})

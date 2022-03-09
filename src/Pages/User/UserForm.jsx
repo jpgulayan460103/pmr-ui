@@ -236,7 +236,7 @@ const UserForm = (props) => {
                         Update
                         </Button>
                         &nbsp;&nbsp;&nbsp;
-                        <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
+                        <Button type="danger" onClick={() => {}  }>
                         Cancel
                         </Button>
                     </Form.Item>

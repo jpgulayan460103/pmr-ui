@@ -125,11 +125,11 @@ const AttachmentUpload = (props) => {
             type: "SET_UPLOADING_FILES",
             data: false,
         });
-        notification.success({
-            message: 'Done',
-            description:
-              'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-          });
+        // notification.success({
+        //     message: 'Done',
+        //     description:
+        //       'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+        // });
     }
 
     const uploadProgress = (progressEvent, index) => {
