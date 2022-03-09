@@ -15,6 +15,7 @@ const { SubMenu } = Menu;
 function mapStateToProps(state) {
     return {
         purchaseRequestFormType: state.purchaseRequest.formType,
+        user: state.user.data,
     };
 }
 
@@ -63,10 +64,12 @@ const Sidemenu = (props) => {
                     Home
                 </Menu.Item>
                 <SubMenu key="submenu-procurement" icon={<Icon component={ProcurementSvg} />} title="Procurement">
-                    <Menu.Item key="/procurement">
-                        <Link to="/procurement"></Link>
-                        Procurement
-                    </Menu.Item>
+                    { props.user?.permissions?.data?.filter(i => i.name == "procurement.view").length != 0 ? (
+                        <Menu.Item key="/procurement">
+                            <Link to="/procurement"></Link>
+                            Procurement
+                        </Menu.Item>
+                    ) : "" }
                     <SubMenu key="submenu-quotation" title="Quotations">
                         <Menu.Item key="/procurement/quotations/form">
                             <Link to="/procurement/quotations/form"></Link>
@@ -83,58 +86,82 @@ const Sidemenu = (props) => {
                     </SubMenu>
                 </SubMenu>
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
-                    <Menu.Item key="/forms/requests">
-                        <Link to="/forms/requests"></Link>
-                        Forwarded Forms
-                    </Menu.Item>
-                    <Menu.Item key="/forms/approved">
-                        <Link to="/forms/approved"></Link>
-                        Approved Forms
-                    </Menu.Item>
-                    <Menu.Item key="/forms/disapproved">
-                        <Link to="/forms/disapproved"></Link>
-                        Disapproved Forms
-                    </Menu.Item>
+                    { props.user?.permissions?.data?.filter(i => i.name == "form.routing.pending.view").length != 0 ? (
+                        <Menu.Item key="/forms/requests">
+                            <Link to="/forms/requests"></Link>
+                            Forwarded Forms
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "form.routing.approved.view").length != 0 ? (
+                        <Menu.Item key="/forms/approved">
+                            <Link to="/forms/approved"></Link>
+                            Approved Forms
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "form.routing.disapproved.view").length != 0 ? (
+                        <Menu.Item key="/forms/disapproved">
+                            <Link to="/forms/disapproved"></Link>
+                            Disapproved Forms
+                        </Menu.Item>
+                    ) : "" }
                 </SubMenu>
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">
-                    <Menu.Item key="/purchase-requests/form">
-                        <Link to="/purchase-requests/form"></Link>
-                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
-                    </Menu.Item>
-                    <Menu.Item key="/purchase-requests">
-                        <Link to="/purchase-requests"></Link>
-                        View Purchase Requests
-                    </Menu.Item>
+                    { props.user?.permissions?.data?.filter(i => i.name == "purchase.requests.create" || i.name == "purchase.requests.update").length != 0 ? (
+                        <Menu.Item key="/purchase-requests/form">
+                            <Link to="/purchase-requests/form"></Link>
+                            { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "purchase.requests.view").length != 0 ? (
+                        <Menu.Item key="/purchase-requests">
+                            <Link to="/purchase-requests"></Link>
+                            View Purchase Requests
+                        </Menu.Item>
+                    ) : "" }
                 </SubMenu>
-                <Menu.Item key="/users" icon={<UserOutlined />}>
-                    <Link to="/users"></Link>
-                    Users
-                </Menu.Item>
-                <Menu.Item key="/activity-logs"  icon={<Icon component={LogsSvg} />}>
-                    <Link to="/activity-logs"></Link>
-                    Activity Logs
-                </Menu.Item>
+                { props.user?.permissions?.data?.filter(i => i.name == "users.view").length != 0 ? (
+                    <Menu.Item key="/users" icon={<UserOutlined />}>
+                        <Link to="/users"></Link>
+                        Users
+                    </Menu.Item>
+                ) : "" }
+                { props.user?.permissions?.data?.filter(i => i.name == "activitylogs.view").length != 0 ? (
+                    <Menu.Item key="/activity-logs"  icon={<Icon component={LogsSvg} />}>
+                        <Link to="/activity-logs"></Link>
+                        Activity Logs
+                    </Menu.Item>
+                ) : "" }
                 <SubMenu key="submenu-libraries" icon={<Icon component={LibrarySvg} />} title="Libraries">
-                    <Menu.Item key="/libraries/items">
-                        <Link to="/libraries/items"></Link>
-                        Items
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/items/categories">
-                        <Link to="/libraries/items/categories"></Link>
-                        Item Categories
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/items/measures">
-                        <Link to="/libraries/items/measures"></Link>
-                        Unit of Measures
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/offices/divisions">
-                        <Link to="/libraries/offices/divisions"></Link>
-                        Office Divisions
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/offices/sections">
-                        <Link to="/libraries/offices/sections"></Link>
-                        Office Sections
-                    </Menu.Item>
+                    { props.user?.permissions?.data?.filter(i => i.name == "libraries.items.view").length != 0 ? (
+                        <Menu.Item key="/libraries/items">
+                            <Link to="/libraries/items"></Link>
+                            Items
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "libraries.categories.view").length != 0 ? (
+                        <Menu.Item key="/libraries/items/categories">
+                            <Link to="/libraries/items/categories"></Link>
+                            Item Categories
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "libraries.uom.view").length != 0 ? (
+                        <Menu.Item key="/libraries/items/measures">
+                            <Link to="/libraries/items/measures"></Link>
+                            Unit of Measures
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "libraries.office.divisions.view").length != 0 ? (
+                        <Menu.Item key="/libraries/offices/divisions">
+                            <Link to="/libraries/offices/divisions"></Link>
+                            Office Divisions
+                        </Menu.Item>
+                    ) : "" }
+                    { props.user?.permissions?.data?.filter(i => i.name == "libraries.sections.view").length != 0 ? (
+                        <Menu.Item key="/libraries/offices/sections">
+                            <Link to="/libraries/offices/sections"></Link>
+                            Office Sections
+                        </Menu.Item>
+                    ) : "" }
                 </SubMenu>
                 <SubMenu key="submenu-user_offices" icon={<Icon component={SignatureSvg} />} title="UserOffice">
                     <Menu.Item key="/libraries/user_offices/administrators">
