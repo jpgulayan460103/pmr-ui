@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, DatePicker, Form, notification, Modal  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -30,6 +30,7 @@ function mapStateToProps(state) {
 
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
+const { Title } = Typography;
 
 const CreatePurchaseRequest = (props) => {
     useEffect(() => {
@@ -324,223 +325,226 @@ const CreatePurchaseRequest = (props) => {
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
             {/* <p className="text-right ...">Appendix 60</p> */}
-            <p className="text-center ..."><b>PURCHASE REQUEST</b></p>
-            <Form>
-            <table id="pr-table" style={style}>
-                <thead>
-                    {/* <tr>
-                        <td colSpan={3}><b>Entity Name:</b><br />
-                        Department of Social Welfare and Development Field Office XI
-                        <Input placeholder="Type here..." value="Department of Social Welfare and Development Field Office XI" disabled />
-                        </td>
-                        <td colSpan={3}><b>Fund Cluster:</b>
-                        <Input placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'fund_cluster')} value={props.formData.fund_cluster} disabled />
-                        </td>
-                        <td></td>
-                    </tr> */}
-                    <tr>
-                        <td colSpan={2}>
-                            <b>Office/Section:</b><br />
-                            { props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name }
-                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `end_user_id`) }>
+            {/* <p className="text-center ..."><b>PURCHASE REQUEST</b></p> */}
+            <Title className='text-center' level={3}>PURCHASE REQUEST</Title>
+            <Form layout='vertical'>
+            <Row gutter={[8, 8]}>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Office/Section">
+                        <Input placeholder="input placeholder" readOnly value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                    </Form.Item>
+                </Col>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) }>
+                            <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
+                        </Form.Item>
+                </Col>
 
-                                <Select
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Date">
+                        <Input placeholder="input placeholder" readOnly value={moment().format('MM/DD/YYYY')} />
+                    </Form.Item>
+                </Col>
+            </Row>
+            <Row gutter={[8, 8]} className="pr-items-header">
+                <Col xs={24} sm={24} md={4} lg={4} xl={4}>
+                    <div className='text-center'>
+                        <b>Stock/ Property No.</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-center'>
+                        <b>Unit</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <div className='text-center'>
+                        <b>Item Description</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                    <div className='text-center'>
+                        <b>Quantity</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-center'>
+                        <b>Unit Cost</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-center'>
+                        <b>Total Cost</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={1} lg={1} xl={1}>
+                    <div  className='text-right'>
+                        <Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button>
+                    </div>
+                </Col>
+            </Row>
+            { isEmpty(props.formData.items) && (
+                <Row gutter={[8, 8]} className="pr-items-row">
+                    <Col span={24}>
+                        <div className='text-center mb-3'>
+                            Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button> button to add item.
+                        </div>
+                    </Col>
+                </Row>
+            ) }
+            {
+                props.formData.items.map((item, index) => (
+                    <Row gutter={[8, 8]}  key={item.key} className="pr-items-row">
+                        <Col xs={24} sm={24} md={4} lg={4} xl={4}>
+                            <div className='text-center'>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_code`) }>
+                                { item.item_code }
+                                {/* <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled /> */}
+                            </Form.Item>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div className='text-center'>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
+                                { item.is_ppmp ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                     showSearch
-                                    value={props.formData.end_user_id}
-                                    placeholder="Section/Unit/Office"
+                                    value={item.unit_of_measure_id}
+                                    placeholder="Select a Unit"
                                     optionFilterProp="children"
-                                    onChange={(e) => changeFieldValue(e, 'end_user_id', false)}
+                                    onChange={(e) => selectUnit(e, index)}
                                     style={{ width: "100%" }}
+                                    // disabled={  }/*  */
                                     filterOption={(input, option) =>
-                                        option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
-                                    disabled
                                 >
-                                    { props.user_divisions.map(division =>  {
-                                        return (
-                                            <OptGroup label={division.name}  key={division.id}>
-                                                { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
-                                                    return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
-                                                }) }
-                                            </OptGroup>
-                                        );
-                                    }) }
-                                </Select>
-                            </Form.Item> */}
-                        </td>
-                        <td colSpan={2}>
-                            <b>Title:</b>
-                            <Form.Item { ...helpers.displayError(props.formErrors, `title`) }>
-                                <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
+                                    { props.unit_of_measures.map((option, index) => (
+                                        <Option value={option.id} key={option.id}>{option.name}</Option>
+                                    )) }
+                                </Select>) }
                             </Form.Item>
-                            {/* <b>PR No.:</b> */}
-                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `purchase_request_number`) }> */}
-                                {/* <Input disabled placeholder="Type here..." onChange={(e) => changeFieldValue(e, 'purchase_request_number')} value={props.formData.purchase_request_number} /> */}
-                            {/* </Form.Item> */}
-                        </td>
-                        <td colSpan={2}>
-                        <b>Date:</b><br />
-                            { moment().format('MM/DD/YYYY') }
-                        {/* <Form.Item { ...helpers.displayError(props.formErrors, `pr_date`) }> */}
-                            {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
-                        {/* </Form.Item> */}
-                        </td>
-                        <td></td>
-                    </tr>
-                    {/* <tr> */}
-                        {/* <td colSpan={2}></td> */}
-                        {/* <td colSpan={2}><b>Responsibility Center Code:</b> */}
-                            {/* <Form.Item { ...helpers.displayError(props.formErrors, `center_code`) }> */}
-                                {/* <Input disabled placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'center_code')} value={props.formData.center_code} /> */}
-                            {/* </Form.Item> */}
-                        {/* </td> */}
-                        {/* <td colSpan={2}> */}
-                            {/* <b>Date:</b><br /> */}
-                            {/* { moment().format('MM/DD/YYYY') } */}
-                        {/* <Form.Item { ...helpers.displayError(props.formErrors, `pr_date`) }> */}
-                            {/* <DatePicker disabled defaultValue={dayjs(props.formData.pr_date, 'YYYY-MM-DD')} format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e, dateString) => changeFieldValue(dateString, 'pr_date', false)} /> */}
-                        {/* </Form.Item> */}
-                        {/* </td> */}
-                        {/* <td></td> */}
-                    {/* </tr> */}
-                    <tr>
-                        <td className='text-center'><b>Stock/ Property No.</b></td>
-                        <td className='text-center' style={{ width: 120}}><b>Unit</b></td>
-                        <td className='text-center' style={{ width: "40%"}}><b>Item Description</b></td>
-                        <td className='text-center'><b>Quantity</b></td>
-                        <td className='text-center'><b>Unit Cost</b></td>
-                        <td className='text-center'><b>Total Cost</b></td>
-                        <td><Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        props.formData.items.map((item, index) => (
-                            <tr key={item.key}>
-                                <td className='text-center'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_code`) }>
-                                        { item.item_code }
-                                        {/* <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled /> */}
-                                    </Form.Item>
-                                </td>
-                                <td className='text-center'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
-                                        { item.is_ppmp ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
-                                            showSearch
-                                            value={item.unit_of_measure_id}
-                                            placeholder="Select a Unit"
-                                            optionFilterProp="children"
-                                            onChange={(e) => selectUnit(e, index)}
-                                            style={{ width: "100%" }}
-                                            // disabled={  }/*  */
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                            }
-                                        >
-                                            { props.unit_of_measures.map((option, index) => (
-                                                <Option value={option.id} key={option.id}>{option.name}</Option>
-                                            )) }
-                                        </Select>) }
-                                    </Form.Item>
-                                </td>
-                                <td>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
-                                        { item.is_ppmp ? item.item_name : (
-                                            <AutoComplete
-                                                style={{ width: "100%" }}
-                                                allowClear
-                                                options={props.items}
-                                                onSelect={(val, item) => selectItem(val, item, index)}
-                                                placeholder="Type here..."
-                                                filterOption={(input, option) =>
-                                                    option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                                }
-                                                onChange={(e) => {
-                                                    changeTableFieldValue(e, {}, 'item_name', index);
-                                                }}
-                                                value={item.item_name}
-                                            >
-                                                <TextArea autoSize />
-                                            </AutoComplete>
-                                        ) }
-                                    </Form.Item>
-                                    {/* <Input placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } value={item.description} /> */}
-                                </td>
-                                <td className='text-center'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
-                                        <Input type="number" min={1} autoComplete='off' style={{ width: 100 }} placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
-                                    </Form.Item>
-                                    </td>
-                                <td className='text-right'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
-                                        <Input type="number" autoComplete='off' style={{ width: 150 }} step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
-                                    </Form.Item>
-                                </td>
-                                <td className='text-right'>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format( (item.unit_cost * item.quantity) ) }</td>
-                                <td className='text-right'><Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button></td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td className='text-center'><b>Total</b></td>
-                        <td></td>
-                        <td></td>
-                        <td className='text-right'> { new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(  total_cost() )}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colSpan={7}><b>Purpose:</b>
-                            <Form.Item { ...helpers.displayError(props.formErrors, `purpose`) }>
-                                <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
-                                {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                            <div>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
+                                { item.is_ppmp ? item.item_name : (
+                                    <AutoComplete
+                                        style={{ width: "100%" }}
+                                        allowClear
+                                        options={props.items}
+                                        onSelect={(val, item) => selectItem(val, item, index)}
+                                        placeholder="Type here..."
+                                        filterOption={(input, option) =>
+                                            option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                        onChange={(e) => {
+                                            changeTableFieldValue(e, {}, 'item_name', index);
+                                        }}
+                                        value={item.item_name}
+                                    >
+                                        <TextArea autoSize />
+                                    </AutoComplete>
+                                ) }
                             </Form.Item>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2} style={{borderBottom: 0}}><br /><br /></td>
-                        <td style={{borderBottom: 0}}>Requested By:
-                        <Form.Item { ...helpers.displayError(props.formErrors, `requested_by_id`) }>
-                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
-                                { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
-                            </Select>
-                        </Form.Item>
-                        <br /><br />&nbsp;</td>
-                        <td colSpan={4} style={{borderBottom: 0}}>Approved by:
-                        <Form.Item { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
-                            <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
-                                { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
-                            </Select>
-                        </Form.Item>
-                        <br /><br />&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2} style={{borderTop: 0, borderBottom: 0}}>Printed Name:</td>
-                        <td style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.requestedBySignatory?.name }
-                        </td>
-                        <td colSpan={4} style={{fontWeight: "bold",textAlign: "center",borderTop: 0, borderBottom: 0}}>
-                            { props.approvedBySignatory?.name }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2} style={{borderTop: 0}}>Designation:</td>
-                        <td style={{ textAlign: "center", borderTop: 0}}>
-                            {/* { props.formData.requestedBy_designation } */}
-                            { props.requestedBySignatory?.parent?.name }
-                        </td>
-                        <td colSpan={4} style={{ textAlign: "center", borderTop: 0}}>
-                            {/* { props.formData.approvedBy_designation } */}
-                            { props.approvedBySignatory?.parent?.name }
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
+                                <Input type="number" className='text-center' min={1} autoComplete='off' style={{ width: "100%" }} placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
+                            </Form.Item>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div>
+                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
+                                <Input type="number"  className='text-right' autoComplete='off' style={{ width: "100%" }} step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
+                            </Form.Item>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div  className='text-right'>
+                                { new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format( (item.unit_cost * item.quantity) ) }
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={1} lg={1} xl={1}>
+                            <div  className='text-right'>
+                                <Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button>
+                            </div>
+                        </Col>
+                    </Row>
+                ))
+            }
+            <Row gutter={[8, 8]} className="pr-items-footer">
+                <Col xs={24} sm={24} md={4} lg={4} xl={4}>
+                    <div className='text-center'>
+                        <b></b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-center'>
+                        <b></b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <div className='text-center'>
+                        <b></b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                    <div className='text-center'>
+                        <b></b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-center'>
+                        <b>Total</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <div className='text-right'>
+                        <b>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(  total_cost() )}</b>
+                    </div>
+                </Col>
+                <Col xs={24} sm={24} md={1} lg={1} xl={1}>
+                    <div  className='text-right'>
+                        
+                    </div>
+                </Col>
+            </Row>
+            <br />
+            <br />
+            <Row gutter={[8, 8]}>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
+                        <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                        {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
+                    </Form.Item>
+                </Col>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Requested by" { ...helpers.displayError(props.formErrors, `requested_by_id`) }>
+                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
+                            { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
+                        </Select>
+                    </Form.Item>
+                    <p className='text-center'><b>{ props.requestedBySignatory?.name }</b></p>
+                    <p className='text-center'>{ props.requestedBySignatory?.parent?.name }</p>
+                </Col>
+
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item  label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
+                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
+                            { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
+                        </Select>
+                    </Form.Item>
+                    <p className='text-center'><b>{ props.approvedBySignatory?.name }</b></p>
+                    <p className='text-center'>{ props.approvedBySignatory?.parent?.name }</p>
+                </Col>
+            </Row>
+
             </Form>
-            <div className='text-center'>
+            <div className='text-center space-x-2'>
                 
                 <br />
                 {/* <p style={{color: "red"}}>
