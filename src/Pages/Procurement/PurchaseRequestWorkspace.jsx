@@ -106,9 +106,9 @@ const Pruchaserequestworkspace = (props) => {
                 <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
             </TabPane>
 
-            <TabPane tab="BAC Data" key="bac-task">
+            {/* <TabPane tab="BAC Data" key="bac-task">
                 <Bacform saveBacForm={saveBacForm}/>
-            </TabPane>
+            </TabPane> */}
             <TabPane tab="Audit Trail" key="audit-trail">
                 { !isEmpty(props.selectedPurchaseRequest.audit_trail?.data) ? (
                     <AuditTrail logger={props.selectedPurchaseRequest.audit_trail?.data} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="display_log" />
