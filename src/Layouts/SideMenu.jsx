@@ -9,6 +9,7 @@ import Icon, {
     ShoppingCartOutlined ,
   } from '@ant-design/icons';
 import { Link, useLocation  } from 'react-router-dom'
+import helpers from '../Utilities/helpers';
 
 const { SubMenu } = Menu;
 
@@ -65,8 +66,8 @@ const Sidemenu = (props) => {
                 </Menu.Item>
                 <SubMenu key="submenu-procurement" icon={<Icon component={ProcurementSvg} />} title="Procurement">
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "procurement.view" || i.name == "procurement.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['procurement.view','procurement.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/procurement">
                             <Link to="/procurement"></Link>
@@ -90,8 +91,8 @@ const Sidemenu = (props) => {
                 </SubMenu>
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "form.routing.pending.view" || i.name == "form.routing.pending.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['form.routing.pending.view','form.routing.pending.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/forms/forwarded">
                             <Link to="/forms/forwarded"></Link>
@@ -99,8 +100,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "form.routing.approved.view" || i.name == "form.routing.approved.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['form.routing.approved.view','form.routing.approved.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/forms/approved">
                             <Link to="/forms/approved"></Link>
@@ -108,8 +109,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "form.routing.disapproved.view" || i.name == "form.routing.disapproved.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['form.routing.disapproved.view','form.routing.disapproved.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/forms/disapproved">
                             <Link to="/forms/disapproved"></Link>
@@ -119,8 +120,8 @@ const Sidemenu = (props) => {
                 </SubMenu>
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "purchase.requests.create" || i.name == "purchase.requests.update" || i.name == "purchase.requests.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['purchase.requests.create','purchase.requests.update','purchase.requests.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/purchase-requests/form">
                             <Link to="/purchase-requests/form"></Link>
@@ -128,8 +129,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "purchase.requests.view" || i.name == "purchase.requests.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['purchase.requests.view','purchase.requests.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/purchase-requests">
                             <Link to="/purchase-requests"></Link>
@@ -138,8 +139,8 @@ const Sidemenu = (props) => {
                     ) : "" }
                 </SubMenu>
                 {
-                    props.user?.permissions?.data?.filter(i => i.name == "users.view" || i.name == "users.all").length != 0 ||
-                    props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                    helpers.hasPermission(props.user, ['users.view','users.all']) || 
+                    helpers.hasRole(props.user, ["admin","super-admin"])
                 ? (
                     <Menu.Item key="/users" icon={<UserOutlined />}>
                         <Link to="/users"></Link>
@@ -147,8 +148,8 @@ const Sidemenu = (props) => {
                     </Menu.Item>
                 ) : "" }
                 {
-                    props.user?.permissions?.data?.filter(i => i.name == "activitylogs.view" || i.name == "activitylogs.all").length != 0 ||
-                    props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                    helpers.hasPermission(props.user, ['activitylogs.view','activitylogs.all']) || 
+                    helpers.hasRole(props.user, ["admin","super-admin"])
                 ? (
                     <Menu.Item key="/activity-logs"  icon={<Icon component={LogsSvg} />}>
                         <Link to="/activity-logs"></Link>
@@ -157,8 +158,8 @@ const Sidemenu = (props) => {
                 ) : "" }
                 <SubMenu key="submenu-libraries" icon={<Icon component={LibrarySvg} />} title="Libraries">
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "libraries.items.view" || i.name == "libraries.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['libraries.items.view','libraries.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/libraries/items">
                             <Link to="/libraries/items"></Link>
@@ -166,8 +167,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "libraries.categories.view" || i.name == "libraries.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['libraries.categories.view','libraries.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/libraries/items/categories">
                             <Link to="/libraries/items/categories"></Link>
@@ -175,8 +176,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "libraries.uom.view" || i.name == "libraries.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['libraries.uom.view','libraries.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/libraries/items/measures">
                             <Link to="/libraries/items/measures"></Link>
@@ -184,8 +185,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "libraries.office.divisions.view" || i.name == "libraries.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['libraries.office.divisions.view','libraries.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/libraries/offices/divisions">
                             <Link to="/libraries/offices/divisions"></Link>
@@ -193,8 +194,8 @@ const Sidemenu = (props) => {
                         </Menu.Item>
                     ) : "" }
                     {
-                        props.user?.permissions?.data?.filter(i => i.name == "libraries.sections.view" || i.name == "libraries.all").length != 0 ||
-                        props.user?.roles?.data?.filter(i => i.name == "admin" || i.name == "super-admin").length != 0
+                        helpers.hasPermission(props.user, ['libraries.sections.view','libraries.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
                     ? (
                         <Menu.Item key="/libraries/offices/sections">
                             <Link to="/libraries/offices/sections"></Link>

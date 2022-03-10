@@ -131,7 +131,7 @@ const UserTable = (props) => {
     const menu = (item, index) => (
         <Menu>
             <Menu.Item key="menu-edit" icon={<LockOutlined />}  onClick={() => { props.selectUser(item, 'permissions'); setSelectedIndex(index) }}>
-                Permissions and Roles
+                Roles and Permissions
             </Menu.Item>
         </Menu>
       );

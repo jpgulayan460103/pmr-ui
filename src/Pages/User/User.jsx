@@ -6,6 +6,7 @@ import UserForm from './UserForm';
 import api from '../../api';
 import { debounce, map } from 'lodash'
 import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import helpers from '../../Utilities/helpers';
 
 
 
@@ -75,9 +76,9 @@ const User = (props) => {
                         </Card>
                     ) : "" }
                     { editType=="permissions" ?  (
-                        <Card size="small" title="Permissions and Roles" bordered={false}  >
+                        <Card size="small" title="Roles and Permissions" bordered={false}  >
                             <div className='user-card-content'>
-                                <UserPermissions user={selectedUser} allowSuperAdmin={props.user?.roles?.data?.filter(i => i.name == "super-admin").length != 0} getUsers={getUsers} />
+                                <UserPermissions user={selectedUser} allowSuperAdmin={helpers.hasRole(props.user,['super-admin'])} getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
