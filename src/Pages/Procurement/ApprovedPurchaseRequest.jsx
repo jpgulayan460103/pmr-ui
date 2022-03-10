@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import {
     Table,
@@ -9,8 +9,13 @@ import {
     Menu,
     Dropdown,
     Tooltip,
+    Button,
+    Upload,
+    message,
+    Modal,
+    Form,
 } from 'antd';
-import filter from '../../Shared/filter';
+import filter from '../../Utilities/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
 import {
     SettingOutlined,
@@ -18,11 +23,12 @@ import {
     EyeInvisibleOutlined,
     MoreOutlined,
     EllipsisOutlined,
-    FormOutlined,
+    UploadOutlined,
     MessageOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import api from '../../api';
+import helpers from '../../Utilities/helpers';
 
 
 const { Option } = Select;
@@ -31,6 +37,7 @@ function mapStateToProps(state) {
     return {
         user_sections: state.library.user_sections,
         procurement_types: state.library.procurement_types,
+        procurement_type_categories: state.library.procurement_type_categories,
         mode_of_procurements: state.library.mode_of_procurements,
         selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
         columns: state.procurement.columns,
@@ -39,19 +46,14 @@ function mapStateToProps(state) {
         filterData: state.procurement.purchaseRequestsTableFilter,
         tableLoading: state.procurement.purchaseRequestsTableLoading,
         isInitialized: state.user.isInitialized,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 
 const Settings = ({columns, toggleColumn}) => {
-    useEffect(() => {
-        console.log("render");
-    }, []);
     return (
-
         <List
             style={{height: 250, overflowY: "scroll"}}
-            // header={<div>Header</div>}
-            // footer={<div>Footer</div>}
             size='small'
             bordered
             dataSource={columns.filter(i => i.filterable)}
@@ -72,7 +74,12 @@ const Settings = ({columns, toggleColumn}) => {
 }
 
 const ApprovedPurchaseRequest = (props) => {
-    let navigate = useNavigate();
+    let history = useHistory();
+    const procurementFormRef = React.useRef();
+    const [submit, setSubmit] = useState(false);
+    const [errorMessage, setErrorMessage] = useState({});
+    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
+    const [modalProcurementForm, setModalProcurementForm] = useState(false);
 
     useEffect(() => {
         if(props.isInitialized){
@@ -101,8 +108,16 @@ const ApprovedPurchaseRequest = (props) => {
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(sorter);
-        console.log(filters);
+        // console.log(sorter);
+        // console.log(filters);
+        if(!isEmpty(sorter)){
+            filters.sortColumn = sorter.columnKey
+            filters.sortOrder = sorter.order
+            props.dispatch({
+                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
+                data: {...props.filterData, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
+            });
+        }
         props.getPurchaseRequests({...props.filterData, ...filters})
     };
 
@@ -118,33 +133,62 @@ const ApprovedPurchaseRequest = (props) => {
         props.getPurchaseRequests({...props.filterData, page: page, size: size})
     }
 
-    const viewPurchaseRequest = (item, index) => {
-        selectPurchaseRequest(item)
-        props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
-            data: "pdf"
-        });
+    const viewPurchaseRequest = async (item, index) => {
+        if(props.uploadingFiles){
+            Modal.warning({
+                title: "Uploading your files",
+                content: "Please wait for the system to finish uploading.",
+            });
+        }else{
+            props.dispatch({
+                type: "SELECT_PURCHASE_REQUEST",
+                data: item
+            });
+            await selectPurchaseRequest(item)
+        }
     }
-    const selectPurchaseRequest = (item) => {
+    const selectPurchaseRequest = async (item) => {
         props.dispatch({
-            type: "SELECT_PURCHASE_REQUEST",
-            data: item
+            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+            data: true
         });
-    }
-
-    const editPurchaseRequest = (item, index) => {
-        selectPurchaseRequest(item);
-        props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
-            data: "edit-form"
-        });
+        await api.PurchaseRequest.get(item.id)
+        .then(res => {
+            let purchase_request = res.data;
+            api.PurchaseRequest.logger(item.id)
+            .then(res => {
+                props.dispatch({
+                    type: "SELECT_PURCHASE_REQUEST",
+                    data: {...purchase_request, audit_trail: res.data }
+                });
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
+            })
+            .catch(res => {
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
+            })
+            .then(res => {
+                props.dispatch({
+                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    data: false
+                });
+            })
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
 
     const makeQuotation = (item, index) => {
         api.PurchaseRequest.get(item.id)
         .then(res => {
             selectPurchaseRequest(res.data);
-            navigate("/procurement/quotations");
+            history.push("/procurement/quotations");
         })
         .catch(err => {})
         .then(res => {})
@@ -167,15 +211,55 @@ const ApprovedPurchaseRequest = (props) => {
         return i;
     });
 
-    const purchaseRequestTypeFilter = cloneDeep(props.procurement_types).map(i => {
+    const purchaseRequestTypeCategoryFilter = cloneDeep(props.procurement_type_categories).map(i => {
         i.value = i.id;
         return i;
     });
+
+    const purchaseRequestTypeFilter = () => {
+        let filteredCategory = cloneDeep(props.procurement_type_categories);
+        if(!isEmpty(props.filterData.purchase_request_type_category)){
+            filteredCategory = filteredCategory.filter(i => props.filterData.purchase_request_type_category.includes(i.id));
+        }
+        return filteredCategory.map(i => {
+            let newI = [];
+            for (let index = 0; index < i.children.data.length; index++) {
+                let element = i.children.data[index];
+                newI.push({
+                    id: element.id,
+                    key: element.key,
+                    library_type: element.library_type,
+                    name: element.name,
+                    text: `${element.parent.name} - ${element.text}`,
+                    title: element.title,
+                    value: element.id,
+                });
+            }
+            return newI;
+        }).flat(1);
+    };
 
     const modeOfProcurementFilter = cloneDeep(props.mode_of_procurements).map(i => {
         i.value = i.id;
         return i;
     });
+
+
+    const onCell = {
+        onCell: (record, colIndex) => {
+            return {
+                onClick: event => {
+                    if(isEmpty(props.selectedPurchaseRequest)){
+                        viewPurchaseRequest(record, colIndex);
+                    }else{
+                        if(props.selectedPurchaseRequest.id != record.id){
+                            viewPurchaseRequest(record, colIndex);
+                        }
+                    }
+                },
+            };
+          }
+    }
     
     const dataSource = props.purchaseRequests
 
@@ -189,6 +273,8 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].shown : true,
             filterable: true,
             ...filter.search('pr_date','date_range', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'SA/OR',
@@ -199,19 +285,35 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].shown : true,
             filterable: true,
             ...filter.search('sa_or','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'PR Number',
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
-            width: 150,
+            width: 200,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
             ...filter.search('purchase_request_number','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
-            title: 'Particulars',
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+            width: 150,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].shown : true,
+            filterable: true,
+            ...filter.search('title','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
+        {
+            title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
             width: 150,
@@ -219,6 +321,8 @@ const ApprovedPurchaseRequest = (props) => {
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].shown : true,
             filterable: true,
             ...filter.search('purpose','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'PMO/End-User',
@@ -235,42 +339,66 @@ const ApprovedPurchaseRequest = (props) => {
                 </span>
             ),
             ...filter.list('end_user_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Total Cost',
             key: 'total_cost',
             width: 150,
+            align: "right",
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
-            ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
+            // ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
             filterable: true,
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
                 </span>
             ),
+            ...onCell,
+            sorter: (a, b) => {},
             
         },
         {
-            title: 'Type',
-            key: 'purchase_request_type_id',
-            filters: purchaseRequestTypeFilter,
+            title: 'Category',
+            key: 'purchase_request_type_category',
+            filters: purchaseRequestTypeCategoryFilter,
             width: 150,
-            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].ellipsis : true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_id')[0].shown : true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].shown : true,
             filterable: true,
-            ...filter.list('purchase_request_type_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('purchase_request_type_category','text', setFilterData, props.filterData, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    { item?.purchase_request_type?.name }
+                    {item?.procurement_type?.parent?.name}
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
+        },
+        {
+            title: 'Type',
+            key: 'procurement_type_id',
+            filters: purchaseRequestTypeFilter(),
+            width: 200,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].shown : true,
+            filterable: true,
+            ...filter.list('procurement_type_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    { item?.procurement_type?.name }
+                </span>
+            ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Mode of Procurement',
             key: 'mode_of_procurement_id',
             filters: modeOfProcurementFilter,
-            width: 150,
+            width: 250,
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].shown : true,
             filterable: true,
@@ -279,7 +407,9 @@ const ApprovedPurchaseRequest = (props) => {
                 <span>
                     { item?.mode_of_procurement?.name }
                 </span>
-            )
+            ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Pre-Proc Conference',
@@ -293,6 +423,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.preproc_conference }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Ads/Post of IB',
@@ -306,6 +438,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.adspost_of_ib }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Pre-bid Conf',
@@ -319,6 +453,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.prebid_conf }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Eligibility Check',
@@ -332,6 +468,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.eligibility_check }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Sub/Open of Bids',
@@ -345,6 +483,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.subopen_of_bids }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Bid Evaluation',
@@ -358,6 +498,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.bid_evaluation }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Post Qual',
@@ -371,6 +513,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.post_qual }
                 </span>
             ),
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Notice of Award',
@@ -384,6 +528,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_of_award }
                 </span>
             ),
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Contract Signing',
@@ -397,6 +543,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.contract_signing }
                 </span>
             ),
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Notice to Proceed',
@@ -410,6 +558,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.notice_to_proceed }
                 </span>
             ),
+            // ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Estimated LDD',
@@ -423,6 +573,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.estimated_ldd }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: 'Abstract of Quotations',
@@ -436,6 +588,8 @@ const ApprovedPurchaseRequest = (props) => {
                     { item?.bac_task?.abstract_of_quotations }
                 </span>
             ),
+            ...onCell,
+            // sorter: (a, b) => {},
         },
         {
             title: "Action",
@@ -445,27 +599,55 @@ const ApprovedPurchaseRequest = (props) => {
             shown: true,
             align: "center",
             filterable: false,
-            render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <EllipsisOutlined style={{ fontSize: '24px' }} />
-                </Dropdown>
-              )
+            render: (text, item, index) => {
+                if(props.uploadingFiles){
+                    return (
+                        <Button size='small'>
+                            <EllipsisOutlined />
+                        </Button>
+                    )
+                }
+                return(
+                    <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                        <Button size='small'>
+                            <EllipsisOutlined />
+                        </Button>
+                    </Dropdown>
+                )
+            }
         },
     ];
 
     const menu = (item, index) => (
         <Menu onClick={() => handleMenuClick()}>
-            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewPurchaseRequest(item, index) }}>
-                View
-            </Menu.Item>
-            <Menu.Item key="menu-bac-task" icon={<MessageOutlined />} onClick={() => { viewBacForm(item, index) }}>
-                BAC Data
-            </Menu.Item>
-            <Menu.Item key="menu-quotation" icon={<MessageOutlined />} onClick={() => { makeQuotation(item, index) }}>
-                Make Quotation
+            <Menu.Item key="menu-bac-task" icon={<MessageOutlined />} onClick={() => { handleProceedProcurement(item) }}>
+                Proceed to Procurement Process
             </Menu.Item>
         </Menu>
-      );
+    );
+
+
+    let token = JSON.parse(sessionStorage.getItem("session"));
+    let access_token = token.access_token;
+    // customAxios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+    const uploadProps = {
+        name: 'file',
+        action: 'http://pmr-api.test/api/forms/uploads/purchase-request',
+        headers: {
+          authorization: `Bearer ${access_token}`,
+        },
+        onChange(info) {
+          if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+          }
+          if (info.file.status === 'done') {
+            message.success(`${info.file.name} file uploaded successfully`);
+          } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+          }
+        },
+      };
 
     const handleMenuClick =() => {
 
@@ -479,12 +661,130 @@ const ApprovedPurchaseRequest = (props) => {
         });
     }
 
+    const cancelProcurementForm = () => {
+        procurementFormRef.current.setFieldsValue({
+            action_type: null,
+            technical_working_group_id: null,
+            procurement_type_category: null,
+            procurement_type_id: null,
+            mode_of_procurement_id: null,
+        });
+        setModalProcurementForm(false);
+    }
 
+    const submitProcurementForm = debounce(async (e) => {
+        setSubmit(true);
+        let formData = {
+            ...e,
+            id: props.selectedPurchaseRequest.id,
+            updater: "procurement",
+        };
 
+        api.PurchaseRequest.save(formData, 'update')
+        .then(res => {
+            setSubmit(false);
+            setErrorMessage({});
+            setModalProcurementForm(false);
+            cancelProcurementForm();
+            props.dispatch({
+                type: "SELECT_PURCHASE_REQUEST",
+                data: {},
+            });
+            props.getPurchaseRequests();
+        })
+        .catch(err => {
+            setSubmit(false);
+            setErrorMessage(err.response.data.errors)
+            
+        })
+    }, 150);
+
+    const handleProceedProcurement = (record) => {
+        // viewPurchaseRequest(record, 0);
+        setModalProcurementForm(true);
+        setSelectedProcurementCategory(record.procurement_type.parent.id);
+        // console.log(record);
+        setTimeout(() => {
+            procurementFormRef.current.setFieldsValue({
+                procurement_type_category: record.procurement_type.parent.id,
+                procurement_type_id: record.procurement_type_id,
+                mode_of_procurement_id: record.mode_of_procurement_id,
+            });
+        }, 150);
+    }
 
     return (
         <>
             <div className="flex justify-end mb-2">
+            
+
+            <Modal title="Proceed to Procurement Process" visible={modalProcurementForm} 
+                footer={[
+                    <Button type='primary' form="procurementForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
+                        Submit
+                    </Button>
+                    ,
+                    <Button form="procurementForm" key="cancel" onClick={() => cancelProcurementForm()}>
+                        Cancel
+                    </Button>
+                    ]}
+                onCancel={cancelProcurementForm}
+                >
+                <Form
+                    ref={procurementFormRef}
+                    name="normal_login"
+                    className="login-form"
+                    onFinish={(e) => submitProcurementForm(e)}
+                    layout='vertical'
+                    id="procurementForm"
+                >
+
+                        <Form.Item
+                                name="procurement_type_category"
+                                label="Procurement Category"
+                                { ...helpers.displayError(errorMessage, 'procurement_type_category') }
+                                rules={[{ required: true, message: 'Please select Procurement Category.' }]}
+                            >
+                                <Select placeholder='Select Procurement Category' onSelect={(e) => {
+                                    procurementFormRef?.current?.setFieldsValue({
+                                        procurement_type_id: null,
+                                    });
+                                    setSelectedProcurementCategory(e);
+                                }}>
+                                    { props.procurement_type_categories.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                </Select>
+                            </Form.Item>
+
+                            {
+                                selectedProcurementCategory != null ? (
+                                    <Form.Item
+                                        name="procurement_type_id"
+                                        label="Procurement Type"
+                                        { ...helpers.displayError(errorMessage, 'procurement_type_id') }
+                                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                    >
+                                        <Select placeholder='Select Procurement Category' allowClear > 
+                                            { props.procurement_types.filter(i => i.parent.id == selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                        </Select>
+                                    </Form.Item>
+                                ) : ""
+                            }
+
+                            <Form.Item
+                                name="mode_of_procurement_id"
+                                label="Mode of Procurement"
+                                { ...helpers.displayError(errorMessage, 'mode_of_procurement_id') }
+                                rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
+                            >
+                                <Select placeholder='Select Mode of Procurement'>
+                                    { props.mode_of_procurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                </Select>
+                            </Form.Item>
+
+                                        
+                </Form>
+            </Modal>
+
             
             <Popover content={<Settings columns={props.columns} toggleColumn={toggleColumn} />} title="Column Settings" trigger="click" placement='bottomRight'>
                 <Tooltip placement="left" title="Settings">
@@ -508,16 +808,14 @@ const ApprovedPurchaseRequest = (props) => {
                 }}
             />
             <div className="flex justify-end mt-2">
-            {/* <b>{process.env.REACT_APP_PRODUCTION_URL}</b> */}
             <Pagination
                     current={props.purchaseRequestsPagination?.current_page || 1}
                     total={props.purchaseRequestsPagination?.total || 1}
                     pageSize={props.purchaseRequestsPagination?.per_page || 1}
                     onChange={paginationChange}
-                    // showSizeChanger
                     showQuickJumper
+                    showSizeChanger={false}
                     size="small"
-                    onShowSizeChange={(current, size) => changePageSize(current, size)}
                 />
             </div>
         </>

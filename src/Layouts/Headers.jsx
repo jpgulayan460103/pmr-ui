@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import { connect } from 'react-redux';
 import { Layout, Menu, Dropdown, Badge } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
+import api from '../api';
 
 const { Header } = Layout;
 
@@ -21,9 +22,6 @@ const MenuItems = ({userLogout}) => {
         <Menu>
             <Menu.Item icon={<UserOutlined />} key="1">
                 <span style={{fontSize: 18}}>Profile</span>
-            </Menu.Item>
-            <Menu.Item icon={<DownOutlined />} key="2">
-                <span style={{fontSize: 18}}>1st menu item</span>
             </Menu.Item>
             <Menu.Item icon={<SettingOutlined />} key="3">
                 <span style={{fontSize: 18}}>Settings</span>
@@ -43,7 +41,7 @@ const MenuIcon = (props) => {
     );
 }
 const Headers = ({ notifications, dispatch, collapsed, user }) => {
-    let navigate = useNavigate();
+    let history = useHistory();
     const [showSide, setShowSide] = useState(false);
     const toggleSide = () => {
         setShowSide(!showSide);
@@ -63,12 +61,13 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     }
 
     const userLogout = () => {
+        api.User.logout();
         dispatch({
             type: "SET_INITIAL_STATE",
             data: {}
         });
         sessionStorage.removeItem('session');
-        navigate("/login");
+        history.push("/login");
     }
     return (
         <React.Fragment>

@@ -3,7 +3,7 @@ import { Input, Checkbox, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import _map from 'lodash/map'
 
-const ListOptions = (
+const FilterOptions = (
     {
         setSelectedKeys,
         selectedKeys,
@@ -53,9 +53,9 @@ const ListOptions = (
             <div className='px-1 mb-2'>
                 <Input placeholder="search in filters" prefix={<SearchOutlined />} onChange={(e) => {changeSearchStr(e)}} />
             </div>
-            <div className='px-1 mb-2'style={{maxHeight: 200, overflow: "auto", overflowX: "hidden"}}>
+            <div className='px-1 mb-2'style={{maxHeight: 200, overflow: "scroll", overflowX: "hidden"}}>
                 <Checkbox.Group style={{ width: '100%' }} value={selectedKeys} >
-                { filters.filter(i => i.text.toLocaleLowerCase().search(searchStr.toLocaleLowerCase()) >=0 ).map((option, index) => (<div key={index}><Checkbox onChange={(e) => selectOption(e, option)} value={option.value}>{option.text}</Checkbox></div>)) }
+                { filters.filter(i => i.text.toLocaleLowerCase().search(searchStr.toLocaleLowerCase()) >=0 ).map((option, index) => (<div key={index} className="filter-options"><Checkbox onChange={(e) => selectOption(e, option)} value={option.value}>{option.text}</Checkbox></div>)) }
                 </Checkbox.Group>
             </div>
             <div className='px-1'>
@@ -66,4 +66,4 @@ const ListOptions = (
     );
 }
 
-export default ListOptions;
+export default FilterOptions;

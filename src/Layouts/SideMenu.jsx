@@ -8,13 +8,15 @@ import Icon, {
     MessageOutlined,
     ShoppingCartOutlined ,
   } from '@ant-design/icons';
-import { useLocation, Link  } from 'react-router-dom'
+import { Link, useLocation  } from 'react-router-dom'
+import helpers from '../Utilities/helpers';
 
 const { SubMenu } = Menu;
 
 function mapStateToProps(state) {
     return {
         purchaseRequestFormType: state.purchaseRequest.formType,
+        user: state.user.data,
     };
 }
 
@@ -45,6 +47,9 @@ const FormsSvg = () => (
         <path d="M775.164361 536.380951C788.910114 536.380951 800.05325 525.465229 800.05325 512 800.05325 498.534771 788.910114 487.619049 775.164361 487.619049L263.111111 487.619049C249.365357 487.619049 238.222222 498.534771 238.222222 512 238.222222 525.465229 249.365357 536.380951 263.111111 536.380951L775.164361 536.380951Z" p-id="21272"></path>
     </svg>
 );
+const LogsSvg = () => (
+<svg t="1646622007423" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3413" width="1.2em" height="1.2em"><path d="M268.8 405.333333h-21.333333c-6.4 0-10.666667 4.266667-10.666667 10.666667s4.266667 10.666667 10.666667 10.666667h21.333333c6.4 0 10.666667-4.266667 10.666667-10.666667s-4.266667-10.666667-10.666667-10.666667zM268.8 512h-21.333333c-6.4 0-10.666667 4.266667-10.666667 10.666667s4.266667 10.666667 10.666667 10.666666h21.333333c6.4 0 10.666667-4.266667 10.666667-10.666666s-4.266667-10.666667-10.666667-10.666667zM593.066667 320l-85.333334 85.333333H320v21.333334h196.266667l85.333333-85.333334h125.866667c4.266667 12.8 17.066667 21.333333 29.866666 21.333334 17.066667 0 32-14.933333 32-32s-14.933333-32-32-32c-14.933333 0-25.6 8.533333-29.866666 21.333333h-134.4zM759.466667 490.666667c-14.933333 0-25.6 8.533333-29.866667 21.333333H320v21.333333h407.466667c4.266667 12.8 17.066667 21.333333 29.866666 21.333334 17.066667 0 32-14.933333 32-32 2.133333-17.066667-12.8-32-29.866666-32zM268.8 618.666667h-21.333333c-6.4 0-10.666667 4.266667-10.666667 10.666666s4.266667 10.666667 10.666667 10.666667h21.333333c6.4 0 10.666667-4.266667 10.666667-10.666667s-4.266667-10.666667-10.666667-10.666666zM320 618.666667h298.666667v21.333333H320zM256 236.8c12.8 0 21.333333-8.533333 21.333333-21.333333V128c0-12.8-8.533333-21.333333-21.333333-21.333333s-21.333333 8.533333-21.333333 21.333333v87.466667c0 10.666667 8.533333 21.333333 21.333333 21.333333zM768 236.8c12.8 0 21.333333-8.533333 21.333333-21.333333V128c0-12.8-8.533333-21.333333-21.333333-21.333333s-21.333333 8.533333-21.333333 21.333333v87.466667c0 10.666667 8.533333 21.333333 21.333333 21.333333zM1004.8 930.133333L928 853.333333c21.333333-27.733333 32-59.733333 32-96 0-87.466667-72.533333-160-160-160S640 669.866667 640 757.333333s72.533333 160 160 160c34.133333 0 68.266667-10.666667 96-32l76.8 76.8c4.266667 4.266667 10.666667 6.4 17.066667 6.4 4.266667 0 10.666667-2.133333 17.066666-6.4 8.533333-8.533333 8.533333-23.466667-2.133333-32z m-132.266667-83.2c-21.333333 17.066667-46.933333 25.6-72.533333 25.6-61.866667 0-113.066667-51.2-113.066667-113.066666s51.2-113.066667 113.066667-113.066667 113.066667 51.2 113.066667 113.066667c2.133333 34.133333-14.933333 64-40.533334 87.466666zM298.666667 170.666667h426.666666v42.666666H298.666667z" p-id="3414"></path><path d="M106.666667 748.8V256c0-23.466667 19.2-42.666667 42.666666-42.666667h64V170.666667H149.333333c-46.933333 0-85.333333 38.4-85.333333 83.2v494.933333C64 795.733333 102.4 832 149.333333 832h469.333334v-40.533333H149.333333c-23.466667 0-42.666667-19.2-42.666666-42.666667zM917.333333 256v364.8h42.666667V253.866667C960 209.066667 921.6 170.666667 874.666667 170.666667h-64v42.666666h64c23.466667 0 42.666667 19.2 42.666666 42.666667z" p-id="3415"></path></svg>
+);
 
 const Sidemenu = (props) => {
     const location = useLocation();
@@ -54,94 +59,259 @@ const Sidemenu = (props) => {
     }, [location.pathname]);
     return (
         <React.Fragment>
-            <Menu theme="light" mode="inline" selectedKeys={[defaultKey]} >
+            <Menu
+                theme="light"
+                mode="inline"
+                selectedKeys={[defaultKey]}
+                >
                 <Menu.Item key="/" icon={<UserOutlined />}>
                     <Link to="/"></Link>
                     Home
                 </Menu.Item>
+
+                {
+                    (
+                        helpers.hasPermission(props.user, [
+                            'procurement.view',
+                            'procurement.all',
+                        ]) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
                 <SubMenu key="submenu-procurement" icon={<Icon component={ProcurementSvg} />} title="Procurement">
-                    <Menu.Item key="/procurement">
-                        <Link to="/procurement"></Link>
-                        Procurement
-                    </Menu.Item>
-                    <SubMenu key="submenu-quotation" title="Quotations">
-                        <Menu.Item key="/procurement/quotations/form">
-                            <Link to="/procurement/quotations/form"></Link>
-                            Create Quotation Form
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['procurement.view','procurement.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/procurement">
+                            <Link to="/procurement"></Link>
+                            Procurement
                         </Menu.Item>
-                        <Menu.Item key="/procurement/quotations">
-                            <Link to="/procurement/quotations"></Link>
-                            View Quotation Forms
-                        </Menu.Item>
-                        <Menu.Item key="/procurement/quotations/suppliers">
-                            <Link to="/procurement/quotations/suppliers"></Link>
-                            Suppliers
-                        </Menu.Item>
-                    </SubMenu>
+                    ) }
                 </SubMenu>
+                ) }
+
+                {
+                    (
+                        helpers.hasPermission(props.user, [
+                            'form.routing.pending.view',
+                            'form.routing.pending.all',
+                            'form.routing.approved.view',
+                            'form.routing.approved.all',
+                            'form.routing.disapproved.view',
+                            'form.routing.disapproved.all',
+                        ]) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
                 <SubMenu key="submenu-form-monitoring" icon={<Icon component={FormsSvg} />} title="Forms">
-                    <Menu.Item key="/forms/requests">
-                        <Link to="/forms/requests"></Link>
-                        Requests
-                    </Menu.Item>
-                    <Menu.Item key="/forms/approved">
-                        <Link to="/forms/approved"></Link>
-                        Approved
-                    </Menu.Item>
-                    <Menu.Item key="/forms/disapproved">
-                        <Link to="/forms/disapproved"></Link>
-                        Disapproved
-                    </Menu.Item>
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['form.routing.pending.view','form.routing.pending.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/forms/forwarded">
+                            <Link to="/forms/forwarded"></Link>
+                            Forwarded Forms
+                        </Menu.Item>
+                    ) }
+                    
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['form.routing.approved.view','form.routing.approved.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/forms/approved">
+                            <Link to="/forms/approved"></Link>
+                            Approved Forms
+                        </Menu.Item>
+                    ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['form.routing.disapproved.view','form.routing.disapproved.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/forms/disapproved">
+                            <Link to="/forms/disapproved"></Link>
+                            Disapproved Forms
+                        </Menu.Item>
+                    ) }
                 </SubMenu>
+                ) }
+
+                {
+                    (
+                        helpers.hasPermission(props.user, [
+                            'purchase.requests.create',
+                            'purchase.requests.update',
+                            'purchase.requests.all',
+                            'purchase.requests.view',
+                            'purchase.requests.all',
+                        ]) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
                 <SubMenu key="submenu-purchase-request" icon={<ShoppingCartOutlined />} title="Purchase Requests">
-                    <Menu.Item key="/purchase-requests/form">
-                        <Link to="/purchase-requests/form"></Link>
-                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
-                    </Menu.Item>
-                    <Menu.Item key="/purchase-requests">
-                        <Link to="/purchase-requests"></Link>
-                        View Purchase Requests
-                    </Menu.Item>
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['purchase.requests.create','purchase.requests.update','purchase.requests.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/purchase-requests/form">
+                            <Link to="/purchase-requests/form"></Link>
+                            { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } Purchase Request
+                        </Menu.Item>
+                    ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['purchase.requests.view','purchase.requests.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/purchase-requests">
+                            <Link to="/purchase-requests"></Link>
+                            View Purchase Requests
+                        </Menu.Item>
+                    ) }
+
                 </SubMenu>
-                <Menu.Item key="/users" icon={<UserOutlined />}>
-                    <Link to="/users"></Link>
-                    Users
-                </Menu.Item>
+                ) }
+
+
+                {
+                    (
+                        helpers.hasPermission(props.user, ['users.view','users.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
+                    <Menu.Item key="/users" icon={<UserOutlined />}>
+                        <Link to="/users"></Link>
+                        Users
+                    </Menu.Item>
+                ) }
+
+                {
+                    (
+                        helpers.hasPermission(props.user, ['activitylogs.view','activitylogs.all']) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
+                    <Menu.Item key="/activity-logs"  icon={<Icon component={LogsSvg} />}>
+                        <Link to="/activity-logs"></Link>
+                        Activity Logs
+                    </Menu.Item>
+                ) }
+
+
+                {
+                    (
+                        helpers.hasPermission(props.user, [
+                            'libraries.items.view',
+                            'libraries.categories.view',
+                            'libraries.uom.view',
+                            'libraries.office.divisions.view',
+                            'libraries.sections.view',
+                            'libraries.all',
+                        ]) || 
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+                && (
                 <SubMenu key="submenu-libraries" icon={<Icon component={LibrarySvg} />} title="Libraries">
-                    <Menu.Item key="/libraries/items">
-                        <Link to="/libraries/items"></Link>
-                        Items
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/items/categories">
-                        <Link to="/libraries/items/categories"></Link>
-                        Item Categories
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/items/measures">
-                        <Link to="/libraries/items/measures"></Link>
-                        Unit of Measures
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/offices/divisions">
-                        <Link to="/libraries/offices/divisions"></Link>
-                        Office Divisions
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/offices/sections">
-                        <Link to="/libraries/offices/sections"></Link>
-                        Office Sections
-                    </Menu.Item>
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.items.view','libraries.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        // <Menu.Item key="/libraries/items">
+                        //     <Link to="/libraries/items"></Link>
+                        //     Items
+                        // </Menu.Item>
+                        ""
+                    ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.categories.view','libraries.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/items/categories">
+                            <Link to="/libraries/items/categories"></Link>
+                            Item Categories
+                        </Menu.Item>
+                    ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.uom.view','libraries.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/items/measures">
+                            <Link to="/libraries/items/measures"></Link>
+                            Unit of Measures
+                        </Menu.Item>
+                    ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.office.divisions.view','libraries.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/offices/divisions">
+                            <Link to="/libraries/offices/divisions"></Link>
+                            Office Divisions
+                        </Menu.Item>
+                    ) }
+                    
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.sections.view','libraries.all']) || 
+                            helpers.hasRole(props.user, ["admin","super-admin"])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/offices/sections">
+                            <Link to="/libraries/offices/sections"></Link>
+                            Office Sections
+                        </Menu.Item>
+                    ) }
                 </SubMenu>
-                <SubMenu key="submenu-user_offices" icon={<Icon component={SignatureSvg} />} title="UserOffice">
-                    <Menu.Item key="/libraries/user_offices/administrators">
-                        <Link to="/libraries/user_offices/administrators"></Link>
-                        Admininstrators
-                    </Menu.Item>
-                    <Menu.Item key="/libraries/user_offices/purchase-requests">
-                        <Link to="/libraries/user_offices/purchase-requests"></Link>
-                        Purchase Request
-                    </Menu.Item>
-                </SubMenu>
-                {/* <Menu.Item key="4" icon={<UserOutlined />}>
-                    nav 4
-                </Menu.Item> */}
+                ) }
+
+                {
+
+                    (
+                        helpers.hasPermission(props.user, ['libraries.signatories.administrators.view']) ||
+                        helpers.hasRole(props.user, ["admin","super-admin"])
+                    )
+
+                    && (
+                        <SubMenu key="submenu-user_offices" icon={<Icon component={SignatureSvg} />} title="UserOffice">
+                            <Menu.Item key="/libraries/user_offices/administrators">
+                                <Link to="/libraries/user_offices/administrators"></Link>
+                                Admininstrators
+                            </Menu.Item>
+                            {/* <Menu.Item key="/libraries/user_offices/purchase-requests">
+                                <Link to="/libraries/user_offices/purchase-requests"></Link>
+                                Purchase Request
+                            </Menu.Item> */}
+                        </SubMenu>
+                    )
+                }
+
             </Menu>
         </React.Fragment>
     );

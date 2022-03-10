@@ -12,7 +12,7 @@ import Icon, {
     InfoCircleOutlined,
     LoadingOutlined,
     UserOutlined,
-    KeyOutlined,
+    LockOutlined,
 } from '@ant-design/icons';
 
 
@@ -29,6 +29,16 @@ const PermissionSvg = () => (
 const UserTable = (props) => {
 
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const onCell = {
+        onCell: (record, colIndex) => {
+            return {
+                onClick: event => {
+                    props.selectUser(record, 'edit')
+                    setSelectedIndex(colIndex)
+                },
+            };
+          }
+    }
     const dataSource = props.users;
     const columns = [
         {
@@ -36,26 +46,32 @@ const UserTable = (props) => {
             dataIndex: 'username',
             key: 'username',
             width: 150,
+            ...onCell,
+            sorter: (a, b) => a.username?.localeCompare(b.username),
         },
         {
             title: 'Fullname',
             key: 'fullname',
             width: 250,
+            sorter: (a, b) => a.user_information?.fullname?.localeCompare(b.user_information?.fullname),
             render: (text, record, index) => (
                 <span>
                     { record.user_information.fullname }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Position',
             key: 'position',
             width: 150,
+            sorter: (a, b) => a.user_information?.position?.name?.localeCompare(b.user_information?.position?.name),
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.position?.name }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Cellphone Number',
@@ -66,16 +82,19 @@ const UserTable = (props) => {
                     { record.user_information?.cellphone_number }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Email Address',
             index: 'email_address',
             width: 150,
+            sorter: (a, b) => a.email_address?.localeCompare(b.email_address),
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.email_address }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Section/Unit/Office',
@@ -86,6 +105,7 @@ const UserTable = (props) => {
                     { record.user_offices?.data.map(i => <Tag key={i.key}>{i.office.name} <br /> </Tag>) }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: 'Technical Working Group',
@@ -96,6 +116,7 @@ const UserTable = (props) => {
                     { record.user_groups?.data.map(i => <Tag key={i.key}>{i.group.name} <br /> </Tag>) }
                 </span>
             ),
+            ...onCell,
         },
         {
             title: "Action",
@@ -107,17 +128,14 @@ const UserTable = (props) => {
                 <Dropdown overlay={menu(item, index)} trigger={['click']}>
                     <EllipsisOutlined style={{ fontSize: '24px' }} />
                 </Dropdown>
-              )
+            ),
         },
     ];
 
     const menu = (item, index) => (
         <Menu>
-            <Menu.Item key="menu-view" icon={<UserOutlined />}  onClick={() => { props.selectUser(item, 'edit'); setSelectedIndex(index) }}>
-                Edit
-            </Menu.Item>
-            <Menu.Item key="menu-edit" icon={<KeyOutlined />}  onClick={() => { props.selectUser(item, 'permissions'); setSelectedIndex(index) }}>
-                Permissions
+            <Menu.Item key="menu-edit" icon={<LockOutlined />}  onClick={() => { props.selectUser(item, 'permissions'); setSelectedIndex(index) }}>
+                Roles and Permissions
             </Menu.Item>
         </Menu>
       );

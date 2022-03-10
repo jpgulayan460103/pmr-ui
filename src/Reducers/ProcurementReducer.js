@@ -2,7 +2,7 @@ const initialState = () => {
     return {
       selectedPurchaseRequest: {},
       columns: [],
-      purchaseRequestTab: "edit-form",
+      purchaseRequestTab: "information",
       purchaseRequests: [],
       purchaseRequestsPagination: {
         current_page: 1,
@@ -12,8 +12,10 @@ const initialState = () => {
       purchaseRequestsTableFilter: {
         page: 1,
         type: 'procurement',
+        purchase_request_type_category: [],
       },
       purchaseRequestsTableLoading: false,
+      purchaseRequestsWorkspaceLoading: false,
     }
   }
   
@@ -56,6 +58,11 @@ const initialState = () => {
         return {
           ...state,
           purchaseRequestsTableLoading: action.data,
+        };
+      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING':
+        return {
+          ...state,
+          purchaseRequestsWorkspaceLoading: action.data,
         };
       case 'SET_PROCUREMENT_INITIAL_STATE':
         state = initialState();

@@ -35,4 +35,7 @@ export default {
   toggleRoleUser(user){
     return axios.post(`api/users/role-status/${user.id}`);
   },
+  updatePermission(formData){
+    return axios.post(`api/users/${formData.user_id}/permissions`, formData);
+  },
 }

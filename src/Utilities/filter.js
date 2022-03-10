@@ -1,9 +1,9 @@
 import React from 'react';
 import { Input, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import ListOptions from './ListOptions';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
+import FilterOptions from './../Components/FilterOptions'
 
 
 const { Search } = Input;
@@ -31,6 +31,7 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
       <div style={{ padding: 8 }}>
           { type == "text" ? <Search placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setFilters)} onSearch={(e, event) => handleSearch(event, getData)} style={{ width: 200 }} /> : "" }
           { type == "number" ? <Input type="number" placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setFilters)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
+          { type == "amount" ? <Input type="number" placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setFilters)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
           { type == "date_range" ? <RangePicker format={'YYYY-MM-DD'} style={{width: "100%"}} onChange={(e) => searchInput(e, dataIndex, type, setFilters)} /> : "" }
       </div>
     ),
@@ -45,7 +46,7 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
 
 const list = (dataIndex, type, setFilters, filterData, getData) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, filters }) => {
-        return <ListOptions 
+        return <FilterOptions 
             setSelectedKeys={setSelectedKeys}
             selectedKeys={selectedKeys}
             confirm={confirm}

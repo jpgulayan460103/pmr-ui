@@ -54,4 +54,7 @@ export default {
   saveBacData(formdata){
     return axios.post(`api/purchase-requests/${formdata.purchase_request_id}/bac-tasks`, formdata);
   },
+  getNextNumber(){
+    return axios.get(`api/next-numbers/purchase-request`);
+  },
 }

@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import UserTable from './UserTable'
 import UserPermissions from './UserPermissions'
-import RegistrationFormActive from '../Login/RegistrationFormActive';
+import UserForm from './UserForm';
 import api from '../../api';
 import { debounce, map } from 'lodash'
 import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import helpers from '../../Utilities/helpers';
 
 
 
 function mapStateToProps(state) {
     return {
-        isInitialized: state.user.isInitialized
+        isInitialized: state.user.isInitialized,
+        user: state.user.data
     };
 }
 
@@ -67,16 +69,16 @@ const User = (props) => {
                 </Col>
                 <Col sm={24} md={8} lg={10} xl={10}>
                     { editType=="edit" ?  (
-                        <Card size="small" title="Edit User" bordered={false}>
+                        <Card size="small" title="Update User" bordered={false}>
                             <div className='user-card-content'>
-                                <RegistrationFormActive userInfo={formData} type="update" getUsers={getUsers} />
+                                <UserForm userInfo={formData} type="update" getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
                     { editType=="permissions" ?  (
-                        <Card size="small" title="Edit Permissions" bordered={false}  >
+                        <Card size="small" title="Roles and Permissions" bordered={false}  >
                             <div className='user-card-content'>
-                                <UserPermissions />
+                                <UserPermissions user={selectedUser} allowSuperAdmin={helpers.hasRole(props.user,['super-admin'])} getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }

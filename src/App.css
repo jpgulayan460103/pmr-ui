@@ -48,6 +48,10 @@
 }
 .ant-table-thead > tr >th{
   color: white;
+  background-image: linear-gradient(to top, #4834d4, #686de0) !important;
+}
+.ant-table-column-sort > tr >th{
+  color: white;
   background-image: linear-gradient(to top, #4834d4, #686de0);
 }
 
@@ -59,6 +63,10 @@
   margin-left: -20px;
 }
 
+.custom-pointer .anticon{
+  position: relative;
+  top: -0.2em;
+}
 .ant-btn .anticon{
   position: relative;
   top: -0.1em;
@@ -92,6 +100,22 @@
   top: -10px;
 }
 
+.filter-options:hover{
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.filter-options{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.form-upload-selected-files:hover{
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.form-upload-selected-files{
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+
 /* .ant-card-head{
   height: 40px;
   min-height: 40px;
@@ -111,13 +135,13 @@
 
 }
 .purchase-request-card-content{
-  height: 90vh;
+  height: 65vh;
   overflow: auto;
   padding-right: 5px;
 }
 
 .forms-card-content{
-  height: 45vh;
+  height: 70vh;
   overflow: auto;
   padding-right: 5px;
 }

@@ -5,14 +5,36 @@ import {
     notification,
     Tabs,
     Skeleton,
+    Collapse,
+    message,
+    Upload,
+    Button,
+    List,
+    Progress,
+    Select,
+    Input,
+    Tooltip,
 } from 'antd';
 import api from '../../api';
+
+import {
+    UploadOutlined,
+    DeleteOutlined,
+    InboxOutlined,
+    PaperClipOutlined,
+} from '@ant-design/icons';
+
+
 import { cloneDeep, isEmpty,  } from 'lodash';
-import dayjs from 'dayjs';
 import AuditTrail from '../../Components/AuditTrail';
 import Bacform from './BacForm';
+import AttachmentUpload from '../../Components/AttachmentUpload';
+import Attachments from '../../Components/Attachments';
 
 const { TabPane } = Tabs;
+const { Panel } = Collapse;
+const { Dragger } = Upload;
+const { Option } = Select;
 
 
 function mapStateToProps(state) {
@@ -22,19 +44,12 @@ function mapStateToProps(state) {
         modeOfProcurements: state.library.mode_of_procurements,
         purchaseRequestTab: state.procurement.purchaseRequestTab,
         purchaseRequests: state.procurement.purchaseRequests,
+        uploadingFiles: state.user.uploadingFiles,
     };
 }
 
 const Pruchaserequestworkspace = (props) => {
     const formRef = React.useRef();
-    useEffect(() => {
-        // if(props.purchaseRequestTab == "edit-form"){
-        //     setFormData()
-        // }
-        if(props.purchaseRequestTab == "audit-trail"){
-            loadAuditTrail()
-        }
-    }, [props.purchaseRequestTab || props.selectedPurchaseRequest]);
     const [errorMessage, setErrorMessage] = useState([]);
     const [logger, setLogger] = useState([]);
     const showErrorMessage = () => {
@@ -45,59 +60,6 @@ const Pruchaserequestworkspace = (props) => {
             }
         }
     }
-    const setFormData = () => {
-        setTimeout(() => {
-            formRef.current.setFieldsValue({
-                purchase_request_number: props.selectedPurchaseRequest.purchase_request_number,
-                purchase_request_type_id: props.selectedPurchaseRequest.purchase_request_type_id,
-                mode_of_procurement_id: props.selectedPurchaseRequest.mode_of_procurement_id,
-                fund_cluster: props.selectedPurchaseRequest.fund_cluster,
-                center_code: props.selectedPurchaseRequest.center_code,
-            })
-        }, 150);
-    }
-    const loadAuditTrail = () => {
-        setLogger([]);
-        api.PurchaseRequest.loggerProcurement(props.selectedPurchaseRequest.id)
-        .then(res => {
-            setLogger(res.data.data);
-        })
-        .catch(res => {})
-        .then(res => {})
-    }
-    
-    const onFinish = (values) => {
-        let formData = {
-            ...values,
-            id: props.selectedPurchaseRequest.id
-        };
-        api.PurchaseRequest.save(formData, 'update')
-        .then(res => {
-            let resData = res.data;
-            let clonedPrs = cloneDeep(props.purchaseRequests);
-            let index = clonedPrs.findIndex(i => i.id == props.selectedPurchaseRequest.id);
-            clonedPrs[index] = {
-                ...clonedPrs[index],
-                ...resData
-            }
-            props.dispatch({
-                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS",
-                data: clonedPrs
-            });
-            notification['success']({
-                message: `Successfully Saved.`,
-                description: `Purchase Request # ${formData.purchase_request_number} has been updated.`,
-            });
-            if(props.purchaseRequestTab == 'audit-trail'){
-                loadAuditTrail();
-            }
-        })
-        .catch(err => {
-            
-        })
-        .then(res => {})
-        ;
-    };
 
     const changeTab = (key) => {
         props.dispatch({
@@ -106,23 +68,6 @@ const Pruchaserequestworkspace = (props) => {
         });
     }
 
-    const columns = [
-        {
-          title: 'Field',
-          dataIndex: 'label',
-          key: 'label',
-        },
-        {
-          title: 'Old',
-          dataIndex: 'old',
-          key: 'old',
-        },
-        {
-          title: 'New',
-          dataIndex: 'new',
-          key: 'new',
-        },
-    ];
 
     const saveBacForm = (value) => {
         api.PurchaseRequest.saveBacData(value)
@@ -135,53 +80,38 @@ const Pruchaserequestworkspace = (props) => {
         <div>
 
         <Tabs activeKey={props.purchaseRequestTab} type="card" size="small" onChange={(key) => changeTab(key)}>
-            <TabPane tab="File" key="pdf">
+            <TabPane tab="Information" key="information">
+                <p>
+                    <b>PR No.:</b> {props.selectedPurchaseRequest?.purchase_request_number || ""} <br />
+                    <b>PR Date:</b> {props.selectedPurchaseRequest?.pr_date || ""} <br />
+                    <b>Procurement Category:</b> {props.selectedPurchaseRequest.procurement_type?.parent?.name || ""} <br />
+                    <b>Procurement Type:</b> {props.selectedPurchaseRequest.procurement_type?.name || ""} <br />
+                    <b>Mode of Procurement:</b> {props.selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
+                    <b>End User:</b> {props.selectedPurchaseRequest?.end_user?.name || ""} <br />
+                    <b>Fund Cluster:</b> {props.selectedPurchaseRequest?.fund_cluster || ""} <br />
+                    <b>Responsibility Center Code:</b> {props.selectedPurchaseRequest?.center_code || ""} <br />
+                    <b>Total Unit Cost:</b> {props.selectedPurchaseRequest?.total_cost_formatted || ""} <br />
+                    <b>Purpose:</b> {props.selectedPurchaseRequest?.purpose || ""} <br />
+                    <b>Charge To:</b> {props.selectedPurchaseRequest?.charge_to || ""} <br />
+                    <b>Alloted Amount:</b> {props.selectedPurchaseRequest?.alloted_amount || ""} <br />
+                    <b>UACS Code:</b> {props.selectedPurchaseRequest?.uacs_code || ""} <br />
+                    <b>SA/OR:</b> {props.selectedPurchaseRequest?.sa_or || ""} <br />
+                </p>
+            </TabPane>
+            <TabPane tab="Form" key="pdf">
                     {props.selectedPurchaseRequest && props.selectedPurchaseRequest.file ? <iframe src={`${props.selectedPurchaseRequest?.file}?view=1`} style={{height: "65vh", width: "100%"}}></iframe> : ""}
             </TabPane>
-            {/* <TabPane tab="Edit Form" key="edit-form">
-                <Form
-                    ref={formRef}
-                    name="normal_login"
-                    className="login-form"
-                    initialValues={{ remember: true, username: "ict", password: "admin123" }}
-                    onFinish={onFinish}
-                    layout='vertical'
-                >
-                    <Form.Item
-                        name="purchase_request_number"
-                        label="Purchase Request Number"
-                        // rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...showErrorMessage() }
-                    >
-                        <Input placeholder="Purchase Request Number" />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="fund_cluster"
-                        label="Fund Cluster"
-                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
-                        { ...showErrorMessage() }
-                    >
-                        <Input placeholder="Fund Cluster" />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="center_code"
-                        label="Responsibility Center Code"
-                        // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
-                        { ...showErrorMessage() }
-                    >
-                        <Input placeholder="Responsibility Center Code" />
-                    </Form.Item>
-
-                </Form>
-            </TabPane> */}
-            <TabPane tab="BAC Data" key="bac-task">
-                    <Bacform saveBacForm={saveBacForm}/>
+            <TabPane tab="Attachments" key="uploads">
+                {/* <Attachments fileList={props.selectedPurchaseRequest.form_uploads?.data} /> */}
+                <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
             </TabPane>
+
+            {/* <TabPane tab="BAC Data" key="bac-task">
+                <Bacform saveBacForm={saveBacForm}/>
+            </TabPane> */}
             <TabPane tab="Audit Trail" key="audit-trail">
-                { !isEmpty(logger) ? (
-                    <AuditTrail logger={logger} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="purchase_request_number" />
+                { !isEmpty(props.selectedPurchaseRequest.audit_trail?.data) ? (
+                    <AuditTrail logger={props.selectedPurchaseRequest.audit_trail?.data} tableScroll="45vh" hasChild childProp="purchase_request"  displayProp="display_log" />
                 ) : <Skeleton active />  }
             </TabPane>
         </Tabs>

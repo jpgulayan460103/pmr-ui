@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Form, Input, Button, Select, notification } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
+import helpers from '../../Utilities/helpers';
 
 const { Option, OptGroup } = Select;
 
@@ -19,9 +20,9 @@ function mapStateToProps(state) {
 }
 
 
-const RegistrationFormActive = (props) => {
+const UserForm = (props) => {
     const formRef = React.useRef();
-    let navigate = useNavigate();
+    let history = useHistory();
     useEffect(() => {
         formRef.current.setFieldsValue({
             firstname: props.userInfo.firstname,
@@ -56,7 +57,11 @@ const RegistrationFormActive = (props) => {
         .then(res => {
             sessionStorage.setItem('session',JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
-            navigate("/");
+            props.dispatch({
+                type: "SET_INITIALIZED",
+                data: false
+            });
+            history.push("/");
         })
         .catch(err => {
             setFormErrors(err.response.data.errors);
@@ -83,23 +88,6 @@ const RegistrationFormActive = (props) => {
         ;
     }
 
-    const displayError = (field) => {
-        if(formErrors && formErrors[field]){
-            return {
-              validateStatus: 'error',
-              help: formErrors[field][0]
-            }
-          }
-    }
-    
-    const testField = () => {
-        console.log(props);
-        formRef.current.setFieldsValue({
-            firstname: "firstname", 
-            middlename: "middlename", 
-            lastname: "lastname"
-        });
-    }
     return (
         <div>
             <Form
@@ -115,7 +103,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="firstname"
                     label="Firstname"
-                    { ...displayError(`firstname`) }
+                    { ...helpers.displayError(formErrors, `firstname`)  }
                     rules={[{ required: true, message: 'Please input your Firstname!' }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" />
@@ -123,14 +111,14 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="middlename"
                     label="Middle Initial"
-                    { ...displayError(`middlename`) }
+                    { ...helpers.displayError(formErrors, `middlename`) }
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="middlename" />
                 </Form.Item>
                 <Form.Item
                     name="lastname"
                     label="Lastname"
-                    { ...displayError(`lastname`) }
+                    { ...helpers.displayError(formErrors, `lastname`) }
                     rules={[{ required: true, message: 'Please input your Lastname!' }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
@@ -138,7 +126,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="office_id"
                     label="Section/Unit/Office"
-                    { ...displayError(`office_id`) }
+                    { ...helpers.displayError(formErrors, `office_id`) }
                     rules={[{ required: true, message: 'Please select section/unit/office' }]}
                 >
                     <Select
@@ -165,7 +153,7 @@ const RegistrationFormActive = (props) => {
                     <Form.Item
                         name="group_id"
                         label="Techinical Working Group"
-                        { ...displayError(`group_id`) }
+                        { ...helpers.displayError(formErrors, `group_id`) }
                         // rules={[{ required: true, message: 'Please select Techinical Working Group' }]}
                     >
                         <Select
@@ -189,7 +177,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="position_id"
                     label="Position"
-                    { ...displayError(`position_id`) }
+                    { ...helpers.displayError(formErrors, `position_id`) }
                     rules={[{ required: true, message: 'Please select Position' }]}
                 >
                     <Select
@@ -211,7 +199,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="designation"
                     label="Designation"
-                    { ...displayError(`designation`) }
+                    { ...helpers.displayError(formErrors, `designation`) }
                     // rules={[{ required: true, message: 'Please input your Designation!' }]}
                 >
                     <Input placeholder="Designation" />
@@ -219,7 +207,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="cellphone_number"
                     label="Cellphone Number"
-                    { ...displayError(`cellphone_number`) }
+                    { ...helpers.displayError(formErrors, `cellphone_number`) }
                     rules={[{ required: true, message: 'Please input your Cellphone Number!' }]}
                 >
                     <Input prefix={<PhoneOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
@@ -227,7 +215,7 @@ const RegistrationFormActive = (props) => {
                 <Form.Item
                     name="email_address"
                     label="Email Address"
-                    { ...displayError(`email_address`) }
+                    { ...helpers.displayError(formErrors, `email_address`) }
                     rules={[{ required: true, message: 'Please input your Email Address!' }]}
                 >
                     <Input type="email" prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email Address" />
@@ -247,21 +235,16 @@ const RegistrationFormActive = (props) => {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                         Update
                         </Button>
-                        &nbsp;&nbsp;&nbsp;
-                        <Button type="danger" onClick={() => props.setRegisterStep(0)  }>
-                        Cancel
-                        </Button>
                     </Form.Item>
                 ) }
             </Form>
-            {/* <span onClick={() => testField() }>aaaaaa</span> */}
         </div>
     );
 }
 
-// export default RegistrationFormActive;
+// export default UserForm;
 
 export default connect(
     mapStateToProps,
-  )(RegistrationFormActive);
+  )(UserForm);
 
