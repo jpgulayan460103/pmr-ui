@@ -74,22 +74,20 @@ const Attachments = (props) => {
         actions.push(<Tooltip placement="top" title="Download">
         <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
     </Tooltip>);
-        if(props.user.key === item.user_id){
-            actions.push(
-                <Popconfirm
-                    title="Are you sure to delete this attachment?"
-                    onConfirm={() => handleConfirm(item) }
-                    // onCancel={cancel}
-                    okText="Yes"
-                    cancelText="No"
-                    placement='left'
-                >
-                    <Tooltip placement="top" title="Delete">
-                        <Button size='small' icon={<DeleteOutlined />} type="link" />
-                    </Tooltip>
-                </Popconfirm>
-            );
-        }
+        actions.push(
+            <Popconfirm
+                title="Are you sure to delete this attachment?"
+                onConfirm={() => handleConfirm(item) }
+                // onCancel={cancel}
+                okText="Yes"
+                cancelText="No"
+                placement='left'
+            >
+                <Tooltip placement="top" title="Delete">
+                    <Button size='small' icon={<DeleteOutlined />} type="link" />
+                </Tooltip>
+            </Popconfirm>
+        );
         return actions;
     }
 

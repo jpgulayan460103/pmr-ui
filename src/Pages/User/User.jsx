@@ -11,7 +11,8 @@ import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input,
 
 function mapStateToProps(state) {
     return {
-        isInitialized: state.user.isInitialized
+        isInitialized: state.user.isInitialized,
+        user: state.user.data
     };
 }
 
@@ -67,16 +68,16 @@ const User = (props) => {
                 </Col>
                 <Col sm={24} md={8} lg={10} xl={10}>
                     { editType=="edit" ?  (
-                        <Card size="small" title="Edit User" bordered={false}>
+                        <Card size="small" title="Update User" bordered={false}>
                             <div className='user-card-content'>
                                 <UserForm userInfo={formData} type="update" getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }
                     { editType=="permissions" ?  (
-                        <Card size="small" title="Edit Permissions" bordered={false}  >
+                        <Card size="small" title="Permissions and Roles" bordered={false}  >
                             <div className='user-card-content'>
-                                <UserPermissions user={selectedUser} />
+                                <UserPermissions user={selectedUser} allowSuperAdmin={props.user?.roles?.data?.filter(i => i.name == "super-admin").length != 0} getUsers={getUsers} />
                             </div>
                         </Card>
                     ) : "" }

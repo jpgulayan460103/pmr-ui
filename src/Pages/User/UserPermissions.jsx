@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tree, Button } from 'antd';
+import { Tree, Button, notification, Radio } from 'antd';
 import { map } from 'lodash';
 import api from '../../api';
 
@@ -23,7 +23,7 @@ const UserPermissions = (props) => {
               key: 'users.permission.view',
             },
             {
-              title: 'Permission to update permissions a user.',
+              title: 'Permission to update permissions of a user.',
               key: 'users.permission.update',
             },
             {
@@ -41,10 +41,6 @@ const UserPermissions = (props) => {
                 key: 'purchase.requests.view',
               },
               {
-                title: 'Permission to finalize and approve the created purchase request.',
-                key: 'purchase.requests.approve',
-              },
-              {
                 title: 'Permission to create a purchase request.',
                 key: 'purchase.requests.create',
               },
@@ -57,7 +53,7 @@ const UserPermissions = (props) => {
                 key: 'purchase.requests.delete',
               },
               {
-                title: 'Permission to view the list of purchase request.',
+                title: 'Permission to view the attachments of a purchase request.',
                 key: 'purchase.requests.attachments.view',
               },
               {
@@ -65,7 +61,7 @@ const UserPermissions = (props) => {
                 key: 'purchase.requests.attachments.create',
               },
               {
-                title: 'Permission to remove attachments to a purchase request.',
+                title: 'Permission to remove attachments of a purchase request.',
                 key: 'purchase.requests.attachments.delete',
               },
             ],
@@ -79,15 +75,15 @@ const UserPermissions = (props) => {
                 key: 'procurement.view',
               },
               {
-                title: 'Permission to view the list of purchase request in the procurement module.',
+                title: 'Permission to view the attachments of a form.',
                 key: 'procurement.attachment.view',
               },
               {
-                title: 'Permission to add attachments to a purchase request in the procurement module.',
+                title: 'Permission to add attachments to a form.',
                 key: 'procurement.attachment.create',
               },
               {
-                title: 'Permission to remove attachments to a purchase request in the procurement module.',
+                title: 'Permission to remove attachments of a form',
                 key: 'procurement.attachment.delete',
               },
             ],
@@ -155,7 +151,7 @@ const UserPermissions = (props) => {
                 key: 'form.routing.pending.attachment.create',
               },
               {
-                title: 'Permission to remove attachments to the forwarded form.',
+                title: 'Permission to remove attachments of the forwarded form.',
                 key: 'form.routing.pending.attachment.delete',
               },
             ],
@@ -200,17 +196,75 @@ const UserPermissions = (props) => {
       const [checkedKeys, setCheckedKeys] = useState();
       const [selectedKeys, setSelectedKeys] = useState([]);
       const [autoExpandParent, setAutoExpandParent] = useState(true);
+      const [loading, setLoading] = useState(false);
+
+      const [role, setRole] = useState("");
+
+      const handleChangeRole = e => {
+        let selectedRole = e.target.value;
+        setPermissionsOnRole(selectedRole)
+      };
+
+      const setPermissionsOnRole = (selectedRole) => {
+
+        switch (selectedRole) {
+          case "admin":
+          case "super-admin":
+            setCheckedKeys([
+              'activitylogs.all',
+              'form.routing.approved.all',
+              'form.routing.disapproved.all',
+              'form.routing.pending.all',
+              'libraries.all',
+              'procurement.all',
+              'purchase.requests.all',
+              'users.all',
+            ]);
+            break;
+          case "user":
+            setCheckedKeys([
+              'purchase.requests.view',
+              'purchase.requests.create',
+              'libraries.items.categories.view',
+              'libraries.items.view',
+              'libraries.office.divisions.view',
+              'libraries.office.sections.view',
+              'libraries.signatories.administrators.view',
+              'libraries.uom.view',
+            ]);
+            break;
+        
+          default:
+            break;
+        }
+        setRole(selectedRole);
+      }
 
       const savePermission = () => {
+        setLoading(true);
         let formData = {
           user_id: props.user.key,
-          permissions: checkedKeys
+          permissions: checkedKeys,
+          role: role,
         };
-        api.User.updatePermission(formData);
+        api.User.updatePermission(formData)
+        .then(res => {
+            setLoading(false);
+            props.getUsers();
+            notification.success({
+                message: 'Success',
+                description:
+                  `Permission and roles of the user has been updated`,
+            });
+        })
+        .catch(err => {
+          setLoading(false);
+        })
+        .then(res => {})
+        ;
       }
 
       useEffect(() => {
-        setCheckedKeys(map(props.user.permissions.data, 'name'));
         setExpandedKeys([
           'activitylogs.all',
           'form.routing.approved.all',
@@ -221,6 +275,12 @@ const UserPermissions = (props) => {
           'purchase.requests.all',
           'users.all',
         ]);
+        let propUserRoles = props.user.roles.data[0].name;
+        setRole(propUserRoles);
+        setPermissionsOnRole(propUserRoles);
+        if(propUserRoles == "user"){
+          setCheckedKeys(map(props.user.permissions.data, 'name'));
+        }
       }, [props.user]);
     
       const onExpand = (expandedKeysValue) => {
@@ -244,6 +304,16 @@ const UserPermissions = (props) => {
     return (
         
         <div>
+
+            Role: &nbsp;
+            <Radio.Group onChange={handleChangeRole} value={role}>
+              <Radio value="user">User</Radio>
+              <Radio value="admin">Admin</Radio>
+              { props.allowSuperAdmin && <Radio value="super-admin">Super Admin</Radio> }
+            </Radio.Group>
+            <br />
+            <br />
+            Permissions:
             <Tree
             checkable
             onExpand={onExpand}
@@ -255,8 +325,9 @@ const UserPermissions = (props) => {
             // checkedKeys={['users.delete', 'purchase.requests.all']}
             checkedKeys={checkedKeys}
             treeData={treeData}
+            disabled={role != 'user'}
             />
-            <Button type='primary' onClick={() => {
+            <Button type='primary' loading={loading} disabled={loading} onClick={() => {
               savePermission()
             }}>Save</Button>
         </div>

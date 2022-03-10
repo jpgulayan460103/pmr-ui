@@ -78,7 +78,7 @@ const App = (props) => {
           <Route exact path="/procurement/quotations/suppliers"  >
               <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
           </Route>
-          <Route exact path="/forms/requests"  >
+          <Route exact path="/forms/forwarded"  >
               <PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/forms/approved"  >

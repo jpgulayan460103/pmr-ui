@@ -235,10 +235,6 @@ const UserForm = (props) => {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                         Update
                         </Button>
-                        &nbsp;&nbsp;&nbsp;
-                        <Button type="danger" onClick={() => {}  }>
-                        Cancel
-                        </Button>
                     </Form.Item>
                 ) }
             </Form>
