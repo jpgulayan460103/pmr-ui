@@ -336,7 +336,7 @@ const CreatePurchaseRequest = (props) => {
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) }>
-                            <Input placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
+                            <Input placeholder="Title"  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
                         </Form.Item>
                 </Col>
 
@@ -434,7 +434,7 @@ const CreatePurchaseRequest = (props) => {
                                         allowClear
                                         options={props.items}
                                         onSelect={(val, item) => selectItem(val, item, index)}
-                                        placeholder="Type here..."
+                                        placeholder="Item Description"
                                         filterOption={(input, option) =>
                                             option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
@@ -452,14 +452,14 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
-                                <Input type="number" className='text-center' min={1} autoComplete='off' style={{ width: "100%" }} placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
+                                <Input type="number" className='text-center' min={1} autoComplete='off' style={{ width: "100%" }} placeholder="Quantity" onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
                             </Form.Item>
                             </div>
                         </Col>
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
-                                <Input type="number"  className='text-right' autoComplete='off' style={{ width: "100%" }} step="0.01" placeholder="Type here..."  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
+                                <Input type="number"  className='text-right' autoComplete='off' style={{ width: "100%" }} step="0.01" placeholder="Unit Cost"  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
                             </Form.Item>
                             </div>
                         </Col>

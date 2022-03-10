@@ -63,13 +63,6 @@ const Sidemenu = (props) => {
                 theme="light"
                 mode="inline"
                 selectedKeys={[defaultKey]}
-                defaultOpenKeys={[
-                    'submenu-procurement',
-                    'submenu-form-monitoring',
-                    'submenu-purchase-request',
-                    'submenu-libraries',
-                    'submenu-user_offices',
-                ]}
                 >
                 <Menu.Item key="/" icon={<UserOutlined />}>
                     <Link to="/"></Link>
