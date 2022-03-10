@@ -7,4 +7,11 @@ export default {
   all(){
     return axios.get(`api/libraries`);
   },
+  save(arg, formdata, formType){
+    if(formType != "Create"){
+      return axios.put(`api/libraries/${arg}/${formdata.id}`,formdata);
+    }else{
+      return axios.post(`api/libraries/${arg}`,formdata);
+    }
+  },
 }

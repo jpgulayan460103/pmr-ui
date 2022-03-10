@@ -100,22 +100,22 @@ const App = (props) => {
               <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/items/categories"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="item_categories"/></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category"}} /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/items/measures"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measures" /></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/offices/divisions"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_divisions" options={{parent: true, title: true, parentLabel: "Division"}} /></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="user_division" options={{libraryName: "Office Division",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/offices/sections"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_sections" options={{parent: true, title: true, parentLabel: "Division"}} /></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="user_section" options={{libraryName: "Office Section",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/user_offices/administrators"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_names" options={{parent: true, title: true, parentLabel: "Designation"}} /></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" options={{libraryName: "Office Administrators",parent: true, title: true, parentLabel: "Designation", parentType: "user_signatory_designation"}} /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/user_offices/purchase-requests"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_names" /></Layout></PrivateRoute>
+              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/users"  >
               <PrivateRoute><Layout><User /></Layout></PrivateRoute>
