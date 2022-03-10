@@ -78,12 +78,21 @@ const ActivityLogs = (props) => {
             dataIndex: 'description_str',
             key: 'description_str',
             width: 150,
+            sorter: (a, b) => a.description_str?.localeCompare(b.description_str),
             ...onCell,
         },
         {
             title: 'Subject',
             key: 'subject',
             width: 250,
+            sorter: (a, b) => {
+                if(a.subject?.parent){
+                    return a.subject?.parent?.display_log?.localeCompare(b.subject?.parent?.display_log)
+                }else{
+                    return a.subject?.display_log?.localeCompare(b.subject?.display_log)
+
+                }
+            },
             render: (text, record, index) => (
                 <span>
                     { record.subject?.parent ? record.subject?.parent?.display_log : record.subject?.display_log }
@@ -95,6 +104,13 @@ const ActivityLogs = (props) => {
             title: 'Contents',
             key: 'target',
             width: 250,
+            sorter: (a, b) => {
+                if(a.subject?.parent){
+                    return a.description_str?.localeCompare(b.description_str);
+                }else{
+                    return a.subject.display_log?.localeCompare(b.subject.display_log);
+                }
+            },
             render: (text, record, index) => (
                 <span>
                     { record.subject?.parent ? record.subject.display_log : "" }
@@ -108,14 +124,16 @@ const ActivityLogs = (props) => {
             key: 'created_at',
             width: 150,
             ...onCell,
+            sorter: (a, b) => a.created_at?.localeCompare(b.created_at),
         },
         {
             title: 'User',
             key: 'user',
             width: 250,
+            sorter: (a, b) => a.user?.user_information?.fullname?.localeCompare(b.user?.user_information?.fullname),
             render: (text, record, index) => (
                 <span>
-                    { record.user.user_information.fullname }
+                    { record.user?.user_information?.fullname }
                 </span>
             ),
             ...onCell,

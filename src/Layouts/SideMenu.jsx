@@ -241,10 +241,11 @@ const Sidemenu = (props) => {
                             helpers.hasRole(props.user, ["admin","super-admin"])
                         )
                     && (
-                        <Menu.Item key="/libraries/items">
-                            <Link to="/libraries/items"></Link>
-                            Items
-                        </Menu.Item>
+                        // <Menu.Item key="/libraries/items">
+                        //     <Link to="/libraries/items"></Link>
+                        //     Items
+                        // </Menu.Item>
+                        ""
                     ) }
 
                     {
@@ -310,10 +311,10 @@ const Sidemenu = (props) => {
                                 <Link to="/libraries/user_offices/administrators"></Link>
                                 Admininstrators
                             </Menu.Item>
-                            <Menu.Item key="/libraries/user_offices/purchase-requests">
+                            {/* <Menu.Item key="/libraries/user_offices/purchase-requests">
                                 <Link to="/libraries/user_offices/purchase-requests"></Link>
                                 Purchase Request
-                            </Menu.Item>
+                            </Menu.Item> */}
                         </SubMenu>
                     )
                 }

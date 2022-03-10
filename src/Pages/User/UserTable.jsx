@@ -47,11 +47,13 @@ const UserTable = (props) => {
             key: 'username',
             width: 150,
             ...onCell,
+            sorter: (a, b) => a.username?.localeCompare(b.username),
         },
         {
             title: 'Fullname',
             key: 'fullname',
             width: 250,
+            sorter: (a, b) => a.user_information?.fullname?.localeCompare(b.user_information?.fullname),
             render: (text, record, index) => (
                 <span>
                     { record.user_information.fullname }
@@ -63,6 +65,7 @@ const UserTable = (props) => {
             title: 'Position',
             key: 'position',
             width: 150,
+            sorter: (a, b) => a.user_information?.position?.name?.localeCompare(b.user_information?.position?.name),
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.position?.name }
@@ -85,6 +88,7 @@ const UserTable = (props) => {
             title: 'Email Address',
             index: 'email_address',
             width: 150,
+            sorter: (a, b) => a.email_address?.localeCompare(b.email_address),
             render: (text, record, index) => (
                 <span>
                     { record.user_information?.email_address }
