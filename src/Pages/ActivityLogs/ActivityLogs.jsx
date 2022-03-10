@@ -192,7 +192,7 @@ const ActivityLogs = (props) => {
                                 columns={logsColumns}
                                 size={"small"}
                                 loading={{spinning: loading, tip: "Loading..."}}
-                                pagination={false}
+                                // pagination={false}
                                 // onChange={handleTableChange}
                                 scroll={{ y: "50vh" }}
                                 rowClassName={(record, index) => {
@@ -202,7 +202,7 @@ const ActivityLogs = (props) => {
                                 }}
                             />
                             <div className="flex justify-end mt-2">
-                                <Pagination
+{/*                                 <Pagination
                                     current={paginationMeta?.current_page || 1}
                                     total={paginationMeta?.total || 1}
                                     pageSize={paginationMeta?.per_page || 1}
@@ -210,7 +210,7 @@ const ActivityLogs = (props) => {
                                     showQuickJumper
                                     size="small"
                                     showSizeChanger={false}
-                                />
+                                /> */}
                             </div>
                         </div>
                     </Card>
