@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import {
   BrowserRouter as Router,
   Switch,
@@ -25,6 +26,7 @@ import DisapprovedForm from './Pages/Forms/DisapprovedForm';
 import Procurement from './Pages/Procurement/Procurement'
 import Quotation from './Pages/Quotation/Quotation';
 import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
+import { cloneDeep, isEmpty } from 'lodash';
 
 
 window.Pusher = require('pusher-js');
@@ -50,7 +52,63 @@ const PrivateRoute  = ({ children, ...props }) => {
   }
   return children;
 }
+
+function mapStateToProps(state) {
+    return {
+        unit_of_measures: state.library.unit_of_measures,
+        items: state.library.items,
+        libraries: state.library.libraries,
+        isLibrariesLoaded: state.library.isLibrariesLoaded,
+        user_offices: state.library.user_offices,
+        user: state.user.data,
+        mainLoading: state.user.mainLoading,
+        isInitialized: state.user.isInitialized,
+        notifications: state.user.notifications,
+    };
+}
+
 const App = (props) => {
+
+    useEffect(() => {
+        window.Echo.channel('home').listen('NewMessage', (e) => {
+            // console.log(e);
+            // var notification = new Notification(e.message);
+            // console.log(e);
+            // console.log(props.user.user_offices);
+            if(!isEmpty(props.user)){
+                // console.log(e.message.notify_offices);
+                if(props.user?.user_offices?.data.filter(i => i.office_id == e.message.notify_offices).length != 0){
+                    console.log(e.message);
+                    let clonedNotif = cloneDeep(props.notifications)
+                    switch (e.message.message_type) {
+                        case "approved_form":
+                            clonedNotif.push({
+                                message_type: e.message.message_type,
+                                message: `New purchase request from ${e.message.form_route.form_routable.end_user.name}`,
+                                // data: e.message.form_route,
+                            })
+                            break;
+                        case "rejected_form":
+                            clonedNotif.push({
+                                message_type: e.message.message_type,
+                                message: `Purchase request ${e.message.form_route.form_routable.uuid} has been disapproved by: ${e.message.from_user.username}`,
+                                // data: e.message.form_route,
+                            })
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                    props.dispatch({
+                        type: "ADD_NOTIFICATION",
+                        data: clonedNotif
+                    });
+                }
+                // console.log(e.message.notify_offices);
+                // console.log("notify");
+            }
+          });
+    }, [props.user]);
   return (
     <Router>
 
@@ -138,4 +196,7 @@ const App = (props) => {
   );
 }
 
-export default App;
+export default connect(
+    mapStateToProps,
+  )(App);
+

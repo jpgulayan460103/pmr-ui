@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
 import helpers from '../../Utilities/helpers';
 import AttachmentUpload from '../../Components/AttachmentUpload';
+import { Link, useLocation  } from 'react-router-dom'
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -33,6 +34,7 @@ const MaximizeSvg = () => (
 );  
 
 const ForwardedForm = (props) => {
+    const location = useLocation();
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
     const budgetFormRef = React.useRef();
@@ -41,11 +43,14 @@ const ForwardedForm = (props) => {
         document.title = "Forwarded Forms";
         if(props.isInitialized){
             getForm();
-            window.Echo.channel('home').listen('NewMessage', (e) => {
-                getForm();
-            });
         }
     }, [props.isInitialized]);
+    useEffect(() => {
+        window.Echo.channel('home').listen('NewMessage', (e) => {
+            console.log(location.pathname);
+            getForm();
+        });
+    }, []);
     const [forms, setForms] = useState([]);
     const [selectedFormRoute, setSelectedFormRoute] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
@@ -93,6 +98,7 @@ const ForwardedForm = (props) => {
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
+            rejectFormRef.current.resetFields()
         })
         .catch(err => {
             setSubmit(false);
@@ -165,6 +171,7 @@ const ForwardedForm = (props) => {
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
+            resolveFormRef.current.resetFields()
         })
         .catch(err => {
             setSubmit(false);
@@ -293,6 +300,7 @@ const ForwardedForm = (props) => {
                 approve(selectedFormRoute);
                 setModalBudgetForm(false);
                 cancelBudgetForm();
+                budgetFormRef.current.resetFields()
             })
             .catch(err => {
                 setSubmit(false);
@@ -357,6 +365,7 @@ const ForwardedForm = (props) => {
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
                     cancelProcurementForm();
+                    procurementFormRef.current.resetFields()
                 })
                 .catch(err => {
                     setSubmit(false);
@@ -376,6 +385,7 @@ const ForwardedForm = (props) => {
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
                     cancelProcurementForm();
+                    procurementFormRef.current.resetFields()
                 })
                 .catch(err => {
                     setSubmit(false);

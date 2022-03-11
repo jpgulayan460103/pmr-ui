@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { connect } from 'react-redux';
-import { Layout, Menu, Dropdown, Badge } from 'antd';
+import { Layout, Menu, Dropdown, Badge, List } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
 import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
@@ -17,6 +17,35 @@ function mapStateToProps(state) {
     };
 }
 
+const data = [
+    'Racing car sprays burning fuel into crowd.',
+    'Japanese princess to wed commoner.',
+    'Australian walks 100km after outback crash.',
+    'Man charged over missing wedding girl.',
+    'Los Angeles battles huge wildfires.',
+];
+
+const NotificationItems = ({notifications}) => {
+    return (
+        <List
+            size="small"
+            // header={<div>Notifications</div>}
+            // footer={<div>Footer</div>}
+            bordered
+            dataSource={notifications}
+            renderItem={item => (
+                <List.Item
+                    className="notificaton-items"
+                    actions={[
+                        <span className='custom-pointer'>View</span>
+                    ]}
+                >
+                    {item.message}
+                </List.Item>
+            )}
+            />
+    );
+};
 const MenuItems = ({userLogout}) => {
     return (
         <Menu>
@@ -75,11 +104,11 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 {/* { showSide ? <img src={logo} className="h-full bg-white p-1 custom-pointer float-left" onClick={() => { toggleSide() }} /> : "" } */}
                 {/* { collapsed ? <span className='header-items' style={{color: "white", marginLeft: 10, fontSize: 20, cursor: "pointer", top: "-12px"}} onClick={() => { toggleSide() }}>{ !showSide ? <MenuFoldOutlined /> : "" }</span> : "" } */}
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
-                    <p className="float-right mr-4 header-items" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
+                    <p className="float-right mr-4 ml-4 header-items" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
-                <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
+                <Dropdown overlay={<NotificationItems notifications={notifications} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
                         <p className="float-right mr-2 header-items" style={{color:"white", cursor: "pointer"}}>
-                        <Badge count={notifications}>
+                        <Badge count={notifications.length}>
                             <span  style={{color:"white", cursor: "pointer"}}>
                                 <MenuIcon icon={<BellFilled style={{fontSize: 18}} />} label="Menu" />
                             </span>

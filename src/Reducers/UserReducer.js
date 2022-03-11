@@ -1,7 +1,7 @@
 const initialState = () => {
   return {
     data: {},
-    notifications: 0,
+    notifications: [],
     collapsed: true,
     collapsedWidth: 80,
     mainLoading: true,
@@ -16,7 +16,7 @@ export default function reducer(state = initialState(), action) {
     case 'ADD_NOTIFICATION':
       return {
         ...state,
-        notifications: state.notifications + 1,
+        notifications: action.data,
       };    
     case 'SET_COLLAPSE':
       return {

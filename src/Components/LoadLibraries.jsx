@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import api from '../api';
 import { isEmpty } from 'lodash';
@@ -51,15 +51,7 @@ const Loadlibraries = (props) => {
                 data: true
             });
     
-            window.Echo.channel('home').listen('NewMessage', (e) => {
-                console.log(e);
-                // var notification = new Notification(e.message);
-                // console.log(notification);
-                props.dispatch({
-                    type: "ADD_NOTIFICATION",
-                    data: 0
-                });
-              });
+
         }
     }, []);
 
