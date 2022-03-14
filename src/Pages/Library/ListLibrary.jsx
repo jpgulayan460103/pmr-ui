@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import api from '../../api';
 import { Table, Card, Col, Row, Form, Input, Select, Button, notification  } from 'antd';
@@ -33,7 +33,7 @@ const ListLibrary = (props) => {
     }, [props.isInitialized]);
 
     const dataSource = props[props.libraryType].map(i => {
-            let newI = i;
+            let newI = cloneDeep(i);
             delete newI.children
             return newI;
         }

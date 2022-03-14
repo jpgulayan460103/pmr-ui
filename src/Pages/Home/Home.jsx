@@ -12,7 +12,7 @@ function mapStateToProps(state) {
 const Home = () => {
     return (
         <div style={style}>
-             <Row gutter={[16, 16]} className="mb-3">
+             {/* <Row gutter={[16, 16]} className="mb-3">
                 <Col xs={24} sm={24} md={12} lg={6} xl={6}>
                     <Card size="small" bordered={false}  >
                         <div>
@@ -41,7 +41,7 @@ const Home = () => {
                         </div>
                     </Card>
                 </Col>
-            </Row>
+            </Row> */}
         </div>
     );
 }

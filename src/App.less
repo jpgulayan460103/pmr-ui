@@ -8,8 +8,7 @@
 /* @import 'your-theme-file.less'; */
 
 @mainColor: #4834d4;
-@mainColorLight: #686de0;
-@mainColorDark: #30336b;
+@mainColorSecond: #686de0;
 @hoverColor: rgba(0, 0, 0, 0.1);
 @selectColor: #f8faec;
 @mainColorFont: #fff;
@@ -37,7 +36,7 @@
 }
 
 .site-layout-sub-header-background {
-    background-image: linear-gradient(to left, @mainColorDark, @mainColor, @mainColorLight);
+    background-image: linear-gradient(to left, @mainColor, @mainColorSecond);
 }
 
 #main-content{
@@ -47,7 +46,7 @@
 .ant-layout-sider-light{
     .ant-layout-sider-trigger {
         color: @mainColorFont;
-        background-image: linear-gradient(to right, @mainColor, @mainColorLight);
+        background-image: linear-gradient(to right, @mainColor, @mainColorSecond);
     }
     .ant-layout-sider-zero-width-trigger{
         display: none;
@@ -75,37 +74,46 @@
 
 .ant-table-thead > tr >th{
     color: @mainColorFont;
-    background-image: linear-gradient(to top, @mainColor, @mainColorLight) !important;
+    background-image: linear-gradient(to top, @mainColor, @mainColorSecond) !important;
 }
 .ant-table-column-sort > tr >th{
     color: @mainColorFont;
-    background-image: linear-gradient(to top, @mainColor, @mainColorLight);
+    background-image: linear-gradient(to top, @mainColor, @mainColorSecond);
 }
 
-.ant-btn .anticon{
-    position: relative;
-    top: -0.1em;
+.ant-btn{
+    .anticon{
+        position: relative;
+        top: -0.1em;
+    }
 }
-.ant-back-top-icon .anticon{
-    position: relative;
-    top: -0.25em;
+.ant-back-top-icon{
+    .anticon{
+        position: relative;
+        top: -0.25em;
+    }
 }
-.ant-menu-item .anticon{
-    position: relative;
-    top: -0.30em;
+.ant-menu-item{
+    .anticon{
+        position: relative;
+        top: -0.30em;
+    }
     &:hover{
         background-color: @hoverColor;
     }
 }
-.ant-dropdown-trigger .anticon{
-    position: relative;
-    top: -0.1em;
+.ant-dropdown-trigger{
+    .anticon{
+        position: relative;
+        top: -0.1em;
+    }
 }
-.ant-select-selection-item-remove .anticon{
-    position: relative;
-    top: -0.30em;
+.ant-select-selection-item-remove{
+    .anticon{
+        position: relative;
+        top: -0.30em;
+    }    
 }
-  
 .ant-dropdown{
     /* border: 1px solid black; */
     -moz-box-shadow: 0 0 3px #ccc;
@@ -113,8 +121,10 @@
     box-shadow: 0 0 3px #ccc;
 }
 
-.ant-tabs-tabpane .ant-timeline{
-    padding-left: 10px;
+.ant-tabs-tabpane{
+    .ant-timeline{
+        padding-left: 10px;
+    }
 }
 
 
