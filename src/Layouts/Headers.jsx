@@ -17,33 +17,41 @@ function mapStateToProps(state) {
     };
 }
 
-const data = [
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.',
-];
 
-const NotificationItems = ({notifications}) => {
+const NotificationItems = ({notifications, history, dispatch}) => {
     return (
-        <List
+        <div id='notifications-container'>
+            <List
             size="small"
-            // header={<div>Notifications</div>}
-            // footer={<div>Footer</div>}
+            header={<div>Notifications</div>}
+            footer={<div className='custom-pointer' onClick={() => {
+                dispatch({
+                    type: "ADD_NOTIFICATION",
+                    data: []
+                });
+            }}>Clear Notifications</div>}
             bordered
             dataSource={notifications}
             renderItem={item => (
                 <List.Item
                     className="notificaton-items"
                     actions={[
-                        <span className='custom-pointer'>View</span>
+                        <span className='custom-pointer' onClick={() => {
+                            history.push('/forms/forwarded');
+                        }}>View</span>
                     ]}
                 >
-                    {item.message}
+
+                <List.Item.Meta
+                        // avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                        title={<span>{item.notification_title}</span>}
+                        description={item.notification_message}
+                        />
+                    
                 </List.Item>
             )}
             />
+        </div>
     );
 };
 const MenuItems = ({userLogout}) => {
@@ -106,7 +114,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
                     <p className="float-right mr-4 ml-4 header-items" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
-                <Dropdown overlay={<NotificationItems notifications={notifications} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
+                <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
                         <p className="float-right mr-2 header-items" style={{color:"white", cursor: "pointer"}}>
                         <Badge count={notifications.length}>
                             <span  style={{color:"white", cursor: "pointer"}}>

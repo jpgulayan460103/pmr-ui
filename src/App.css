@@ -118,14 +118,14 @@
   padding-bottom: 4px !important;
 }
 .notificaton-items:hover{
-  /* background-color: rgba(0, 0, 0, 0.1); */
-  z-index: 10000000 !important;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .notificaton-items{
-  width: 350px;
-  background-color: white;
   padding: 20px !important;
-  z-index: 10000000 !important;
+}
+#notifications-container{
+  width: 350px !important;
+  background-color: white;
 }
 
 

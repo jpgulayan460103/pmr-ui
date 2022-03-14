@@ -80,18 +80,20 @@ const App = (props) => {
                 if(props.user?.user_offices?.data.filter(i => i.office_id == e.message.notify_offices).length != 0){
                     console.log(e.message);
                     let clonedNotif = cloneDeep(props.notifications)
-                    switch (e.message.message_type) {
+                    switch (e.message.notification_type) {
                         case "approved_form":
                             clonedNotif.push({
-                                message_type: e.message.message_type,
-                                message: `New purchase request from ${e.message.form_route.form_routable.end_user.name}`,
+                                notification_type: e.message.notification_type,
+                                notification_title: e.message.notification_title,
+                                notification_message: e.message.notification_message,
                                 // data: e.message.form_route,
                             })
                             break;
                         case "rejected_form":
                             clonedNotif.push({
-                                message_type: e.message.message_type,
-                                message: `Purchase request ${e.message.form_route.form_routable.uuid} has been disapproved by: ${e.message.from_user.username}`,
+                                notification_title: e.message.notification_title,
+                                notification_type: e.message.notification_type,
+                                notification_message: e.message.notification_message,
                                 // data: e.message.form_route,
                             })
                             break;
