@@ -294,8 +294,7 @@ const Sidemenu = (props) => {
                 {
 
                     (
-                        helpers.hasPermission(props.user, ['libraries.signatories.administrators.view']) ||
-                        helpers.hasRole(props.user, ["admin","super-admin"])
+                        helpers.hasRole(props.user, ["super-admin"])
                     )
 
                     && (
@@ -304,10 +303,10 @@ const Sidemenu = (props) => {
                                 <Link to="/libraries/user_offices/administrators"></Link>
                                 Admininstrators
                             </Menu.Item>
-                            {/* <Menu.Item key="/libraries/user_offices/purchase-requests">
-                                <Link to="/libraries/user_offices/purchase-requests"></Link>
-                                Purchase Request
-                            </Menu.Item> */}
+                            <Menu.Item key="/libraries/user_offices/administrators/designations">
+                                <Link to="/libraries/user_offices/administrators/designations"></Link>
+                                Admininstrator's Designation
+                            </Menu.Item>
                         </SubMenu>
                     )
                 }

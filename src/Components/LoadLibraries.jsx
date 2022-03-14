@@ -59,6 +59,7 @@ const Loadlibraries = (props) => {
         return api.Library.all()
         .then(res => {
             let libraries = res.data.data;
+            libraries = libraries.filter(i => i.is_active);
             props.dispatch({
                 type: "SET_LIBRARY_USER_DIVISIONS",
                 data: libraries.filter(library => library.library_type == "user_division")

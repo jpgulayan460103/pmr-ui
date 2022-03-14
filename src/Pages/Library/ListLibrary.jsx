@@ -3,7 +3,7 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import api from '../../api';
 import { Table, Card, Col, Row, Form, Input, Select, Button, notification  } from 'antd';
-import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, DeleteOutlined } from '@ant-design/icons';
 import helpers from '../../Utilities/helpers';
 
 const { Option } = Select;
@@ -18,6 +18,7 @@ function mapStateToProps(state) {
         user_section: state.library.user_sections,
         user_signatory_name: state.library.user_signatory_names,
         user_signatory_designation: state.library.user_signatory_designations,
+        user: state.user.data,
     };
 }
 
@@ -32,7 +33,7 @@ const ListLibrary = (props) => {
         }
     }, [props.isInitialized]);
 
-    const dataSource = props[props.libraryType].map(i => {
+    const dataSource = props[props.libraryType] && props[props.libraryType].map(i => {
             let newI = cloneDeep(i);
             delete newI.children
             return newI;
@@ -41,6 +42,9 @@ const ListLibrary = (props) => {
 
     const onCell = {
         onCell: (record, colIndex) => {
+            if(!helpers.hasRole(props.user, ['super-admin'])){
+                return false;
+            }
             return {
                 onClick: event => {
                     setSelectedLibrary(record);
@@ -107,8 +111,40 @@ const ListLibrary = (props) => {
                 }
             );
         }
+        if(helpers.hasRole(props.user,["super-admin"])){
+            cols.push(
+                {
+                    title: "",
+                    key: 'action',
+                    width: 50,
+                    render: (text, item, index) => (
+                        <span className='custom-pointer' onClick={() => { setInactiveLibrary(item) }}>
+                            <DeleteOutlined />
+                        </span>
+                    ),
+                }
+            );
+        }
         return cols;
     };
+
+    const setInactiveLibrary = (item) => {
+        let values = {
+            id: item.id,
+            is_active: 0,
+        }
+        api.Library.save(props.libraryType, values, "update")
+        .then(res => {
+                notification.success({
+                    message: 'Done',
+                    description:
+                      'Refresh the page',
+                });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
 
     const onFinish = (values) => {
         values.id = selectedLibrary.id;
@@ -143,6 +179,10 @@ const ListLibrary = (props) => {
                     </div>
                 </Card>
             </Col>
+            
+            { 
+                helpers.hasRole(props.user,["super-admin"]) && (
+            
             <Col sm={24} md={8} lg={10} xl={10}>
                 <Card size="small" title={`${formType} ${props.options.libraryName}`} bordered={false}>
                     <div className='user-card-content'>
@@ -160,7 +200,7 @@ const ListLibrary = (props) => {
                                 { ...helpers.displayError(formErrors, `name`)  }
                                 rules={[{ required: true, message: 'Name field is required' }]}
                             >
-                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" />
+                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Name" />
                             </Form.Item>   
 
                             { props.options.title && (<Form.Item
@@ -169,7 +209,7 @@ const ListLibrary = (props) => {
                                 { ...helpers.displayError(formErrors, `title`)  }
                                 rules={[{ required: true, message: 'Title field is required' }]}
                             >
-                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" />
+                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Title" />
                             </Form.Item>  ) } 
 
                             { props.options.parent && (<Form.Item
@@ -179,7 +219,14 @@ const ListLibrary = (props) => {
                                 rules={[{ required: true, message: `${props.options.parentLabel} field is required` }]}
                             >
                                 {/* <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" /> */}
-                                <Select style={{ width: "100%" }} placeholder={`Select ${props.options.parentLabel}`}>
+                                <Select
+                                    style={{ width: "100%" }}
+                                    placeholder={`Select ${props.options.parentLabel}`}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    showSearch
+                                >
                                     { props[props.options.parentType].map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
                                 </Select>
                             </Form.Item>  ) } 
@@ -197,6 +244,7 @@ const ListLibrary = (props) => {
                     </div>
                 </Card>
             </Col>
+            )}
         </Row>
     );
 }

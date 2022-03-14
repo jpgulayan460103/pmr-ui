@@ -175,6 +175,9 @@ const App = (props) => {
           <Route exact path="/libraries/user_offices/administrators"  >
               <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" options={{libraryName: "Office Administrators",parent: true, title: true, parentLabel: "Designation", parentType: "user_signatory_designation"}} /></Layout></PrivateRoute>
           </Route>
+          <Route exact path="/libraries/user_offices/administrators/designations"  >
+              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_designation" options={{libraryName: "Office Administrator's Designation",parent: true, title: true, parentLabel: "Designation", parentType: "user_section"}} /></Layout></PrivateRoute>
+          </Route>
           <Route exact path="/libraries/user_offices/purchase-requests"  >
               <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" /></Layout></PrivateRoute>
           </Route>

@@ -704,7 +704,7 @@ const ApprovedPurchaseRequest = (props) => {
     }, 150);
 
     const handleProceedProcurement = (record) => {
-        // viewPurchaseRequest(record, 0);
+        viewPurchaseRequest(record, 0);
         setModalProcurementForm(true);
         setSelectedProcurementCategory(record.procurement_type.parent.id);
         // console.log(record);
