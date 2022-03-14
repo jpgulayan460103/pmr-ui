@@ -9,6 +9,7 @@ import {
   Redirect,
   BrowserRouter,
 } from "react-router-dom";
+import { cloneDeep, isEmpty } from 'lodash';
 import './App.less';
 // import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -26,8 +27,8 @@ import DisapprovedForm from './Pages/Forms/DisapprovedForm';
 import Procurement from './Pages/Procurement/Procurement'
 import Quotation from './Pages/Quotation/Quotation';
 import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
-import { cloneDeep, isEmpty } from 'lodash';
 import Home from './Pages/Home/Home';
+import Suppliers from './Pages/Suppliers/Suppliers';
 
 
 window.Pusher = require('pusher-js');
@@ -126,6 +127,9 @@ const App = (props) => {
           </Route>
           <Route exact path="/procurement"  >
               <PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>
+          </Route>
+          <Route exact path="/procurement/suppliers"  >
+              <PrivateRoute><Layout><Suppliers /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/procurement/quotations"  >
               <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>

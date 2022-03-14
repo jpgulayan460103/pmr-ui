@@ -90,6 +90,17 @@ const Sidemenu = (props) => {
                             Procurement
                         </Menu.Item>
                     ) }
+
+                    <Menu.Item key="/procurement/quotations">
+                        <Link to="/procurement/quotations"></Link>
+                        Suppliers
+                    </Menu.Item>
+
+                    <Menu.Item key="/procurement/suppliers">
+                        <Link to="/procurement/suppliers"></Link>
+                        Suppliers
+                    </Menu.Item>
+
                 </SubMenu>
                 ) }
 

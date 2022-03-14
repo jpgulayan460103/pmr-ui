@@ -2,7 +2,7 @@ import axios from './axios.settings'
 
 export default {
   save(formdata, formType){
-    if(formType != "create"){
+    if(formType != "Create"){
       return axios.put(`api/suppliers/${formdata.id}`,formdata);
     }else{
       return axios.post(`api/suppliers`,formdata);

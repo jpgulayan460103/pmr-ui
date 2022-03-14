@@ -125,7 +125,7 @@ const Quotation = (props) => {
                     { item.categories.data.map(i => {
                         return (
                             <Tag key={i.key}>
-                                {i.category?.name}
+                                {i.category?.parent?.name} - {i.category?.name}
                             </Tag>
                         );
                     }) }
