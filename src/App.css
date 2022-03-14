@@ -20,9 +20,6 @@
     background-image: linear-gradient(to left, #30336b, #4834d4, #686de0);
   }
   
-  .site-layout-background {
-    /* background: #fff; */
-  }
 
   #main-content{
       height: "100vh";
@@ -127,19 +124,6 @@
   width: 350px !important;
   background-color: white;
 }
-
-
-/* .ant-card-head{
-  height: 40px;
-  min-height: 40px;
-}
-.ant-card-head-wrapper{
-  height: 40px;
-}
-.ant-card-head-title{
-  height: 40px;
-  padding: 5px;
-} */
 
 .procurement-card-container{
   height: 75vh;

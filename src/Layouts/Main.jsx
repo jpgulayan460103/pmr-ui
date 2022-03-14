@@ -49,7 +49,7 @@ const Main = (props) => {
           collapsed={props.collapsed}
         >
         <div className="logo bg-origin-padding">
-          { !props.collapsed ? <img src={logo} alt="" className='px-3 pt-2' /> : <img src={logoCropped} alt="" className='px-3 pt-2' /> }
+          { !props.collapsed ? <img src={logo} alt="" className='px-3 pt-2' /> : <img src={logoCropped} alt="" className='px-1 pt-2' /> }
         </div>
         <Divider />
         <SideMenu />

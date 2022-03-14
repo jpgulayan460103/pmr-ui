@@ -3,7 +3,7 @@ const initialState = () => {
     data: {},
     notifications: [],
     collapsed: true,
-    collapsedWidth: 80,
+    collapsedWidth: 50,
     mainLoading: true,
     mainLoadingMessage: "",
     isInitialized: false,

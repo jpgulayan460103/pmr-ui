@@ -86,7 +86,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             // setCw(80);
             dispatch({
                 type: "SET_COLLAPSE_WIDTH",
-                data: 80
+                data: 50
             });
         }else{
             // setCw(0);

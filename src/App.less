@@ -6,3 +6,184 @@
 /* @import '~antd/dist/antd.css'; */
 @import '~antd/dist/antd.less';
 /* @import 'your-theme-file.less'; */
+
+@mainColor: #4834d4;
+@mainColorLight: #686de0;
+@mainColorDark: #30336b;
+@hoverColor: rgba(0, 0, 0, 0.1);
+@selectColor: #f8faec;
+@mainColorFont: #fff;
+@primary-color: @mainColor;
+@link-color: @mainColor;
+
+
+#components-layout-demo-custom-trigger{
+    .trigger{
+        padding: 0 24px;
+        font-size: 18px;
+        line-height: 64px;
+        cursor: pointer;
+        transition: color 0.3s;
+        &:hover {
+            background-color: @mainColor;
+        }
+    }
+
+    .logo {
+        height: 32px;
+        margin: 16px;
+        background: rgba(255, 255, 255, 0.3);
+      }
+}
+
+.site-layout-sub-header-background {
+    background-image: linear-gradient(to left, @mainColorDark, @mainColor, @mainColorLight);
+}
+
+#main-content{
+    height: "100vh";
+}
+
+.ant-layout-sider-light{
+    .ant-layout-sider-trigger {
+        color: @mainColorFont;
+        background-image: linear-gradient(to right, @mainColor, @mainColorLight);
+    }
+    .ant-layout-sider-zero-width-trigger{
+        display: none;
+    }
+}
+
+.custom-pointer{
+    cursor: pointer;
+    color: @mainColor;
+
+    .anticon{
+        position: relative;
+        top: -0.2em;
+    }
+}
+
+.header-items{
+    position: relative;
+    top: -10px;
+}
+
+.selected-row{
+    background-color: @selectColor;
+}
+
+.ant-table-thead > tr >th{
+    color: @mainColorFont;
+    background-image: linear-gradient(to top, @mainColor, @mainColorLight) !important;
+}
+.ant-table-column-sort > tr >th{
+    color: @mainColorFont;
+    background-image: linear-gradient(to top, @mainColor, @mainColorLight);
+}
+
+.ant-btn .anticon{
+    position: relative;
+    top: -0.1em;
+}
+.ant-back-top-icon .anticon{
+    position: relative;
+    top: -0.25em;
+}
+.ant-menu-item .anticon{
+    position: relative;
+    top: -0.30em;
+    &:hover{
+        background-color: @hoverColor;
+    }
+}
+.ant-dropdown-trigger .anticon{
+    position: relative;
+    top: -0.1em;
+}
+.ant-select-selection-item-remove .anticon{
+    position: relative;
+    top: -0.30em;
+}
+  
+.ant-dropdown{
+    /* border: 1px solid black; */
+    -moz-box-shadow: 0 0 3px #ccc;
+    -webkit-box-shadow: 0 0 3px #ccc;
+    box-shadow: 0 0 3px #ccc;
+}
+
+.ant-tabs-tabpane .ant-timeline{
+    padding-left: 10px;
+}
+
+
+
+.filter-options{
+    padding-left: 5px;
+    padding-right: 5px;
+    &:hover{
+        background-color: @hoverColor;
+    }
+}
+
+.form-upload-selected-files{
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    &:hover{
+        background-color: @hoverColor;
+    }
+}
+
+.notificaton-items{
+    padding: 20px !important;
+    &:hover{
+        background-color: @hoverColor;
+    }
+}
+
+#notifications-container{
+    width: 350px !important;
+    background-color: white;
+}
+
+.procurement-card-container{
+    height: 75vh;
+    overflow: auto;
+    padding-right: 5px;
+
+}
+.purchase-request-card-content{
+    height: 65vh;
+    overflow: auto;
+    padding-right: 5px;
+}
+
+.forms-card-content{
+    height: 70vh;
+    overflow: auto;
+    padding-right: 5px;
+}
+.forms-card-form-content{
+    height: 90vh;
+    overflow: auto;
+    padding-right: 5px;
+}
+
+.user-card-content{
+    height: 90vh;
+    overflow: auto;
+    padding-right: 5px;
+}
+
+.quotation-main-card-content{
+    height: 90vh;
+    overflow: auto;
+    padding-right: 5px;
+}
+
+.quotation-side-card-content{
+    height: 40.8vh;
+    overflow: auto;
+    padding-right: 5px;
+}

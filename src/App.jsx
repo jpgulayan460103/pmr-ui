@@ -10,7 +10,7 @@ import {
   BrowserRouter,
 } from "react-router-dom";
 import './App.less';
-import './App.css';
+// import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
@@ -27,6 +27,7 @@ import Procurement from './Pages/Procurement/Procurement'
 import Quotation from './Pages/Quotation/Quotation';
 import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
 import { cloneDeep, isEmpty } from 'lodash';
+import Home from './Pages/Home/Home';
 
 
 window.Pusher = require('pusher-js');
@@ -121,7 +122,7 @@ const App = (props) => {
       >
         <Switch>
           <Route exact path="/"  >
-              <PrivateRoute><Layout></Layout></PrivateRoute>
+              <PrivateRoute><Layout><Home /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/procurement"  >
               <PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>
