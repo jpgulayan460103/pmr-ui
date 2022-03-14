@@ -39,14 +39,14 @@ const CreatePurchaseRequest = (props) => {
             }else{
                 if(!isEmpty(props.user)){
                     let reqBy = "OARDA";
-                    if(props.user.user_offices.data[0].office.parent.title === "OARDA" || props.user.user_offices.data[0].office.parent.title === "OARDO"){
+                    if(props.user.user_offices?.data[0]?.office?.parent?.title === "OARDA" || props.user.user_offices?.data[0]?.office?.parent?.title === "OARDO"){
                         reqBy = props.user.user_offices.data[0].office.parent.title;
                     }
                     props.dispatch({
                         type: "SET_PURCHASE_REQUEST_FORM_DATA",
                         data: {
                             ...props.formData,
-                            end_user_id: props.user.user_offices.data[0].office_id,
+                            end_user_id: props.user.user_offices?.data[0]?.office_id,
                             requestedBy: reqBy
                         }
                     });
@@ -54,8 +54,8 @@ const CreatePurchaseRequest = (props) => {
             }
             if(isEmpty(props.requestedBySignatory)){
                 let reqBy = "OARDA";
-                if(props.user.user_offices.data[0].office.parent.title === "OARDA" || props.user.user_offices.data[0].office.parent.title === "OARDO"){
-                    reqBy = props.user.user_offices.data[0].office.parent.title;
+                if(props.user.user_offices?.data[0]?.office?.parent?.title === "OARDA" || props.user.user_offices?.data[0]?.office?.parent?.title === "OARDO"){
+                    reqBy = props.user.user_offices?.data[0]?.office?.parent?.title;
                 }
                 setSignatory(reqBy,'requestedBy');
             }
