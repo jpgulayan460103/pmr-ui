@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -379,7 +379,9 @@ const CreatePurchaseRequest = (props) => {
                 </Col>
                 <Col xs={24} sm={24} md={1} lg={1} xl={1}>
                     <div  className='text-right'>
-                        <Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button>
+                        <Tooltip placement="left" title={"Add Item"}>
+                            <Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button>
+                        </Tooltip>
                     </div>
                 </Col>
             </Row>
@@ -470,7 +472,9 @@ const CreatePurchaseRequest = (props) => {
                         </Col>
                         <Col xs={24} sm={24} md={1} lg={1} xl={1}>
                             <div  className='text-right'>
-                                <Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button>
+                                <Tooltip placement="left" title={"Remove Item"}>
+                                    <Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button>
+                                </Tooltip>
                             </div>
                         </Col>
                     </Row>

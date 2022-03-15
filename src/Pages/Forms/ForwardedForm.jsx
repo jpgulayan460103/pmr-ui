@@ -117,9 +117,9 @@ const ForwardedForm = (props) => {
                 setSubmit(false);
                 setModalRejectForm(false);
                 notification.error({
-                    message: 'Purchase Request has been amended.',
+                    message: 'Error',
                     description:
-                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        'The form has already amended.',
                     }
                 );
                 getForm();
@@ -190,9 +190,9 @@ const ForwardedForm = (props) => {
                 setSubmit(false);
                 setModalResolveForm(false);
                 notification.error({
-                    message: 'Purchase Request has been amended.',
+                    message: 'Error',
                     description:
-                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        'The form has already amended.',
                     }
                 );
                 getForm();
@@ -318,9 +318,9 @@ const ForwardedForm = (props) => {
                 setSubmit(false);
                 setModalBudgetForm(false);
                 notification.error({
-                    message: 'Purchase Request has been amended.',
+                    message: 'Error',
                     description:
-                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        'The form has already amended.',
                     }
                 );
                 getForm();
@@ -403,9 +403,9 @@ const ForwardedForm = (props) => {
                 setSubmit(false);
                 setModalProcurementForm(false);
                 notification.error({
-                    message: 'Purchase Request has been amended.',
+                    message: 'Error',
                     description:
-                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        'The form has already amended.',
                     }
                 );
                 getForm();
@@ -459,9 +459,9 @@ const ForwardedForm = (props) => {
         .then(res => {
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 notification.error({
-                    message: 'Purchase Request has been amended.',
+                    message: 'Error',
                     description:
-                        'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                        'The form has already amended.',
                     }
                 );
                 getForm();

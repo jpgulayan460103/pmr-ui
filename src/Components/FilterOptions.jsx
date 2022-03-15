@@ -51,7 +51,7 @@ const FilterOptions = (
     return (
         <div className='p-2' style={{ minHeight: 100, maxHeight: 400, width: "100%" }}>
             <div className='px-1 mb-2'>
-                <Input placeholder="search in filters" prefix={<SearchOutlined />} onChange={(e) => {changeSearchStr(e)}} />
+                <Input placeholder="search in filters" prefix={<SearchOutlined />} onChange={changeSearchStr} />
             </div>
             <div className='px-1 mb-2'style={{maxHeight: 200, overflow: "scroll", overflowX: "hidden"}}>
                 <Checkbox.Group style={{ width: '100%' }} value={selectedKeys} >
@@ -59,7 +59,7 @@ const FilterOptions = (
                 </Checkbox.Group>
             </div>
             <div className='px-1'>
-                <span className='custom-pointer' onClick={() => resetSelected()}>Reset</span>
+                <span className='custom-pointer' onClick={resetSelected}>Reset</span>
                 <Button type='primary' size='small' className='float-right' onClick={() => setFilterOptions()}>OK</Button>
             </div>
         </div>

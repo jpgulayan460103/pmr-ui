@@ -40,6 +40,16 @@ customAxios.interceptors.response.use((response) => {
       ),
       onOk() {},
     });
+  } else if (error.response && error.response.status == 404) {
+    Modal.error({
+      title: 'Resource not found',
+      content: (
+        <div>
+          <p>This resource has been removed or not existed.</p>
+        </div>
+      ),
+      onOk() {},
+    });
   } else if (error.response && error.response.status >= 500) {
     Modal.error({
       title: 'Server Error',

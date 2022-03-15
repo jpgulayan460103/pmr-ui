@@ -14,4 +14,7 @@ export default {
   get(id){
     return axios.get(`api/suppliers/${id}`);
   },
+  delete(id){
+    return axios.delete(`api/suppliers/${id}`);
+  },
 }

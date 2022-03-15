@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Table, Button, Input, Card, Col, Row, Tag, Form  } from 'antd';
-import { UserOutlined, MailOutlined, DeleteOutlined } from '@ant-design/icons';
-import { cloneDeep, debounce, isEmpty } from 'lodash';
+import { Table, Button, Input, Card, Col, Row, Tag, Form, Select, notification, Popconfirm, Tooltip  } from 'antd';
+import { UserOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { cloneDeep, debounce, isEmpty, map } from 'lodash';
 import api from '../../api';
 import helpers from '../../Utilities/helpers';
 import EditableCell from './SupplierContactEditable'
+
+const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
         user: state.user.data,
         isInitialized: state.user.isInitialized,
         suppliers: state.supplier.suppliers,
+        procurement_type_categories: state.library.procurement_type_categories,
     };
 }
 
@@ -22,36 +25,34 @@ const Suppliers = (props) => {
     const [selectedSupplier, setSelectedSupplier] = useState({});
     const [supplierContacts, setSupplierContacts] = useState([]);
     const [formType, setFormType] = useState("Create");
+    const [suppliers, setSuppliers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [submit, setSubmit] = useState(false);
+
     useEffect(() => {
         if(props.isInitialized){
-            if(isEmpty(props.suppliers)){
-                getSuppliers();
-            }
+            getSuppliers();
         }
     }, [props.isInitialized]);
 
     const getSuppliers = debounce(() => {
+        setLoading(true);
         api.Supplier.all()
         .then(res => {
-            // setSuppliers(res.data.data);'
-            let responseSupplier = res.data.data;
-            responseSupplier.map(i => {
-                i.selected = false;
-                i.selectedContact = i.contacts.data[0]
-                i.selectedContactId = i.contacts.data[0].id
-                return i;
-            })
-            props.dispatch({
-                type: "SET_SUPPLIERS",
-                data: responseSupplier
-            });
+            setLoading(false);
+            setSuppliers(res.data.data);
         })
         .catch(err => {
-            // setLoading(false);
+            setLoading(false);
         })
         .then(res => {})
         ;
     }, 150);
+
+    const deleteSupplier = async (supplier) => {
+        await api.Supplier.delete(supplier.id);
+        getSuppliers();
+    }
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -60,8 +61,10 @@ const Suppliers = (props) => {
                     setSelectedSupplier(record);
                     setSupplierContacts(record?.contacts?.data);
                     setFormType("Update");
+                    let categories = map(record.categories?.data, 'category_id');
                     formRef.current.setFieldsValue({
-                        ...record
+                        ...record,
+                        categories: categories
                     })
                 },
             };
@@ -74,6 +77,7 @@ const Suppliers = (props) => {
             dataIndex: 'name',
             key: 'name',
             width: 250,
+            sorter: (a, b) => a.name?.localeCompare(b.name),
             ...onCell,
         },
         {
@@ -81,12 +85,14 @@ const Suppliers = (props) => {
             dataIndex: 'address',
             key: 'address',
             width: 250,
+            sorter: (a, b) => a.address?.localeCompare(b.address),
             ...onCell,
         },
         {
             title: 'Categories',
             key: 'categories',
             width: 500,
+            ...onCell,
             render: (text, item, index) => (
                 <span>
                     { item.categories.data.map(i => {
@@ -104,9 +110,11 @@ const Suppliers = (props) => {
             key: 'action',
             width: 50,
             render: (text, item, index) => (
-                <span className='custom-pointer' onClick={() => {  }}>
-                    <DeleteOutlined />
-                </span>
+                <Popconfirm title="Are you sure to delete this supplier?" okText="Yes" cancelText="No" onConfirm={() => { deleteSupplier(item) }}>
+                    <span className='custom-pointer'>
+                        <DeleteOutlined />
+                    </span>
+                </Popconfirm>
             ),
         }
     ]
@@ -118,6 +126,21 @@ const Suppliers = (props) => {
             [prop]: e.target.value
         }
         setSupplierContacts(clonedContact);
+    }
+
+    const removeContact = (item) => {
+        setSupplierContacts(prev => prev.filter(i => i.key != item.key));
+    }
+    const addContact = () => {
+        setSupplierContacts(prev => [
+            ...prev,
+            {
+                name: null,
+                contact_number: null,
+                email_address: null,
+                key: `new-contact-${prev.length}`
+            }
+        ]);
     }
 
     const supplierContactColumns = [
@@ -165,17 +188,23 @@ const Suppliers = (props) => {
             )
         },
         {
-            title: "",
+            title: (
+                <Tooltip placement="left" title={"Add Contact Person"}>
+                    <Button size='small' onClick={addContact}>
+                        <PlusOutlined />
+                    </Button>
+                </Tooltip>
+            ),
             key: 'action',
             width: 50,
             render: (text, item, index) => (
                 <span onClick={() => {  }}>
-                    <Form.Item
-                        { ...helpers.displayError(formErrors, `contacts.${index}.email_address`)  }
-                    >
-                        <span className='custom-pointer'>
-                            <DeleteOutlined />
-                        </span>
+                    <Form.Item>
+                        <Tooltip placement="left" title={"Remove Contact Person"}>
+                            <span className='custom-pointer' onClick={() => { removeContact(item) }}>
+                                <DeleteOutlined />
+                            </span>
+                        </Tooltip>
                     </Form.Item>
                     
                 </span>
@@ -183,10 +212,38 @@ const Suppliers = (props) => {
         }
     ]
 
-    const onFinish = (values) => {
+    const onFinish = debounce((values) => {
+        setSubmit(true);
         values.contacts = supplierContacts
         values.id = selectedSupplier.id
         api.Supplier.save(values, formType)
+        .then(res => {
+            setSubmit(false);
+            getSuppliers();
+            notification.success({
+                message: 'Done',
+                description:
+                  'Your changes have been successfully saved!',
+            });
+            resetForm();
+        })
+        .catch(err => {
+            setSubmit(false);
+            setFormErrors(err.response.data.errors);
+            notification.error({
+                message: 'Error',
+                description:
+                  'Please review the form.',
+            });
+        })
+        .then(res => {})
+    }, 150)
+
+    const resetForm = () => {
+        setSelectedSupplier({});
+        setSupplierContacts([]);
+        setFormType("Create");
+        formRef.current.resetFields();
     }
 
     return (
@@ -195,7 +252,7 @@ const Suppliers = (props) => {
                 <Col sm={24} md={16} lg={14} xl={14}>
                     <Card size="small" title="Suppliers" bordered={false}  >
                         <div className='user-card-content'>
-                            <Table size='small' dataSource={props.suppliers} columns={supplierColumns} />
+                            <Table size='small' dataSource={suppliers} columns={supplierColumns} loading={{spinning: loading, tip: "Loading Suppliers..."}} />
                         </div>
                     </Card>
                 </Col>
@@ -208,7 +265,7 @@ const Suppliers = (props) => {
                                 name="normal_login"
                                 className="login-form"
                                 initialValues={{
-                                    remember: true,
+                                    categories: [],
                                 }}
                                 layout="vertical"
                                 onFinish={onFinish}
@@ -219,7 +276,7 @@ const Suppliers = (props) => {
                                     { ...helpers.displayError(formErrors, `name`)  }
                                     rules={[{ required: true, message: 'Please input supplier name' }]}
                                 >
-                                    <Input placeholder="name" />
+                                    <Input placeholder="Supplier Name" />
                                 </Form.Item>
 
                                 <Form.Item
@@ -228,18 +285,39 @@ const Suppliers = (props) => {
                                     { ...helpers.displayError(formErrors, `address`)  }
                                     rules={[{ required: true, message: 'Please input supplier address' }]}
                                 >
-                                    <Input placeholder="address" />
+                                    <Input placeholder="Supplier Address" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="categories"
+                                    label="Category"
+                                    { ...helpers.displayError(formErrors, 'categories') }
+                                    rules={[{ required: true, message: 'Please select Category.' }]}
+                                >
+                                    <Select
+                                        placeholder='Select Category'
+                                        mode="multiple"
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                    >
+                                        { props.procurement_type_categories.map(i => {
+                                            // return <Option value={i.id} key={i.key}>{i.name}</Option>
+                                            return i.children.data.map(c => <Option value={c.id} key={c.key}>{i.name} - {c.name}</Option>)
+                                        }) }
+                                    </Select>
                                 </Form.Item>
 
                                 <Table size='small' dataSource={supplierContacts} columns={supplierContactColumns} />
                                 {/* <EditableCell dataSource={selectedSupplier?.contacts?.data} /> */}
 
                                 <Form.Item>
-                                    <Button type="primary" htmlType="submit" className="login-form-button">
+                                    <Button type="primary" htmlType="submit" className="login-form-button" loading={submit} disabled={submit}>
                                     Save
                                     </Button>
                                     &nbsp;&nbsp;&nbsp;
-                                    <Button type="danger" onClick={() => {}  }>
+                                    <Button type="danger" onClick={resetForm}>
                                     Cancel
                                     </Button>
                                 </Form.Item>

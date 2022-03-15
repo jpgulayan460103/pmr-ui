@@ -252,9 +252,9 @@ const UserPermissions = (props) => {
             setLoading(false);
             props.getUsers();
             notification.success({
-                message: 'Success',
+                message: 'Done',
                 description:
-                  `Permission and roles of the user has been updated`,
+                  'Your changes have been successfully saved!',
             });
         })
         .catch(err => {

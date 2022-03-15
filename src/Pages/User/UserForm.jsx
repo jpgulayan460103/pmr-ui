@@ -6,6 +6,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import helpers from '../../Utilities/helpers';
+import { debounce } from 'lodash';
 
 const { Option, OptGroup } = Select;
 
@@ -39,7 +40,7 @@ const UserForm = (props) => {
     
     const [formErrors, setFormErrors] = useState({});
 
-    const onFinish = (values) => {
+    const onFinish = debounce((values) => {
         values.username = props.userInfo.username;
         values.user_dn = props.userInfo.user_dn;
         if(props.type == "update"){
@@ -50,7 +51,7 @@ const UserForm = (props) => {
             values.account_type = "ad_account";
             createUser(values);
         }
-    };
+    }, 150);
 
     const createUser = (values) => {
         api.User.registerAd(values)
@@ -75,9 +76,9 @@ const UserForm = (props) => {
         .then(res => {
             props.getUsers();
             notification.success({
-                message: 'User has been updated.',
+                message: 'Done',
                 description:
-                    'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    'Your changes have been successfully saved!',
                 }
             );
         })
