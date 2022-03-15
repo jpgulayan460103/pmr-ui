@@ -8,12 +8,28 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import store from './store'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import { ThemeSwitcherProvider } from "react-css-theme-switcher";
+
+const themes = {
+  main: `${process.env.PUBLIC_URL}/main-theme.css`,
+  green: `${process.env.PUBLIC_URL}/green-theme.css`,
+  dark: `${process.env.PUBLIC_URL}/dark-theme.css`,
+  purple: `${process.env.PUBLIC_URL}/purple-theme.css`,
+  orange: `${process.env.PUBLIC_URL}/orange-theme.css`,
+  blue: `${process.env.PUBLIC_URL}/blue-theme.css`,
+  pink: `${process.env.PUBLIC_URL}/pink-theme.css`,
+  yellow: `${process.env.PUBLIC_URL}/yellow-theme.css`,
+};
+
+const defaultTheme = localStorage.getItem("theme");
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={(process.env.NODE_ENV == "development" ? '' : process.env.PUBLIC_URL)}>
     {/* <BrowserRouter> */}
+    <ThemeSwitcherProvider themeMap={themes} defaultTheme={defaultTheme}>
       <App />
+    </ThemeSwitcherProvider>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root')

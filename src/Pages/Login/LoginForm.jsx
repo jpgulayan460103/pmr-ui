@@ -5,6 +5,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import { useLocation, useHistory  } from "react-router-dom";
+import Themepicker from '../../Components/ThemePicker';
 
 const { Title } = Typography;
 
@@ -98,6 +99,7 @@ const Loginform = (props) => {
                     </Button>                  
                     {/* &nbsp;<span className='custom-pointer' href=""> Forgot password?</span> */}
                 </Form.Item>
+                <Themepicker />
             </Form>
             <Divider>or</Divider>
             <Button type="ghost" block onClick={() => { props.setShowRegister(true) }  }>

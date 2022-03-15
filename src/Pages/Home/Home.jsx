@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Card, Col, Row  } from 'antd';
+import { Card, Col, Row } from 'antd';
 import style from './style.less'
 
 function mapStateToProps(state) {

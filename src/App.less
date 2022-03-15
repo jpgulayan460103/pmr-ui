@@ -3,9 +3,7 @@
 @tailwind utilities;
 
 @import '~antd/lib/style/themes/default.less';
-/* @import '~antd/dist/antd.css'; */
 @import '~antd/dist/antd.less';
-/* @import 'your-theme-file.less'; */
 
 @mainColor: #4834d4;
 @mainColorSecond: #686de0;
@@ -15,6 +13,14 @@
 @primary-color: @mainColor;
 @link-color: @mainColor;
 
+
+body{
+    background-image: linear-gradient(to bottom, @mainColor, @mainColorSecond);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: auto;
+}
 
 #components-layout-demo-custom-trigger{
     .trigger{
@@ -196,4 +202,28 @@
     height: 40.8vh;
     overflow: auto;
     padding-right: 5px;
+}
+
+#login-container{
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    -ms-transform: translateY(-30%);
+    transform: translateY(-30%);
+    width: 100%;
+}
+
+
+@media only screen and (max-width: 768px) {
+    #login-container{
+        width: 100%;
+        /* height: 100vh; */
+    }
+
+}
+
+#login-form-container{
+    background-color: whitesmoke;
+    box-shadow: 1px 1px 18px #888888;
+    padding: 50px
 }

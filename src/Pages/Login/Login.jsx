@@ -42,9 +42,9 @@ const Login = () => {
         api.User.all();
     }
     return (
-        <div style={style} id="container" className='flex justify-center'>
+        <div style={style} id="login-container" className='flex justify-center'>
             <LoadLibraries />
-            <div id='login-container' className='h-full'>
+            <div id='login-form-container' className='h-full'>
                 <div className="flex justify-center w-fit mb-6">
                     <div className='w-60'>
                         <img src={logo} alt="" />
