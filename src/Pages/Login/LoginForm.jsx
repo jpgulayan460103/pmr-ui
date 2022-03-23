@@ -17,6 +17,10 @@ function mapStateToProps(state) {
 
 
 const Loginform = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const location = useLocation();
     const history = useHistory()
     const [errorMessage, setErrorMessage] = useState("");
@@ -36,6 +40,7 @@ const Loginform = (props) => {
         setSubmit(true);
         api.User.login(values)
         .then(res =>{
+            if (unmounted.current) { return false; }
             setSubmit(false);
             if(res.data.error_code == "no_user"){
                 props.getAdInfo(res.data.data);

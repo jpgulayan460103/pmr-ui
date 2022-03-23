@@ -21,6 +21,10 @@ function mapStateToProps(state) {
 
 
 const ActivityLogs = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const [filterData, setFilterData] = useState({});
     const [selectedLogger, setSelectedLogger] = useState(null);
     const [activityLogs, setActivityLogs] = useState([]);
@@ -41,6 +45,7 @@ const ActivityLogs = (props) => {
         setLoading(true);
         api.Forms.getLogs(filters)
         .then(res => {
+            if (unmounted.current) { return false; }
             setLoading(false);
             let data = res.data.data;
             let meta = res.data.meta;

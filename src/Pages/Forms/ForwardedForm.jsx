@@ -34,6 +34,11 @@ const MaximizeSvg = () => (
 );  
 
 const ForwardedForm = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
+
     const location = useLocation();
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
@@ -92,6 +97,7 @@ const ForwardedForm = (props) => {
         };
         api.Forms.reject(selectedFormRoute.id, formData)
         .then(res => {
+            if (unmounted.current) { return false; }
             setSubmit(false);
             setErrorMessage({});
             setModalRejectForm(false);
@@ -113,6 +119,7 @@ const ForwardedForm = (props) => {
         setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
+            if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 setSubmit(false);
                 setModalRejectForm(false);
@@ -165,6 +172,7 @@ const ForwardedForm = (props) => {
         };
         api.Forms.resolve(selectedFormRoute.id, formData)
         .then(res => {
+            if (unmounted.current) { return false; }
             setSubmit(false);
             setErrorMessage({});
             setModalResolveForm(false);
@@ -186,6 +194,7 @@ const ForwardedForm = (props) => {
         setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
+            if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 setSubmit(false);
                 setModalResolveForm(false);
@@ -222,6 +231,7 @@ const ForwardedForm = (props) => {
         setTableLoading(true);
         api.Forms.getForApproval(filters)
         .then(res => {
+            if (unmounted.current) { return false; }
             setTableLoading(false);
             let data = res.data.data;
             let meta = res.data.meta;
@@ -295,6 +305,7 @@ const ForwardedForm = (props) => {
         if(selectedFormRoute.route_type == "purchase_request"){
             api.PurchaseRequest.save(formData, 'update')
             .then(res => {
+                if (unmounted.current) { return false; }
                 setSubmit(false);
                 setErrorMessage({});
                 approve(selectedFormRoute);
@@ -314,6 +325,7 @@ const ForwardedForm = (props) => {
         setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
+            if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 setSubmit(false);
                 setModalBudgetForm(false);
@@ -360,6 +372,7 @@ const ForwardedForm = (props) => {
 
                 api.PurchaseRequest.save(formData, 'update')
                 .then(res => {
+                    if (unmounted.current) { return false; }
                     setSubmit(false);
                     setErrorMessage({});
                     approve(selectedFormRoute);
@@ -381,6 +394,7 @@ const ForwardedForm = (props) => {
                 }                
                 api.Forms.updateProcess(formData)
                 .then(res => {
+                    if (unmounted.current) { return false; }
                     setSubmit(false);
                     approve(selectedFormRoute);
                     setModalProcurementForm(false);
@@ -399,6 +413,7 @@ const ForwardedForm = (props) => {
         setSubmit(true);
         api.Forms.getRoute(selectedFormRoute.id)
         .then(res => {
+            if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 setSubmit(false);
                 setModalProcurementForm(false);
@@ -439,6 +454,7 @@ const ForwardedForm = (props) => {
         }else if(budget_user_office.length != 0  && current_route[0].description_code == "aprroval_from_budget"){
             api.PurchaseRequest.getNextNumber()
             .then(res => {
+                if (unmounted.current) { return false; }
                 setModalBudgetForm(true);
                 setTimeout(() => {
                     budgetFormRef.current.setFieldsValue({
@@ -457,6 +473,7 @@ const ForwardedForm = (props) => {
     const approve = debounce(async (item) => {
         api.Forms.getRoute(item.id)
         .then(res => {
+            if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
                 notification.error({
                     message: 'Error',
@@ -471,6 +488,7 @@ const ForwardedForm = (props) => {
             }else{
                 api.Forms.approve(item.id)
                 .then(res => {
+                    if (unmounted.current) { return false; }
                     let nextRoute = res.data.next_route;
                     notification.success({
                         message: 'Purchase Request is approved.',
@@ -498,6 +516,7 @@ const ForwardedForm = (props) => {
         setFormLoading(true);
         api.PurchaseRequest.get(id)
         .then(res => {
+            if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)
             setFormLoading(false);
             // setSelectedForm();

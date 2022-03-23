@@ -31,10 +31,10 @@ const MaximizeSvg = () => (
 );  
 
 const DisapprovedForm = (props) => {
-    const rejectFormRef = React.useRef();
-    const resolveFormRef = React.useRef();
-    const budgetFormRef = React.useRef();
-    const procurementFormRef = React.useRef();
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     useEffect(() => {
         document.title = "Disapproved Forms";
         if(props.isInitialized){
@@ -44,20 +44,9 @@ const DisapprovedForm = (props) => {
 
     const [forms, setForms] = useState([]);
     const [selectedFormRoute, setSelectedFormRoute] = useState({});
-    const [modalRejectForm, setModalRejectForm] = useState(false);
-    const [modalResolveForm, setModalResolveForm] = useState(false);
-    const [modalBudgetForm, setModalBudgetForm] = useState(false);
-    const [modalProcurementForm, setModalProcurementForm] = useState(false);
-    const [routeOptions, setRouteOptions] = useState([]);
-    const [procurementFormType, setProcurementFormType] = useState("");
-    const [currentRoute, setCurrentRoute] = useState({});
-    const [addOn, setAddOn] = useState(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
-    const [errorMessage, setErrorMessage] = useState({});
     const [filterData, setFilterData] = useState({});
     const [tableLoading, setTableLoading] = useState(false);
     const [paginationMeta, setPaginationMeta] = useState({});
-    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
-    const [submit, setSubmit] = useState(false);
 
 
     const getForm = debounce((filters) => {
@@ -67,12 +56,13 @@ const DisapprovedForm = (props) => {
         setTableLoading(true);
         api.Forms.getRejected(filters)
         .then(res => {
-            setTableLoading(false);
-            let data = res.data.data;
-            let meta = res.data.meta;
-            setForms(data);
-            setPaginationMeta(meta.pagination);
-            
+            if (!unmounted.current) {
+                setTableLoading(false);
+                let data = res.data.data;
+                let meta = res.data.meta;
+                setForms(data);
+                setPaginationMeta(meta.pagination);
+            }
         })
         .catch(res => {
             setTableLoading(false);

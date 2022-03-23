@@ -18,6 +18,10 @@ function mapStateToProps(state) {
 }
 
 const User = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
 
     useEffect(() => {
         document.title = "List of Purchase Request";
@@ -46,6 +50,7 @@ const User = (props) => {
         setLoading(true);
         api.User.all()
         .then(res => {
+            if (unmounted.current) { return false; }
             setLoading(false);
             setUsers(res.data.data);
         })

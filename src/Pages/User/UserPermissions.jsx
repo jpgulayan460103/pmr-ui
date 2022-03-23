@@ -4,7 +4,10 @@ import { map } from 'lodash';
 import api from '../../api';
 
 const UserPermissions = (props) => {
-
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const treeData = [
         {
           title: 'Users Module',
@@ -249,6 +252,7 @@ const UserPermissions = (props) => {
         };
         api.User.updatePermission(formData)
         .then(res => {
+            if (unmounted.current) { return false; }
             setLoading(false);
             props.getUsers();
             notification.success({

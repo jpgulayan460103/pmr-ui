@@ -31,6 +31,10 @@ const MaximizeSvg = () => (
 );  
 
 const ApprovedForm = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
     const budgetFormRef = React.useRef();
@@ -67,11 +71,13 @@ const ApprovedForm = (props) => {
         setTableLoading(true);
         api.Forms.getApproved(filters)
         .then(res => {
-            setTableLoading(false);
-            let data = res.data.data;
-            let meta = res.data.meta;
-            setForms(data);
-            setPaginationMeta(meta.pagination);
+            if (!unmounted.current) {
+                setTableLoading(false);
+                let data = res.data.data;
+                let meta = res.data.meta;
+                setForms(data);
+                setPaginationMeta(meta.pagination);
+            }
             
         })
         .catch(res => {

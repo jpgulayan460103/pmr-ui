@@ -20,6 +20,10 @@ function mapStateToProps(state) {
 
 
 const Suppliers = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const formRef = React.useRef();
     const [formErrors, setFormErrors] = useState({});
     const [selectedSupplier, setSelectedSupplier] = useState({});
@@ -39,6 +43,7 @@ const Suppliers = (props) => {
         setLoading(true);
         api.Supplier.all()
         .then(res => {
+            if (unmounted.current) { return false; }
             setLoading(false);
             setSuppliers(res.data.data);
         })
@@ -218,6 +223,7 @@ const Suppliers = (props) => {
         values.id = selectedSupplier.id
         api.Supplier.save(values, formType)
         .then(res => {
+            if (unmounted.current) { return false; }
             setSubmit(false);
             getSuppliers();
             notification.success({

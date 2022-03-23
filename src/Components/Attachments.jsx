@@ -55,15 +55,20 @@ const handleDownload = (item) => {
 }
 
 const Attachments = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const [files, setFiles] = useState([]);
     useEffect(() => {
         setFiles(props.fileList);
     }, [props.fileList]);
     const handleConfirm = (item) => {
-        console.log(item);
         api.Forms.deleteUpload(item.upload_type, item.id)
         .then(res => {
-            setFiles(prev => prev.filter(i => i.id != item.id));
+            if (!unmounted.current) {
+                setFiles(prev => prev.filter(i => i.id != item.id));
+            }
         })
         .catch(err => {})
         .then(res => {})

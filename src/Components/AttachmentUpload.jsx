@@ -55,6 +55,10 @@ function mapStateToProps(state) {
 }
 
 const AttachmentUpload = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     const [showUpload, setShowUpload] = useState(false);
 
     useBeforeunload((event) => {

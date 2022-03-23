@@ -46,6 +46,10 @@ const RouteSvg = () => (
 );
 
 const Listpurchaserequest = (props) => {
+    const unmounted = React.useRef(false);
+    useEffect(() => {
+        return () => { unmounted.current = true }
+    }, []);
     let history = useHistory()
     useEffect(() => {
         document.title = "List of Purchase Request";
@@ -79,11 +83,13 @@ const Listpurchaserequest = (props) => {
         setTableLoading(true);
         api.PurchaseRequest.all(filters)
         .then(res => {
-            setTableLoading(false);
-            let data = res.data.data;
-            let meta = res.data.meta;
-            setPurchaseRequests(data);
-            setPaginationMeta(meta.pagination);
+            if (!unmounted.current) {
+                setTableLoading(false);
+                let data = res.data.data;
+                let meta = res.data.meta;
+                setPurchaseRequests(data);
+                setPaginationMeta(meta.pagination);
+            }
         })
         .catch(res => {
             setTableLoading(false);
@@ -120,6 +126,7 @@ const Listpurchaserequest = (props) => {
     const loadPurchaseRequestData = async (id) => {
         await api.PurchaseRequest.get(id)
         .then(res => {
+            if (unmounted.current) { return false; }
             let item = res.data;
             let form_routes = item.form_routes.data;
             setTimelines(form_routes);
@@ -159,6 +166,7 @@ const Listpurchaserequest = (props) => {
     const loadAuditTrail = async (id) => {
         await api.PurchaseRequest.logger(id)
         .then(res => {
+            if (unmounted.current) { return false; }
             setLogger(res.data.data);
         })
         .catch(res => {})
@@ -168,6 +176,7 @@ const Listpurchaserequest = (props) => {
     const loadItemsAuditTrail = async (id) => {
         await api.PurchaseRequest.loggerItems(id)
         .then(res => {
+            if (unmounted.current) { return false; }
             setLoggerItems(res.data.data);
         })
         .catch(res => {})
