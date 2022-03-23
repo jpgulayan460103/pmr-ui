@@ -18,8 +18,8 @@ const Themepicker = () => {
             <Icon onClick={() => switchTheme('blue') } component={ () => <ColorSvg color="#546de5" /> } />
             <Icon onClick={() => switchTheme('purple') } component={ () => <ColorSvg color="#8e44ad" /> } />
             <Icon onClick={() => switchTheme('pink') } component={ () => <ColorSvg color="#c44569" /> } />
+            <Icon onClick={() => switchTheme('yellow') } component={ () => <ColorSvg color="#d35400" /> } />
             <Icon onClick={() => switchTheme('orange') } component={ () => <ColorSvg color="#f19066" /> } />
-            <Icon onClick={() => switchTheme('yellow') } component={ () => <ColorSvg color="#f5cd79" /> } />
             <Icon onClick={() => switchTheme('green') } component={ () => <ColorSvg color="#16a085" /> } />
             <Icon onClick={() => switchTheme('dark') } component={ () => <ColorSvg color="#2c3e50" /> } />
         </div>
