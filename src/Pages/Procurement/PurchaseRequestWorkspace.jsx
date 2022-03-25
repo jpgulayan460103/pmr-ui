@@ -94,7 +94,7 @@ const Pruchaserequestworkspace = (props) => {
                     <b>Purpose:</b> {props.selectedPurchaseRequest?.purpose || ""} <br />
                     <b>Charge To:</b> {props.selectedPurchaseRequest?.charge_to || ""} <br />
                     <b>Alloted Amount:</b> {props.selectedPurchaseRequest?.alloted_amount || ""} <br />
-                    <b>UACS Code:</b> {props.selectedPurchaseRequest?.uacs_code || ""} <br />
+                    <b>UACS Code:</b> {props.selectedPurchaseRequest?.uacs_code?.name || ""} <br />
                     <b>SA/OR:</b> {props.selectedPurchaseRequest?.sa_or || ""} <br />
                 </p>
             </TabPane>

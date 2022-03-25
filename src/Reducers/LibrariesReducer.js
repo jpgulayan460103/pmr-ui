@@ -15,6 +15,7 @@ const initialState = () => {
       technical_working_groups: [],
       user_signatory_designations: [],
       user_signatory_names: [],
+      uacs_codes: [],
       isLibrariesLoaded: false,
     }
   }
@@ -95,6 +96,11 @@ const initialState = () => {
         return {
           ...state,
           user_signatory_names: action.data,
+        };
+      case 'SET_LIBRARY_UACS_CODE':
+        return {
+          ...state,
+          uacs_codes: action.data,
         };
       case 'LOAD_LIBRARIES':
         return {

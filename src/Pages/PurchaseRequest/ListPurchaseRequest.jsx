@@ -408,7 +408,7 @@ const Listpurchaserequest = (props) => {
                                                     <b>Purpose:</b> {selectedPurchaseRequest?.purpose || ""} <br />
                                                     <b>Charge To:</b> {selectedPurchaseRequest?.charge_to || ""} <br />
                                                     <b>Alloted Amount:</b> {selectedPurchaseRequest?.alloted_amount || ""} <br />
-                                                    <b>UACS Code:</b> {selectedPurchaseRequest?.uacs_code || ""} <br />
+                                                    <b>UACS Code:</b> {selectedPurchaseRequest?.uacs_code?.name || ""} <br />
                                                     <b>SA/OR:</b> {selectedPurchaseRequest?.sa_or || ""} <br />
                                                 </p>
                                             </div>

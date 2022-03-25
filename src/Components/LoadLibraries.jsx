@@ -110,6 +110,10 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_SIGNATORY_NAME",
                 data: libraries.filter(library => library.library_type == "user_signatory_name")
             });
+            props.dispatch({
+                type: "SET_LIBRARY_UACS_CODE",
+                data: libraries.filter(library => library.library_type == "uacs_code")
+            });
             
         })
         .catch(err => {})

@@ -19,6 +19,7 @@ function mapStateToProps(state) {
     return {
         user: state.user.data,
         procurementTypes: state.library.procurement_types,
+        uacsCodes: state.library.uacs_codes,
         procurementTypeCategories: state.library.procurement_type_categories,
         modeOfProcurements: state.library.mode_of_procurements,
         technicalWorkingGroups: state.library.technical_working_groups,
@@ -836,11 +837,20 @@ const ForwardedForm = (props) => {
                         <Input placeholder='Amount' type="number" min={0.01} step={0.01} />
                     </Form.Item>
                     <Form.Item
-                        name="uacs_code"
+                        name="uacs_code_id"
                         label="UACS Code"
                         rules={[{ required: true, message: 'Please enter UACS Code' }]}
                     >
-                        <Input placeholder='UACS CODE' />
+                        {/* <Input placeholder='UACS CODE' /> */}
+                        <Select
+                            placeholder='Select Category'
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            { props.uacsCodes.map(i => <Option value={i.id} key={i.key}>{`${i.name} - ${i.title}`}</Option> ) }
+                        </Select>
                     </Form.Item>
                     <Form.Item
                         name="sa_or"
