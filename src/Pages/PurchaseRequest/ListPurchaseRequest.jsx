@@ -129,7 +129,9 @@ const Listpurchaserequest = (props) => {
         .catch(res => {
             setTableLoading(false);
         })
-        .then(res => {})
+        .then(res => {
+            setTableLoading(false);
+        })
         ;
     }, 200);
      
@@ -204,7 +206,13 @@ const Listpurchaserequest = (props) => {
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
         // console.log(filters);
-        getPurchaseRequests(filters)
+        if(!isEmpty(sorter)){
+            filters.sortColumn = sorter.columnKey
+            filters.sortOrder = sorter.order
+            getPurchaseRequests(filters)
+        }else{
+            getPurchaseRequests(filters)
+        }
     };
 
     const paginationChange = async (e) => {
@@ -271,7 +279,8 @@ const Listpurchaserequest = (props) => {
             key: 'purchase_request_number',
             width: 450,
             ...filter.search('purchase_request_number','text', setFilterData, filterData, getPurchaseRequests),
-            ...onCell
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Title',
@@ -279,7 +288,8 @@ const Listpurchaserequest = (props) => {
             key: 'title',
             width: 450,
             ...filter.search('title','text', setFilterData, filterData, getPurchaseRequests),
-            ...onCell
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Purpose',
@@ -287,20 +297,22 @@ const Listpurchaserequest = (props) => {
             key: 'purpose',
             width: 450,
             ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
-            ...onCell
+            ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Total Cost',
             key: 'total_cost',
             width: 150,
             align: "center",
-            // ...filter.search('total_cost','number', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('total_cost','number_range', setFilterData, filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
                 </span>
             ),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'PR Date',
@@ -310,6 +322,7 @@ const Listpurchaserequest = (props) => {
             align: "center",
             ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Status',

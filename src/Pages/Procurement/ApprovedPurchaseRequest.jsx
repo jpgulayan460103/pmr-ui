@@ -353,7 +353,7 @@ const ApprovedPurchaseRequest = (props) => {
             align: "right",
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
-            // ...filter.search('total_cost','number', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('total_cost','number_range', setFilterData, props.filterData, props.getPurchaseRequests),
             filterable: true,
             render: (text, item, index) => (
                 <span>
