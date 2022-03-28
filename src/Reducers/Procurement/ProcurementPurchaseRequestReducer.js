@@ -34,37 +34,37 @@ const initialState = () => {
           ...state,
           columns: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB':
+      case 'SET_PROCUREMENT_PURCHASE_REQUEST_TAB':
         return {
           ...state,
           tab: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PURCHASE_REQUESTS':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_PURCHASE_REQUESTS':
         return {
           ...state,
           purchaseRequests: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PAGINATION':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_PAGINATION':
         return {
           ...state,
           pagination: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER':
         return {
           ...state,
           tableFilter: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_LOADING':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_LOADING':
         return {
           ...state,
           tableLoading: action.data,
         };
-      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_WORKSPACE_LOADING':
         return {
           ...state,
           workspaceLoading: action.data,
         };
-      case 'SET_PROCUREMENT_INITIAL_STATE':
+      case 'SET_INITIAL_STATE':
         state = initialState();
         return state
       default:

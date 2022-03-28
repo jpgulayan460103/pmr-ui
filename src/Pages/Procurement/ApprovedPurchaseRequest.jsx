@@ -106,7 +106,7 @@ const ApprovedPurchaseRequest = (props) => {
     }, [props.isInitialized]);
     const setFilterData = (data) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER",
+            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
             data: {...props.filterData, ...data()}
         });
     }
@@ -118,7 +118,7 @@ const ApprovedPurchaseRequest = (props) => {
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
             props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
                 data: {...props.filterData, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
             });
         }
@@ -153,7 +153,7 @@ const ApprovedPurchaseRequest = (props) => {
     }
     const selectPurchaseRequest = async (item) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
+            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_WORKSPACE_LOADING",
             data: true
         });
         await api.PurchaseRequest.get(item.id)
@@ -166,19 +166,19 @@ const ApprovedPurchaseRequest = (props) => {
                     data: {...purchase_request, audit_trail: res.data }
                 });
                 props.dispatch({
-                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_WORKSPACE_LOADING",
                     data: false
                 });
             })
             .catch(res => {
                 props.dispatch({
-                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_WORKSPACE_LOADING",
                     data: false
                 });
             })
             .then(res => {
                 props.dispatch({
-                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_WORKSPACE_LOADING",
                     data: false
                 });
             })
@@ -643,7 +643,7 @@ const ApprovedPurchaseRequest = (props) => {
     const viewBacForm = (item, index) => {
         selectPurchaseRequest(item)
         props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB",
+            type: "SET_PROCUREMENT_PURCHASE_REQUEST_TAB",
             data: "bac-task"
         });
     }

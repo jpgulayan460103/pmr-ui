@@ -25,6 +25,19 @@ function mapStateToProps(state) {
         technicalWorkingGroups: state.libraries.technical_working_groups,
         user_sections: state.libraries.user_sections,
         isInitialized: state.user.isInitialized,
+        forms: state.forms.forwardedForm.forms,
+        pagination: state.forms.forwardedForm.pagination,
+        selectedFormRoute: state.forms.forwardedForm.selectedFormRoute,
+        routeOptions: state.forms.forwardedForm.routeOptions,
+        procurementFormType: state.forms.forwardedForm.procurementFormType,
+        currentRoute: state.forms.forwardedForm.currentRoute,
+        addOn: state.forms.forwardedForm.addOn,
+        errorMessage: state.forms.forwardedForm.errorMessage,
+        tableLoading: state.forms.forwardedForm.tableLoading,
+        selectedProcurementCategory: state.forms.forwardedForm.selectedProcurementCategory,
+        submit: state.forms.forwardedForm.submit,
+        attachments: state.forms.forwardedForm.attachments,
+        formLoading: state.forms.forwardedForm.formLoading,
     };
 }
 
@@ -37,7 +50,22 @@ const MaximizeSvg = () => (
 const ForwardedForm = (props) => {
     const unmounted = React.useRef(false);
     useEffect(() => {
-        return () => { unmounted.current = true }
+        return () => {
+            unmounted.current = true;
+            setForms([]);
+            setPaginationMeta({});
+            setSelectedFormRoute({});
+            setRouteOptions([]);
+            setProcurementFormType("");
+            setCurrentRoute({});
+            setAddOn(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
+            setErrorMessage({});
+            setTableLoading(false);
+            setSelectedProcurementCategory(null);
+            setSubmit(false);
+            setAttachments([]);
+            setFormLoading(false);
+        }
     }, []);
 
     const location = useLocation();
@@ -57,24 +85,90 @@ const ForwardedForm = (props) => {
             getForm();
         });
     }, []);
-    const [forms, setForms] = useState([]);
-    const [selectedFormRoute, setSelectedFormRoute] = useState({});
+    const [filterData, setFilterData] = useState({});
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
-    const [routeOptions, setRouteOptions] = useState([]);
-    const [procurementFormType, setProcurementFormType] = useState("");
-    const [currentRoute, setCurrentRoute] = useState({});
-    const [addOn, setAddOn] = useState(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
-    const [errorMessage, setErrorMessage] = useState({});
-    const [filterData, setFilterData] = useState({});
-    const [tableLoading, setTableLoading] = useState(false);
-    const [paginationMeta, setPaginationMeta] = useState({});
-    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
-    const [submit, setSubmit] = useState(false);
-    const [attachments, setAttachments] = useState([]);
-    const [formLoading, setFormLoading] = useState(false);
+
+    const setForms = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_FORMS",
+            data: value,
+        });
+    }
+    const setPaginationMeta = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_PAGINATION_META",
+            data: value,
+        });
+    }
+    const setSelectedFormRoute = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_SELECTED_FORM_ROUTE",
+            data: value,
+        });
+    }
+    const setRouteOptions = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_ROUTE_OPTIONS",
+            data: value,
+        });
+    }
+    const setProcurementFormType = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_PROCUREMENT_FORM_TYPE",
+            data: value,
+        });
+    }
+    const setCurrentRoute = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_CURRENT_ROUTE",
+            data: value,
+        });
+    }
+    const setAddOn = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_ADD_ON",
+            data: value,
+        });
+    }
+    const setErrorMessage = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_ERROR_MESSAGE",
+            data: value,
+        });
+    }
+    const setTableLoading = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_TABLE_LOADING",
+            data: value,
+        });
+    }
+    const setSelectedProcurementCategory = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_SELECTED_PROCUREMENT_CATEGORY",
+            data: value,
+        });
+    }
+    const setSubmit = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_SUBMIT",
+            data: value,
+        });
+    }
+    const setAttachments = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_ATTACHMENTS",
+            data: value,
+        });
+    }
+    const setFormLoading = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_FORM_LOADING",
+            data: value,
+        });
+    }
     
 
     const showRejectForm = (formRouteItem) => {
@@ -96,7 +190,7 @@ const ForwardedForm = (props) => {
         let formData = {
             ...e,
         };
-        api.Forms.reject(selectedFormRoute.id, formData)
+        api.Forms.reject(props.selectedFormRoute.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
             setSubmit(false);
@@ -118,7 +212,7 @@ const ForwardedForm = (props) => {
 
     const submitRejectForm = (e) => {
         setSubmit(true);
-        api.Forms.getRoute(selectedFormRoute.id)
+        api.Forms.getRoute(props.selectedFormRoute.id)
         .then(res => {
             if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
@@ -171,7 +265,7 @@ const ForwardedForm = (props) => {
             ...e,
 
         };
-        api.Forms.resolve(selectedFormRoute.id, formData)
+        api.Forms.resolve(props.selectedFormRoute.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
             setSubmit(false);
@@ -193,7 +287,7 @@ const ForwardedForm = (props) => {
 
     const submitResolveForm = (e) => {
         setSubmit(true);
-        api.Forms.getRoute(selectedFormRoute.id)
+        api.Forms.getRoute(props.selectedFormRoute.id)
         .then(res => {
             if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
@@ -248,7 +342,7 @@ const ForwardedForm = (props) => {
     },150);
     
     const openInFull = () => {
-        window.open(`${selectedFormRoute.form_routable?.file}?view=1`,
+        window.open(`${props.selectedFormRoute.form_routable?.file}?view=1`,
                 'newwindow',
                 'width=960,height=1080');
             return false;
@@ -299,17 +393,17 @@ const ForwardedForm = (props) => {
         setErrorMessage({});
         let formData = {
             ...e,
-            id: selectedFormRoute.form_routable.id,
-            purchase_request_number: `${addOn}${e.purchase_request_number_last}`,
+            id: props.selectedFormRoute.form_routable.id,
+            purchase_request_number: `${props.addOn}${e.purchase_request_number_last}`,
             updater: "budget",
         };
-        if(selectedFormRoute.route_type == "purchase_request"){
+        if(props.selectedFormRoute.route_type == "purchase_request"){
             api.PurchaseRequest.save(formData, 'update')
             .then(res => {
                 if (unmounted.current) { return false; }
                 setSubmit(false);
                 setErrorMessage({});
-                approve(selectedFormRoute);
+                approve(props.selectedFormRoute);
                 setModalBudgetForm(false);
                 cancelBudgetForm();
                 budgetFormRef.current.resetFields()
@@ -324,7 +418,7 @@ const ForwardedForm = (props) => {
     }
     const submitBudgetForm = async (e) => {
         setSubmit(true);
-        api.Forms.getRoute(selectedFormRoute.id)
+        api.Forms.getRoute(props.selectedFormRoute.id)
         .then(res => {
             if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
@@ -363,11 +457,11 @@ const ForwardedForm = (props) => {
 
     const proceedProcurement = (e) => {
         setErrorMessage({});
-        if(selectedFormRoute.route_type == "purchase_request"){
-            if(procurementFormType == "approve"){
+        if(props.selectedFormRoute.route_type == "purchase_request"){
+            if(props.procurementFormType == "approve"){
                 let formData = {
                     ...e,
-                    id: selectedFormRoute.form_routable.id,
+                    id: props.selectedFormRoute.form_routable.id,
                     updater: "procurement",
                 };
 
@@ -376,7 +470,7 @@ const ForwardedForm = (props) => {
                     if (unmounted.current) { return false; }
                     setSubmit(false);
                     setErrorMessage({});
-                    approve(selectedFormRoute);
+                    approve(props.selectedFormRoute);
                     setModalProcurementForm(false);
                     cancelProcurementForm();
                     procurementFormRef.current.resetFields()
@@ -386,18 +480,18 @@ const ForwardedForm = (props) => {
                     setErrorMessage(err.response.data.errors)
                     
                 })
-            }else if(procurementFormType == "twg"){
+            }else if(props.procurementFormType == "twg"){
                 let formData = {
                     ...e,
-                    id: selectedFormRoute.form_process.id,
-                    type: procurementFormType,
+                    id: props.selectedFormRoute.form_process.id,
+                    type: props.procurementFormType,
                     updater: "procurement",
                 }                
                 api.Forms.updateProcess(formData)
                 .then(res => {
                     if (unmounted.current) { return false; }
                     setSubmit(false);
-                    approve(selectedFormRoute);
+                    approve(props.selectedFormRoute);
                     setModalProcurementForm(false);
                     cancelProcurementForm();
                     procurementFormRef.current.resetFields()
@@ -412,7 +506,7 @@ const ForwardedForm = (props) => {
     }
     const submitProcurementForm = debounce(async (e) => {
         setSubmit(true);
-        api.Forms.getRoute(selectedFormRoute.id)
+        api.Forms.getRoute(props.selectedFormRoute.id)
         .then(res => {
             if (unmounted.current) { return false; }
             if(res.data.status != "pending" && res.data.status != "with_issues"){
@@ -541,7 +635,7 @@ const ForwardedForm = (props) => {
           }
     }
 
-    const dataSource = forms
+    const dataSource = props.forms
       
     const columns = [
         {
@@ -708,7 +802,7 @@ const ForwardedForm = (props) => {
         <div className='row' style={{minHeight: "50vh"}}>
             <Modal title="Disapproval Form" visible={modalRejectForm} 
                 footer={[
-                    <Button type='primary' form="rejectForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
+                    <Button type='primary' form="rejectForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
                     <Button form="rejectForm" key="cancel" onClick={() => cancelRejectForm()}>
@@ -737,7 +831,7 @@ const ForwardedForm = (props) => {
                         rules={[{ required: true, message: 'Please select office.' }]}
                     >
                         <Select>
-                            { routeOptions.map((item, index) => <Option value={item.office_id} key={index}>{item.office_name}</Option> ) }
+                            { props.routeOptions.map((item, index) => <Option value={item.office_id} key={index}>{item.office_name}</Option> ) }
                         </Select>
                     </Form.Item>
 
@@ -746,7 +840,7 @@ const ForwardedForm = (props) => {
 
             <Modal title="Resolve Form" visible={modalResolveForm} 
                 footer={[
-                    <Button type='primary' form="resolveForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
+                    <Button type='primary' form="resolveForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
                     <Button form="resolveForm" key="cancel" onClick={() => cancelResolveForm()}>
@@ -774,7 +868,7 @@ const ForwardedForm = (props) => {
 
             <Modal title="Budget Approval Form" visible={modalBudgetForm} 
                 footer={[
-                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
+                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
                     <Button form="budgetForm" key="cancel" onClick={() => cancelBudgetForm()}>
@@ -795,7 +889,7 @@ const ForwardedForm = (props) => {
                         name="purchase_request_number_last"
                         label="Purchase Request Number"
                         rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...helpers.displayError(errorMessage, 'purchase_request_number_last') }
+                        { ...helpers.displayError(props.errorMessage, 'purchase_request_number_last') }
                     >
                         <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
                             <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
@@ -809,7 +903,7 @@ const ForwardedForm = (props) => {
                         name="fund_cluster"
                         label="Fund Cluster"
                         rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
-                        { ...helpers.displayError(errorMessage, 'fund_cluster') }
+                        { ...helpers.displayError(props.errorMessage, 'fund_cluster') }
                     >
                         <Input placeholder="Fund Cluster" />
                     </Form.Item>
@@ -818,7 +912,7 @@ const ForwardedForm = (props) => {
                         name="center_code"
                         label="Responsibility Center Code"
                         // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
-                        { ...helpers.displayError(errorMessage, 'center_code') }
+                        { ...helpers.displayError(props.errorMessage, 'center_code') }
                     >
                         <Input placeholder="Responsibility Center Code" />
                     </Form.Item> */}
@@ -866,7 +960,7 @@ const ForwardedForm = (props) => {
 
             <Modal title="Procurement Approval Form" visible={modalProcurementForm} 
                 footer={[
-                    procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit" disabled={submit} loading={submit}>
+                    props.procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>) : ""
                     ,
@@ -885,7 +979,7 @@ const ForwardedForm = (props) => {
                     id="procurementForm"
                 >
 
-                    { currentRoute.description_code != "aprroval_from_proc" ? (
+                    { props.currentRoute.description_code != "aprroval_from_proc" ? (
                         <Form.Item
                             name="action_type"
                             label="Action"
@@ -898,7 +992,7 @@ const ForwardedForm = (props) => {
                         </Form.Item>
                     ) : "" }
 
-                    { procurementFormType == "twg" ? (
+                    { props.procurementFormType == "twg" ? (
                         <Form.Item
                             name="technical_working_group_id"
                             label="Technical Working Groups"
@@ -909,12 +1003,12 @@ const ForwardedForm = (props) => {
                             </Select>
                         </Form.Item>
                     ) : "" }
-                    { procurementFormType == "approve" ? (
+                    { props.procurementFormType == "approve" ? (
                         <>
                             <Form.Item
                                 name="procurement_type_category"
                                 label="Procurement Category"
-                                { ...helpers.displayError(errorMessage, 'procurement_type_category') }
+                                { ...helpers.displayError(props.errorMessage, 'procurement_type_category') }
                                 rules={[{ required: true, message: 'Please select Procurement Category.' }]}
                             >
                                 <Select placeholder='Select Procurement Category' onSelect={(e) => {
@@ -928,15 +1022,15 @@ const ForwardedForm = (props) => {
                             </Form.Item>
 
                             {
-                                selectedProcurementCategory != null ? (
+                                props.selectedProcurementCategory != null ? (
                                     <Form.Item
                                         name="procurement_type_id"
                                         label="Procurement Type"
-                                        { ...helpers.displayError(errorMessage, 'procurement_type_id') }
+                                        { ...helpers.displayError(props.errorMessage, 'procurement_type_id') }
                                         rules={[{ required: true, message: 'Please select Procurement Type.' }]}
                                     >
                                         <Select placeholder='Select Procurement Category' allowClear > 
-                                            { props.procurementTypes.filter(i => i.parent.id == selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                            { props.procurementTypes.filter(i => i.parent.id == props.selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                         </Select>
                                     </Form.Item>
                                 ) : ""
@@ -945,7 +1039,7 @@ const ForwardedForm = (props) => {
                             <Form.Item
                                 name="mode_of_procurement_id"
                                 label="Mode of Procurement"
-                                { ...helpers.displayError(errorMessage, 'mode_of_procurement_id') }
+                                { ...helpers.displayError(props.errorMessage, 'mode_of_procurement_id') }
                                 rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
                             >
                                 <Select placeholder='Select Mode of Procurement'>
@@ -967,21 +1061,21 @@ const ForwardedForm = (props) => {
                                 dataSource={dataSource}
                                 columns={columns}
                                 size={"small"}
-                                loading={{spinning: tableLoading, tip: "Loading..."}}
+                                loading={{spinning: props.tableLoading, tip: "Loading..."}}
                                 pagination={false}
                                 onChange={handleTableChange}
                                 scroll={{ y: "60vh" }}
                                 rowClassName={(record, index) => {
-                                    if(selectedFormRoute.id == record.id){
+                                    if(props.selectedFormRoute.id == record.id){
                                         return "selected-row";
                                     }
                                 }}
                             />
                             <div className="flex justify-end mt-2">
                                 <Pagination
-                                        current={paginationMeta?.current_page || 1}
-                                        total={paginationMeta?.total || 1}
-                                        pageSize={paginationMeta?.per_page || 1}
+                                        current={props.pagination?.current_page || 1}
+                                        total={props.pagination?.total || 1}
+                                        pageSize={props.pagination?.per_page || 1}
                                         onChange={paginationChange}
                                         showQuickJumper
                                         size="small"
@@ -990,24 +1084,24 @@ const ForwardedForm = (props) => {
                         </div>
                     </Card>
                 </Col>
-                { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+                { isEmpty(props.selectedFormRoute) || props.selectedFormRoute.form_routable.file == "" ? "" : (
                     <Col md={24} lg={8} xl={6}>
                         <Card size="small" title="Form Information" bordered={false} extra={(
                             <div className='text-right flex space-x-0.5'>
                                 <div className='space-x-0.5 mr-2'>
-                                    { selectedFormRoute.status == "with_issues" ? (
+                                    { props.selectedFormRoute.status == "with_issues" ? (
                                         <Tooltip placement="top" title={"Resolve"}>
-                                            <Button size='small' type='default' onClick={() => { resolveForm(selectedFormRoute, 0) }}><SendOutlined /></Button>
+                                            <Button size='small' type='default' onClick={() => { resolveForm(props.selectedFormRoute, 0) }}><SendOutlined /></Button>
                                         </Tooltip>
                                     ) : (
                                         <>
                                         <Tooltip placement="top" title={"Approve"}>
-                                            <Button size='small' type='default' onClick={() => { confirm(selectedFormRoute, 0) }}><LikeTwoTone twoToneColor="#0000FF" /></Button>
+                                            <Button size='small' type='default' onClick={() => { confirm(props.selectedFormRoute, 0) }}><LikeTwoTone twoToneColor="#0000FF" /></Button>
                                         </Tooltip>
                                             
-                                            { selectedFormRoute.from_office_id == selectedFormRoute.to_office_id ? "" : (
+                                            { props.selectedFormRoute.from_office_id == props.selectedFormRoute.to_office_id ? "" : (
                                                 <Tooltip placement="top" title={"Disapprove"}>
-                                                    <Button size='small' type='default' onClick={() => { showRejectForm(selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
+                                                    <Button size='small' type='default' onClick={() => { showRejectForm(props.selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
                                                 </Tooltip>
                                             ) }
                                         </>
@@ -1023,17 +1117,17 @@ const ForwardedForm = (props) => {
                         )}>
                             <div className='forms-card-content'>
                                 <p>
-                                    <span><b>Form type:</b> <span>{selectedFormRoute.route_type_str}</span></span><br />
-                                    <span><b>Title:</b> <span>{selectedFormRoute.form_routable?.title}</span></span><br />
-                                    <span><b>End User:</b> <span>{selectedFormRoute.end_user.name}</span></span><br />
-                                    <span><b>Purpose:</b> <span>{selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    <span><b>Amount:</b> <span>{selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
-                                    <span><b>Forwarded by:</b> <span>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</span></span><br />
-                                    <span><b>Forwarded to:</b> <span>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</span></span><br />
-                                    <span><b>Remarks:</b> <span>{selectedFormRoute.remarks}</span></span><br />
-                                    { selectedFormRoute.forwarded_remarks ? <span><b>Remarks:</b> <span>{selectedFormRoute.forwarded_remarks}</span><br /></span> : ""}
-                                    <span><b>Status:</b> <span>{ selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</span></span><br />
-                                    { selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <span>{selectedFormRoute.user?.user_information?.fullname}</span><br /></span> : ""}
+                                    <span><b>Form type:</b> <span>{props.selectedFormRoute.route_type_str}</span></span><br />
+                                    <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
+                                    <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
+                                    <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
+                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
+                                    <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
+                                    <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
+                                    <span><b>Remarks:</b> <span>{props.selectedFormRoute.remarks}</span></span><br />
+                                    { props.selectedFormRoute.forwarded_remarks ? <span><b>Remarks:</b> <span>{props.selectedFormRoute.forwarded_remarks}</span><br /></span> : ""}
+                                    <span><b>Status:</b> <span>{ props.selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</span></span><br />
+                                    { props.selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <span>{props.selectedFormRoute.user?.user_information?.fullname}</span><br /></span> : ""}
                                 </p>
                                 
                             </div>
@@ -1041,20 +1135,20 @@ const ForwardedForm = (props) => {
                     </Col>
                 )  }
             </Row>
-            { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+            { isEmpty(props.selectedFormRoute) || props.selectedFormRoute.form_routable.file == "" ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Forwarded Form" bordered={false} loading={formLoading}>
+                    <Card size="small" title="Forwarded Form" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
-                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
+                            <iframe src={`${props.selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
 
                 <Col md={24} lg={8} xl={6}>
-                        <Card size="small" title="Attachments" bordered={false} loading={formLoading}>
+                        <Card size="small" title="Attachments" bordered={false} loading={props.formLoading}>
                             <div className='forms-card-form-content'>
-                                <AttachmentUpload formId={selectedFormRoute.form_routable_id} formType={selectedFormRoute.route_type} fileList={attachments}></AttachmentUpload>
+                                <AttachmentUpload formId={props.selectedFormRoute.form_routable_id} formType={props.selectedFormRoute.route_type} fileList={props.attachments}></AttachmentUpload>
                             </div>
                         </Card>
                     </Col>

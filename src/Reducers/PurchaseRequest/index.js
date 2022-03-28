@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import create from './CreatePurchaseRequestReducer'
-import list from './ListPurchaseRequest'
+import list from './ListPurchaseRequestReducer'
 
 const rootReducer = combineReducers({
   create,

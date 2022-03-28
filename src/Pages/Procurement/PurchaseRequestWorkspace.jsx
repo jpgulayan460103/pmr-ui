@@ -63,7 +63,7 @@ const Pruchaserequestworkspace = (props) => {
 
     const changeTab = (key) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB",
+            type: "SET_PROCUREMENT_PURCHASE_REQUEST_TAB",
             data: key
         });
     }

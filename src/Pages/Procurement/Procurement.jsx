@@ -48,29 +48,29 @@ const Procurement = (props) => {
             filters = props.tableFilter
         }
         props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_LOADING",
+            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_LOADING",
             data: true
         });
         api.PurchaseRequest.all(filters)
         .then(res => {
             props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_LOADING",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_LOADING",
                 data: false
             });
             let data = res.data.data;
             let meta = res.data.meta;
             props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PURCHASE_REQUESTS",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_PURCHASE_REQUESTS",
                 data: data
             });
             props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PAGINATION",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_PAGINATION",
                 data: meta.pagination
             });
         })
         .catch(res => {
             props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_LOADING",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_LOADING",
                 data: false
             });
         })

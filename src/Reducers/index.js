@@ -6,6 +6,7 @@ import procurements from './Procurement'
 import quotations from './QuotationReducer'
 import suppliers from './SupplierReducer'
 import activtyLogs from './ActivityLog'
+import forms from './Forms'
 
 const rootReducer = combineReducers({
   user,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   quotations,
   suppliers,
   activtyLogs,
+  forms,
 })
 
 export default rootReducer

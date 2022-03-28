@@ -21,6 +21,10 @@ function mapStateToProps(state) {
         technicalWorkingGroups: state.libraries.technical_working_groups,
         user_sections: state.libraries.user_sections,
         isInitialized: state.user.isInitialized,
+        forms: state.forms.approvedForm.forms,
+        selectedFormRoute: state.forms.approvedForm.selectedFormRoute,
+        pagination: state.forms.approvedForm.pagination,
+        loading: state.forms.approvedForm.loading,
     };
 }
 
@@ -33,35 +37,45 @@ const MaximizeSvg = () => (
 const ApprovedForm = (props) => {
     const unmounted = React.useRef(false);
     useEffect(() => {
-        return () => { unmounted.current = true }
+        return () => {
+            unmounted.current = true;
+            setForms([]);
+        }
     }, []);
-    const rejectFormRef = React.useRef();
-    const resolveFormRef = React.useRef();
-    const budgetFormRef = React.useRef();
-    const procurementFormRef = React.useRef();
     useEffect(() => {
         document.title = "Approved Forms";
         if(props.isInitialized){
             getForm();
         }
     }, [props.isInitialized]);
+    
 
-    const [forms, setForms] = useState([]);
-    const [selectedFormRoute, setSelectedFormRoute] = useState({});
-    const [modalRejectForm, setModalRejectForm] = useState(false);
-    const [modalResolveForm, setModalResolveForm] = useState(false);
-    const [modalBudgetForm, setModalBudgetForm] = useState(false);
-    const [modalProcurementForm, setModalProcurementForm] = useState(false);
-    const [routeOptions, setRouteOptions] = useState([]);
-    const [procurementFormType, setProcurementFormType] = useState("");
-    const [currentRoute, setCurrentRoute] = useState({});
-    const [addOn, setAddOn] = useState(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
-    const [errorMessage, setErrorMessage] = useState({});
     const [filterData, setFilterData] = useState({});
-    const [tableLoading, setTableLoading] = useState(false);
-    const [paginationMeta, setPaginationMeta] = useState({});
-    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
-    const [submit, setSubmit] = useState(false);
+
+    const setForms = (value) => {
+        props.dispatch({
+            type: "SET_FORM_APPROVED_FORM_FORMS",
+            data: value,
+        });
+    }
+    const setSelectedFormRoute = (value) => {
+        props.dispatch({
+            type: "SET_FORM_APPROVED_FORM_SELECTED_FORM_ROUTE",
+            data: value,
+        });
+    }
+    const setPaginationMeta = (value) => {
+        props.dispatch({
+            type: "SET_FORM_APPROVED_FORM_PAGINATION",
+            data: value,
+        });
+    }
+    const setTableLoading = (value) => {
+        props.dispatch({
+            type: "SET_FORM_APPROVED_FORM_LOADING",
+            data: value,
+        });
+    }
 
 
     const getForm = debounce((filters) => {
@@ -83,7 +97,9 @@ const ApprovedForm = (props) => {
         .catch(res => {
             setTableLoading(false);
         })
-        .then(res => {})
+        .then(res => {
+            setTableLoading(false);
+        })
         ;
     },150);
 
@@ -106,7 +122,7 @@ const ApprovedForm = (props) => {
         return i;
     });
 
-    const dataSource = forms
+    const dataSource = props.forms
       
     const columns = [
         {
@@ -232,7 +248,7 @@ const ApprovedForm = (props) => {
     }
 
     const openInFull = () => {
-        window.open(`${selectedFormRoute.form_routable?.file}?view=1`,
+        window.open(`${props.selectedFormRoute.form_routable?.file}?view=1`,
                 'newwindow',
                 'width=960,height=1080');
             return false;
@@ -252,21 +268,21 @@ const ApprovedForm = (props) => {
                                 dataSource={dataSource}
                                 columns={columns}
                                 size={"small"}
-                                loading={{spinning: tableLoading, tip: "Loading..."}}
+                                loading={{spinning: props.loading, tip: "Loading..."}}
                                 pagination={false}
                                 onChange={handleTableChange}
                                 scroll={{ y: "60vh" }}
                                 rowClassName={(record, index) => {
-                                    if(selectedFormRoute.id == record.id){
+                                    if(props.selectedFormRoute.id == record.id){
                                         return "selected-row";
                                     }
                                 }}
                             />
                             <div className="flex justify-end mt-2">
                                 <Pagination
-                                        current={paginationMeta?.current_page || 1}
-                                        total={paginationMeta?.total || 1}
-                                        pageSize={paginationMeta?.per_page || 1}
+                                        current={props.pagination?.current_page || 1}
+                                        total={props.pagination?.total || 1}
+                                        pageSize={props.pagination?.per_page || 1}
                                         onChange={paginationChange}
                                         showQuickJumper
                                         size="small"
@@ -275,7 +291,7 @@ const ApprovedForm = (props) => {
                         </div>
                     </Card>
                 </Col>
-                { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+                { isEmpty(props.selectedFormRoute) || props.selectedFormRoute.form_routable.file == "" ? "" : (
                     <Col md={24} lg={8} xl={6}>
                         <Card size="small" title="Form Information" bordered={false} extra={(
                             <div className='text-right flex space-x-0.5'>
@@ -289,18 +305,18 @@ const ApprovedForm = (props) => {
                         )}>
                             <div className='forms-card-content'>
                                 <p>
-                                    <span><b>Form type:</b> <span>{selectedFormRoute.route_type_str}</span></span><br />
-                                    <span><b>Title:</b> <span>{selectedFormRoute.form_routable?.title}</span></span><br />
-                                    <span><b>End User:</b> <span>{selectedFormRoute.end_user.name}</span></span><br />
-                                    <span><b>Purpose:</b> <span>{selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    <span><b>Amount:</b> <span>{selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
-                                    <span><b>Forwarded by:</b> <span>{selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.from_office?.name}` : selectedFormRoute.from_office?.name }</span></span><br />
-                                    <span><b>Forwarded to:</b> <span>{selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${selectedFormRoute.to_office?.name}` : selectedFormRoute.to_office?.name }</span></span><br />
-                                    <span><b>Description:</b> <span>{selectedFormRoute.remarks}</span><br /></span>
-                                    <span><b>Remarks:</b> <span>{selectedFormRoute.forwarded_remarks}</span><br /></span>
+                                    <span><b>Form type:</b> <span>{props.selectedFormRoute.route_type_str}</span></span><br />
+                                    <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
+                                    <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
+                                    <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
+                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
+                                    <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
+                                    <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
+                                    <span><b>Description:</b> <span>{props.selectedFormRoute.remarks}</span><br /></span>
+                                    <span><b>Remarks:</b> <span>{props.selectedFormRoute.forwarded_remarks}</span><br /></span>
                                     <br />
-                                    <span><b>Status:</b> <span>{ selectedFormRoute.status }</span></span><br />
-                                    <span><b>Action Taken:</b> <span>{ selectedFormRoute.action_taken }</span></span><br />
+                                    <span><b>Status:</b> <span>{ props.selectedFormRoute.status }</span></span><br />
+                                    <span><b>Action Taken:</b> <span>{ props.selectedFormRoute.action_taken }</span></span><br />
                                 </p>
                                 
                             </div>
@@ -308,12 +324,12 @@ const ApprovedForm = (props) => {
                     </Col>
                 )  }
             </Row>
-            { isEmpty(selectedFormRoute) || selectedFormRoute.form_routable.file == "" ? "" : (
+            { isEmpty(props.selectedFormRoute) || props.selectedFormRoute.form_routable.file == "" ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col span={24}>
                     <Card size="small" title="Approved Form" bordered={false}>
                         <div className='forms-card-form-content'>
-                            <iframe src={`${selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
+                            <iframe src={`${props.selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
