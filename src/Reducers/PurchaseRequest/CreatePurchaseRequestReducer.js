@@ -1,4 +1,4 @@
-import customDayJs from "./../customDayJs";
+import customDayJs from "./../../customDayJs";
 
 const initialState = () => {
     return {
@@ -14,55 +14,43 @@ const initialState = () => {
         pr_date: customDayJs().format('YYYY-MM-DD')
       },
       formErrors: {},
-      formProccess: [],
       requestedBySignatory: {},
       approvedBySignatory: {},
       formType: "create",
-      selectedPurchaseRequest: {},
     }
   }
   
   export default function reducer(state = initialState(), action) {
     switch (action.type) {
-      case 'SET_PURCHASE_REQUEST_FORM_DATA':
+      case 'SET_PURCHASE_REQUEST_CREATE_FORM_DATA':
         return {
           ...state,
           formData: action.data,
         };
-      case 'SET_PURCHASE_REQUEST_FORM_ERRORS':
+      case 'SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS':
         return {
           ...state,
           formErrors: action.data,
         };
-      case 'SET_PURCHASE_REQUEST_FORM_PROCCESS':
-        return {
-          ...state,
-          formProccess: action.data,
-        };
-      case 'SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY':
+      case 'SET_PURCHASE_REQUEST_CREATE_REQUESTED_BY_SIGNATORY':
         return {
           ...state,
           requestedBySignatory: action.data,
         };
-      case 'SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY':
+      case 'SET_PURCHASE_REQUEST_CREATE_APPROVED_BY_SIGNATORY':
         return {
           ...state,
           approvedBySignatory: action.data,
         };
-      case 'SET_PURCHASE_REQUEST_FORM_TYPE':
+      case 'SET_PURCHASE_REQUEST_CREATE_FORM_TYPE':
         return {
           ...state,
           formType: action.data,
         };
-      case 'RESET_PURCHASE_REQUEST_FORM_DATA':
+      case 'RESET_PURCHASE_REQUEST_CREATE_FORM_DATA':
         return {
           ...state,
           formData: {...initialState().formData, ...action.data},
-        };
-      case 'SET_PURCHASE_REQUEST_SELECTED_PURCHASE_REQUEST':
-        return {
-          ...state,
-          selectedPurchaseRequest: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

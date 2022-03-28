@@ -17,12 +17,12 @@ function mapStateToProps(state) {
         user_divisions: state.library.user_divisions,
         user_signatory_designations: state.library.user_signatory_designations,
         user_signatory_names: state.library.user_signatory_names,
-        formData: state.purchaseRequest.formData,
-        formType: state.purchaseRequest.formType,
-        formErrors: state.purchaseRequest.formErrors,
-        formProccess: state.purchaseRequest.formProccess,
-        requestedBySignatory: state.purchaseRequest.requestedBySignatory,
-        approvedBySignatory: state.purchaseRequest.approvedBySignatory,
+        formData: state.purchaseRequest.create.formData,
+        formType: state.purchaseRequest.create.formType,
+        formErrors: state.purchaseRequest.create.formErrors,
+        formProccess: state.purchaseRequest.create.formProccess,
+        requestedBySignatory: state.purchaseRequest.create.requestedBySignatory,
+        approvedBySignatory: state.purchaseRequest.create.approvedBySignatory,
         user: state.user.data,
         isInitialized: state.user.isInitialized,
     };
@@ -43,7 +43,7 @@ const CreatePurchaseRequest = (props) => {
                         reqBy = props.user.user_offices.data[0].office.parent.title;
                     }
                     props.dispatch({
-                        type: "SET_PURCHASE_REQUEST_FORM_DATA",
+                        type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
                         data: {
                             ...props.formData,
                             end_user_id: props.user.user_offices?.data[0]?.office_id,
@@ -99,7 +99,7 @@ const CreatePurchaseRequest = (props) => {
     const savePurchaseRequest = debounce(() => {
         setSubmit(true);
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
             data: {}
         });
         let formData = cloneDeep(props.formData);
@@ -126,7 +126,7 @@ const CreatePurchaseRequest = (props) => {
             setSubmit(false);
             if(err.response.status == "422"){
                 props.dispatch({
-                    type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                    type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
                     data: err.response.data.errors
                 });
     
@@ -159,17 +159,17 @@ const CreatePurchaseRequest = (props) => {
 
     const clearForm = async () => {
         props.dispatch({
-            type: "RESET_PURCHASE_REQUEST_FORM_DATA",
+            type: "RESET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 end_user_id: props.user.user_offices.data[0].office_id,
             }
         });
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_TYPE",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_TYPE",
             data: "create"
         });
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
             data: {}
         });
 
@@ -179,7 +179,7 @@ const CreatePurchaseRequest = (props) => {
 
     const previewPurchaseRequest = debounce(() => {
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
             data: {}
         });
         let formData = cloneDeep(props.formData);
@@ -195,7 +195,7 @@ const CreatePurchaseRequest = (props) => {
         })
         .catch(err => {
             props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_ERRORS",
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
                 data: err.response.data.errors
             });
         })
@@ -219,7 +219,7 @@ const CreatePurchaseRequest = (props) => {
             item_id: null,
         };
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 items: [...props.formData.items, newValue]
@@ -230,7 +230,7 @@ const CreatePurchaseRequest = (props) => {
     const deleteItem = (key) => {
         let newValue = props.formData.items.filter(item => item.key !== key)
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 items: newValue
@@ -245,7 +245,7 @@ const CreatePurchaseRequest = (props) => {
             value = e.target.value;
         }
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 [field]: value
@@ -271,7 +271,7 @@ const CreatePurchaseRequest = (props) => {
         }
         newValue[index][field] = value;
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 items: newValue
@@ -292,7 +292,7 @@ const CreatePurchaseRequest = (props) => {
         newValue[index]["item_name"] = value;
         newValue[index]["item_id"] = item.id;
         props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FORM_DATA",
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 items: newValue
@@ -310,13 +310,13 @@ const CreatePurchaseRequest = (props) => {
         if(type == "requestedBy"){
             let user_office = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
-                type: "SET_PURCHASE_REQUEST_REQUESTED_BY_SIGNATORY",
+                type: "SET_PURCHASE_REQUEST_CREATE_REQUESTED_BY_SIGNATORY",
                 data: user_office[0]
             });
         }else{
             let user_office = props.user_signatory_names.filter(i => i.title == e);
             props.dispatch({
-                type: "SET_PURCHASE_REQUEST_APPROVED_BY_SIGNATORY",
+                type: "SET_PURCHASE_REQUEST_CREATE_APPROVED_BY_SIGNATORY",
                 data: user_office[0]
             });
         }

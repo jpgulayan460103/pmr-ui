@@ -15,7 +15,7 @@ const { SubMenu } = Menu;
 
 function mapStateToProps(state) {
     return {
-        purchaseRequestFormType: state.purchaseRequest.formType,
+        purchaseRequestFormType: state.purchaseRequest.create.formType,
         user: state.user.data,
     };
 }

@@ -28,7 +28,9 @@ customAxios.interceptors.response.use((response) => {
           <p>Please reload the page.</p>
         </div>
       ),
-      onOk() {},
+      onOk() {
+        Modal.destroyAll();
+      },
     });
   } else if (error.response && error.response.status == 403) {
     Modal.error({
@@ -38,7 +40,9 @@ customAxios.interceptors.response.use((response) => {
           <p>You don't have permission to access or to make action to this resource.</p>
         </div>
       ),
-      onOk() {},
+      onOk() {
+        Modal.destroyAll();
+      },
     });
   } else if (error.response && error.response.status == 404) {
     Modal.error({
@@ -48,7 +52,9 @@ customAxios.interceptors.response.use((response) => {
           <p>This resource has been removed or not existed.</p>
         </div>
       ),
-      onOk() {},
+      onOk() {
+        Modal.destroyAll();
+      },
     });
   } else if (error.response && error.response.status >= 500) {
     Modal.error({
@@ -58,7 +64,9 @@ customAxios.interceptors.response.use((response) => {
           <p>Please try again later.</p>
         </div>
       ),
-      onOk() {},
+      onOk() {
+        Modal.destroyAll();
+      },
     });
   }
   return Promise.reject(error);

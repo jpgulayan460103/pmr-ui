@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import user from './UserReducer'
 import library from './LibrariesReducer'
-import purchaseRequest from './PurchaseRequestReducer'
+import purchaseRequest from './PurchaseRequest'
 import procurement from './ProcurementReducer'
 import quotation from './QuotationReducer'
 import supplier from './SupplierReducer'

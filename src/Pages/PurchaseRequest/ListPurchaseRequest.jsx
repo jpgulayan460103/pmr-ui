@@ -30,7 +30,12 @@ const { RangePicker } = DatePicker;
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        selectedPurchaseRequest: state.purchaseRequest.selectedPurchaseRequest,
+        selectedPurchaseRequest: state.purchaseRequest.list.selectedPurchaseRequest,
+        purchaseRequests: state.purchaseRequest.list.purchaseRequests,
+        paginationMeta: state.purchaseRequest.list.paginationMeta,
+        loading: state.purchaseRequest.list.loading,
+        timelines: state.purchaseRequest.list.timelines,
+        logger: state.purchaseRequest.list.logger,
     };
 }
 
@@ -60,22 +65,48 @@ const Listpurchaserequest = (props) => {
     }, [props.isInitialized]);
     
     
-    const [purchaseRequests, setPurchaseRequests] = useState([]);
-    const [paginationMeta, setPaginationMeta] = useState({
-        current_page: 1,
-        total: 1,
-        per_page: 1,
-    });
-    const [purchaseRequestOutput, setPurchaseRequestOutput] = useState("");
-    const [tableLoading, setTableLoading] = useState(false);
-    const [timelines, setTimelines] = useState([]);
     const [filterData, setFilterData] = useState({
         page: 1,
     });
-    const [loggerItems, setLoggerItems] = useState([]);
-    const [logger, setLogger] = useState([]);
-    // const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState({});
     const [tabKey, setTabKey] = useState('information');
+
+    const setTableLoading = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_LOADING",
+            data: value,
+        });
+    }
+    const setPurchaseRequests = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_PURCHASE_REQUESTS",
+            data: value,
+        });
+    }
+    const setPaginationMeta = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_PAGINATION_META",
+            data: value,
+        });
+    }
+    const setLogger = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_LOGGER",
+            data: value,
+        });
+    }
+    const setSelectedPurchaseRequest = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_SELECTED_PURCHASE_REQUEST",
+            data: value
+        });
+    }
+
+    const setTimelines = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_LIST_TIMELINES",
+            data: value
+        });
+    }
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
@@ -99,36 +130,22 @@ const Listpurchaserequest = (props) => {
         ;
     }, 200);
      
-
-    const getPurchaseRequest = (id) => {
-        api.PurchaseRequest.get(id);
-    }
-    
-
     const openInFull = () => {
-        window.open(`${purchaseRequestOutput}?view=1`,
+        window.open(`${props.selectedPurchaseRequest.file}?view=1`,
                 'newwindow',
                 'width=960,height=1080');
             return false;
     }
 
-    const setSelectedPurchaseRequest = (value) => {
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_SELECTED_PURCHASE_REQUEST",
-            data: value
-        });
-    }
+
 
 
     const openPurchaseRequest = async (item, index) => {
-        setPurchaseRequestOutput(item.file);
         setSelectedPurchaseRequest(item)
         setTimelines([]);
         setLogger([]);
-        setLoggerItems([]);
-        await loadPurchaseRequestData(item.id);
-        await loadAuditTrail(item.id);
-        // await loadItemsAuditTrail(item.id);
+        loadPurchaseRequestData(item.id);
+        loadAuditTrail(item.id);
     }
 
     const loadPurchaseRequestData = async (id) => {
@@ -145,7 +162,6 @@ const Listpurchaserequest = (props) => {
         ;
     }
     const closePurchaseRequest = () => {
-        setPurchaseRequestOutput("");
         setSelectedPurchaseRequest({});
     }
 
@@ -157,11 +173,11 @@ const Listpurchaserequest = (props) => {
             purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
             purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
             props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_DATA",
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
                 data: purchaseRequest
             });
             props.dispatch({
-                type: "SET_PURCHASE_REQUEST_FORM_TYPE",
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_TYPE",
                 data: "update"
             });
             history.push("/purchase-requests/form");
@@ -181,15 +197,6 @@ const Listpurchaserequest = (props) => {
         .then(res => {})
     }
 
-    const loadItemsAuditTrail = async (id) => {
-        await api.PurchaseRequest.loggerItems(id)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            setLoggerItems(res.data.data);
-        })
-        .catch(res => {})
-        .then(res => {})
-    }
 
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
@@ -235,7 +242,7 @@ const Listpurchaserequest = (props) => {
         return { label, color, logo }
     }
 
-    const dataSource = purchaseRequests
+    const dataSource = props.purchaseRequests;
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -368,14 +375,14 @@ const Listpurchaserequest = (props) => {
                                 size={"small"}
                                 pagination={false}
                                 scroll={{ y: "50vh" }}
-                                loading={{spinning: tableLoading, tip: "Loading..."}}
+                                loading={{spinning: props.loading, tip: "Loading..."}}
                             />
 
                             <div className="flex justify-end mt-2">
                                 <Pagination
-                                    current={paginationMeta?.current_page || 1}
-                                    total={paginationMeta?.total || 1}
-                                    pageSize={paginationMeta?.per_page || 1}
+                                    current={props.paginationMeta?.current_page || 1}
+                                    total={props.paginationMeta?.total || 1}
+                                    pageSize={props.paginationMeta?.per_page || 1}
                                     onChange={paginationChange}
                                     // showSizeChanger
                                     showQuickJumper
@@ -386,7 +393,7 @@ const Listpurchaserequest = (props) => {
                         </div>
                     </Card>
                 </Col>
-                { purchaseRequestOutput == "" ? "" : (
+                { props.selectedPurchaseRequest.file == "" ? "" : (
                     <Col md={24} lg={10} xl={8}>
                             <Card size="small" bordered={false} title="Puchase Request Details" extra={(
                                 <div className='text-right space-x-0.5'>
@@ -425,10 +432,10 @@ const Listpurchaserequest = (props) => {
                                         <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
-                                            { !isEmpty(timelines) ? (
+                                            { !isEmpty(props.timelines) ? (
                                                 <div className='pt-4'>
                                                     <Timeline>
-                                                        { timelines.map((timeline, index) => {
+                                                        { props.timelines.map((timeline, index) => {
                                                             return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
                                                         }) }
                                                     </Timeline>
@@ -436,8 +443,8 @@ const Listpurchaserequest = (props) => {
                                             ) : <Skeleton active />  }
                                         </TabPane>
                                         <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
-                                            { !isEmpty(logger) ? (
-                                                <AuditTrail logger={logger} tableScroll="65vh" hasChild childProp="purchase_request"  displayProp="display_log" />
+                                            { !isEmpty(props.logger) ? (
+                                                <AuditTrail logger={props.logger} tableScroll="65vh" hasChild childProp="purchase_request"  displayProp="display_log" />
                                             ) : <Skeleton active /> }
                                         </TabPane>
                                     </Tabs>
@@ -451,7 +458,7 @@ const Listpurchaserequest = (props) => {
                 <Col span={24}>
                     <div className='purchase-request-card-content'>
                         { isEmpty(props.selectedPurchaseRequest) ? "" : (
-                            <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                            <iframe src={`${props.selectedPurchaseRequest.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         ) }
                     </div>
                 </Col>

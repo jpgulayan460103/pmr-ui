@@ -130,7 +130,7 @@ const Loadlibraries = (props) => {
             });
         })
         .catch(err => {
-            console.log("session");
+            getUser();
         })
         .then(res => {})
     }
