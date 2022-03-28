@@ -18,11 +18,11 @@ import moment from 'moment';
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
+        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
         procurementTypes: state.library.procurement_types,
         modeOfProcurements: state.library.mode_of_procurements,
-        purchaseRequestTab: state.procurement.purchaseRequestTab,
-        purchaseRequests: state.procurement.purchaseRequests,
+        tab: state.procurement.purchaseRequest.tab,
+        purchaseRequests: state.procurement.purchaseRequest.purchaseRequests,
     };
 }
 

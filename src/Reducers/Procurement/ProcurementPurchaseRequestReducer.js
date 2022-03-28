@@ -2,20 +2,20 @@ const initialState = () => {
     return {
       selectedPurchaseRequest: {},
       columns: [],
-      purchaseRequestTab: "information",
+      tab: "information",
       purchaseRequests: [],
-      purchaseRequestsPagination: {
+      pagination: {
         current_page: 1,
         total: 1,
         per_page: 1,
       },
-      purchaseRequestsTableFilter: {
+      tableFilter: {
         page: 1,
         type: 'procurement',
         purchase_request_type_category: [],
       },
-      purchaseRequestsTableLoading: false,
-      purchaseRequestsWorkspaceLoading: false,
+      tableLoading: false,
+      workspaceLoading: false,
     }
   }
   
@@ -34,35 +34,35 @@ const initialState = () => {
           ...state,
           columns: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB':
+      case 'SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB':
         return {
           ...state,
-          purchaseRequestTab: action.data,
+          tab: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PURCHASE_REQUESTS':
         return {
           ...state,
           purchaseRequests: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_PAGINATION':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_PAGINATION':
         return {
           ...state,
-          purchaseRequestsPagination: action.data,
+          pagination: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER':
         return {
           ...state,
-          purchaseRequestsTableFilter: action.data,
+          tableFilter: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_LOADING':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_LOADING':
         return {
           ...state,
-          purchaseRequestsTableLoading: action.data,
+          tableLoading: action.data,
         };
-      case 'SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING':
+      case 'SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING':
         return {
           ...state,
-          purchaseRequestsWorkspaceLoading: action.data,
+          workspaceLoading: action.data,
         };
       case 'SET_PROCUREMENT_INITIAL_STATE':
         state = initialState();

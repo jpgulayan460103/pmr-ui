@@ -43,12 +43,12 @@ function mapStateToProps(state) {
         procurement_types: state.library.procurement_types,
         procurement_type_categories: state.library.procurement_type_categories,
         mode_of_procurements: state.library.mode_of_procurements,
-        selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
-        columns: state.procurement.columns,
-        purchaseRequests: state.procurement.purchaseRequests,
-        purchaseRequestsPagination: state.procurement.purchaseRequestsPagination,
-        filterData: state.procurement.purchaseRequestsTableFilter,
-        tableLoading: state.procurement.purchaseRequestsTableLoading,
+        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
+        columns: state.procurement.purchaseRequest.columns,
+        purchaseRequests: state.procurement.purchaseRequest.purchaseRequests,
+        purchaseRequestsPagination: state.procurement.purchaseRequest.pagination,
+        filterData: state.procurement.purchaseRequest.tableFilter,
+        tableLoading: state.procurement.purchaseRequest.tableLoading,
         isInitialized: state.user.isInitialized,
         uploadingFiles: state.user.uploadingFiles,
     };
@@ -106,7 +106,7 @@ const ApprovedPurchaseRequest = (props) => {
     }, [props.isInitialized]);
     const setFilterData = (data) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
+            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER",
             data: {...props.filterData, ...data()}
         });
     }
@@ -118,7 +118,7 @@ const ApprovedPurchaseRequest = (props) => {
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
             props.dispatch({
-                type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_TABLE_FILTER",
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_TABLE_FILTER",
                 data: {...props.filterData, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
             });
         }
@@ -153,7 +153,7 @@ const ApprovedPurchaseRequest = (props) => {
     }
     const selectPurchaseRequest = async (item) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
             data: true
         });
         await api.PurchaseRequest.get(item.id)
@@ -166,19 +166,19 @@ const ApprovedPurchaseRequest = (props) => {
                     data: {...purchase_request, audit_trail: res.data }
                 });
                 props.dispatch({
-                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
                     data: false
                 });
             })
             .catch(res => {
                 props.dispatch({
-                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
                     data: false
                 });
             })
             .then(res => {
                 props.dispatch({
-                    type: "SET_PROCUREMENT_SET_PURCHASE_REQUESTS_WORKSPACE_LOADING",
+                    type: "SET_PROCUREMENT_PURCHASE_REQUESTS_SET_WORKSPACE_LOADING",
                     data: false
                 });
             })
@@ -643,7 +643,7 @@ const ApprovedPurchaseRequest = (props) => {
     const viewBacForm = (item, index) => {
         selectPurchaseRequest(item)
         props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
+            type: "SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB",
             data: "bac-task"
         });
     }

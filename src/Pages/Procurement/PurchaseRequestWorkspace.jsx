@@ -39,11 +39,11 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.selectedPurchaseRequest,
+        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
         procurementTypes: state.library.procurement_types,
         modeOfProcurements: state.library.mode_of_procurements,
-        purchaseRequestTab: state.procurement.purchaseRequestTab,
-        purchaseRequests: state.procurement.purchaseRequests,
+        tab: state.procurement.purchaseRequest.tab,
+        purchaseRequests: state.procurement.purchaseRequest.purchaseRequests,
         uploadingFiles: state.user.uploadingFiles,
     };
 }
@@ -63,7 +63,7 @@ const Pruchaserequestworkspace = (props) => {
 
     const changeTab = (key) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_SET_PURCHASE_REQUEST_TAB",
+            type: "SET_PROCUREMENT_PURCHASE_REQUEST_SET_TAB",
             data: key
         });
     }
@@ -79,7 +79,7 @@ const Pruchaserequestworkspace = (props) => {
     return (
         <div>
 
-        <Tabs activeKey={props.purchaseRequestTab} type="card" size="small" onChange={(key) => changeTab(key)}>
+        <Tabs activeKey={props.tab} type="card" size="small" onChange={(key) => changeTab(key)}>
             <TabPane tab="Information" key="information">
                 <p>
                     <b>PR No.:</b> {props.selectedPurchaseRequest?.purchase_request_number || ""} <br />
