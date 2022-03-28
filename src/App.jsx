@@ -57,11 +57,11 @@ const PrivateRoute  = ({ children, ...props }) => {
 
 function mapStateToProps(state) {
     return {
-        unit_of_measures: state.library.unit_of_measures,
-        items: state.library.items,
-        libraries: state.library.libraries,
-        isLibrariesLoaded: state.library.isLibrariesLoaded,
-        user_offices: state.library.user_offices,
+        unit_of_measures: state.libraries.unit_of_measures,
+        items: state.libraries.items,
+        libraries: state.libraries.libraries,
+        isLibrariesLoaded: state.libraries.isLibrariesLoaded,
+        user_offices: state.libraries.user_offices,
         user: state.user.data,
         mainLoading: state.user.mainLoading,
         isInitialized: state.user.isInitialized,

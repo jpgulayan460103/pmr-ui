@@ -20,12 +20,12 @@ const { Option, OptGroup } = Select;
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
-        suppliers: state.supplier.suppliers,
+        selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
+        suppliers: state.suppliers.suppliers,
         isInitialized: state.user.isInitialized,
-        selectedSupplier: state.quotation.selectedSupplier,
-        selectedSuppliers: state.quotation.selectedSuppliers,
-        selectedSupplierContact: state.quotation.selectedSupplierContact,
+        selectedSupplier: state.quotations.selectedSupplier,
+        selectedSuppliers: state.quotations.selectedSuppliers,
+        selectedSupplierContact: state.quotations.selectedSupplierContact,
     };
 }
 

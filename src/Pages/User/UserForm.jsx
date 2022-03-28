@@ -12,11 +12,11 @@ const { Option, OptGroup } = Select;
 
 function mapStateToProps(state) {
     return {
-        user_sections: state.library.user_sections,
-        user_divisions: state.library.user_divisions,
-        user_positions: state.library.user_positions,
-        technical_working_groups: state.library.technical_working_groups,
-        libraries: state.library.libraries,
+        user_sections: state.libraries.user_sections,
+        user_divisions: state.libraries.user_divisions,
+        user_positions: state.libraries.user_positions,
+        technical_working_groups: state.libraries.technical_working_groups,
+        libraries: state.libraries.libraries,
     };
 }
 

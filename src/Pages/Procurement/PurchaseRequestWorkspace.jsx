@@ -39,11 +39,11 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
-        procurementTypes: state.library.procurement_types,
-        modeOfProcurements: state.library.mode_of_procurements,
-        tab: state.procurement.purchaseRequest.tab,
-        purchaseRequests: state.procurement.purchaseRequest.purchaseRequests,
+        selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
+        procurementTypes: state.libraries.procurement_types,
+        modeOfProcurements: state.libraries.mode_of_procurements,
+        tab: state.procurements.purchaseRequest.tab,
+        purchaseRequests: state.procurements.purchaseRequest.purchaseRequests,
         uploadingFiles: state.user.uploadingFiles,
     };
 }

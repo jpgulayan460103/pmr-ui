@@ -30,12 +30,12 @@ const { RangePicker } = DatePicker;
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        selectedPurchaseRequest: state.purchaseRequest.list.selectedPurchaseRequest,
-        purchaseRequests: state.purchaseRequest.list.purchaseRequests,
-        paginationMeta: state.purchaseRequest.list.paginationMeta,
-        loading: state.purchaseRequest.list.loading,
-        timelines: state.purchaseRequest.list.timelines,
-        logger: state.purchaseRequest.list.logger,
+        selectedPurchaseRequest: state.purchaseRequests.list.selectedPurchaseRequest,
+        purchaseRequests: state.purchaseRequests.list.purchaseRequests,
+        paginationMeta: state.purchaseRequests.list.paginationMeta,
+        loading: state.purchaseRequests.list.loading,
+        timelines: state.purchaseRequests.list.timelines,
+        logger: state.purchaseRequests.list.logger,
     };
 }
 
@@ -54,7 +54,10 @@ const RouteSvg = () => (
 const Listpurchaserequest = (props) => {
     const unmounted = React.useRef(false);
     useEffect(() => {
-        return () => { unmounted.current = true }
+        return () => {
+            unmounted.current = true;
+            setPurchaseRequests([]);
+        }
     }, []);
     let history = useHistory()
     useEffect(() => {

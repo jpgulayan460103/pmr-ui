@@ -12,12 +12,12 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        item_category: state.library.item_categories,
-        unit_of_measure: state.library.unit_of_measures,
-        user_division: state.library.user_divisions,
-        user_section: state.library.user_sections,
-        user_signatory_name: state.library.user_signatory_names,
-        user_signatory_designation: state.library.user_signatory_designations,
+        item_category: state.libraries.item_categories,
+        unit_of_measure: state.libraries.unit_of_measures,
+        user_division: state.libraries.user_divisions,
+        user_section: state.libraries.user_sections,
+        user_signatory_name: state.libraries.user_signatory_names,
+        user_signatory_designation: state.libraries.user_signatory_designations,
         user: state.user.data,
     };
 }

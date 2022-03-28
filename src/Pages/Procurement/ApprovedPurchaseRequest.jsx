@@ -39,16 +39,16 @@ const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
-        user_sections: state.library.user_sections,
-        procurement_types: state.library.procurement_types,
-        procurement_type_categories: state.library.procurement_type_categories,
-        mode_of_procurements: state.library.mode_of_procurements,
-        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
-        columns: state.procurement.purchaseRequest.columns,
-        purchaseRequests: state.procurement.purchaseRequest.purchaseRequests,
-        purchaseRequestsPagination: state.procurement.purchaseRequest.pagination,
-        filterData: state.procurement.purchaseRequest.tableFilter,
-        tableLoading: state.procurement.purchaseRequest.tableLoading,
+        user_sections: state.libraries.user_sections,
+        procurement_types: state.libraries.procurement_types,
+        procurement_type_categories: state.libraries.procurement_type_categories,
+        mode_of_procurements: state.libraries.mode_of_procurements,
+        selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
+        columns: state.procurements.purchaseRequest.columns,
+        purchaseRequests: state.procurements.purchaseRequest.purchaseRequests,
+        purchaseRequestsPagination: state.procurements.purchaseRequest.pagination,
+        filterData: state.procurements.purchaseRequest.tableFilter,
+        tableLoading: state.procurements.purchaseRequest.tableLoading,
         isInitialized: state.user.isInitialized,
         uploadingFiles: state.user.uploadingFiles,
     };

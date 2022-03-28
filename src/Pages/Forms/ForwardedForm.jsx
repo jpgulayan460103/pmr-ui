@@ -18,12 +18,12 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user: state.user.data,
-        procurementTypes: state.library.procurement_types,
-        uacsCodes: state.library.uacs_codes,
-        procurementTypeCategories: state.library.procurement_type_categories,
-        modeOfProcurements: state.library.mode_of_procurements,
-        technicalWorkingGroups: state.library.technical_working_groups,
-        user_sections: state.library.user_sections,
+        procurementTypes: state.libraries.procurement_types,
+        uacsCodes: state.libraries.uacs_codes,
+        procurementTypeCategories: state.libraries.procurement_type_categories,
+        modeOfProcurements: state.libraries.mode_of_procurements,
+        technicalWorkingGroups: state.libraries.technical_working_groups,
+        user_sections: state.libraries.user_sections,
         isInitialized: state.user.isInitialized,
     };
 }

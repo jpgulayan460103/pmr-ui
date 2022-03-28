@@ -13,8 +13,8 @@ function mapStateToProps(state) {
     return {
         user: state.user.data,
         isInitialized: state.user.isInitialized,
-        suppliers: state.supplier.suppliers,
-        procurement_type_categories: state.library.procurement_type_categories,
+        suppliers: state.suppliers.suppliers,
+        procurement_type_categories: state.libraries.procurement_type_categories,
     };
 }
 

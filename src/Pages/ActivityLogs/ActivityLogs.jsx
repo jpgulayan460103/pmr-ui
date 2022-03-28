@@ -16,8 +16,8 @@ import api from '../../api';
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        activityLogs: state.activtyLog.activityLogs,
-        loading: state.activtyLog.loading,
+        activityLogs: state.activtyLogs.activityLogs,
+        loading: state.activtyLogs.loading,
     };
 }
 

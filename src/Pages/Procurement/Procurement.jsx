@@ -12,9 +12,9 @@ import { debounce } from 'lodash';
 
 function mapStateToProps(state) {
     return {
-        selectedPurchaseRequest: state.procurement.purchaseRequest.selectedPurchaseRequest,
-        tableFilter: state.procurement.purchaseRequest.tableFilter,
-        workspaceLoading: state.procurement.purchaseRequest.workspaceLoading,
+        selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
+        tableFilter: state.procurements.purchaseRequest.tableFilter,
+        workspaceLoading: state.procurements.purchaseRequest.workspaceLoading,
         uploadingFiles: state.user.uploadingFiles,
     };
 }

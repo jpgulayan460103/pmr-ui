@@ -11,7 +11,7 @@ const { Title } = Typography;
 
 function mapStateToProps(state) {
     return {
-        unit_of_measures: state.library.unit_of_measures,
+        unit_of_measures: state.libraries.unit_of_measures,
     };
 }
 
