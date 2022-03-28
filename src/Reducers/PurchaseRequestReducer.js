@@ -18,6 +18,7 @@ const initialState = () => {
       requestedBySignatory: {},
       approvedBySignatory: {},
       formType: "create",
+      selectedPurchaseRequest: {},
     }
   }
   
@@ -57,6 +58,11 @@ const initialState = () => {
         return {
           ...state,
           formData: {...initialState().formData, ...action.data},
+        };
+      case 'SET_PURCHASE_REQUEST_SELECTED_PURCHASE_REQUEST':
+        return {
+          ...state,
+          selectedPurchaseRequest: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

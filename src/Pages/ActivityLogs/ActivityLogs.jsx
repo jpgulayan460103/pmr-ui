@@ -15,7 +15,9 @@ import api from '../../api';
 
 function mapStateToProps(state) {
     return {
-        isInitialized: state.user.isInitialized
+        isInitialized: state.user.isInitialized,
+        activityLogs: state.activtyLog.activityLogs,
+        loading: state.activtyLog.loading,
     };
 }
 
@@ -27,16 +29,29 @@ const ActivityLogs = (props) => {
     }, []);
     const [filterData, setFilterData] = useState({});
     const [selectedLogger, setSelectedLogger] = useState(null);
-    const [activityLogs, setActivityLogs] = useState([]);
     const [paginationMeta, setPaginationMeta] = useState([]);
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        document.title = "List of Purchase Request";
+        document.title = "Activity Logs";
         if(props.isInitialized){
             getLogs();
         }
+
+        return () => {
+            props.dispatch({
+                type: "SET_ACTIVITY_LOG_ACTIVITY_LOGS",
+                data: []
+            });
+        };
     }, [props.isInitialized]);
+
+    const setLoading = (value) => {
+        props.dispatch({
+            type: "SET_ACTIVITY_LOG_LOADING",
+            data: value
+        });
+    }
+    
 
     const getLogs = debounce((filters) => {
         if(filters == null){
@@ -49,7 +64,10 @@ const ActivityLogs = (props) => {
             setLoading(false);
             let data = res.data.data;
             let meta = res.data.meta;
-            setActivityLogs(data);
+            props.dispatch({
+                type: "SET_ACTIVITY_LOG_ACTIVITY_LOGS",
+                data: data
+            });
             setPaginationMeta(meta.pagination);
         })
         .catch(res => {
@@ -76,7 +94,7 @@ const ActivityLogs = (props) => {
             };
           }
     }
-    const logsDataSource = activityLogs;
+    const logsDataSource = props.activityLogs;
     const logsColumns = [
         {
             title: 'Action Taken',
@@ -196,7 +214,7 @@ const ActivityLogs = (props) => {
                                 dataSource={logsDataSource}
                                 columns={logsColumns}
                                 size={"small"}
-                                loading={{spinning: loading, tip: "Loading..."}}
+                                loading={{spinning: props.loading, tip: "Loading..."}}
                                 // pagination={false}
                                 // onChange={handleTableChange}
                                 scroll={{ y: "50vh" }}

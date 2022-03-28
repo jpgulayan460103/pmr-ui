@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import logo from './../Images/logo.png'
 import logoCropped from './../Images/logo-cropped-1.png'
@@ -30,8 +30,6 @@ const Main = (props) => {
       data: collapsed
     });
   };
-  const [cw, setCw] = useState(80);
-  const [loading, setLoading] = useState(true);
     return (
       <div>
       <Layout>

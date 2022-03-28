@@ -29,7 +29,8 @@ const { RangePicker } = DatePicker;
 
 function mapStateToProps(state) {
     return {
-        isInitialized: state.user.isInitialized
+        isInitialized: state.user.isInitialized,
+        selectedPurchaseRequest: state.purchaseRequest.selectedPurchaseRequest,
     };
 }
 
@@ -73,7 +74,7 @@ const Listpurchaserequest = (props) => {
     });
     const [loggerItems, setLoggerItems] = useState([]);
     const [logger, setLogger] = useState([]);
-    const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState({});
+    // const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState({});
     const [tabKey, setTabKey] = useState('information');
 
     const getPurchaseRequests = debounce((filters) => {
@@ -109,6 +110,13 @@ const Listpurchaserequest = (props) => {
                 'newwindow',
                 'width=960,height=1080');
             return false;
+    }
+
+    const setSelectedPurchaseRequest = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_SELECTED_PURCHASE_REQUEST",
+            data: value
+        });
     }
 
 
@@ -234,10 +242,10 @@ const Listpurchaserequest = (props) => {
             return {
                 onClick: event => {
                     setSelectedPurchaseRequest(record)
-                    if(isEmpty(selectedPurchaseRequest)){
+                    if(isEmpty(props.selectedPurchaseRequest)){
                         openPurchaseRequest(record, colIndex);
                     }else{
-                        if(selectedPurchaseRequest.id != record.id){
+                        if(props.selectedPurchaseRequest.id != record.id){
                             openPurchaseRequest(record, colIndex);
                         }
                     }
@@ -352,7 +360,7 @@ const Listpurchaserequest = (props) => {
                     <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                                    if(selectedPurchaseRequest?.id == record.id){
+                                    if(props.selectedPurchaseRequest?.id == record.id){
                                         return "selected-row";
                                     }
                                 }}
@@ -396,25 +404,25 @@ const Listpurchaserequest = (props) => {
                                         <TabPane tab="Information" key="information">
                                             <div className='p-2'>
                                                 <p>
-                                                    <b>PR No.:</b> {selectedPurchaseRequest?.purchase_request_number || ""} <br />
-                                                    <b>PR Date:</b> {selectedPurchaseRequest?.pr_date || ""} <br />
-                                                    <b>Procurement Category:</b> {selectedPurchaseRequest.procurement_type?.parent?.name || ""} <br />
-                                                    <b>Procurement Type:</b> {selectedPurchaseRequest.procurement_type?.name || ""} <br />
-                                                    <b>Mode of Procurement:</b> {selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
-                                                    <b>End User:</b> {selectedPurchaseRequest?.end_user?.name || ""} <br />
-                                                    <b>Fund Cluster:</b> {selectedPurchaseRequest?.fund_cluster || ""} <br />
-                                                    <b>Responsibility Center Code:</b> {selectedPurchaseRequest?.center_code || ""} <br />
-                                                    <b>Total Unit Cost:</b> {selectedPurchaseRequest?.total_cost_formatted || ""} <br />
-                                                    <b>Purpose:</b> {selectedPurchaseRequest?.purpose || ""} <br />
-                                                    <b>Charge To:</b> {selectedPurchaseRequest?.charge_to || ""} <br />
-                                                    <b>Alloted Amount:</b> {selectedPurchaseRequest?.alloted_amount || ""} <br />
-                                                    <b>UACS Code:</b> {selectedPurchaseRequest?.uacs_code?.name || ""} <br />
-                                                    <b>SA/OR:</b> {selectedPurchaseRequest?.sa_or || ""} <br />
+                                                    <b>PR No.:</b> {props.selectedPurchaseRequest?.purchase_request_number || ""} <br />
+                                                    <b>PR Date:</b> {props.selectedPurchaseRequest?.pr_date || ""} <br />
+                                                    <b>Procurement Category:</b> {props.selectedPurchaseRequest.procurement_type?.parent?.name || ""} <br />
+                                                    <b>Procurement Type:</b> {props.selectedPurchaseRequest.procurement_type?.name || ""} <br />
+                                                    <b>Mode of Procurement:</b> {props.selectedPurchaseRequest.mode_of_procurement?.name || ""} <br />
+                                                    <b>End User:</b> {props.selectedPurchaseRequest?.end_user?.name || ""} <br />
+                                                    <b>Fund Cluster:</b> {props.selectedPurchaseRequest?.fund_cluster || ""} <br />
+                                                    <b>Responsibility Center Code:</b> {props.selectedPurchaseRequest?.center_code || ""} <br />
+                                                    <b>Total Unit Cost:</b> {props.selectedPurchaseRequest?.total_cost_formatted || ""} <br />
+                                                    <b>Purpose:</b> {props.selectedPurchaseRequest?.purpose || ""} <br />
+                                                    <b>Charge To:</b> {props.selectedPurchaseRequest?.charge_to || ""} <br />
+                                                    <b>Alloted Amount:</b> {props.selectedPurchaseRequest?.alloted_amount || ""} <br />
+                                                    <b>UACS Code:</b> {props.selectedPurchaseRequest?.uacs_code?.name || ""} <br />
+                                                    <b>SA/OR:</b> {props.selectedPurchaseRequest?.sa_or || ""} <br />
                                                 </p>
                                             </div>
                                         </TabPane>
                                         <TabPane tab="Attachments" key="uploads">
-                                        <AttachmentUpload formId={selectedPurchaseRequest.id} formType="purchase_request" fileList={selectedPurchaseRequest.form_uploads?.data} />
+                                        <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
                                             { !isEmpty(timelines) ? (
@@ -442,7 +450,7 @@ const Listpurchaserequest = (props) => {
             <Row gutter={[16, 16]} className="mb-3">
                 <Col span={24}>
                     <div className='purchase-request-card-content'>
-                        { isEmpty(selectedPurchaseRequest) ? "" : (
+                        { isEmpty(props.selectedPurchaseRequest) ? "" : (
                             <iframe src={`${purchaseRequestOutput}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         ) }
                     </div>

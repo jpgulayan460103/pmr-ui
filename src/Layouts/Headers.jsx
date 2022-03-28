@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { Layout, Menu, Dropdown, Badge, List } from 'antd';
 import { DownOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, MenuFoldOutlined, MenuUnfoldOutlined   } from '@ant-design/icons';
@@ -79,23 +79,6 @@ const MenuIcon = (props) => {
 }
 const Headers = ({ notifications, dispatch, collapsed, user }) => {
     let history = useHistory();
-    const [showSide, setShowSide] = useState(false);
-    const toggleSide = () => {
-        setShowSide(!showSide);
-        if(showSide){
-            // setCw(80);
-            dispatch({
-                type: "SET_COLLAPSE_WIDTH",
-                data: 50
-            });
-        }else{
-            // setCw(0);
-            dispatch({
-                type: "SET_COLLAPSE_WIDTH",
-                data: 0
-            });
-        }
-    }
 
     const userLogout = () => {
         api.User.logout();

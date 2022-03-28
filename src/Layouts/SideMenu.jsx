@@ -6,7 +6,7 @@ import Icon, {
     UploadOutlined,
     FormOutlined,
     MessageOutlined,
-    ShoppingCartOutlined ,
+    ShoppingCartOutlined,
   } from '@ant-design/icons';
 import { Link, useLocation  } from 'react-router-dom'
 import helpers from '../Utilities/helpers';
