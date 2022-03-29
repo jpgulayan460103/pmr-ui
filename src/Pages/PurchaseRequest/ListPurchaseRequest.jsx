@@ -20,6 +20,7 @@ import { debounce, isEmpty } from 'lodash';
 import filter from '../../Utilities/filter';
 import AuditTrail from '../../Components/AuditTrail';
 import AttachmentUpload from '../../Components/AttachmentUpload';
+import TableFooterPagination from '../../Components/TableFooterPagination';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -394,18 +395,7 @@ const Listpurchaserequest = (props) => {
                                 loading={{spinning: props.loading, tip: "Loading..."}}
                             />
 
-                            <div className="flex justify-end mt-2">
-                                <Pagination
-                                    current={props.paginationMeta?.current_page || 1}
-                                    total={props.paginationMeta?.total || 1}
-                                    pageSize={props.paginationMeta?.per_page || 1}
-                                    onChange={paginationChange}
-                                    // showSizeChanger
-                                    showQuickJumper
-                                    size="small"
-                                    // onShowSizeChange={(current, size) => changePageSize(current, size)}
-                                />
-                            </div>
+                            <TableFooterPagination pagination={props.paginationMeta} paginationChange={paginationChange} />
                         </div>
                     </Card>
                 </Col>

@@ -6,6 +6,7 @@ import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, Disli
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
+import TableFooterPagination from '../../Components/TableFooterPagination';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -278,16 +279,7 @@ const ApprovedForm = (props) => {
                                     }
                                 }}
                             />
-                            <div className="flex justify-end mt-2">
-                                <Pagination
-                                        current={props.pagination?.current_page || 1}
-                                        total={props.pagination?.total || 1}
-                                        pageSize={props.pagination?.per_page || 1}
-                                        onChange={paginationChange}
-                                        showQuickJumper
-                                        size="small"
-                                    />
-                            </div>
+                            <TableFooterPagination pagination={props.pagination} paginationChange={paginationChange} />
                         </div>
                     </Card>
                 </Col>

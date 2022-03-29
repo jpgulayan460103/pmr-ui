@@ -29,6 +29,7 @@ import Icon, {
 import { useHistory } from 'react-router-dom'
 import api from '../../api';
 import helpers from '../../Utilities/helpers';
+import TableFooterPagination from '../../Components/TableFooterPagination';
 
 
 const ReloadSvg = () => (
@@ -798,17 +799,7 @@ const ApprovedPurchaseRequest = (props) => {
                     }
                 }}
             />
-            <div className="flex justify-end mt-2">
-            <Pagination
-                    current={props.purchaseRequestsPagination?.current_page || 1}
-                    total={props.purchaseRequestsPagination?.total || 1}
-                    pageSize={props.purchaseRequestsPagination?.per_page || 1}
-                    onChange={paginationChange}
-                    showQuickJumper
-                    showSizeChanger={false}
-                    size="small"
-                />
-            </div>
+            <TableFooterPagination pagination={props.purchaseRequestsPagination} paginationChange={paginationChange} />
         </>
     );
 }

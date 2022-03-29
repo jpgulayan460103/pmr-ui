@@ -18,6 +18,7 @@ function mapStateToProps(state) {
         isInitialized: state.user.isInitialized,
         activityLogs: state.activtyLogs.activityLogs,
         loading: state.activtyLogs.loading,
+        selectedLogger: state.activtyLogs.selectedLogger,
     };
 }
 
@@ -28,7 +29,6 @@ const ActivityLogs = (props) => {
         return () => { unmounted.current = true }
     }, []);
     const [filterData, setFilterData] = useState({});
-    const [selectedLogger, setSelectedLogger] = useState(null);
     const [paginationMeta, setPaginationMeta] = useState([]);
 
     useEffect(() => {
@@ -48,6 +48,12 @@ const ActivityLogs = (props) => {
     const setLoading = (value) => {
         props.dispatch({
             type: "SET_ACTIVITY_LOG_LOADING",
+            data: value
+        });
+    }
+    const setSelectedLogger = (value) => {
+        props.dispatch({
+            type: "SET_ACTIVITY_LOG_SELECTED_LOGGER",
             data: value
         });
     }
@@ -219,7 +225,7 @@ const ActivityLogs = (props) => {
                                 // onChange={handleTableChange}
                                 scroll={{ y: "50vh" }}
                                 rowClassName={(record, index) => {
-                                    if(selectedLogger?.id == record.id){
+                                    if(props.selectedLogger?.id == record.id){
                                         return "selected-row";
                                     }
                                 }}
@@ -243,30 +249,32 @@ const ActivityLogs = (props) => {
                         <div className='forms-card-content'>
                             <div>
                                 <p>
-                                    <b>Action Taken:</b> <span>{ selectedLogger?.description_str }</span><br />
-                                    <b>Subject:</b> <span>{ ( selectedLogger?.subject?.parent ) ? selectedLogger?.subject?.parent?.display_log : selectedLogger?.subject?.display_log }</span><br />
-                                    <b>Content:</b> <span>{ ( selectedLogger?.subject?.parent ) ? selectedLogger?.subject?.display_log : "" }</span><br />
-                                    <b>User:</b> <span>{ selectedLogger?.user.user_information.fullname }</span><br />
-                                    <b>Date and Time:</b> <span>{selectedLogger?.created_at}</span><br />
+                                    <b>Action Taken:</b> <span>{ props.selectedLogger?.description_str }</span><br />
+                                    <b>Subject:</b> <span>{ ( props.selectedLogger?.subject?.parent ) ? props.selectedLogger?.subject?.parent?.display_log : props.selectedLogger?.subject?.display_log }</span><br />
+                                    <b>Content:</b> <span>{ ( props.selectedLogger?.subject?.parent ) ? props.selectedLogger?.subject?.display_log : "" }</span><br />
+                                    <b>User:</b> <span>{ props.selectedLogger?.user?.user_information?.fullname }</span><br />
+                                    <b>Date and Time:</b> <span>{props.selectedLogger?.created_at}</span><br />
                                 </p>
                             </div>
-                            <Table size='small' dataSource={selectedLogger?.properties} columns={logPropertiesColumns} pagination={false} />
+                                <Table size='small' dataSource={props.selectedLogger?.properties} columns={logPropertiesColumns} pagination={false} />
                         </div>
                     </Card>
                 </Col>
             </Row>
-            <Row gutter={[16, 16]} className="mb-3">
-                <Col span={24}>
-                    { selectedLogger?.subject?.parent?.file || selectedLogger?.subject?.file ? (
-                        <Card size="small" title="" bordered={false}  >
-                            <div className='forms-card-content'>
-                                { selectedLogger?.subject?.parent?.file ? (<iframe src={`${selectedLogger?.subject?.parent?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
-                                { selectedLogger?.subject?.file ? (<iframe src={`${selectedLogger?.subject?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
-                            </div>
-                        </Card>
-                    ) : "" }
-                </Col>
-            </Row>
+            { props.selectedLogger?.description == "" ? (
+                <Row gutter={[16, 16]} className="mb-3">
+                    <Col span={24}>
+                        { props.selectedLogger?.subject?.parent?.file || props.selectedLogger?.subject?.file ? (
+                            <Card size="small" title="" bordered={false}  >
+                                <div className='forms-card-content'>
+                                    { props.selectedLogger?.subject?.parent?.file ? (<iframe src={`${props.selectedLogger?.subject?.parent?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
+                                    { props.selectedLogger?.subject?.file ? (<iframe src={`${props.selectedLogger?.subject?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
+                                </div>
+                            </Card>
+                        ) : "" }
+                    </Col>
+                </Row>
+            ) : ""}
         </div>
     );
 }

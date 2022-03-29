@@ -9,6 +9,7 @@ import filter from '../../Utilities/filter';
 import helpers from '../../Utilities/helpers';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import { Link, useLocation  } from 'react-router-dom'
+import TableFooterPagination from '../../Components/TableFooterPagination';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -1071,16 +1072,7 @@ const ForwardedForm = (props) => {
                                     }
                                 }}
                             />
-                            <div className="flex justify-end mt-2">
-                                <Pagination
-                                        current={props.pagination?.current_page || 1}
-                                        total={props.pagination?.total || 1}
-                                        pageSize={props.pagination?.per_page || 1}
-                                        onChange={paginationChange}
-                                        showQuickJumper
-                                        size="small"
-                                    />
-                            </div>
+                            <TableFooterPagination pagination={props.pagination} paginationChange={paginationChange} />
                         </div>
                     </Card>
                 </Col>

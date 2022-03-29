@@ -5,7 +5,7 @@ import purchaseRequests from './PurchaseRequest'
 import procurements from './Procurement'
 import quotations from './QuotationReducer'
 import suppliers from './SupplierReducer'
-import activtyLogs from './ActivityLog'
+import activtyLogs from './ActivityLogReducer'
 import forms from './Forms'
 
 const rootReducer = combineReducers({

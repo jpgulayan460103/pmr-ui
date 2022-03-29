@@ -1,7 +1,7 @@
 const initialState = () => {
     return {
         filterData: {},
-        selectedLogger: null,
+        selectedLogger: {},
         activityLogs: [],
         paginationMeta: [],
         loading: false,
