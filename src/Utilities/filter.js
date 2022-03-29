@@ -31,16 +31,23 @@ const searchInput = (e, dataIndex, type, setFilters) => {
 
 const NumberRange = ({searchInput, dataIndex, type, setFilters, getData}) => {
     const [range, setRange] = useState(">=");
+    const [value, setValue] = useState(null);
+    const handleChange = (e) => {
+        searchInput({ operand: range, value: e.target.value }, dataIndex, type, setFilters);
+        setValue(e.target.value);
+    }
+    const handleSelect = (e) => {
+        searchInput({ operand: e, value }, dataIndex, type, setFilters);
+        setRange(e);
+    }
     const selectBefore = (
-        <Select value={range} onChange={setRange} className="select-before">
-          {<Option value=">=">Greater than</Option>}
-          {<Option value="<=">Less than</Option>}
-          {/* <Option value=">=" label=">="><div className="demo-option-label-item">Greater than or equal to</div></Option> */}
-          {/* <Option value="<=" label="<="><div className="demo-option-label-item">Less than or equal to</div></Option> */}
+        <Select value={range} onChange={handleSelect} className="select-before">
+          <Option value=">=">Greater than</Option>
+          <Option value="<=">Less than</Option>
         </Select>   
     );
     return (
-        <Input addonBefore={selectBefore} type="number" placeholder="input search number" allowClear onChange={(e) => searchInput({ operand: range, value: e.target.value }, dataIndex, type, setFilters)} onPressEnter={() => getData() } style={{ width: 300 }} />
+        <Input addonBefore={selectBefore} type="number" placeholder="input search number" allowClear onChange={handleChange} onPressEnter={() => getData() } style={{ width: 300 }} />
     )
 }
 
