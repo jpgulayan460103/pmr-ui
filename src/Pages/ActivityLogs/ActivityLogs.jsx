@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { debounce, map } from 'lodash'
-import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import { cloneDeep, debounce, isEmpty, map } from 'lodash'
+import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Select, Menu  } from 'antd';
 import {
     SettingOutlined,
     EyeOutlined,
@@ -12,6 +12,10 @@ import {
     UserOutlined,
 } from '@ant-design/icons';
 import api from '../../api';
+import TableFooterPagination from '../../Components/TableFooterPagination';
+import filter from '../../Utilities/filter';
+
+const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
@@ -19,6 +23,7 @@ function mapStateToProps(state) {
         activityLogs: state.activtyLogs.activityLogs,
         loading: state.activtyLogs.loading,
         selectedLogger: state.activtyLogs.selectedLogger,
+        usersLibrary: state.libraries.users,
     };
 }
 
@@ -35,6 +40,9 @@ const ActivityLogs = (props) => {
         document.title = "Activity Logs";
         if(props.isInitialized){
             getLogs();
+            if(isEmpty(props.usersLibrary)){
+                getUsers();
+            }
         }
 
         return () => {
@@ -56,6 +64,19 @@ const ActivityLogs = (props) => {
             type: "SET_ACTIVITY_LOG_SELECTED_LOGGER",
             data: value
         });
+    }
+
+    const getUsers = () => {
+        return api.Library.getLibraries('users')
+        .then(res => {
+            props.dispatch({
+                type: "SET_LIBRARY_USERS",
+                data: res.data.data
+            });
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
     
 
@@ -90,6 +111,25 @@ const ActivityLogs = (props) => {
         getLogs({...filterData, page: e})
     }
 
+    const usersFilter = cloneDeep(props.usersLibrary).map(i => {
+        i.value = i.key;
+        i.text = i.user_information.fullname;
+        i.name = i.user_information.fullname;
+        return i;
+    });
+
+    const logTypeFilters = [
+        {text: "BAC Task", value: "bac_task"},
+        {text: "Form Routing", value: "form_routing"},
+        {text: "Form Upload", value: "form_upload"},
+        {text: "Purchase Request", value: "purchase_request"},
+        {text: "Purchase Request Item", value: "purchase_request_item"},
+        {text: "Supplier", value: "supplier"},
+        {text: "Supplier Contact Person", value: "supplier_contact_person"},
+        {text: "User Login", value: "user_login"},
+        {text: "User Logout", value: "user_logout"},
+    ];
+
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -103,25 +143,43 @@ const ActivityLogs = (props) => {
     const logsDataSource = props.activityLogs;
     const logsColumns = [
         {
+            title: 'Date & Time',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            width: 150,
+            ...onCell,
+            // sorter: (a, b) => a.created_at?.localeCompare(b.created_at),
+        },
+        {
+            title: 'Activity Category',
+            dataIndex: 'log_type',
+            key: 'log_type',
+            width: 150,
+            // sorter: (a, b) => a.log_type?.localeCompare(b.log_type),
+            ...onCell,
+            filters: logTypeFilters,
+            ...filter.list('log_type','text', setFilterData, filterData, getLogs),
+        },
+        {
             title: 'Action Taken',
             dataIndex: 'description_str',
             key: 'description_str',
             width: 150,
-            sorter: (a, b) => a.description_str?.localeCompare(b.description_str),
+            // sorter: (a, b) => a.description_str?.localeCompare(b.description_str),
             ...onCell,
         },
         {
             title: 'Subject',
             key: 'subject',
             width: 250,
-            sorter: (a, b) => {
-                if(a.subject?.parent){
-                    return a.subject?.parent?.display_log?.localeCompare(b.subject?.parent?.display_log)
-                }else{
-                    return a.subject?.display_log?.localeCompare(b.subject?.display_log)
+            // sorter: (a, b) => {
+            //     if(a.subject?.parent){
+            //         return a.subject?.parent?.display_log?.localeCompare(b.subject?.parent?.display_log)
+            //     }else{
+            //         return a.subject?.display_log?.localeCompare(b.subject?.display_log)
 
-                }
-            },
+            //     }
+            // },
             render: (text, record, index) => (
                 <span>
                     { record.subject?.parent ? record.subject?.parent?.display_log : record.subject?.display_log }
@@ -133,13 +191,13 @@ const ActivityLogs = (props) => {
             title: 'Contents',
             key: 'target',
             width: 250,
-            sorter: (a, b) => {
-                if(a.subject?.parent){
-                    return a.description_str?.localeCompare(b.description_str);
-                }else{
-                    return a.subject.display_log?.localeCompare(b.subject.display_log);
-                }
-            },
+            // sorter: (a, b) => {
+            //     if(a.subject?.parent){
+            //         return a.description_str?.localeCompare(b.description_str);
+            //     }else{
+            //         return a.subject.display_log?.localeCompare(b.subject.display_log);
+            //     }
+            // },
             render: (text, record, index) => (
                 <span>
                     { record.subject?.parent ? record.subject.display_log : "" }
@@ -148,18 +206,12 @@ const ActivityLogs = (props) => {
             ...onCell,
         },
         {
-            title: 'Time',
-            dataIndex: 'created_at',
-            key: 'created_at',
-            width: 150,
-            ...onCell,
-            sorter: (a, b) => a.created_at?.localeCompare(b.created_at),
-        },
-        {
             title: 'User',
-            key: 'user',
+            key: 'causer_id',
             width: 250,
-            sorter: (a, b) => a.user?.user_information?.fullname?.localeCompare(b.user?.user_information?.fullname),
+            filters: usersFilter,
+            ...filter.list('causer_id','text', setFilterData, filterData, getLogs),
+            // sorter: (a, b) => a.user?.user_information?.fullname?.localeCompare(b.user?.user_information?.fullname),
             render: (text, record, index) => (
                 <span>
                     { record.user?.user_information?.fullname }
@@ -221,7 +273,7 @@ const ActivityLogs = (props) => {
                                 columns={logsColumns}
                                 size={"small"}
                                 loading={{spinning: props.loading, tip: "Loading..."}}
-                                // pagination={false}
+                                pagination={false}
                                 // onChange={handleTableChange}
                                 scroll={{ y: "50vh" }}
                                 rowClassName={(record, index) => {
@@ -230,18 +282,8 @@ const ActivityLogs = (props) => {
                                     }
                                 }}
                             />
-                            <div className="flex justify-end mt-2">
-{/*                                 <Pagination
-                                    current={paginationMeta?.current_page || 1}
-                                    total={paginationMeta?.total || 1}
-                                    pageSize={paginationMeta?.per_page || 1}
-                                    onChange={paginationChange}
-                                    showQuickJumper
-                                    size="small"
-                                    showSizeChanger={false}
-                                /> */}
-                            </div>
-                        </div>
+                            <TableFooterPagination pagination={paginationMeta} paginationChange={paginationChange} />
+                        </div>                        
                     </Card>
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={10} xl={10}>
