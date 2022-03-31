@@ -9,9 +9,7 @@ import {
   Redirect,
   BrowserRouter,
 } from "react-router-dom";
-import { cloneDeep, isEmpty } from 'lodash';
 import './App.less';
-// import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
@@ -71,14 +69,14 @@ function mapStateToProps(state) {
 
 const App = (props) => {
 
-    useEffect(() => {
+/*     useEffect(() => {
         window.Echo.channel('home').listen('NewMessage', (e) => {
             // console.log(e);
             // var notification = new Notification(e.message);
             // console.log(e);
             // console.log(props.user.user_offices);
             if(!isEmpty(props.user)){
-                // console.log(e.message.notify_offices);
+                console.log(e.message.notify_offices);
                 if(props.user?.user_offices?.data.filter(i => i.office_id == e.message.notify_offices).length != 0){
                     console.log(e.message);
                     let clonedNotif = cloneDeep(props.notifications)
@@ -112,7 +110,7 @@ const App = (props) => {
                 // console.log("notify");
             }
           });
-    }, [props.user]);
+    }, [props.user]); */
   return (
     <Router>
 

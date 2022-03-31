@@ -84,7 +84,7 @@ const AttachmentUpload = (props) => {
             });
         },
         beforeUpload: file => {
-            console.log(file);
+            // console.log(file);
             file['description'] = "";
             file['uploading'] = "";
             setfileList(prev => [...prev, file]);

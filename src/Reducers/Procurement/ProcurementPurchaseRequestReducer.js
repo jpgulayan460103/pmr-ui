@@ -1,3 +1,5 @@
+import helpers from "../../Utilities/helpers";
+
 const initialState = () => {
     return {
       selectedPurchaseRequest: {},
@@ -13,6 +15,7 @@ const initialState = () => {
         page: 1,
         type: 'procurement',
         purchase_request_type_category: [],
+        pr_date: helpers.defaultDateRange,
       },
       tableLoading: false,
       workspaceLoading: false,

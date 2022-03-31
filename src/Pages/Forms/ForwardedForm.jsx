@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Space, Divider, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu, Pagination } from 'antd';
-import api from '../../api';
+import { useLocation  } from 'react-router-dom'
+import dayjs from 'dayjs';
+import { Table, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
-import dayjs from 'dayjs';
+import api from '../../api';
 import filter from '../../Utilities/filter';
 import helpers from '../../Utilities/helpers';
 import AttachmentUpload from '../../Components/AttachmentUpload';
-import { Link, useLocation  } from 'react-router-dom'
 import TableFooterPagination from '../../Components/TableFooterPagination';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
-
 
 function mapStateToProps(state) {
     return {
@@ -24,7 +23,7 @@ function mapStateToProps(state) {
         procurementTypeCategories: state.libraries.procurement_type_categories,
         modeOfProcurements: state.libraries.mode_of_procurements,
         technicalWorkingGroups: state.libraries.technical_working_groups,
-        user_sections: state.libraries.user_sections,
+        userSections: state.libraries.user_sections,
         isInitialized: state.user.isInitialized,
         forms: state.forms.forwardedForm.forms,
         pagination: state.forms.forwardedForm.pagination,
@@ -79,14 +78,12 @@ const ForwardedForm = (props) => {
         if(props.isInitialized){
             getForm();
         }
+        // console.log("rerender");
     }, [props.isInitialized]);
-    useEffect(() => {
-        window.Echo.channel('home').listen('NewMessage', (e) => {
-            console.log(location.pathname);
-            getForm();
-        });
-    }, []);
-    const [filterData, setFilterData] = useState({});
+    const [filterData, setFilterData] = useState({
+        page: 1,
+        created_at: helpers.defaultDateRange
+    });
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
@@ -338,9 +335,40 @@ const ForwardedForm = (props) => {
         .catch(res => {
             setTableLoading(false);
         })
+        .then(res => {
+            setTableLoading(false);
+        })
+        ;
+    },150);
+    const getFormNoLoading = debounce((filters) => {
+        if(filters == null){
+            filters = filterData
+        }
+        api.Forms.getForApproval(filters)
+        .then(res => {
+            if (unmounted.current) { return false; }
+            let data = res.data.data;
+            let meta = res.data.meta;
+            setForms(data);
+            setPaginationMeta(meta.pagination);
+            
+        })
+        .catch(res => {
+        })
         .then(res => {})
         ;
     },150);
+    var debouncedGetForm = React.useCallback(debounce(getFormNoLoading, 400), []);
+    useEffect(() => {
+        window.Echo.channel('home').listen('NewMessage', (e) => {
+            debouncedGetForm();
+        });
+        return () => {
+            debouncedGetForm = () => {
+
+            }
+        };
+    }, []);
     
     const openInFull = () => {
         window.open(`${props.selectedFormRoute.form_routable?.file}?view=1`,
@@ -385,7 +413,7 @@ const ForwardedForm = (props) => {
         setModalBudgetForm(false);
     }
 
-    const endUserFilter = cloneDeep(props.user_sections).map(i => {
+    const endUserFilter = cloneDeep(props.userSections).map(i => {
         i.value = i.id;
         return i;
     });
@@ -647,6 +675,19 @@ const ForwardedForm = (props) => {
             ...onCell,
         },
         {
+            title: 'Forwareded on',
+            key: 'created_at',
+            width: 150,
+            ...filter.search('created_at','date_range', setFilterData, filterData, getForm),
+            ...onCell,
+            sorter: (a, b) => {},
+            render: (text, item, index) => (
+                <span>
+                    { item.created_at_date }
+                </span>
+            ),
+        },
+        {
             title: 'Title',
             key: 'title',
             render: (text, item, index) => (
@@ -657,6 +698,7 @@ const ForwardedForm = (props) => {
             ...filter.search('title','text', setFilterData, filterData, getForm),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'Purpose',
@@ -669,10 +711,12 @@ const ForwardedForm = (props) => {
             ...filter.search('purpose','text', setFilterData, filterData, getForm),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'Amount',
-            key: 'amount',
+            key: 'total_cost',
+            ...filter.search('total_cost','number_range', setFilterData, filterData, getForm),
             render: (text, item, index) => (
                 <span>
                     { item.form_routable?.total_cost_formatted }
@@ -680,6 +724,7 @@ const ForwardedForm = (props) => {
             ),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'End User',
@@ -711,10 +756,11 @@ const ForwardedForm = (props) => {
             filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
             ...filter.list('status','text', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Description',
-            key: 'description',
+            key: 'remarks',
             width: 250,
             render: (text, item, index) => (
                 <span>
@@ -723,10 +769,11 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('remarks','text', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Remarks',
-            key: 'remarks',
+            key: 'forwarded_remarks',
             width: 250,
             render: (text, item, index) => (
                 <span>
@@ -735,6 +782,7 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('forwarded_remarks','text', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
 
         {
@@ -754,13 +802,18 @@ const ForwardedForm = (props) => {
     ];
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(sorter);
-        console.log(filters);
+        // console.log(sorter);
+        // console.log(filters);
+        if(!isEmpty(sorter)){
+            filters.sortColumn = sorter.columnKey
+            filters.sortOrder = sorter.order
+            setFilterData(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
+        }
         getForm({...filterData, ...filters})
     };
 
     const paginationChange = async (e) => {
-        console.log(e);
+        // console.log(e);
         setFilterData(prev => ({...prev, page: e}));
         getForm({...filterData, page: e})
     }

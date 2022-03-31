@@ -1,32 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom'
 import { connect } from 'react-redux';
-import {
-    Table,
-    Pagination,
-    Popover,
-    Select,
-    List,
-    Menu,
-    Dropdown,
-    Tooltip,
-    Button,
-    Upload,
-    message,
-    Modal,
-    Form,
-} from 'antd';
+import { Table, Popover, Select, List, Menu, Dropdown, Tooltip, Button, Modal, Form,} from 'antd';
 import filter from '../../Utilities/filter';
 import _, { cloneDeep, debounce, isEmpty, map } from 'lodash';
-import Icon, {
-    SettingOutlined,
-    EyeOutlined,
-    EyeInvisibleOutlined,
-    MoreOutlined,
-    EllipsisOutlined,
-    ReloadOutlined,
-    MessageOutlined,
-} from '@ant-design/icons';
-import { useHistory } from 'react-router-dom'
+import Icon, { SettingOutlined, EyeOutlined, EyeInvisibleOutlined, MoreOutlined, EllipsisOutlined, MessageOutlined } from '@ant-design/icons';
 import api from '../../api';
 import helpers from '../../Utilities/helpers';
 import TableFooterPagination from '../../Components/TableFooterPagination';

@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const displayError = (formErrors, field) => {
     if(formErrors && formErrors[field]){
         return {
@@ -20,9 +22,14 @@ const hasPermission = (user, permissions) => {
 const hasRole = (user, roles) => {
     return user?.roles?.data?.filter(i => roles.includes(i.name)) != 0
 }
+var currentDate = moment();
+var dateStart = currentDate.clone().subtract(2, 'month').format("YYYY-MM-DD");
+var dateEnd = currentDate.clone().format("YYYY-MM-DD");
+const defaultDateRange = [dateStart,dateEnd]
 export default {
     displayError,
     bytesToSize,
     hasPermission,
     hasRole,
+    defaultDateRange,
 }

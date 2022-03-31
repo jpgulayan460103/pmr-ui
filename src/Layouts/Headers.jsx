@@ -35,11 +35,6 @@ const NotificationItems = ({notifications, history, dispatch}) => {
             renderItem={item => (
                 <List.Item
                     className="notificaton-items"
-                    actions={[
-                        <span className='custom-pointer' onClick={() => {
-                            history.push('/forms/forwarded');
-                        }}>View</span>
-                    ]}
                 >
 
                 <List.Item.Meta
@@ -97,7 +92,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
                     <p className="float-right mr-4 ml-4 header-items" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
-                <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
+                {/* <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
                         <p className="float-right mr-2 header-items" style={{color:"white", cursor: "pointer"}}>
                         <Badge count={notifications.length}>
                             <span  style={{color:"white", cursor: "pointer"}}>
@@ -105,7 +100,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                             </span>
                         </Badge>
                         </p>
-                </Dropdown>
+                </Dropdown> */}
             </Header>
         </React.Fragment>
     );

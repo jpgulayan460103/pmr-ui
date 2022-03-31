@@ -7,6 +7,7 @@ import { cloneDeep, debounce, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
 import TableFooterPagination from '../../Components/TableFooterPagination';
+import helpers from '../../Utilities/helpers';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -51,7 +52,10 @@ const ApprovedForm = (props) => {
     }, [props.isInitialized]);
     
 
-    const [filterData, setFilterData] = useState({});
+    const [filterData, setFilterData] = useState({
+        page: 1,
+        created_at: helpers.defaultDateRange
+    });
 
     const setForms = (value) => {
         props.dispatch({
@@ -134,6 +138,19 @@ const ApprovedForm = (props) => {
             ...onCell,
         },
         {
+            title: 'Requested on',
+            key: 'created_at',
+            width: 150,
+            ...filter.search('created_at','date_range', setFilterData, filterData, getForm),
+            ...onCell,
+            sorter: (a, b) => {},
+            render: (text, item, index) => (
+                <span>
+                    { item.created_at_date }
+                </span>
+            ),
+        },
+        {
             title: 'Title',
             key: 'title',
             render: (text, item, index) => (
@@ -144,6 +161,7 @@ const ApprovedForm = (props) => {
             ...filter.search('title','text', setFilterData, filterData, getForm),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'Purpose',
@@ -156,10 +174,11 @@ const ApprovedForm = (props) => {
             ...filter.search('purpose','text', setFilterData, filterData, getForm),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'Amount',
-            key: 'amount',
+            key: 'total_cost',
             render: (text, item, index) => (
                 <span>
                     { item.form_routable?.total_cost_formatted }
@@ -167,6 +186,7 @@ const ApprovedForm = (props) => {
             ),
             ...onCell,
             width: 150,
+            sorter: (a, b) => {},
         },
         {
             title: 'End User',
@@ -183,24 +203,17 @@ const ApprovedForm = (props) => {
             ...onCell,
         },
         {
-            title: 'Requested on',
-            dataIndex: 'created_at',
-            key: 'created_at',
-            width: 250,
-            ...filter.search('created_at','date_range', setFilterData, filterData, getForm),
-            ...onCell,
-        },
-        {
             title: 'Approved on',
             dataIndex: 'updated_at',
             key: 'updated_at',
             width: 250,
             ...filter.search('updated_at','date_range', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Description',
-            key: 'description',
+            key: 'remarks',
             width: 250,
             render: (text, item, index) => (
                 <span>
@@ -209,10 +222,11 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('remarks','text', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
         {
             title: 'Remarks',
-            key: 'remarks',
+            key: 'forwarded_remarks',
             width: 250,
             render: (text, item, index) => (
                 <span>
@@ -221,6 +235,7 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('forwarded_remarks','text', setFilterData, filterData, getForm),
             ...onCell,
+            sorter: (a, b) => {},
         },
     ];
 
@@ -233,13 +248,18 @@ const ApprovedForm = (props) => {
       );
 
     const handleTableChange = (pagination, filters, sorter) => {
-        console.log(sorter);
-        console.log(filters);
+        // console.log(sorter);
+        // console.log(filters);
+        if(!isEmpty(sorter)){
+            filters.sortColumn = sorter.columnKey
+            filters.sortOrder = sorter.order
+            setFilterData(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
+        }
         getForm({...filterData, ...filters})
     };
 
     const paginationChange = async (e) => {
-        console.log(e);
+        // console.log(e);
         setFilterData(prev => ({...prev, page: e}));
         getForm({...filterData, page: e})
     }

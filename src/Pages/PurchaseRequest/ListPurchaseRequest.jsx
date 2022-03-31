@@ -21,6 +21,7 @@ import filter from '../../Utilities/filter';
 import AuditTrail from '../../Components/AuditTrail';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import TableFooterPagination from '../../Components/TableFooterPagination';
+import helpers from '../../Utilities/helpers';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -71,6 +72,7 @@ const Listpurchaserequest = (props) => {
     
     const [filterData, setFilterData] = useState({
         page: 1,
+        pr_date: helpers.defaultDateRange
     });
     const [tabKey, setTabKey] = useState('information');
 
@@ -275,6 +277,16 @@ const Listpurchaserequest = (props) => {
       
     const columns = [
         {
+            title: 'PR Date',
+            dataIndex: 'pr_date',
+            key: 'pr_date',
+            width: 120,
+            align: "center",
+            ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
+        {
             title: 'PR Number',
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
@@ -312,16 +324,6 @@ const Listpurchaserequest = (props) => {
                     { item.total_cost_formatted }
                 </span>
             ),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'PR Date',
-            dataIndex: 'pr_date',
-            key: 'pr_date',
-            width: 120,
-            align: "center",
-            ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
