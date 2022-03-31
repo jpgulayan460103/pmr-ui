@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Input, DatePicker, Select, Button, Tag } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterFilled } from '@ant-design/icons';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
 import FilterOptions from './../Components/FilterOptions'
@@ -140,7 +140,7 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
           { type == "date_range" ? <DateRange defaultValue={filterData[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setFilters={setFilters} getData={getData} /> : "" }
       </div>
     ),
-    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    filterIcon: filtered => <FilterFilled className={filtered ? 'table-active-filter' : null} />,
     filteredValue: filterData[dataIndex] || null,
     onFilterDropdownVisibleChange: visible => {
         if (!visible) {
@@ -162,6 +162,7 @@ const list = (dataIndex, type, setFilters, filterData, getData) => ({
         />;
     },
     filteredValue: filterData[dataIndex] || null,
+    filterIcon: filtered => <FilterFilled className={filtered ? 'table-active-filter' : null} />,
 });
 export default {
     search,
