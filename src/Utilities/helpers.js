@@ -22,14 +22,28 @@ const hasPermission = (user, permissions) => {
 const hasRole = (user, roles) => {
     return user?.roles?.data?.filter(i => roles.includes(i.name)) != 0
 }
+
+const currencyFormat = (value) => {
+    if (typeof value !== "number") {
+        return value;
+    }
+    var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+    return formatter.format(value).replace('$', '');
+}
+
 var currentDate = moment();
 var dateStart = currentDate.clone().subtract(2, 'month').format("YYYY-MM-DD");
 var dateEnd = currentDate.clone().format("YYYY-MM-DD");
-const defaultDateRange = [dateStart,dateEnd]
+const defaultDateRange = [dateStart,dateEnd];
+
 export default {
     displayError,
     bytesToSize,
     hasPermission,
     hasRole,
+    currencyFormat,
     defaultDateRange,
 }
