@@ -3,7 +3,18 @@ import { connect } from 'react-redux';
 import { Typography, Card, Divider } from 'antd';
 import helpers from '../../../Utilities/helpers';
 import dayjs from 'dayjs'
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+    ComposedChart,
+    Line,
+    Area,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+  } from 'recharts';
 
 const { Title } = Typography;
 
@@ -13,69 +24,8 @@ function mapStateToProps(state) {
     };
 }
 
-const BarPurchaseRequest = ({label}) => {
-    const data = [
-        {
-            name: 'January',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'February',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'March',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'April',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'May',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'June',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'July',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'August',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'September',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'October',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'November',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-        {
-            name: 'December',
-            approved: Math.floor(Math.random() * 1000000),
-            unapproved: Math.floor(Math.random() * 1000000),
-        },
-      ];
+const BarPurchaseRequest = ({label, yearlyData}) => {
+    const data = yearlyData?.summary;
     const test = (e) => {
         console.log(e);
     }
@@ -91,28 +41,30 @@ const BarPurchaseRequest = ({label}) => {
                 <p>{label}</p>
                 <div style={{height: "256px", width: "100%"}}>
                 <ResponsiveContainer width="100%" height="100%">
-                <BarChart
+                    <ComposedChart
+                    width={500}
+                    height={400}
                     data={data}
                     margin={{
-                        top: 5,
-                        right: 30,
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
                         left: 20,
-                        bottom: 5,
                     }}
-                    onClick={(e) => test(e)}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    >
+                        <Tooltip formatter={(value) => new Intl.NumberFormat('en').format(value)} />
+                    <CartesianGrid stroke="#f5f5f5" />
+                    <XAxis dataKey="month_short" scale="band" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar name="Approved PR Amount" dataKey="approved" fill="#8884d8" />
-                    <Bar name="Unapproved PR Amount" dataKey="unapproved" fill="#82ca9d" />
-                </BarChart>
+                    <Bar dataKey="pending" barSize={20} fill="#413ea0" />
+                    <Line type="monotone" dataKey="approved" stroke="#ff7300" />
+                    </ComposedChart>
                 </ResponsiveContainer>
                 </div>
                 <Divider className='mb-2' />
-                { dayjs().startOf('year').format("MMMM DD, YYYY") } - { dayjs().endOf('year').format("MMMM DD, YYYY") }
+                { yearlyData?.start_day } - { yearlyData?.end_day }
             </div>
         </Card>
     );

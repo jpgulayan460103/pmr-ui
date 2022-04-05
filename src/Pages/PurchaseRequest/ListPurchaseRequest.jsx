@@ -72,7 +72,7 @@ const Listpurchaserequest = (props) => {
     
     const [filterData, setFilterData] = useState({
         page: 1,
-        pr_date: helpers.defaultDateRange
+        // pr_date: helpers.defaultDateRange
     });
     const [tabKey, setTabKey] = useState('information');
 

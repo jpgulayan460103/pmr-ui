@@ -12,112 +12,60 @@ function mapStateToProps(state) {
     };
 }
 
-const TopRequestedItems = ({label}) => {
+const TopRequestedItems = ({label, summaryData}) => {
 
-    const dataSource = [
-        {
-          key: '1',
-          name: 'Item ',
-          quantity: Math.floor(Math.random() * 100),
-          amount: Math.floor(Math.random() * 1000000),
-        },
-        {
-          key: '2',
-          name: 'Item ',
-          quantity: Math.floor(Math.random() * 100),
-          amount: Math.floor(Math.random() * 1000000),
-        },
-        {
-            key: '3',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '4',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '5',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '6',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '7',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '8',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '9',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '10',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-          {
-            key: '11',
-            name: 'Item ',
-            quantity: Math.floor(Math.random() * 100),
-            amount: Math.floor(Math.random() * 1000000),
-          },
-      ];
+    const dataSource = summaryData?.items;
       
-      const columns = [
+    const columns = [
         {
             title: '#',
-            key: 'spot',
-            render: (text, item, index) => (<span>{index + 1}</span>),
+            dataIndex: 'key',
+            key: 'key',
+            width: 50,
+            align: "center",
+            sorter: (a, b) => a.key - b.key,
         },
         {
-          title: 'Item Name',
-          key: 'name',
-          render: (text, item, index) => (<span>{ item.name } {Math.floor(Math.random() * 100)}</span>),
+            title: 'Item Name',
+            key: 'name',
+            dataIndex: 'item_name',
+            width: 350,
+            sorter: (a, b) => a.item_name.localeCompare(b.item_name)
         },
         {
             title: 'Quantity',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            dataIndex: 'sum_quantity',
+            key: 'sum_quantity',
             align: "center",
+            width: 80,
+            sorter: (a, b) => a.sum_quantity - b.sum_quantity,
+        },
+        {
+            title: 'Ave Cost',
+            key: 'ave_sum_cost',
+            align: "right",
+            width: 150,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.ave_sum_cost) }</span>),
+            sorter: (a, b) => a.ave_sum_cost - b.ave_sum_cost,
         },
         {
             title: 'Amount',
-            key: 'amount',
+            key: 'sum_cost',
             align: "right",
-            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.amount) }</span>),
-            defaultSortOrder: 'descend',
-            sorter: (a, b) => a.amount - b.amount,
+            width: 150,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.sum_cost) }</span>),
+            sorter: (a, b) => a.sum_cost - b.sum_cost,
         },
-      ];
+    ];
     return (
         <Card size="small" bordered={false} style={{height: "466px"}} >
             <div>
                 <p>{label}</p>
                 <div style={{height: "356px"}}>
-                    <Table dataSource={dataSource} columns={columns} size={"small"}  scroll={{ y: "286px" }}/>
+                    <Table pagination={false} dataSource={dataSource} columns={columns} size={"small"}  scroll={{ y: "336px" }}/>
                 </div>
                 <Divider className='mb-2' />
-                { dayjs().startOf('month').format("MMMM DD, YYYY") } - { dayjs().endOf('month').format("MMMM DD, YYYY") }
+                { summaryData?.start_day } - { summaryData?.end_day }
             </div>
         </Card>
     );

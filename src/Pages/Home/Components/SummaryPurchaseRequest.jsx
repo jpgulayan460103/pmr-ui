@@ -12,18 +12,18 @@ function mapStateToProps(state) {
     };
 }
 
-const SummaryPurchaseRequest = ({label}) => {
+const SummaryPurchaseRequest = ({label, summaryData}) => {
     return (
         <Card size="small" bordered={false} style={{height: "175px"}} >
             <div>
                 <p>{label}</p>
                 <div style={{height: "55px"}}>
                     <Title className='text-center mt-4'>
-                        { helpers.currencyFormat(Math.floor(Math.random() * 1000000)) }
+                        { helpers.currencyFormat(summaryData?.total) }
                     </Title>
                 </div>
                 <Divider className='mb-2' />
-                { dayjs().startOf('month').format("MMMM DD, YYYY") } - { dayjs().endOf('month').format("MMMM DD, YYYY") }
+                { summaryData?.start_day } - { summaryData?.end_day }
             </div>
         </Card>
     );

@@ -5,7 +5,7 @@ import Icon, {
     UserOutlined,
     UploadOutlined,
     FormOutlined,
-    MessageOutlined,
+    DashboardOutlined,
     ShoppingCartOutlined,
   } from '@ant-design/icons';
 import { Link, useLocation  } from 'react-router-dom'
@@ -64,9 +64,9 @@ const Sidemenu = (props) => {
                 mode="inline"
                 selectedKeys={[defaultKey]}
                 >
-                <Menu.Item key="/" icon={<UserOutlined />}>
+                <Menu.Item key="/" icon={<DashboardOutlined />}>
                     <Link to="/"></Link>
-                    Home
+                    Dashboard
                 </Menu.Item>
 
                 {
