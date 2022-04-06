@@ -64,7 +64,7 @@ const BarPurchaseRequest = ({label, yearlyData}) => {
                 </ResponsiveContainer>
                 </div>
                 <Divider className='mb-2' />
-                { yearlyData?.start_day } - { yearlyData?.end_day }
+                Period: { yearlyData?.start_day } - { yearlyData?.end_day }
             </div>
         </Card>
     );

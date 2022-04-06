@@ -4,10 +4,9 @@ import { Typography, Card, Divider, Table  } from 'antd';
 import helpers from '../../../Utilities/helpers';
 import dayjs from 'dayjs'
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip, Label, LabelList } from 'recharts';
-import { cloneDeep, isEmpty } from 'lodash';
-import Icon from '@ant-design/icons';
+import { isEmpty } from 'lodash';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 function mapStateToProps(state) {
     return {
@@ -15,17 +14,9 @@ function mapStateToProps(state) {
     };
 }
 
-const ColorSvg = () => (
-    <svg t="1649210395377" className='anticon' viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5897" width="1.5em" height="1.5em"><path d="M426.666667 384V213.333333l-298.666667 298.666667 298.666667 298.666667v-174.933334c213.333333 0 362.666667 68.266667 469.333333 217.6-42.666667-213.333333-170.666667-426.666667-469.333333-469.333333z" p-id="5898"></path></svg>
-)
-
-const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategory}) => {
-    // const data01 = summaryData?.data2.filter(i => i.procurement_type_category_id == selectedCategory.procurement_type_category_id);
-    const data01 = cloneDeep(summaryData)?.data2.filter(i => i.procurement_type_category_id == selectedCategory.procurement_type_category_id).map(i => {
-        i.procurement_type_percentage_mod = Math.round((((i.procurement_type_percentage / selectedCategory.category_percentage) * 100) + Number.EPSILON) * 100) / 100;
-        return i;
-    });
-    // console.log(data01);
+const ProcurementCategoryPie = ({label, summaryData, selectCategory}) => {
+    const data01 = summaryData?.data1;
+    const data02 = summaryData?.data2;
     const RADIAN = Math.PI / 180;
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const radius = innerRadius + (outerRadius - innerRadius)  * 1.6;
@@ -51,37 +42,38 @@ const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategor
         },
         {
             title: 'Percentage',
-            key: 'procurement_type_percentage_mod',
+            key: 'category_percentage',
             align: "center",
-            sorter: (a, b) => a.procurement_type_percentage_mod - b.procurement_type_percentage_mod,
-            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.procurement_type_percentage_mod) }%</span>),
+            sorter: (a, b) => a.category_percentage - b.category_percentage,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.category_percentage) }%</span>),
         },
         {
             title: 'Total',
-            key: 'sum_cost',
+            key: 'category_total',
             align: "right",
-            sorter: (a, b) => a.sum_cost - b.sum_cost,
-            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.sum_cost) }</span>),
+            sorter: (a, b) => a.category_total - b.category_total,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.category_total) }</span>),
         },
     ];
     
+
+    const handleClick = (e) => {
+        if(!isEmpty(e)){
+            selectCategory(e.payload.payload)
+        }
+    }
     return (
         <Card size="small" bordered={false} style={{height: "766px"}} >
             <div>
-                <div className="flex justify-between">
-                    <p>{label} - {selectedCategory.name}</p>
-                    <p>
-                        <Icon component={ColorSvg} onClick={() => { selectCategory({}) }} />
-                    </p>
-                </div>
+                <p>{label}</p>
                 <div style={{height: "356px"}}>
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                         <Tooltip cursor={false} formatter={(value, name, props) => {
                             // return `${value}%`;
-                            return helpers.currencyFormat(props.payload.payload.sum_cost);
+                            return helpers.currencyFormat(props.payload.payload.category_total);
                         }} />
-                        <Pie data={data01} dataKey="procurement_type_percentage_mod" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#82ca9d" label={renderCustomizedLabel} />
+                        <Pie  onClick={handleClick} data={data01} dataKey="category_percentage" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#8884d8" label={renderCustomizedLabel} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -94,7 +86,7 @@ const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategor
                         summary={pageData => {
                             let total = 0;
                             total = pageData.reduce((sum, item) => {
-                                return sum += item.sum_cost;
+                                return sum += item.category_total;
                             }, 0);
                             return (
                                 <>
@@ -123,4 +115,4 @@ const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategor
 
 export default connect(
     mapStateToProps,
-)(ProcurementTypePie);
+)(ProcurementCategoryPie);

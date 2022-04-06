@@ -5,9 +5,10 @@ import style from './style.less'
 import SummaryPurchaseRequest from './Components/SummaryPurchaseRequest';
 import BarPurchaseRequest from './Components/BarPurchaseRequest';
 import TopRequestedItems from './Components/TopRequestedItems';
-import ProcurementTypePie from './Components/ProcurementTypePie';
+import ModeOfProcurementPie from './Components/ModeOfProcurementPie';
+import ProcurementTypeVisual from './Components/ProcurementTypeVisual';
 import api from '../../api';
-import { cloneDeep, uniqBy } from 'lodash';
+import { cloneDeep, isEmpty, uniqBy } from 'lodash';
 
 function mapStateToProps(state) {
     return {
@@ -20,7 +21,9 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
     useEffect(() => {
         document.title = "Dashboard";
         if(isInitialized){
-            getPurchaseRequests();
+            if(isEmpty(purchaseRequest)){
+                getPurchaseRequests();
+            }
         }
     }, [isInitialized]);
 
@@ -38,8 +41,8 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                 let category_total = categoryProcurementTypes.reduce((sum, item) => {
                     return sum += item.sum_cost;
                 }, 0);
-                i.category_percentage = Math.round(category_percentage * 100) / 100;
-                i.category_total = Math.round(category_total * 100) / 100;
+                i.category_percentage = Math.round((category_percentage + Number.EPSILON) * 100) / 100;
+                i.category_total = Math.round((category_total + Number.EPSILON) * 100) / 100;
                 delete i.sum_cost;
                 delete i.procurement_type_percentage;
                 delete i.name;
@@ -91,7 +94,10 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                     <TopRequestedItems label="Most requested items by unit cost" summaryData={purchaseRequest.most_cost_items} />
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <ProcurementTypePie label="Procurement Types" summaryData={purchaseRequest.procurement_types} />
+                    <ProcurementTypeVisual />
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                    <ModeOfProcurementPie label="Mode of Procurement" summaryData={purchaseRequest.mode_of_procurements} />
                 </Col>
             </Row>
             <Row gutter={[16, 16]} className="mb-3">

@@ -23,7 +23,7 @@ const SummaryPurchaseRequest = ({label, summaryData}) => {
                     </Title>
                 </div>
                 <Divider className='mb-2' />
-                { summaryData?.start_day } - { summaryData?.end_day }
+                Period: { summaryData?.start_day } - { summaryData?.end_day }
             </div>
         </Card>
     );
