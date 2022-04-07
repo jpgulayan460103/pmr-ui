@@ -19,7 +19,7 @@ const ColorSvg = () => (
     <svg t="1649210395377" className='anticon' viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5897" width="1.5em" height="1.5em"><path d="M426.666667 384V213.333333l-298.666667 298.666667 298.666667 298.666667v-174.933334c213.333333 0 362.666667 68.266667 469.333333 217.6-42.666667-213.333333-170.666667-426.666667-469.333333-469.333333z" p-id="5898"></path></svg>
 )
 
-const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategory}) => {
+const PieProcurementType = ({label, summaryData, selectedCategory, selectCategory}) => {
     // const data01 = summaryData?.data2.filter(i => i.procurement_type_category_id == selectedCategory.procurement_type_category_id);
     const data01 = cloneDeep(summaryData)?.data2.filter(i => i.procurement_type_category_id == selectedCategory.procurement_type_category_id).map(i => {
         i.procurement_type_percentage_mod = Math.round((((i.procurement_type_percentage / selectedCategory.category_percentage) * 100) + Number.EPSILON) * 100) / 100;
@@ -123,4 +123,4 @@ const ProcurementTypePie = ({label, summaryData, selectedCategory, selectCategor
 
 export default connect(
     mapStateToProps,
-)(ProcurementTypePie);
+)(PieProcurementType);

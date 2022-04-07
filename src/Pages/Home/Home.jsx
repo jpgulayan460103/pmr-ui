@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Card, Col, Row } from 'antd';
 import style from './style.less'
-import SummaryPurchaseRequest from './Components/SummaryPurchaseRequest';
+import ReportPurchaseRequest from './Components/ReportPurchaseRequest';
 import BarPurchaseRequest from './Components/BarPurchaseRequest';
 import TopRequestedItems from './Components/TopRequestedItems';
-import ModeOfProcurementPie from './Components/ModeOfProcurementPie';
-import ProcurementTypeVisual from './Components/ProcurementTypeVisual';
+import PieModeOfProcurement from './Components/PieModeOfProcurement';
+import ReportProcurementType from './Components/ReportProcurementType';
 import api from '../../api';
 import { cloneDeep, isEmpty, uniqBy } from 'lodash';
 
@@ -31,7 +31,7 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
        api.Report.purchaseRequest()
        .then(res => {
            let results = res.data;
-           let procurement_types = cloneDeep(results.procurement_types.types);
+           let procurement_types = cloneDeep(results.procurement_types.data);
            let uniqProcCategory = uniqBy(procurement_types, 'procurement_type_category');
            let mappedUniqProcCategory = uniqProcCategory.map(i => {
                 let categoryProcurementTypes = procurement_types.filter(p => p.procurement_type_category_id == i.procurement_type_category_id);
@@ -53,7 +53,7 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
            });
            results.procurement_types = {
                data1: mappedUniqProcCategory,
-               data2: results.procurement_types.types,
+               data2: results.procurement_types.data,
                start_day: results.procurement_types.start_day,
                end_day: results.procurement_types.end_day,
            };
@@ -71,16 +71,16 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <SummaryPurchaseRequest label="Monthly Approved Purchase Request" summaryData={purchaseRequest.approved_month} />
+                            <ReportPurchaseRequest label="Monthly Approved Purchase Request" summaryData={purchaseRequest.approved_month} />
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <SummaryPurchaseRequest label="Monthly Pending Purchase Request" summaryData={purchaseRequest.pending_month} />
+                            <ReportPurchaseRequest label="Monthly Pending Purchase Request" summaryData={purchaseRequest.pending_month} />
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <SummaryPurchaseRequest label="Yearly Approved Purchase Request" summaryData={purchaseRequest.approved_year} />
+                            <ReportPurchaseRequest label="Yearly Approved Purchase Request" summaryData={purchaseRequest.approved_year} />
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <SummaryPurchaseRequest label="Yearly Pending Purchase Request" summaryData={purchaseRequest.pending_year} />
+                            <ReportPurchaseRequest label="Yearly Pending Purchase Request" summaryData={purchaseRequest.pending_year} />
                         </Col>
                     </Row>
                 </Col>
@@ -94,10 +94,10 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                     <TopRequestedItems label="Most requested items by unit cost" summaryData={purchaseRequest.most_cost_items} />
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <ProcurementTypeVisual />
+                    <ReportProcurementType />
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <ModeOfProcurementPie label="Mode of Procurement" summaryData={purchaseRequest.mode_of_procurements} />
+                    <PieModeOfProcurement label="Mode of Procurement" summaryData={purchaseRequest.mode_of_procurements} />
                 </Col>
             </Row>
             <Row gutter={[16, 16]} className="mb-3">

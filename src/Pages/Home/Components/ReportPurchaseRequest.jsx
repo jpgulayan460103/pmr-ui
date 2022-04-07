@@ -12,14 +12,14 @@ function mapStateToProps(state) {
     };
 }
 
-const SummaryPurchaseRequest = ({label, summaryData}) => {
+const ReportPurchaseRequest = ({label, summaryData}) => {
     return (
         <Card size="small" bordered={false} style={{height: "175px"}} >
             <div>
                 <p>{label}</p>
                 <div style={{height: "55px"}}>
                     <Title className='text-center mt-4'>
-                        { helpers.currencyFormat(summaryData?.total) }
+                        { helpers.currencyFormat(summaryData?.data) }
                     </Title>
                 </div>
                 <Divider className='mb-2' />
@@ -31,4 +31,4 @@ const SummaryPurchaseRequest = ({label, summaryData}) => {
 
 export default connect(
     mapStateToProps,
-)(SummaryPurchaseRequest);
+)(ReportPurchaseRequest);

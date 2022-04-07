@@ -14,7 +14,7 @@ function mapStateToProps(state) {
 
 const TopRequestedItems = ({label, summaryData}) => {
 
-    const dataSource = summaryData?.items;
+    const dataSource = summaryData?.data;
       
     const columns = [
         {

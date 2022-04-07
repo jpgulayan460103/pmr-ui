@@ -4,6 +4,7 @@ import { Typography, Card, Divider, Table  } from 'antd';
 import helpers from '../../../Utilities/helpers';
 import dayjs from 'dayjs'
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip, Label, LabelList } from 'recharts';
+import { isEmpty } from 'lodash';
 
 const { Title } = Typography;
 
@@ -13,8 +14,9 @@ function mapStateToProps(state) {
     };
 }
 
-const ModeOfProcurementPie = ({label, summaryData}) => {
-    const data01 = summaryData?.types;
+const PieProcurementCategory = ({label, summaryData, selectCategory}) => {
+    const data01 = summaryData?.data1;
+    const data02 = summaryData?.data2;
     const RADIAN = Math.PI / 180;
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const radius = innerRadius + (outerRadius - innerRadius)  * 1.6;
@@ -40,19 +42,26 @@ const ModeOfProcurementPie = ({label, summaryData}) => {
         },
         {
             title: 'Percentage',
-            key: 'mode_of_procurement_percentage',
+            key: 'category_percentage',
             align: "center",
-            sorter: (a, b) => a.mode_of_procurement_percentage - b.mode_of_procurement_percentage,
-            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.mode_of_procurement_percentage) }%</span>),
+            sorter: (a, b) => a.category_percentage - b.category_percentage,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.category_percentage) }%</span>),
         },
         {
             title: 'Total',
-            key: 'sum_cost',
+            key: 'category_total',
             align: "right",
-            sorter: (a, b) => a.sum_cost - b.sum_cost,
-            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.sum_cost) }</span>),
+            sorter: (a, b) => a.category_total - b.category_total,
+            render: (text, item, index) => (<span>{ helpers.currencyFormat(item.category_total) }</span>),
         },
     ];
+    
+
+    const handleClick = (e) => {
+        if(!isEmpty(e)){
+            selectCategory(e.payload.payload)
+        }
+    }
     return (
         <Card size="small" bordered={false} style={{height: "766px"}} >
             <div>
@@ -62,9 +71,9 @@ const ModeOfProcurementPie = ({label, summaryData}) => {
                         <PieChart>
                         <Tooltip cursor={false} formatter={(value, name, props) => {
                             // return `${value}%`;
-                            return helpers.currencyFormat(props.payload.payload.sum_cost);
+                            return helpers.currencyFormat(props.payload.payload.category_total);
                         }} />
-                        <Pie data={data01} dataKey="mode_of_procurement_percentage" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#83a6ed" label={renderCustomizedLabel} />
+                        <Pie  onClick={handleClick} data={data01} dataKey="category_percentage" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#8884d8" label={renderCustomizedLabel} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -77,7 +86,7 @@ const ModeOfProcurementPie = ({label, summaryData}) => {
                         summary={pageData => {
                             let total = 0;
                             total = pageData.reduce((sum, item) => {
-                                return sum += item.sum_cost;
+                                return sum += item.category_total;
                             }, 0);
                             return (
                                 <>
@@ -106,4 +115,4 @@ const ModeOfProcurementPie = ({label, summaryData}) => {
 
 export default connect(
     mapStateToProps,
-)(ModeOfProcurementPie);
+)(PieProcurementCategory);

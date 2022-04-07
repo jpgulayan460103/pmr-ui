@@ -25,11 +25,7 @@ function mapStateToProps(state) {
 }
 
 const BarPurchaseRequest = ({label, yearlyData}) => {
-    const data = yearlyData?.summary;
-    const test = (e) => {
-        console.log(e);
-    }
-
+    const data = yearlyData?.data;
     const renderColorfulLegendText = (value, entry) => {
         const { color } = entry;
       
