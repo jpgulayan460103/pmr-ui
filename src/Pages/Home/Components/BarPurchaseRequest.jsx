@@ -26,11 +26,6 @@ function mapStateToProps(state) {
 
 const BarPurchaseRequest = ({label, yearlyData}) => {
     const data = yearlyData?.data;
-    const renderColorfulLegendText = (value, entry) => {
-        const { color } = entry;
-      
-        return <span style={{ color }}>{helpers.currencyFormat(value)}</span>;
-      };
     return (
         <Card size="small" bordered={false} style={{height: "366px"}} >
             <div>
