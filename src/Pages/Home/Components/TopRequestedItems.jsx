@@ -58,11 +58,11 @@ const TopRequestedItems = ({label, summaryData}) => {
         },
     ];
     return (
-        <Card size="small" bordered={false} style={{height: "466px"}} >
+        <Card size="small" bordered={false} style={{height: "566px"}} >
             <div>
                 <p>{label}</p>
-                <div style={{height: "356px"}}>
-                    <Table pagination={false} dataSource={dataSource} columns={columns} size={"small"}  scroll={{ y: "336px" }}/>
+                <div style={{height: "456px"}}>
+                    <Table pagination={false} dataSource={dataSource} columns={columns} size={"small"}  scroll={{ y: "436px" }}/>
                 </div>
                 <Divider className='mb-2' />
                 Period: { summaryData?.start_day } - { summaryData?.end_day }

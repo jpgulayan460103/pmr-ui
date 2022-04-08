@@ -36,10 +36,12 @@ const CustomizedAxisTick = (props) => {
 const BarPurchaseRequestPerDivision = ({label, summaryData, selectDivision}) => {
     const data = summaryData?.data1;
     const handleClick = (e) => {
-        console.log(e);
-        if(!isEmpty(e)){
-            selectDivision(e.payload)
+        if(e && e.activePayload && !isEmpty(e.activePayload)){
+            selectDivision(e.activePayload[0].payload)
         }
+        // if(!isEmpty(e)){
+        //     selectDivision(e.payload)
+        // }
     }
     return (
         <Card size="small" bordered={false} style={{height: "566px"}} >
@@ -55,6 +57,7 @@ const BarPurchaseRequestPerDivision = ({label, summaryData, selectDivision}) => 
                         left: 20,
                         bottom: 5,
                     }}
+                    onClick={handleClick}
                     >
                         <Tooltip
                             label="asd"
@@ -76,7 +79,7 @@ const BarPurchaseRequestPerDivision = ({label, summaryData, selectDivision}) => 
                     <YAxis />
                     {/* <Tooltip /> */}
                     <Legend verticalAlign="top" />
-                    <Bar dataKey="sum_cost" fill="#8884d8"  name="Approved Purchase Request" onClick={handleClick} />
+                    <Bar dataKey="total" fill="#8884d8"  name="Approved Purchase Request" onClick={handleClick} />
                     {/* <Brush /> */}
                     </BarChart>
                     </ResponsiveContainer>

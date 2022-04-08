@@ -49,8 +49,8 @@ const BarPurchaseRequest = ({label, yearlyData}) => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="pending" barSize={20} fill="#413ea0" />
                     <Line type="monotone" dataKey="approved" stroke="#ff7300" />
+                    <Bar dataKey="pending" barSize={20} fill="#413ea0" />
                     </ComposedChart>
                 </ResponsiveContainer>
                 </div>

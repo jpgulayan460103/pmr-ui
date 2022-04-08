@@ -82,7 +82,7 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                 start_day: results.per_section.start_day,
                 end_day: results.per_section.end_day,
             };
-            console.log(mappeduniqProcPerDivision);
+            // console.log(mappeduniqProcPerDivision);
            dispatch({
                type: "SET_REPORT_PURCHASE_REQUEST",
                data: results
@@ -120,16 +120,17 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
                     {/* <BarPurchaseRequestPerDivision label="Approved Purchase Request by Office" summaryData={purchaseRequest.per_section}/> */}
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                    <TopRequestedItems label="Most requested items by quantity" summaryData={purchaseRequest.most_quantity_items}/>
                     {/* <BarPurchaseRequestOffice label="Approved Purchase Request per Section" summaryData={purchaseRequest.per_section}/> */}
                 </Col>
 
 
-                <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                {/* <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <TopRequestedItems label="Most requested items by quantity" summaryData={purchaseRequest.most_quantity_items}/>
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <TopRequestedItems label="Most requested items by unit cost" summaryData={purchaseRequest.most_cost_items} />
-                </Col>
+                </Col> */}
 
 
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
