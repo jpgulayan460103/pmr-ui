@@ -1,6 +1,10 @@
 const initialState = () => {
     return {
       purchaseRequest: {},
+      filterData: {
+        end_user_id: null,
+        month: "",
+      }
     }
   }
   
@@ -10,6 +14,11 @@ const initialState = () => {
         return {
           ...state,
           purchaseRequest: action.data,
+        };
+      case 'SET_REPORT_FILTER_DATA':
+        return {
+          ...state,
+          filterData: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

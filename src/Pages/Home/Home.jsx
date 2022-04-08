@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, DatePicker, Tag, Select, Button } from 'antd';
 import style from './style.less'
 import ReportPurchaseRequest from './Components/ReportPurchaseRequest';
 import BarPurchaseRequest from './Components/BarPurchaseRequest';
@@ -11,15 +11,31 @@ import PieModeOfProcurement from './Components/PieModeOfProcurement';
 import ReportProcurementType from './Components/ReportProcurementType';
 import api from '../../api';
 import { cloneDeep, isEmpty, uniqBy } from 'lodash';
+import moment from 'moment';
+
+const { Option, OptGroup } = Select;
+const { RangePicker } = DatePicker;
 
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
         purchaseRequest: state.reports.purchaseRequest,
+        filterData: state.reports.filterData,
+        user_divisions: state.libraries.user_divisions,
+        user_sections: state.libraries.user_sections,
     };
 }
 
-const Home = ({dispatch, isInitialized, purchaseRequest}) => {
+const Home = (
+    {
+        dispatch, 
+        isInitialized,
+        purchaseRequest,
+        filterData,
+        user_divisions,
+        user_sections,
+    }
+) => {
     useEffect(() => {
         document.title = "Dashboard";
         if(isInitialized){
@@ -28,9 +44,10 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
             }
         }
     }, [isInitialized]);
+    
 
     const getPurchaseRequests = () => {
-       api.Report.purchaseRequest()
+       api.Report.purchaseRequest(filterData)
        .then(res => {
            let results = res.data;
            //start of procurement types
@@ -66,14 +83,18 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
            let uniqProcPerDivision = uniqBy(per_section, 'division_id');
            let mappeduniqProcPerDivision = uniqProcPerDivision.map(i => {
                 let perDivisionProcurementTypes = per_section.filter(d=> d.division_id == i.division_id);
-                let perDivisionTotal = perDivisionProcurementTypes.reduce((sum, item) => {
-                    return sum += item.sum_cost;
+                let perDivisionApprovedTotal = perDivisionProcurementTypes.reduce((sum, item) => {
+                    return sum += item.approved;
+                }, 0);
+                let perDivisionPendingTotal = perDivisionProcurementTypes.reduce((sum, item) => {
+                    return sum += item.pending;
                 }, 0);
                 delete i.section_name;
                 delete i.section_id;
                 delete i.section_title;
                 delete i.end_user_id;
-                i.total = Math.round((perDivisionTotal + Number.EPSILON) * 100) / 100;
+                i.approved_total = Math.round((perDivisionApprovedTotal + Number.EPSILON) * 100) / 100;
+                i.pending_total = Math.round((perDivisionPendingTotal + Number.EPSILON) * 100) / 100;
                 return i;
             });
             results.per_section = {
@@ -91,16 +112,64 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
        .catch(err => {})
        .then(res => {})
     }
+
+    const setFilterData = (e, name) => {
+        let cloned = cloneDeep(filterData);
+        cloned[name] = e;
+        dispatch({
+            type: "SET_REPORT_FILTER_DATA",
+            data: cloned
+        });
+    }
+
     return (
         <div style={style}>
              <Row gutter={[16, 16]} className="mb-3">
+                <Col span={24}>
+                    {/* <RangePicker renderExtraFooter={() => <ExtraDateRangeFooter />} /> */}
+                    <RangePicker picker="month" format={"MMMM YYYY"} onChange={(e) => {
+                        let month = null;
+                        if(e){
+                            month = e.map(i => moment(i).format("YYYY-MM-DD"));
+                        }
+                        setFilterData(month, "month");
+                    }} value={filterData.month && filterData.month.map(i => moment(i, "YYYY-MM-DD"))} />
+                    <Select
+                        placeholder="Section/Unit/Office"
+                        optionFilterProp="children"
+                        showSearch
+                        style={{width: "288px"}}
+                        filterOption={(input, option) =>
+                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        allowClear
+                        onClear={() => {
+                            setFilterData(null, "end_user_id")
+                        }}
+                        onSelect={(e) => {
+                            setFilterData(e, "end_user_id");
+                        }}
+                        value={filterData.end_user_id}
+                    >
+                        { user_divisions.map(division =>  {
+                            return (
+                                <OptGroup label={division.name}  key={division.id}>
+                                    { user_sections?.filter(section => section.parent.name == division.name).map(section => {
+                                        return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
+                                    }) }
+                                </OptGroup>
+                            );
+                        }) }
+                    </Select>
+                    <Button type='primary' onClick={getPurchaseRequests}>View</Button>
+                </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <ReportPurchaseRequest label="Monthly Approved Purchase Request" summaryData={purchaseRequest.approved_month} />
+                            <ReportPurchaseRequest label="Total Approved Purchase Request" summaryData={purchaseRequest.approved_month} />
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            <ReportPurchaseRequest label="Monthly Pending Purchase Request" summaryData={purchaseRequest.pending_month} />
+                            <ReportPurchaseRequest label="Total Pending Purchase Request" summaryData={purchaseRequest.pending_month} />
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             <ReportPurchaseRequest label="Yearly Approved Purchase Request" summaryData={purchaseRequest.approved_year} />
@@ -117,11 +186,9 @@ const Home = ({dispatch, isInitialized, purchaseRequest}) => {
 
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <BarPurchaseRequestOffice />
-                    {/* <BarPurchaseRequestPerDivision label="Approved Purchase Request by Office" summaryData={purchaseRequest.per_section}/> */}
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <TopRequestedItems label="Most requested items by quantity" summaryData={purchaseRequest.most_quantity_items}/>
-                    {/* <BarPurchaseRequestOffice label="Approved Purchase Request per Section" summaryData={purchaseRequest.per_section}/> */}
+                    <TopRequestedItems label="Most requested items" summaryData={purchaseRequest.most_quantity_items}/>
                 </Col>
 
 

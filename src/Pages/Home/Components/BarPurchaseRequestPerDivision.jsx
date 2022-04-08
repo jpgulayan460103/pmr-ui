@@ -62,10 +62,7 @@ const BarPurchaseRequestPerDivision = ({label, summaryData, selectDivision}) => 
                         <Tooltip
                             label="asd"
                             formatter={(value, name, props) => {
-                                return [
-                                    new Intl.NumberFormat('en').format(value),
-                                    "Approved Purchase Request"
-                                ]
+                                return new Intl.NumberFormat('en').format(value)
                             }}
                             labelFormatter={(value, payload) => {
                                 if(isEmpty(payload)){
@@ -79,13 +76,14 @@ const BarPurchaseRequestPerDivision = ({label, summaryData, selectDivision}) => 
                     <YAxis />
                     {/* <Tooltip /> */}
                     <Legend verticalAlign="top" />
-                    <Bar dataKey="total" fill="#8884d8"  name="Approved Purchase Request" onClick={handleClick} />
+                    <Bar dataKey="approved_total" fill="#8884d8"  name="Approved Purchase Request" onClick={handleClick} />
+                    <Bar dataKey="pending_total" fill="#82ca9d"  name="Pending Purchase Request" onClick={handleClick} />
                     {/* <Brush /> */}
                     </BarChart>
                     </ResponsiveContainer>
                 </div>
                 <Divider className='mb-2' />
-                Period: { summaryData?.start_day } - { summaryData?.end_day }
+                Period: <b>{ summaryData?.start_day } - { summaryData?.end_day }</b>
             </div>
         </Card>
     );

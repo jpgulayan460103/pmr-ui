@@ -8,6 +8,7 @@ import Icon, { SettingOutlined, EyeOutlined, EyeInvisibleOutlined, MoreOutlined,
 import api from '../../api';
 import helpers from '../../Utilities/helpers';
 import TableFooterPagination from '../../Components/TableFooterPagination';
+import TableRefresh from '../../Components/TableRefresh'
 
 
 const ReloadSvg = () => (
@@ -687,11 +688,7 @@ const ApprovedPurchaseRequest = (props) => {
                     <SettingOutlined />
                 </Tooltip>
             </Popover>
-            <Tooltip placement="right" title="Refresh">
-                <Icon component={ReloadSvg} style={{cursor: "pointer"}} onClick={() => {
-                    props.getPurchaseRequests();
-                }} />
-            </Tooltip>
+                <TableRefresh getData={props.getPurchaseRequests} />
             
             
             </div>

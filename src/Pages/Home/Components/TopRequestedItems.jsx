@@ -65,7 +65,7 @@ const TopRequestedItems = ({label, summaryData}) => {
                     <Table pagination={false} dataSource={dataSource} columns={columns} size={"small"}  scroll={{ y: "436px" }}/>
                 </div>
                 <Divider className='mb-2' />
-                Period: { summaryData?.start_day } - { summaryData?.end_day }
+                Period: <b>{ summaryData?.start_day } - { summaryData?.end_day }</b>
             </div>
         </Card>
     );

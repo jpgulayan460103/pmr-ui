@@ -19,11 +19,11 @@ const ReportPurchaseRequest = ({label, summaryData}) => {
                 <p>{label}</p>
                 <div style={{height: "55px"}}>
                     <Title className='text-center mt-4'>
-                        { helpers.currencyFormat(summaryData?.data) }
+                        { helpers.currencyFormat(summaryData?.data) || "0.00" }
                     </Title>
                 </div>
                 <Divider className='mb-2' />
-                Period: { summaryData?.start_day } - { summaryData?.end_day }
+                Period: <b>{ summaryData?.start_day } - { summaryData?.end_day }</b>
             </div>
         </Card>
     );

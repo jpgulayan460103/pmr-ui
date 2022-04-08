@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Typography, Card, Divider, Table  } from 'antd';
 import helpers from '../../../Utilities/helpers';
 import dayjs from 'dayjs'
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip, Label, LabelList } from 'recharts';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip, Label, LabelList, Legend } from 'recharts';
 import { isEmpty } from 'lodash';
 
 const { Title } = Typography;
@@ -73,6 +73,7 @@ const PieProcurementCategory = ({label, summaryData, selectCategory}) => {
                             // return `${value}%`;
                             return helpers.currencyFormat(props.payload.payload.category_total);
                         }} />
+                        {/* <Legend verticalAlign="top" layout='radial'/> */}
                         <Pie  onClick={handleClick} data={data01} dataKey="category_percentage" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#8884d8" label={renderCustomizedLabel} />
                         </PieChart>
                     </ResponsiveContainer>
@@ -107,7 +108,7 @@ const PieProcurementCategory = ({label, summaryData, selectCategory}) => {
                     />
                 </div>
                 <Divider className='mb-2' />
-                Period: { summaryData?.start_day } - { summaryData?.end_day }
+                Period: <b>{ summaryData?.start_day } - { summaryData?.end_day }</b>
             </div>
         </Card>
     );

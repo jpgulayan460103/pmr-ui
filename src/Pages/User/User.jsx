@@ -7,6 +7,7 @@ import api from '../../api';
 import { debounce, map } from 'lodash'
 import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
 import helpers from '../../Utilities/helpers';
+import TableRefresh from '../../Components/TableRefresh';
 
 
 
@@ -68,6 +69,9 @@ const User = (props) => {
                 <Col sm={24} md={16} lg={14} xl={14}>
                     <Card size="small" title="Users" bordered={false}  >
                         <div className='user-card-content'>
+                            <div className="flex justify-end mb-2 space-x-2">
+                                <TableRefresh getData={getUsers} />
+                            </div>
                             <UserTable loading={loading} users={users} selectUser={selectUser} />
                         </div>
                     </Card>

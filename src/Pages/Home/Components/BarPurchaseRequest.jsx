@@ -42,15 +42,18 @@ const BarPurchaseRequest = ({label, yearlyData}) => {
                         bottom: 20,
                         left: 20,
                     }}
+                    onClick={(e) => {
+                        console.log(e);
+                    }}
                     >
                         <Tooltip formatter={(value) => new Intl.NumberFormat('en').format(value)} />
                     <CartesianGrid stroke="#f5f5f5" />
                     <XAxis dataKey="month_short" scale="band" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="approved" stroke="#ff7300" />
-                    <Bar dataKey="pending" barSize={20} fill="#413ea0" />
+                    <Legend verticalAlign="top" />
+                    <Line type="monotone" dataKey="approved"  name="Approved Purchase Request" stroke="#8884d8" />
+                    <Bar dataKey="pending" barSize={20}  name="Pending Purchase Request" fill="#82ca9d" />
                     </ComposedChart>
                 </ResponsiveContainer>
                 </div>

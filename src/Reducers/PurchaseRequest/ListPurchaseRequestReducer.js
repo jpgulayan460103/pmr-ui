@@ -12,6 +12,10 @@ const initialState = () => {
       loading: false,
       timelines: [],
       logger: [],
+      filterData: {
+        page: 1,
+      },
+      tab: "information",
     }
   }
   
@@ -46,6 +50,16 @@ const initialState = () => {
         return {
           ...state,
           logger: action.data,
+        };
+      case 'SET_PURCHASE_REQUEST_FILTER_DATA':
+        return {
+          ...state,
+          filterData: action.data,
+        };
+      case 'SET_PURCHASE_REQUEST_TAB':
+        return {
+          ...state,
+          tab: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

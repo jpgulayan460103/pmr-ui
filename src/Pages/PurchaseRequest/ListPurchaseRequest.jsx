@@ -22,6 +22,7 @@ import AuditTrail from '../../Components/AuditTrail';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
+import TableRefresh from '../../Components/TableRefresh';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -38,6 +39,8 @@ function mapStateToProps(state) {
         loading: state.purchaseRequests.list.loading,
         timelines: state.purchaseRequests.list.timelines,
         logger: state.purchaseRequests.list.logger,
+        filterData: state.purchaseRequests.list.filterData,
+        tab: state.purchaseRequests.list.tab,
     };
 }
 
@@ -58,23 +61,34 @@ const Listpurchaserequest = (props) => {
     useEffect(() => {
         return () => {
             unmounted.current = true;
-            setPurchaseRequests([]);
+            // setPurchaseRequests([]);
         }
     }, []);
     let history = useHistory()
     useEffect(() => {
         document.title = "List of Purchase Request";
         if(props.isInitialized){
-            getPurchaseRequests();
+            if(isEmpty(props.purchaseRequests)){
+                getPurchaseRequests();
+            }
         }
     }, [props.isInitialized]);
     
     
-    const [filterData, setFilterData] = useState({
-        page: 1,
-        // pr_date: helpers.defaultDateRange
-    });
-    const [tabKey, setTabKey] = useState('information');
+
+    const setFilterData = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_FILTER_DATA",
+            data: value,
+        });
+    }
+
+    const setTabKey = (value) => {
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_TAB",
+            data: value,
+        });
+    }
 
     const setTableLoading = (value) => {
         props.dispatch({
@@ -116,7 +130,7 @@ const Listpurchaserequest = (props) => {
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
-            filters = filterData
+            filters = props.filterData
         }
         setTableLoading(true);
         api.PurchaseRequest.all(filters)
@@ -220,7 +234,7 @@ const Listpurchaserequest = (props) => {
 
     const paginationChange = async (e) => {
         setFilterData(prev => ({...prev, page: e}));
-        getPurchaseRequests({...filterData, page: e})
+        getPurchaseRequests({...props.filterData, page: e})
     }
 
     const timelineContent = (timeline) => {
@@ -282,7 +296,7 @@ const Listpurchaserequest = (props) => {
             key: 'pr_date',
             width: 120,
             align: "center",
-            ...filter.search('pr_date','date_range', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('pr_date','date_range', setFilterData, props.filterData, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -291,7 +305,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
             width: 450,
-            ...filter.search('purchase_request_number','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('purchase_request_number','text', setFilterData, props.filterData, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -300,7 +314,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'title',
             key: 'title',
             width: 450,
-            ...filter.search('title','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('title','text', setFilterData, props.filterData, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -309,7 +323,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'purpose',
             key: 'purpose',
             width: 450,
-            ...filter.search('purpose','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('purpose','text', setFilterData, props.filterData, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -318,7 +332,7 @@ const Listpurchaserequest = (props) => {
             key: 'total_cost',
             width: 150,
             align: "center",
-            ...filter.search('total_cost','number_range', setFilterData, filterData, getPurchaseRequests),
+            ...filter.search('total_cost','number_range', setFilterData, props.filterData, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
@@ -341,7 +355,7 @@ const Listpurchaserequest = (props) => {
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
             ],
-            ...filter.list('status','text', setFilterData, filterData, getPurchaseRequests),
+            ...filter.list('status','text', setFilterData, props.filterData, getPurchaseRequests),
             ...onCell,
         },
         {
@@ -385,6 +399,9 @@ const Listpurchaserequest = (props) => {
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
+                            <div className="flex justify-end mb-2 space-x-2">
+                                <TableRefresh getData={getPurchaseRequests} />
+                            </div>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
                                     if(props.selectedPurchaseRequest?.id == record.id){
                                         return "selected-row";
@@ -401,7 +418,7 @@ const Listpurchaserequest = (props) => {
                         </div>
                     </Card>
                 </Col>
-                { props.selectedPurchaseRequest.file == "" ? "" : (
+                { props.selectedPurchaseRequest.file == "" ? "" : ( 
                     <Col md={24} lg={10} xl={8}>
                             <Card size="small" bordered={false} title="Puchase Request Details" extra={(
                                 <div className='text-right space-x-0.5'>
@@ -415,7 +432,7 @@ const Listpurchaserequest = (props) => {
                             )}
                             >
                                 <div className='purchase-request-card-content'>
-                                    <Tabs activeKey={tabKey} type="card" size="small" onChange={setTabKey}>
+                                    <Tabs activeKey={props.tab} type="card" size="small" onChange={setTabKey}>
                                         <TabPane tab="Information" key="information">
                                             <div className='p-2'>
                                                 <p>

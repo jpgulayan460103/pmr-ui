@@ -14,6 +14,7 @@ import {
 import api from '../../api';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import filter from '../../Utilities/filter';
+import TableRefresh from '../../Components/TableRefresh'
 
 const { Option } = Select;
 
@@ -39,17 +40,19 @@ const ActivityLogs = (props) => {
     useEffect(() => {
         document.title = "Activity Logs";
         if(props.isInitialized){
-            getLogs();
             if(isEmpty(props.usersLibrary)){
                 getUsers();
+            }
+            if(isEmpty(props.activityLogs)){
+                getLogs();
             }
         }
 
         return () => {
-            props.dispatch({
-                type: "SET_ACTIVITY_LOG_ACTIVITY_LOGS",
-                data: []
-            });
+            // props.dispatch({
+            //     type: "SET_ACTIVITY_LOG_ACTIVITY_LOGS",
+            //     data: []
+            // });
         };
     }, [props.isInitialized]);
 
@@ -268,6 +271,9 @@ const ActivityLogs = (props) => {
                 <Col xs={24} sm={24} md={16} lg={14} xl={14}>
                     <Card size="small" title="Activity Logs" bordered={false}  >
                         <div className='forms-card-content'>
+                            <div className="flex justify-end mb-2 space-x-2">
+                                <TableRefresh getData={getLogs} />
+                            </div>
                             <Table
                                 dataSource={logsDataSource}
                                 columns={logsColumns}

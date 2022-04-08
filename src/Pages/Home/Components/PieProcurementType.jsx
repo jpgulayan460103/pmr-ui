@@ -81,7 +81,7 @@ const PieProcurementType = ({label, summaryData, selectedCategory, selectCategor
                             // return `${value}%`;
                             return helpers.currencyFormat(props.payload.payload.sum_cost);
                         }} />
-                        <Pie data={data01} dataKey="procurement_type_percentage_mod" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#82ca9d" label={renderCustomizedLabel} />
+                        <Pie data={data01} dataKey="procurement_type_percentage_mod" cx="50%" cy="50%" innerRadius={60} outerRadius={110} fill="#83a6ed" label={renderCustomizedLabel} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -115,7 +115,7 @@ const PieProcurementType = ({label, summaryData, selectedCategory, selectCategor
                     />
                 </div>
                 <Divider className='mb-2' />
-                Period: { summaryData?.start_day } - { summaryData?.end_day }
+                Period: <b>{ summaryData?.start_day } - { summaryData?.end_day }</b>
             </div>
         </Card>
     );
