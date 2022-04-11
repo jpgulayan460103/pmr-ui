@@ -1,6 +1,12 @@
 import helpers from "../../Utilities/helpers";
 
 const initialState = () => {
+    const defaultTableFilter = {
+      page: 1,
+      type: 'procurement',
+      purchase_request_type_category: [],
+      pr_date: helpers.defaultDateRange,
+    };
     return {
       selectedPurchaseRequest: {},
       columns: [],
@@ -11,12 +17,8 @@ const initialState = () => {
         total: 1,
         per_page: 1,
       },
-      tableFilter: {
-        page: 1,
-        type: 'procurement',
-        purchase_request_type_category: [],
-        pr_date: helpers.defaultDateRange,
-      },
+      tableFilter: defaultTableFilter,
+      defaultTableFilter: defaultTableFilter,
       tableLoading: false,
       workspaceLoading: false,
     }

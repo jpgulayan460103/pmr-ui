@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
+import TableRefresh from '../../Components/TableRefresh';
+import TableResetFilter from '../../Components/TableResetFilter';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -51,10 +53,11 @@ const DisapprovedForm = (props) => {
         }
     }, [props.isInitialized]);
 
-    const [filterData, setFilterData] = useState({
+    const defaultTableFilter = {
         page: 1,
         created_at: helpers.defaultDateRange
-    });
+    };
+    const [filterTable, setTableFilter] = useState(defaultTableFilter);
 
     const setForms = (value) => {
         props.dispatch({
@@ -84,7 +87,7 @@ const DisapprovedForm = (props) => {
 
     const getForm = debounce((filters) => {
         if(filters == null){
-            filters = filterData
+            filters = filterTable
         }
         setTableLoading(true);
         api.Forms.getRejected(filters)
@@ -137,7 +140,7 @@ const DisapprovedForm = (props) => {
             title: 'Requested on',
             key: 'created_at',
             width: 150,
-            ...filter.search('created_at','date_range', setFilterData, filterData, getForm),
+            ...filter.search('created_at','date_range', setTableFilter, filterTable, getForm),
             ...onCell,
             sorter: (a, b) => {},
             render: (text, item, index) => (
@@ -155,7 +158,7 @@ const DisapprovedForm = (props) => {
                     { item.form_routable?.title }
                 </span>
             ),
-            ...filter.search('title','text', setFilterData, filterData, getForm),
+            ...filter.search('title','text', setTableFilter, filterTable, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -168,7 +171,7 @@ const DisapprovedForm = (props) => {
                     { item.form_routable?.purpose }
                 </span>
             ),
-            ...filter.search('purpose','text', setFilterData, filterData, getForm),
+            ...filter.search('purpose','text', setTableFilter, filterTable, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -191,7 +194,7 @@ const DisapprovedForm = (props) => {
             ellipsis: true,
             width: 250,
             filters: endUserFilter,
-            ...filter.list('end_user_id','text', setFilterData, filterData, getForm),
+            ...filter.list('end_user_id','text', setTableFilter, filterTable, getForm),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -204,7 +207,7 @@ const DisapprovedForm = (props) => {
             dataIndex: 'updated_at',
             key: 'updated_at',
             width: 250,
-            ...filter.search('updated_at','date_range', setFilterData, filterData, getForm),
+            ...filter.search('updated_at','date_range', setTableFilter, filterTable, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -217,7 +220,7 @@ const DisapprovedForm = (props) => {
                     <span>{item.remarks }</span>
                 </span>
             ),
-            ...filter.search('remarks','text', setFilterData, filterData, getForm),
+            ...filter.search('remarks','text', setTableFilter, filterTable, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -230,7 +233,7 @@ const DisapprovedForm = (props) => {
                     <span>{ item.forwarded_remarks }</span>
                 </span>
             ),
-            ...filter.search('forwarded_remarks','text', setFilterData, filterData, getForm),
+            ...filter.search('forwarded_remarks','text', setTableFilter, filterTable, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -250,15 +253,15 @@ const DisapprovedForm = (props) => {
         if(!isEmpty(sorter)){
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
-            setFilterData(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
+            setTableFilter(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
         }
-        getForm({...filterData, ...filters})
+        getForm({...filterTable, ...filters})
     };
 
     const paginationChange = async (e) => {
         // console.log(e);
-        setFilterData(prev => ({...prev, page: e}));
-        getForm({...filterData, page: e})
+        setTableFilter(prev => ({...prev, page: e}));
+        getForm({...filterTable, page: e})
     }
 
     const closeForm = () => {
@@ -282,6 +285,10 @@ const DisapprovedForm = (props) => {
                 <Col md={24} lg={16} xl={18}>
                     <Card size="small" title="Disapproved Forms" bordered={false}>
                         <div className='forms-card-content'>
+                            <div className="flex justify-end mb-2 space-x-2">
+                                <TableResetFilter defaultTableFilter={defaultTableFilter} setTableFilter={setTableFilter} />
+                                <TableRefresh getData={getForm} />
+                            </div>
                             <Table
                                 dataSource={dataSource}
                                 columns={columns}
@@ -289,7 +296,7 @@ const DisapprovedForm = (props) => {
                                 loading={{spinning: props.loading, tip: "Loading..."}}
                                 pagination={false}
                                 onChange={handleTableChange}
-                                scroll={{ y: "60vh" }}
+                                scroll={{ y: "58vh" }}
                                 rowClassName={(record, index) => {
                                     if(props.selectedFormRoute.id == record.id){
                                         return "selected-row";

@@ -9,6 +9,7 @@ import api from '../../api';
 import helpers from '../../Utilities/helpers';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import TableRefresh from '../../Components/TableRefresh'
+import TableResetFilter from '../../Components/TableResetFilter';
 
 
 const ReloadSvg = () => (
@@ -85,10 +86,11 @@ const ApprovedPurchaseRequest = (props) => {
         }
     }, [props.isInitialized]);
     const setFilterData = (data) => {
-        props.dispatch({
-            type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-            data: {...props.filterData, ...data()}
-        });
+        console.log(data);
+        // props.dispatch({
+        //     type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
+        //     data: {...props.filterData, ...data()}
+        // });
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -684,10 +686,11 @@ const ApprovedPurchaseRequest = (props) => {
         <>
             <div className="flex justify-end mb-2 space-x-2">
             <Popover content={<Settings columns={props.columns} toggleColumn={toggleColumn} />} title="Column Settings" trigger="click" placement='bottomRight'>
-                <Tooltip placement="left" title="Settings">
+                <Tooltip placement="top" title="Settings">
                     <SettingOutlined />
                 </Tooltip>
             </Popover>
+                <TableResetFilter defaultFilter={props.filterData} setFilter={setFilterData} />
                 <TableRefresh getData={props.getPurchaseRequests} />
             
             
