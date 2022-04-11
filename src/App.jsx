@@ -112,13 +112,6 @@ const App = (props) => {
           });
     }, [props.user]); */
   return (
-    <Router>
-
-<BrowserRouter
-        getUserConfirmation={() => {
-          /* Empty callback to block the default browser prompt */
-        }}
-      >
         <Switch>
           <Route exact path="/"  >
               <PrivateRoute><Layout><Home /></Layout></PrivateRoute>
@@ -199,8 +192,6 @@ const App = (props) => {
             <PrivateRoute><Layout></Layout></PrivateRoute>
           </Route>
         </Switch>
-        </BrowserRouter>
-    </Router>
   );
 }
 
