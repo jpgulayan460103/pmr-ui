@@ -34,7 +34,7 @@ const ActivityLogs = (props) => {
     useEffect(() => {
         return () => { unmounted.current = true }
     }, []);
-    const [filterData, setFilterData] = useState({});
+    const [tableFilter, setTableFilter] = useState({});
     const [paginationMeta, setPaginationMeta] = useState([]);
 
     useEffect(() => {
@@ -85,7 +85,7 @@ const ActivityLogs = (props) => {
 
     const getLogs = debounce((filters) => {
         if(filters == null){
-            filters = filterData
+            filters = tableFilter
         }
         setLoading(true);
         api.Forms.getLogs(filters)
@@ -110,8 +110,8 @@ const ActivityLogs = (props) => {
     }, 150)
 
     const paginationChange = async (e) => {
-        setFilterData(prev => ({...prev, page: e}));
-        getLogs({...filterData, page: e})
+        setTableFilter(prev => ({...prev, page: e}));
+        getLogs({...tableFilter, page: e})
     }
 
     const usersFilter = cloneDeep(props.usersLibrary).map(i => {
@@ -161,7 +161,7 @@ const ActivityLogs = (props) => {
             // sorter: (a, b) => a.log_type?.localeCompare(b.log_type),
             ...onCell,
             filters: logTypeFilters,
-            ...filter.list('log_type','text', setFilterData, filterData, getLogs),
+            ...filter.list('log_type','text', setTableFilter, tableFilter, getLogs),
         },
         {
             title: 'Action Taken',
@@ -213,7 +213,7 @@ const ActivityLogs = (props) => {
             key: 'causer_id',
             width: 250,
             filters: usersFilter,
-            ...filter.list('causer_id','text', setFilterData, filterData, getLogs),
+            ...filter.list('causer_id','text', setTableFilter, tableFilter, getLogs),
             // sorter: (a, b) => a.user?.user_information?.fullname?.localeCompare(b.user?.user_information?.fullname),
             render: (text, record, index) => (
                 <span>

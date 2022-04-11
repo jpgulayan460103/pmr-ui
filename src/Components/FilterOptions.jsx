@@ -9,7 +9,7 @@ const FilterOptions = (
         selectedKeys,
         confirm,
         filters,
-        setFilters,
+        setTableFilter,
         dataIndex,
         getData,
     }
@@ -24,11 +24,11 @@ const FilterOptions = (
     }
     const resetSelected = () => {
         setSelectedKeys([]);
-        setFilters(prev => ({...prev, [dataIndex]: []}));
+        setTableFilter(prev => ({...prev, [dataIndex]: []}));
     }
     const setFilterOptions = () => {
         confirm({ closeDropdown: true });
-        setFilters(prev => ({...prev, [dataIndex]: selectedKeys}));
+        setTableFilter(prev => ({...prev, [dataIndex]: selectedKeys}));
         getData();
     }
     const selectOption = (e, option) => {
@@ -37,15 +37,15 @@ const FilterOptions = (
             }else{
                 if(selectedKeys){
                     setSelectedKeys([...selectedKeys, option.value]);
-                    setFilters(prev => ({...prev, [dataIndex]: [...selectedKeys, option.value]}));
+                    setTableFilter(prev => ({...prev, [dataIndex]: [...selectedKeys, option.value]}));
                 }else{
                     setSelectedKeys([option.value]);
-                    setFilters(prev => ({...prev, [dataIndex]: [option.value]}));
+                    setTableFilter(prev => ({...prev, [dataIndex]: [option.value]}));
                 }
             }
         }else{
             setSelectedKeys(selectedKeys.filter(i => i != option.value));
-            setFilters(prev => ({...prev, [dataIndex]: selectedKeys.filter(i => i != option.value)}));
+            setTableFilter(prev => ({...prev, [dataIndex]: selectedKeys.filter(i => i != option.value)}));
         }
     }
     return (

@@ -16,13 +16,14 @@ import Icon, {
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
 import dayjs from 'dayjs';
-import { debounce, isEmpty } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import filter from '../../Utilities/filter';
 import AuditTrail from '../../Components/AuditTrail';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
 import TableRefresh from '../../Components/TableRefresh';
+import TableResetFilter from '../../Components/TableResetFilter';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -39,8 +40,10 @@ function mapStateToProps(state) {
         loading: state.purchaseRequests.list.loading,
         timelines: state.purchaseRequests.list.timelines,
         logger: state.purchaseRequests.list.logger,
-        filterData: state.purchaseRequests.list.filterData,
+        tableFilter: state.purchaseRequests.list.tableFilter,
+        defaultTableFilter: state.purchaseRequests.list.defaultTableFilter,
         tab: state.purchaseRequests.list.tab,
+        user_sections: state.libraries.user_sections,
     };
 }
 
@@ -76,11 +79,18 @@ const Listpurchaserequest = (props) => {
     
     
 
-    const setFilterData = (value) => {
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_FILTER_DATA",
-            data: value,
-        });
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
+                data: data(),
+            });
+        }else{
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
     }
 
     const setTabKey = (value) => {
@@ -130,7 +140,7 @@ const Listpurchaserequest = (props) => {
 
     const getPurchaseRequests = debounce((filters) => {
         if(filters == null){
-            filters = props.filterData
+            filters = props.tableFilter
         }
         setTableLoading(true);
         api.PurchaseRequest.all(filters)
@@ -233,8 +243,8 @@ const Listpurchaserequest = (props) => {
     };
 
     const paginationChange = async (e) => {
-        setFilterData(prev => ({...prev, page: e}));
-        getPurchaseRequests({...props.filterData, page: e})
+        setTableFilter(prev => ({...prev, page: e}));
+        getPurchaseRequests({...props.tableFilter, page: e})
     }
 
     const timelineContent = (timeline) => {
@@ -270,6 +280,12 @@ const Listpurchaserequest = (props) => {
         return { label, color, logo }
     }
 
+    const endUserFilter = cloneDeep(props.user_sections).map(i => {
+        i.value = i.id;
+        return i;
+    });
+
+
     const dataSource = props.purchaseRequests;
 
     const onCell = {
@@ -296,7 +312,7 @@ const Listpurchaserequest = (props) => {
             key: 'pr_date',
             width: 120,
             align: "center",
-            ...filter.search('pr_date','date_range', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.search('pr_date','date_range', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -305,7 +321,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
             width: 450,
-            ...filter.search('purchase_request_number','text', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.search('purchase_request_number','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -314,7 +330,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'title',
             key: 'title',
             width: 450,
-            ...filter.search('title','text', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.search('title','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -323,7 +339,7 @@ const Listpurchaserequest = (props) => {
             dataIndex: 'purpose',
             key: 'purpose',
             width: 450,
-            ...filter.search('purpose','text', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -332,7 +348,7 @@ const Listpurchaserequest = (props) => {
             key: 'total_cost',
             width: 150,
             align: "center",
-            ...filter.search('total_cost','number_range', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
@@ -355,7 +371,21 @@ const Listpurchaserequest = (props) => {
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
             ],
-            ...filter.list('status','text', setFilterData, props.filterData, getPurchaseRequests),
+            ...filter.list('status','text', setTableFilter, props.tableFilter, getPurchaseRequests),
+            ...onCell,
+        },
+        {
+            title: 'End User',
+            key: 'end_user',
+            ellipsis: true,
+            width: 250,
+            filters: endUserFilter,
+            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getPurchaseRequests),
+            render: (text, item, index) => (
+                <span>
+                    <span>{ item.end_user.name }</span>
+                </span>
+            ),
             ...onCell,
         },
         {
@@ -400,6 +430,7 @@ const Listpurchaserequest = (props) => {
                     <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
+                                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
                                 <TableRefresh getData={getPurchaseRequests} />
                             </div>
                             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
@@ -418,7 +449,7 @@ const Listpurchaserequest = (props) => {
                         </div>
                     </Card>
                 </Col>
-                { props.selectedPurchaseRequest.file == "" ? "" : ( 
+                { isEmpty(props.selectedPurchaseRequest.file) ? "" : ( 
                     <Col md={24} lg={10} xl={8}>
                             <Card size="small" bordered={false} title="Puchase Request Details" extra={(
                                 <div className='text-right space-x-0.5'>

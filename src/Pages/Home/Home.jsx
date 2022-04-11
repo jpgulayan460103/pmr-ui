@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Card, Col, Row, DatePicker, Tag, Select, Button } from 'antd';
 import style from './style.less'
 import ReportPurchaseRequest from './Components/ReportPurchaseRequest';
 import BarPurchaseRequest from './Components/BarPurchaseRequest';
-import BarPurchaseRequestPerDivision from './Components/BarPurchaseRequestPerDivision';
 import BarPurchaseRequestOffice from './Components/BarPurchaseRequestOffice';
 import TopRequestedItems from './Components/TopRequestedItems';
 import PieModeOfProcurement from './Components/PieModeOfProcurement';
@@ -20,7 +19,7 @@ function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
         purchaseRequest: state.reports.purchaseRequest,
-        filterData: state.reports.filterData,
+        tableFilter: state.reports.tableFilter,
         user_divisions: state.libraries.user_divisions,
         user_sections: state.libraries.user_sections,
     };
@@ -31,7 +30,7 @@ const Home = (
         dispatch, 
         isInitialized,
         purchaseRequest,
-        filterData,
+        tableFilter,
         user_divisions,
         user_sections,
     }
@@ -47,7 +46,7 @@ const Home = (
     
 
     const getPurchaseRequests = () => {
-       api.Report.purchaseRequest(filterData)
+       api.Report.purchaseRequest(tableFilter)
        .then(res => {
            let results = res.data;
            //start of procurement types
@@ -113,11 +112,11 @@ const Home = (
        .then(res => {})
     }
 
-    const setFilterData = (e, name) => {
-        let cloned = cloneDeep(filterData);
+    const setTableFilter = (e, name) => {
+        let cloned = cloneDeep(tableFilter);
         cloned[name] = e;
         dispatch({
-            type: "SET_REPORT_FILTER_DATA",
+            type: "SET_REPORT_TABLE_FILTER",
             data: cloned
         });
     }
@@ -132,8 +131,8 @@ const Home = (
                         if(e){
                             month = e.map(i => moment(i).format("YYYY-MM-DD"));
                         }
-                        setFilterData(month, "month");
-                    }} value={filterData.month && filterData.month.map(i => moment(i, "YYYY-MM-DD"))} />
+                        setTableFilter(month, "month");
+                    }} value={tableFilter.month && tableFilter.month.map(i => moment(i, "YYYY-MM-DD"))} />
                     <Select
                         placeholder="Section/Unit/Office"
                         optionFilterProp="children"
@@ -144,12 +143,12 @@ const Home = (
                         }
                         allowClear
                         onClear={() => {
-                            setFilterData(null, "end_user_id")
+                            setTableFilter(null, "end_user_id")
                         }}
                         onSelect={(e) => {
-                            setFilterData(e, "end_user_id");
+                            setTableFilter(e, "end_user_id");
                         }}
-                        value={filterData.end_user_id}
+                        value={tableFilter.end_user_id}
                     >
                         { user_divisions.map(division =>  {
                             return (

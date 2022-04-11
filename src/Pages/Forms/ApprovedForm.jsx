@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Table, Space, Divider, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu, Pagination } from 'antd';
 import api from '../../api';
@@ -29,6 +29,8 @@ function mapStateToProps(state) {
         selectedFormRoute: state.forms.approvedForm.selectedFormRoute,
         pagination: state.forms.approvedForm.pagination,
         loading: state.forms.approvedForm.loading,
+        tableFilter: state.forms.approvedForm.tableFilter,
+        defaultTableFilter: state.forms.approvedForm.defaultTableFilter,
     };
 }
 
@@ -43,21 +45,32 @@ const ApprovedForm = (props) => {
     useEffect(() => {
         return () => {
             unmounted.current = true;
-            setForms([]);
+            // setForms([]);
         }
     }, []);
     useEffect(() => {
         document.title = "Approved Forms";
         if(props.isInitialized){
-            getForm();
+            // getForm();
+            if(isEmpty(props.forms)){
+                getForm();
+            }
         }
     }, [props.isInitialized]);
     
-    const defaultTableFilter = {
-        page: 1,
-        created_at: helpers.defaultDateRange
-    };
-    const [tableFilter, setTableFilter] = useState(defaultTableFilter);
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
+                data: { ...props.tableFilter, ...data() },
+            });
+        }else{
+            props.dispatch({
+                type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
+    }
 
     const setForms = (value) => {
         props.dispatch({
@@ -87,7 +100,7 @@ const ApprovedForm = (props) => {
 
     const getForm = debounce((filters) => {
         if(filters == null){
-            filters = tableFilter
+            filters = props.tableFilter
         }
         setTableLoading(true);
         api.Forms.getApproved(filters)
@@ -143,7 +156,7 @@ const ApprovedForm = (props) => {
             title: 'Requested on',
             key: 'created_at',
             width: 150,
-            ...filter.search('created_at','date_range', setTableFilter, tableFilter, getForm),
+            ...filter.search('created_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
             render: (text, item, index) => (
@@ -160,7 +173,7 @@ const ApprovedForm = (props) => {
                     { item.form_routable?.title }
                 </span>
             ),
-            ...filter.search('title','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -173,7 +186,7 @@ const ApprovedForm = (props) => {
                     { item.form_routable?.purpose }
                 </span>
             ),
-            ...filter.search('purpose','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -187,6 +200,7 @@ const ApprovedForm = (props) => {
                 </span>
             ),
             ...onCell,
+            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getForm),
             width: 150,
             sorter: (a, b) => {},
         },
@@ -196,7 +210,7 @@ const ApprovedForm = (props) => {
             ellipsis: true,
             width: 250,
             filters: endUserFilter,
-            ...filter.list('end_user_id','text', setTableFilter, tableFilter, getForm),
+            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getForm),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -209,7 +223,7 @@ const ApprovedForm = (props) => {
             dataIndex: 'updated_at',
             key: 'updated_at',
             width: 250,
-            ...filter.search('updated_at','date_range', setTableFilter, tableFilter, getForm),
+            ...filter.search('updated_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -222,7 +236,7 @@ const ApprovedForm = (props) => {
                     <span>{item.remarks }</span>
                 </span>
             ),
-            ...filter.search('remarks','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -235,7 +249,7 @@ const ApprovedForm = (props) => {
                     <span>{ item.forwarded_remarks }</span>
                 </span>
             ),
-            ...filter.search('forwarded_remarks','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('forwarded_remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -257,13 +271,13 @@ const ApprovedForm = (props) => {
             filters.sortOrder = sorter.order
             setTableFilter(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
         }
-        getForm({...tableFilter, ...filters})
+        getForm({...props.tableFilter, ...filters})
     };
 
     const paginationChange = async (e) => {
         // console.log(e);
         setTableFilter(prev => ({...prev, page: e}));
-        getForm({...tableFilter, page: e})
+        getForm({...props.tableFilter, page: e})
     }
 
     const closeForm = () => {
@@ -288,7 +302,7 @@ const ApprovedForm = (props) => {
                     <Card size="small" title="Approved Forms" bordered={false}>
                         <div className='forms-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
-                                <TableResetFilter defaultTableFilter={defaultTableFilter} setTableFilter={setTableFilter} />
+                                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
                                 <TableRefresh getData={getForm} />
                             </div>
                             <Table

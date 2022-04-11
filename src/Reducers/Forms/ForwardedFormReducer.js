@@ -1,6 +1,11 @@
 import dayjs from "dayjs";
+import helpers from "../../Utilities/helpers";
 
 const initialState = () => {
+    const defaultTableFilter = {
+      page: 1,
+      created_at: helpers.defaultDateRange
+    }
     return {
         forms: [],
         pagination: {},
@@ -15,6 +20,8 @@ const initialState = () => {
         submit: false,
         attachments: [],
         formLoading: false,
+        tableFilter: defaultTableFilter,
+        defaultTableFilter: defaultTableFilter,
     }
   }
   
@@ -84,7 +91,12 @@ const initialState = () => {
         return {
           ...state,
           formLoading: action.data,
-        };    
+        };
+      case 'SET_FORM_FORWARDED_TABLE_FILTER':
+        return {
+          ...state,
+          tableFilter: action.data,
+        };
       case 'SET_INITIAL_STATE':
         state = initialState();
         return state

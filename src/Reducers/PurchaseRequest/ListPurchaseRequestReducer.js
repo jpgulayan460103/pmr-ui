@@ -1,6 +1,9 @@
 import customDayJs from "./../../customDayJs";
 
 const initialState = () => {
+    const defaultTableFilter = {
+      page: 1,
+    }
     return {
       selectedPurchaseRequest: {},
       purchaseRequests: [],
@@ -12,9 +15,8 @@ const initialState = () => {
       loading: false,
       timelines: [],
       logger: [],
-      filterData: {
-        page: 1,
-      },
+      tableFilter: defaultTableFilter,
+      defaultTableFilter: defaultTableFilter,
       tab: "information",
     }
   }
@@ -51,10 +53,10 @@ const initialState = () => {
           ...state,
           logger: action.data,
         };
-      case 'SET_PURCHASE_REQUEST_FILTER_DATA':
+      case 'SET_PURCHASE_REQUEST_TABLE_FILTER':
         return {
           ...state,
-          filterData: action.data,
+          tableFilter: action.data,
         };
       case 'SET_PURCHASE_REQUEST_TAB':
         return {

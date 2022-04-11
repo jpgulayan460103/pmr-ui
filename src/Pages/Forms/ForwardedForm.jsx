@@ -40,6 +40,8 @@ function mapStateToProps(state) {
         submit: state.forms.forwardedForm.submit,
         attachments: state.forms.forwardedForm.attachments,
         formLoading: state.forms.forwardedForm.formLoading,
+        tableFilter: state.forms.forwardedForm.tableFilter,
+        defaultTableFilter: state.forms.forwardedForm.defaultTableFilter,
     };
 }
 
@@ -54,19 +56,19 @@ const ForwardedForm = (props) => {
     useEffect(() => {
         return () => {
             unmounted.current = true;
-            setForms([]);
-            setPaginationMeta({});
-            setSelectedFormRoute({});
-            setRouteOptions([]);
-            setProcurementFormType("");
-            setCurrentRoute({});
-            setAddOn(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
-            setErrorMessage({});
-            setTableLoading(false);
-            setSelectedProcurementCategory(null);
-            setSubmit(false);
-            setAttachments([]);
-            setFormLoading(false);
+            // setForms([]);
+            // setPaginationMeta({});
+            // setSelectedFormRoute({});
+            // setRouteOptions([]);
+            // setProcurementFormType("");
+            // setCurrentRoute({});
+            // setAddOn(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
+            // setErrorMessage({});
+            // setTableLoading(false);
+            // setSelectedProcurementCategory(null);
+            // setSubmit(false);
+            // setAttachments([]);
+            // setFormLoading(false);
         }
     }, []);
 
@@ -78,7 +80,9 @@ const ForwardedForm = (props) => {
     useEffect(() => {
         document.title = "Forwarded Forms";
         if(props.isInitialized){
-            getForm();
+            if(isEmpty(props.forms)){
+                getForm();
+            }
         }
         // console.log("rerender");
     }, [props.isInitialized]);
@@ -86,11 +90,25 @@ const ForwardedForm = (props) => {
         page: 1,
         created_at: helpers.defaultDateRange
     };
-    const [tableFilter, setTableFilter] = useState(defaultTableFilter);
+    // const [tableFilter, setTableFilter] = useState(defaultTableFilter);
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
+
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_FORM_FORWARDED_TABLE_FILTER",
+                data: { ...props.tableFilter, ...data() },
+            });
+        }else{
+            props.dispatch({
+                type: "SET_FORM_FORWARDED_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
+    }
 
     const setForms = (value) => {
         props.dispatch({
@@ -322,7 +340,7 @@ const ForwardedForm = (props) => {
 
     const getForm = debounce((filters) => {
         if(filters == null){
-            filters = tableFilter
+            filters = props.tableFilter
         }
         setTableLoading(true);
         api.Forms.getForApproval(filters)
@@ -345,7 +363,7 @@ const ForwardedForm = (props) => {
     },150);
     const getFormNoLoading = debounce((filters) => {
         if(filters == null){
-            filters = tableFilter
+            filters = props.tableFilter
         }
         api.Forms.getForApproval(filters)
         .then(res => {
@@ -681,7 +699,7 @@ const ForwardedForm = (props) => {
             title: 'Forwareded on',
             key: 'created_at',
             width: 150,
-            ...filter.search('created_at','date_range', setTableFilter, tableFilter, getForm),
+            ...filter.search('created_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
             render: (text, item, index) => (
@@ -698,7 +716,7 @@ const ForwardedForm = (props) => {
                     { item.form_routable?.title }
                 </span>
             ),
-            ...filter.search('title','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -711,7 +729,7 @@ const ForwardedForm = (props) => {
                     { item.form_routable?.purpose }
                 </span>
             ),
-            ...filter.search('purpose','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             width: 150,
             sorter: (a, b) => {},
@@ -719,7 +737,7 @@ const ForwardedForm = (props) => {
         {
             title: 'Amount',
             key: 'total_cost',
-            ...filter.search('total_cost','number_range', setTableFilter, tableFilter, getForm),
+            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getForm),
             render: (text, item, index) => (
                 <span>
                     { item.form_routable?.total_cost_formatted }
@@ -735,7 +753,7 @@ const ForwardedForm = (props) => {
             ellipsis: true,
             width: 250,
             filters: endUserFilter,
-            ...filter.list('end_user_id','text', setTableFilter, tableFilter, getForm),
+            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getForm),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -757,7 +775,7 @@ const ForwardedForm = (props) => {
                 </span>
             ),
             filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
-            ...filter.list('status','text', setTableFilter, tableFilter, getForm),
+            ...filter.list('status','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -770,7 +788,7 @@ const ForwardedForm = (props) => {
                     <span>{item.remarks }</span>
                 </span>
             ),
-            ...filter.search('remarks','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -783,7 +801,7 @@ const ForwardedForm = (props) => {
                     <span>{ item.forwarded_remarks }</span>
                 </span>
             ),
-            ...filter.search('forwarded_remarks','text', setTableFilter, tableFilter, getForm),
+            ...filter.search('forwarded_remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -812,13 +830,13 @@ const ForwardedForm = (props) => {
             filters.sortOrder = sorter.order
             setTableFilter(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
         }
-        getForm({...tableFilter, ...filters})
+        getForm({...props.tableFilter, ...filters})
     };
 
     const paginationChange = async (e) => {
         // console.log(e);
         setTableFilter(prev => ({...prev, page: e}));
-        getForm({...tableFilter, page: e})
+        getForm({...props.tableFilter, page: e})
     }
 
     const formatPrNumber = (e) => {
@@ -1115,7 +1133,7 @@ const ForwardedForm = (props) => {
                     <Card size="small" title="Forwarded Forms" bordered={false}>
                         <div className='forms-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
-                                <TableResetFilter defaultTableFilter={defaultTableFilter} setTableFilter={setTableFilter} />
+                                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
                                 <TableRefresh getData={getForm} />
                             </div>
                             <Table

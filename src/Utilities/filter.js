@@ -16,28 +16,28 @@ const handleSearch = (event, getData) => {
     }
     getData();
 }
-const searchInput = (e, dataIndex, type, setFilters) => {
+const searchInput = (e, dataIndex, type, setTableFilter) => {
     if(type == "date_range"){
         if(!isEmpty(e)){
             e = e.map(i => moment(i).format("YYYY-MM-DD"))
         }
-        setFilters(prev => ({...prev, [dataIndex]: e, page: 1}));
+        setTableFilter(prev => ({...prev, [dataIndex]: e, page: 1}));
     }else if(type == "number_range"){
-        setFilters(prev => ({...prev, [dataIndex]: e.value, [`${dataIndex}_op`]: e.operand, page: 1 }));
+        setTableFilter(prev => ({...prev, [dataIndex]: e.value, [`${dataIndex}_op`]: e.operand, page: 1 }));
     }else{
-        setFilters(prev => ({...prev, [dataIndex]: e.target.value, page: 1}));
+        setTableFilter(prev => ({...prev, [dataIndex]: e.target.value, page: 1}));
     }
 }
 
-const NumberRange = ({defaultValue, searchInput, dataIndex, type, setFilters, getData}) => {
+const NumberRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData}) => {
     const [range, setRange] = useState(">=");
     const [value, setValue] = useState(null);
     const handleChange = useCallback((e) => {
-        searchInput({ operand: range, value: e.target.value }, dataIndex, type, setFilters);
+        searchInput({ operand: range, value: e.target.value }, dataIndex, type, setTableFilter);
         setValue(e.target.value);
     },[value]);
     const handleSelect = useCallback((e) => {
-        searchInput({ operand: e, value }, dataIndex, type, setFilters);
+        searchInput({ operand: e, value }, dataIndex, type, setTableFilter);
         setRange(e);
         setValue(null);
     },[range])
@@ -70,7 +70,7 @@ const ExtraDateRangeFooter = ({selectFilter, getData}) => {
     );
 }
 
-const DateRange = ({defaultValue, searchInput, dataIndex, type, setFilters, getData}) => {
+const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData}) => {
     const [value, setValue] = useState([]);
     useEffect(() => {
         setValue(defaultValue?.map(i => moment(i, "YYYY-MM-DD")));
@@ -81,42 +81,42 @@ const DateRange = ({defaultValue, searchInput, dataIndex, type, setFilters, getD
         var dateEnd;
         switch (selected) {
             case "now":
-                searchInput([currentDate, currentDate], dataIndex, type, setFilters)
+                searchInput([currentDate, currentDate], dataIndex, type, setTableFilter)
                 break;
         
             case "this_week":
                 dateStart = currentDate.clone().startOf('isoWeek');
                 dateEnd = currentDate.clone().endOf('isoWeek');
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
         
             case "this_month":
                 dateStart = currentDate.clone().startOf('month');
                 dateEnd = currentDate.clone().endOf('month');
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
         
             case "three_month":
                 dateStart = currentDate.clone().subtract(2, 'month');
                 dateEnd = currentDate.clone();
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
         
             case "six_month":
                 dateStart = currentDate.clone().subtract(5, 'month');
                 dateEnd = currentDate.clone();
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
         
             case "this_year":
                 dateStart = currentDate.clone().startOf('year');
                 dateEnd = currentDate.clone().endOf('year');
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
             case "last_year":
                 dateStart = currentDate.clone().subtract(1, 'year').startOf('year');
                 dateEnd = currentDate.clone().subtract(1, 'year').endOf('year');
-                searchInput([dateStart, dateEnd], dataIndex, type, setFilters)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
                 break;
         
             default:
@@ -125,23 +125,23 @@ const DateRange = ({defaultValue, searchInput, dataIndex, type, setFilters, getD
     }, []);
     return (
         <Input.Group compact>
-            <RangePicker value={value} format={'YYYY-MM-DD'} style={{width: "90%"}} onChange={(e) => searchInput(e, dataIndex, type, setFilters)} renderExtraFooter={() => <ExtraDateRangeFooter selectFilter={selectFilter} getData={getData} />} />
+            <RangePicker value={value} format={'YYYY-MM-DD'} style={{width: "90%"}} onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} renderExtraFooter={() => <ExtraDateRangeFooter selectFilter={selectFilter} getData={getData} />} />
             <Button type="default" icon={<SearchOutlined />}  onClick={() => getData() } />
         </Input.Group>
     );
 }
 
-const search = (dataIndex, type, setFilters, filterData, getData) => ({
+const search = (dataIndex, type, setTableFilter, tableFilter, getData) => ({
     filterDropdown: ({ }) => (
       <div style={{ padding: 8 }}>
-          { type == "text" ? <Search placeholder="input search text" value={filterData[dataIndex]} allowClear onChange={(e) => searchInput(e, dataIndex, type, setFilters)} onSearch={(e, event) => handleSearch(event, getData)} style={{ width: 200 }} /> : "" }
-          { type == "number" ? <Input type="number" value={filterData[dataIndex]} placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setFilters)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
-          { type == "number_range" ? <NumberRange defaultValue={filterData[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setFilters={setFilters} getData={getData} /> : "" }
-          { type == "date_range" ? <DateRange defaultValue={filterData[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setFilters={setFilters} getData={getData} /> : "" }
+          { type == "text" ? <Search placeholder="input search text" value={tableFilter[dataIndex]} allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} onSearch={(e, event) => handleSearch(event, getData)} style={{ width: 200 }} /> : "" }
+          { type == "number" ? <Input type="number" value={tableFilter[dataIndex]} placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
+          { type == "number_range" ? <NumberRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} /> : "" }
+          { type == "date_range" ? <DateRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} /> : "" }
       </div>
     ),
     filterIcon: filtered => <FilterFilled className={filtered ? 'table-active-filter' : null} />,
-    filteredValue: filterData[dataIndex] || null,
+    filteredValue: tableFilter[dataIndex] || null,
     onFilterDropdownVisibleChange: visible => {
         if (!visible) {
             // getData();
@@ -149,19 +149,19 @@ const search = (dataIndex, type, setFilters, filterData, getData) => ({
       },
 });
 
-const list = (dataIndex, type, setFilters, filterData, getData) => ({
+const list = (dataIndex, type, setTableFilter, tableFilter, getData) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, filters }) => {
         return <FilterOptions 
             setSelectedKeys={setSelectedKeys}
             selectedKeys={selectedKeys}
             confirm={confirm}
             filters={filters}
-            setFilters={setFilters}
+            setTableFilter={setTableFilter}
             dataIndex={dataIndex}
             getData={getData}
         />;
     },
-    filteredValue: filterData[dataIndex] || null,
+    filteredValue: tableFilter[dataIndex] || null,
     filterIcon: filtered => <FilterFilled className={filtered ? 'table-active-filter' : null} />,
 });
 export default {

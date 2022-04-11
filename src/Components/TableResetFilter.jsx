@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip } from 'antd';
+import { Tooltip, message } from 'antd';
 import Icon, { ClearOutlined } from '@ant-design/icons'
 
 const ReloadSvg = () => (
@@ -12,6 +12,7 @@ const TableResetFilter = ({defaultTableFilter, setTableFilter}) => {
             <Tooltip placement="top" title="Clear Filters">
                 <ClearOutlined style={{cursor: "pointer"}} onClick={() => {
                     setTableFilter(defaultTableFilter);
+                    message.info('Table filter has been set to default. Please refresh the table');
                 }} />
             </Tooltip>
         </>

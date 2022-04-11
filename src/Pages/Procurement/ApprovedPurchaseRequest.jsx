@@ -28,7 +28,8 @@ function mapStateToProps(state) {
         columns: state.procurements.purchaseRequest.columns,
         purchaseRequests: state.procurements.purchaseRequest.purchaseRequests,
         purchaseRequestsPagination: state.procurements.purchaseRequest.pagination,
-        filterData: state.procurements.purchaseRequest.tableFilter,
+        tableFilter: state.procurements.purchaseRequest.tableFilter,
+        defaultTableFilter: state.procurements.purchaseRequest.defaultTableFilter,
         tableLoading: state.procurements.purchaseRequest.tableLoading,
         isInitialized: state.user.isInitialized,
         uploadingFiles: state.user.uploadingFiles,
@@ -85,12 +86,19 @@ const ApprovedPurchaseRequest = (props) => {
             })
         }
     }, [props.isInitialized]);
-    const setFilterData = (data) => {
-        console.log(data);
-        // props.dispatch({
-        //     type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-        //     data: {...props.filterData, ...data()}
-        // });
+    
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
+                data: {...props.tableFilter, ...data()}
+            });
+        }else{
+            props.dispatch({
+                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
+                data: props.defaultTableFilter
+            });
+        }
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -101,22 +109,22 @@ const ApprovedPurchaseRequest = (props) => {
             filters.sortOrder = sorter.order
             props.dispatch({
                 type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-                data: {...props.filterData, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
+                data: {...props.tableFilter, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
             });
         }
-        props.getPurchaseRequests({...props.filterData, ...filters})
+        props.getPurchaseRequests({...props.tableFilter, ...filters})
     };
 
 
 
     const paginationChange = async (e) => {
-        setFilterData(prev => ({...prev, page: e}));
-        props.getPurchaseRequests({...props.filterData, page: e})
+        setTableFilter(prev => ({...prev, page: e}));
+        props.getPurchaseRequests({...props.tableFilter, page: e})
     }
 
     const changePageSize = (page, size) => {
-        setFilterData(prev => ({...prev, page: page, size: size}));
-        props.getPurchaseRequests({...props.filterData, page: page, size: size})
+        setTableFilter(prev => ({...prev, page: page, size: size}));
+        props.getPurchaseRequests({...props.tableFilter, page: page, size: size})
     }
 
     const viewPurchaseRequest = async (item, index) => {
@@ -204,8 +212,8 @@ const ApprovedPurchaseRequest = (props) => {
 
     const purchaseRequestTypeFilter = () => {
         let filteredCategory = cloneDeep(props.procurement_type_categories);
-        if(!isEmpty(props.filterData.purchase_request_type_category)){
-            filteredCategory = filteredCategory.filter(i => props.filterData.purchase_request_type_category.includes(i.id));
+        if(!isEmpty(props.tableFilter.purchase_request_type_category)){
+            filteredCategory = filteredCategory.filter(i => props.tableFilter.purchase_request_type_category.includes(i.id));
         }
         return filteredCategory.map(i => {
             let newI = [];
@@ -258,7 +266,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'pr_date')[0].shown : true,
             filterable: true,
-            ...filter.search('pr_date','date_range', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('pr_date','date_range', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -270,7 +278,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'sa_or')[0].shown : true,
             filterable: true,
-            ...filter.search('sa_or','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('sa_or','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -282,7 +290,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_number')[0].shown : true,
             filterable: true,
-            ...filter.search('purchase_request_number','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('purchase_request_number','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -294,7 +302,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'title')[0].shown : true,
             filterable: true,
-            ...filter.search('title','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('title','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -306,7 +314,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purpose')[0].shown : true,
             filterable: true,
-            ...filter.search('purpose','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('purpose','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -324,7 +332,7 @@ const ApprovedPurchaseRequest = (props) => {
                     { item.end_user.name }
                 </span>
             ),
-            ...filter.list('end_user_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             // sorter: (a, b) => {},
         },
@@ -335,7 +343,7 @@ const ApprovedPurchaseRequest = (props) => {
             align: "right",
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'total_cost')[0].shown : true,
-            ...filter.search('total_cost','number_range', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             filterable: true,
             render: (text, item, index) => (
                 <span>
@@ -354,7 +362,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'purchase_request_type_category')[0].shown : true,
             filterable: true,
-            ...filter.list('purchase_request_type_category','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('purchase_request_type_category','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     {item?.procurement_type?.parent?.name}
@@ -371,7 +379,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].shown : true,
             filterable: true,
-            ...filter.list('procurement_type_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('procurement_type_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item?.procurement_type?.name }
@@ -388,7 +396,7 @@ const ApprovedPurchaseRequest = (props) => {
             ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].ellipsis : true,
             shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'mode_of_procurement_id')[0].shown : true,
             filterable: true,
-            ...filter.list('mode_of_procurement_id','text', setFilterData, props.filterData, props.getPurchaseRequests),
+            ...filter.list('mode_of_procurement_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item?.mode_of_procurement?.name }
@@ -690,7 +698,7 @@ const ApprovedPurchaseRequest = (props) => {
                     <SettingOutlined />
                 </Tooltip>
             </Popover>
-                <TableResetFilter defaultFilter={props.filterData} setFilter={setFilterData} />
+                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
                 <TableRefresh getData={props.getPurchaseRequests} />
             
             

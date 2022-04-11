@@ -1,9 +1,17 @@
+import helpers from "../../Utilities/helpers";
+
 const initialState = () => {
+    const defaultTableFilter = {
+      page: 1,
+      created_at: helpers.defaultDateRange
+    }
     return {
       forms: [],
       selectedFormRoute: {},
       pagination: {},
       loading: false,
+      tableFilter: defaultTableFilter,
+      defaultTableFilter: defaultTableFilter,
     }
   }
   
@@ -28,7 +36,12 @@ const initialState = () => {
         return {
           ...state,
           loading: action.data,
-        };    
+        };
+      case 'SET_FORM_APPROVED_FORM_TABLE_FILTER':
+        return {
+          ...state,
+          tableFilter: action.data,
+        };
       case 'SET_INITIAL_STATE':
         state = initialState();
         return state

@@ -1,6 +1,6 @@
 const initialState = () => {
     return {
-        filterData: {},
+        tableFilter: {},
         selectedLogger: {},
         activityLogs: [],
         paginationMeta: [],
@@ -10,10 +10,10 @@ const initialState = () => {
   
   export default function reducer(state = initialState(), action) {
     switch (action.type) {
-      case 'SET_ACTIVITY_LOG_FILTER_DATA':
+      case 'SET_ACTIVITY_LOG_TABLE_FILTER':
         return {
           ...state,
-          filterData: action.data,
+          tableFilter: action.data,
         };
       case 'SET_ACTIVITY_LOG_SELECTED_LOGGER':
         return {
