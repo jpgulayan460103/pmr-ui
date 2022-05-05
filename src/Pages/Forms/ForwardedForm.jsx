@@ -20,9 +20,9 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user: state.user.data,
-        procurementTypes: state.libraries.procurement_types,
+        accounts: state.libraries.accounts,
         uacsCodes: state.libraries.uacs_codes,
-        procurementTypeCategories: state.libraries.procurement_type_categories,
+        accountClassifications: state.libraries.account_classifications,
         modeOfProcurements: state.libraries.mode_of_procurements,
         technicalWorkingGroups: state.libraries.technical_working_groups,
         userSections: state.libraries.user_sections,
@@ -36,7 +36,7 @@ function mapStateToProps(state) {
         addOn: state.forms.forwardedForm.addOn,
         errorMessage: state.forms.forwardedForm.errorMessage,
         tableLoading: state.forms.forwardedForm.tableLoading,
-        selectedProcurementCategory: state.forms.forwardedForm.selectedProcurementCategory,
+        selectedAccountClassification: state.forms.forwardedForm.selectedAccountClassification,
         submit: state.forms.forwardedForm.submit,
         attachments: state.forms.forwardedForm.attachments,
         formLoading: state.forms.forwardedForm.formLoading,
@@ -65,7 +65,7 @@ const ForwardedForm = (props) => {
             // setAddOn(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
             // setErrorMessage({});
             // setTableLoading(false);
-            // setSelectedProcurementCategory(null);
+            // setSelectedAccountClassification(null);
             // setSubmit(false);
             // setAttachments([]);
             // setFormLoading(false);
@@ -164,7 +164,7 @@ const ForwardedForm = (props) => {
             data: value,
         });
     }
-    const setSelectedProcurementCategory = (value) => {
+    const setSelectedAccountClassification = (value) => {
         props.dispatch({
             type: "SET_FORM_FORWARDED_SELECTED_PROCUREMENT_CATEGORY",
             data: value,
@@ -497,8 +497,8 @@ const ForwardedForm = (props) => {
         procurementFormRef.current.setFieldsValue({
             action_type: null,
             technical_working_group_id: null,
-            procurement_type_category: null,
-            procurement_type_id: null,
+            account_classification: null,
+            account_id: null,
             mode_of_procurement_id: null,
         });
         setProcurementFormType("");
@@ -1058,7 +1058,7 @@ const ForwardedForm = (props) => {
                         <Form.Item
                             name="action_type"
                             label="Action"
-                            rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                            rules={[{ required: true, message: 'Please select Procurement Description.' }]}
                         >
                             <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
                                 <Option value="twg">Forward to Technical Working Group</Option>
@@ -1081,31 +1081,31 @@ const ForwardedForm = (props) => {
                     { props.procurementFormType == "approve" ? (
                         <>
                             <Form.Item
-                                name="procurement_type_category"
-                                label="Procurement Category"
-                                { ...helpers.displayError(props.errorMessage, 'procurement_type_category') }
-                                rules={[{ required: true, message: 'Please select Procurement Category.' }]}
+                                name="account_classification"
+                                label="Procurement Description Classification"
+                                { ...helpers.displayError(props.errorMessage, 'account_classification') }
+                                rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
                             >
-                                <Select placeholder='Select Procurement Category' onSelect={(e) => {
+                                <Select placeholder='Select Procurement Description Classification' onSelect={(e) => {
                                     procurementFormRef.current.setFieldsValue({
-                                        procurement_type_id: null,
+                                        account_id: null,
                                     });
-                                    setSelectedProcurementCategory(e);
+                                    setSelectedAccountClassification(e);
                                 }}>
-                                    { props.procurementTypeCategories.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                    { props.accountClassifications.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                 </Select>
                             </Form.Item>
 
                             {
-                                props.selectedProcurementCategory != null ? (
+                                props.selectedAccountClassification != null ? (
                                     <Form.Item
-                                        name="procurement_type_id"
-                                        label="Procurement Type"
-                                        { ...helpers.displayError(props.errorMessage, 'procurement_type_id') }
-                                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                        name="account_id"
+                                        label="Procurement Description"
+                                        { ...helpers.displayError(props.errorMessage, 'account_id') }
+                                        rules={[{ required: true, message: 'Please select Procurement Description.' }]}
                                     >
-                                        <Select placeholder='Select Procurement Category' allowClear > 
-                                            { props.procurementTypes.filter(i => i.parent.id == props.selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                        <Select placeholder='Select Procurement Description Classification' allowClear > 
+                                            { props.accounts.filter(i => i.parent.id == props.selectedAccountClassification).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                         </Select>
                                     </Form.Item>
                                 ) : ""

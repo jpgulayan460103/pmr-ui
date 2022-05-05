@@ -7,7 +7,7 @@ import BarPurchaseRequest from './Components/BarPurchaseRequest';
 import BarPurchaseRequestOffice from './Components/BarPurchaseRequestOffice';
 import TopRequestedItems from './Components/TopRequestedItems';
 import PieModeOfProcurement from './Components/PieModeOfProcurement';
-import ReportProcurementType from './Components/ReportProcurementType';
+import ReportAccount from './Components/ReportAccount';
 import api from '../../api';
 import { cloneDeep, isEmpty, uniqBy } from 'lodash';
 import moment from 'moment';
@@ -50,42 +50,42 @@ const Home = (
        .then(res => {
            let results = res.data;
            //start of procurement types
-           let procurement_types = cloneDeep(results.procurement_types.data);
-           let uniqProcCategory = uniqBy(procurement_types, 'procurement_type_category');
+           let accounts = cloneDeep(results.accounts.data);
+           let uniqProcCategory = uniqBy(accounts, 'account_classification');
            let mappedUniqProcCategory = uniqProcCategory.map(i => {
-                let categoryProcurementTypes = procurement_types.filter(p => p.procurement_type_category_id == i.procurement_type_category_id);
-                let category_percentage = categoryProcurementTypes.reduce((sum, item) => {
-                    return sum += item.procurement_type_percentage;
+                let categoryAccounts = accounts.filter(p => p.account_classification_id == i.account_classification_id);
+                let category_percentage = categoryAccounts.reduce((sum, item) => {
+                    return sum += item.account_percentage;
                 }, 0);
-                let category_total = categoryProcurementTypes.reduce((sum, item) => {
+                let category_total = categoryAccounts.reduce((sum, item) => {
                     return sum += item.sum_cost;
                 }, 0);
                 i.category_percentage = Math.round((category_percentage + Number.EPSILON) * 100) / 100;
                 i.category_total = Math.round((category_total + Number.EPSILON) * 100) / 100;
                 delete i.sum_cost;
-                delete i.procurement_type_percentage;
+                delete i.account_percentage;
                 delete i.name;
-                delete i.procurement_type_id;
-                i.name = i.procurement_type_category;
-                delete i.procurement_type_category;
+                delete i.account_id;
+                i.name = i.account_classification;
+                delete i.account_classification;
                return i;
            });
-           results.procurement_types = {
+           results.accounts = {
                data1: mappedUniqProcCategory,
-               data2: results.procurement_types.data,
-               start_day: results.procurement_types.start_day,
-               end_day: results.procurement_types.end_day,
+               data2: results.accounts.data,
+               start_day: results.accounts.start_day,
+               end_day: results.accounts.end_day,
            };
            //end of procurement types
 
            let per_section = cloneDeep(results.per_section.data);
            let uniqProcPerDivision = uniqBy(per_section, 'division_id');
            let mappeduniqProcPerDivision = uniqProcPerDivision.map(i => {
-                let perDivisionProcurementTypes = per_section.filter(d=> d.division_id == i.division_id);
-                let perDivisionApprovedTotal = perDivisionProcurementTypes.reduce((sum, item) => {
+                let perDivisionAccounts = per_section.filter(d=> d.division_id == i.division_id);
+                let perDivisionApprovedTotal = perDivisionAccounts.reduce((sum, item) => {
                     return sum += item.approved;
                 }, 0);
-                let perDivisionPendingTotal = perDivisionProcurementTypes.reduce((sum, item) => {
+                let perDivisionPendingTotal = perDivisionAccounts.reduce((sum, item) => {
                     return sum += item.pending;
                 }, 0);
                 delete i.section_name;
@@ -200,7 +200,7 @@ const Home = (
 
 
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <ReportProcurementType />
+                    <ReportAccount />
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <PieModeOfProcurement label="Mode of Procurement" summaryData={purchaseRequest.mode_of_procurements} />

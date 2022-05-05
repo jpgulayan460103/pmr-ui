@@ -16,7 +16,7 @@ const initialState = () => {
         addOn: `BUDRP-PR-${dayjs().format("YYYY-MM-")}`,
         errorMessage: {},
         tableLoading: false,
-        selectedProcurementCategory: null,
+        selectedAccountClassification: null,
         submit: false,
         attachments: [],
         formLoading: false,
@@ -75,7 +75,7 @@ const initialState = () => {
       case 'SET_FORM_FORWARDED_SELECTED_PROCUREMENT_CATEGORY':
         return {
           ...state,
-          selectedProcurementCategory: action.data,
+          selectedAccountClassification: action.data,
         };    
       case 'SET_FORM_FORWARDED_SUBMIT':
         return {

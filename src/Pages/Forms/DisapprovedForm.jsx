@@ -19,8 +19,8 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user: state.user.data,
-        procurementTypes: state.libraries.procurement_types,
-        procurementTypeCategories: state.libraries.procurement_type_categories,
+        accounts: state.libraries.accounts,
+        accountClassifications: state.libraries.account_classifications,
         modeOfProcurements: state.libraries.mode_of_procurements,
         technicalWorkingGroups: state.libraries.technical_working_groups,
         user_sections: state.libraries.user_sections,

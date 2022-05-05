@@ -14,7 +14,7 @@ function mapStateToProps(state) {
         user: state.user.data,
         isInitialized: state.user.isInitialized,
         suppliers: state.suppliers.suppliers,
-        procurement_type_categories: state.libraries.procurement_type_categories,
+        account_classifications: state.libraries.account_classifications,
     };
 }
 
@@ -308,7 +308,7 @@ const Suppliers = (props) => {
                                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
                                     >
-                                        { props.procurement_type_categories.map(i => {
+                                        { props.account_classifications.map(i => {
                                             // return <Option value={i.id} key={i.key}>{i.name}</Option>
                                             return i.children.data.map(c => <Option value={c.id} key={c.key}>{i.name} - {c.name}</Option>)
                                         }) }

@@ -9,8 +9,8 @@ const initialState = () => {
       user_positions: [],
       user_area_of_assignments: [],
       user_offices: [],
-      procurement_types: [],
-      procurement_type_categories: [],
+      accounts: [],
+      account_classifications: [],
       mode_of_procurements: [],
       technical_working_groups: [],
       user_signatory_designations: [],
@@ -68,15 +68,15 @@ const initialState = () => {
           ...state,
           user_offices: action.data,
         };
-      case 'SET_LIBRARY_PROCUREMENT_TYPES':
+      case 'SET_LIBRARY_ACCOUNTS':
         return {
           ...state,
-          procurement_types: action.data,
+          accounts: action.data,
         };
-      case 'SET_LIBRARY_PROCUREMENT_TYPE_CATEGORIES':
+      case 'SET_LIBRARY_ACCOUNT_CLASSIFICATIONS':
         return {
           ...state,
-          procurement_type_categories: action.data,
+          account_classifications: action.data,
         };
       case 'SET_LIBRARY_MODE_OF_PROCUREMENT_TYPES':
         return {

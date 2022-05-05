@@ -21,8 +21,8 @@ const { Option } = Select;
 function mapStateToProps(state) {
     return {
         user_sections: state.libraries.user_sections,
-        procurement_types: state.libraries.procurement_types,
-        procurement_type_categories: state.libraries.procurement_type_categories,
+        accounts: state.libraries.accounts,
+        account_classifications: state.libraries.account_classifications,
         mode_of_procurements: state.libraries.mode_of_procurements,
         selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
         columns: state.procurements.purchaseRequest.columns,
@@ -64,7 +64,7 @@ const ApprovedPurchaseRequest = (props) => {
     const procurementFormRef = React.useRef();
     const [submit, setSubmit] = useState(false);
     const [errorMessage, setErrorMessage] = useState({});
-    const [selectedProcurementCategory, setSelectedProcurementCategory] = useState(null);
+    const [selectedAccountClassification, setSelectedAccountClassification] = useState(null);
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
 
     useEffect(() => {
@@ -205,13 +205,13 @@ const ApprovedPurchaseRequest = (props) => {
         return i;
     });
 
-    const purchaseRequestTypeCategoryFilter = cloneDeep(props.procurement_type_categories).map(i => {
+    const purchaseRequestTypeCategoryFilter = cloneDeep(props.account_classifications).map(i => {
         i.value = i.id;
         return i;
     });
 
     const purchaseRequestTypeFilter = () => {
-        let filteredCategory = cloneDeep(props.procurement_type_categories);
+        let filteredCategory = cloneDeep(props.account_classifications);
         if(!isEmpty(props.tableFilter.purchase_request_type_category)){
             filteredCategory = filteredCategory.filter(i => props.tableFilter.purchase_request_type_category.includes(i.id));
         }
@@ -365,7 +365,7 @@ const ApprovedPurchaseRequest = (props) => {
             ...filter.list('purchase_request_type_category','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    {item?.procurement_type?.parent?.name}
+                    {item?.account?.parent?.name}
                 </span>
             ),
             ...onCell,
@@ -373,16 +373,16 @@ const ApprovedPurchaseRequest = (props) => {
         },
         {
             title: 'Type',
-            key: 'procurement_type_id',
+            key: 'account_id',
             filters: purchaseRequestTypeFilter(),
             width: 200,
-            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].ellipsis : true,
-            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'procurement_type_id')[0].shown : true,
+            ellipsis: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'account_id')[0].ellipsis : true,
+            shown: !isEmpty(props.columns) ? props.columns.filter(i => i.key == 'account_id')[0].shown : true,
             filterable: true,
-            ...filter.list('procurement_type_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.list('account_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
-                    { item?.procurement_type?.name }
+                    { item?.account?.name }
                 </span>
             ),
             ...onCell,
@@ -642,8 +642,8 @@ const ApprovedPurchaseRequest = (props) => {
         procurementFormRef.current.setFieldsValue({
             action_type: null,
             technical_working_group_id: null,
-            procurement_type_category: null,
-            procurement_type_id: null,
+            account_classification: null,
+            account_id: null,
             mode_of_procurement_id: null,
         });
         setModalProcurementForm(false);
@@ -679,12 +679,12 @@ const ApprovedPurchaseRequest = (props) => {
     const handleProceedProcurement = (record) => {
         viewPurchaseRequest(record, 0);
         setModalProcurementForm(true);
-        setSelectedProcurementCategory(record.procurement_type.parent.id);
-        // console.log(record);
+        console.log(record);
+        setSelectedAccountClassification(record.account.parent.id);
         setTimeout(() => {
             procurementFormRef.current.setFieldsValue({
-                procurement_type_category: record.procurement_type.parent.id,
-                procurement_type_id: record.procurement_type_id,
+                account_classification: record.account.parent.id,
+                account_id: record.account_id,
                 mode_of_procurement_id: record.mode_of_procurement_id,
             });
         }, 150);
@@ -726,31 +726,31 @@ const ApprovedPurchaseRequest = (props) => {
                 >
 
                         <Form.Item
-                                name="procurement_type_category"
-                                label="Procurement Category"
-                                { ...helpers.displayError(errorMessage, 'procurement_type_category') }
-                                rules={[{ required: true, message: 'Please select Procurement Category.' }]}
+                                name="account_classification"
+                                label="Procurement Description Classification"
+                                { ...helpers.displayError(errorMessage, 'account_classification') }
+                                rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
                             >
-                                <Select placeholder='Select Procurement Category' onSelect={(e) => {
+                                <Select placeholder='Select Procurement Description Classification' onSelect={(e) => {
                                     procurementFormRef?.current?.setFieldsValue({
-                                        procurement_type_id: null,
+                                        account_id: null,
                                     });
-                                    setSelectedProcurementCategory(e);
+                                    setSelectedAccountClassification(e);
                                 }}>
-                                    { props.procurement_type_categories.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                    { props.account_classifications.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                 </Select>
                             </Form.Item>
 
                             {
-                                selectedProcurementCategory != null ? (
+                                selectedAccountClassification != null ? (
                                     <Form.Item
-                                        name="procurement_type_id"
-                                        label="Procurement Type"
-                                        { ...helpers.displayError(errorMessage, 'procurement_type_id') }
-                                        rules={[{ required: true, message: 'Please select Procurement Type.' }]}
+                                        name="account_id"
+                                        label="Procurement Description"
+                                        { ...helpers.displayError(errorMessage, 'account_id') }
+                                        rules={[{ required: true, message: 'Please select Procurement Description.' }]}
                                     >
-                                        <Select placeholder='Select Procurement Category' allowClear > 
-                                            { props.procurement_types.filter(i => i.parent.id == selectedProcurementCategory).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                        <Select placeholder='Select Procurement Description Classification' allowClear > 
+                                            { props.accounts.filter(i => i.parent.id == selectedAccountClassification).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                         </Select>
                                     </Form.Item>
                                 ) : ""

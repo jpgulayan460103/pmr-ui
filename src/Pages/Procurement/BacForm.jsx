@@ -19,7 +19,7 @@ import moment from 'moment';
 function mapStateToProps(state) {
     return {
         selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
-        procurementTypes: state.libraries.procurement_types,
+        accounts: state.libraries.accounts,
         modeOfProcurements: state.libraries.mode_of_procurements,
         tab: state.procurements.purchaseRequest.tab,
         purchaseRequests: state.procurements.purchaseRequest.purchaseRequests,

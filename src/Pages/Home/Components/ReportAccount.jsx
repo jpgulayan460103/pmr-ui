@@ -1,8 +1,8 @@
 import { isEmpty } from 'lodash';
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import PieProcurementCategory from './PieProcurementCategory';
-import PieProcurementType from './PieProcurementType';
+import PieAccountClassification from './PieAccountClassification';
+import PieAccount from './PieAccount';
 
 
 function mapStateToProps(state) {
@@ -12,7 +12,7 @@ function mapStateToProps(state) {
     };
 }
 
-const ReportProcurementType = ({purchaseRequest}) => {
+const ReportAccount = ({purchaseRequest}) => {
     const [selectedCategory, setSelectedCategory] = useState({});
 
     const selectCategory = (e) => {
@@ -21,9 +21,9 @@ const ReportProcurementType = ({purchaseRequest}) => {
     return (
         <div>
             { isEmpty(selectedCategory) ? (
-                <PieProcurementCategory label="Procurement Category" summaryData={purchaseRequest.procurement_types} selectCategory={selectCategory} />
+                <PieAccountClassification label="Procurement Description Classification" summaryData={purchaseRequest.accounts} selectCategory={selectCategory} />
             ) : (
-                <PieProcurementType label="Procurement Category" summaryData={purchaseRequest.procurement_types} selectedCategory={selectedCategory} selectCategory={selectCategory} />
+                <PieAccount label="Procurement Description Classification" summaryData={purchaseRequest.accounts} selectedCategory={selectedCategory} selectCategory={selectCategory} />
             ) }
             
         </div>
@@ -32,5 +32,5 @@ const ReportProcurementType = ({purchaseRequest}) => {
 
 export default connect(
     mapStateToProps,
-)(ReportProcurementType);
+)(ReportAccount);
 
