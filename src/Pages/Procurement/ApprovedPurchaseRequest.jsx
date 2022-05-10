@@ -24,6 +24,7 @@ function mapStateToProps(state) {
         accounts: state.libraries.accounts,
         account_classifications: state.libraries.account_classifications,
         mode_of_procurements: state.libraries.mode_of_procurements,
+        procurement_types: state.libraries.procurement_types,
         selectedPurchaseRequest: state.procurements.purchaseRequest.selectedPurchaseRequest,
         columns: state.procurements.purchaseRequest.columns,
         purchaseRequests: state.procurements.purchaseRequest.purchaseRequests,
@@ -234,6 +235,10 @@ const ApprovedPurchaseRequest = (props) => {
     };
 
     const modeOfProcurementFilter = cloneDeep(props.mode_of_procurements).map(i => {
+        i.value = i.id;
+        return i;
+    });
+    const procurementTypeFilter = cloneDeep(props.procurement_types).map(i => {
         i.value = i.id;
         return i;
     });
@@ -640,7 +645,7 @@ const ApprovedPurchaseRequest = (props) => {
 
     const cancelProcurementForm = () => {
         procurementFormRef.current.setFieldsValue({
-            action_type: null,
+            type: null,
             technical_working_group_id: null,
             account_classification: null,
             account_id: null,
@@ -725,36 +730,16 @@ const ApprovedPurchaseRequest = (props) => {
                     id="procurementForm"
                 >
 
-                        <Form.Item
-                                name="account_classification"
-                                label="Procurement Description Classification"
-                                { ...helpers.displayError(errorMessage, 'account_classification') }
-                                rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
+                            <Form.Item
+                                name="procurement_type_id"
+                                label="Type of Procurement"
+                                { ...helpers.displayError(errorMessage, 'procurement_type_id') }
+                                rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
                             >
-                                <Select placeholder='Select Procurement Description Classification' onSelect={(e) => {
-                                    procurementFormRef?.current?.setFieldsValue({
-                                        account_id: null,
-                                    });
-                                    setSelectedAccountClassification(e);
-                                }}>
-                                    { props.account_classifications.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
+                                <Select placeholder='Select Type of Procurement'>
+                                    { props.procurement_types.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
                                 </Select>
                             </Form.Item>
-
-                            {
-                                selectedAccountClassification != null ? (
-                                    <Form.Item
-                                        name="account_id"
-                                        label="Procurement Description"
-                                        { ...helpers.displayError(errorMessage, 'account_id') }
-                                        rules={[{ required: true, message: 'Please select Procurement Description.' }]}
-                                    >
-                                        <Select placeholder='Select Procurement Description Classification' allowClear > 
-                                            { props.accounts.filter(i => i.parent.id == selectedAccountClassification).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                                        </Select>
-                                    </Form.Item>
-                                ) : ""
-                            }
 
                             <Form.Item
                                 name="mode_of_procurement_id"

@@ -16,6 +16,7 @@ const initialState = () => {
       user_signatory_designations: [],
       user_signatory_names: [],
       uacs_codes: [],
+      procurement_types: [],
       users: [],
       isLibrariesLoaded: false,
     }
@@ -102,6 +103,11 @@ const initialState = () => {
         return {
           ...state,
           uacs_codes: action.data,
+        };
+      case 'SET_LIBRARY_PROCUREMENT_TYPE':
+        return {
+          ...state,
+          procurement_types: action.data,
         };
       case 'SET_LIBRARY_USERS':
         return {

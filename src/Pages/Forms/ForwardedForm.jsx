@@ -188,7 +188,6 @@ const ForwardedForm = (props) => {
             data: value,
         });
     }
-    
 
     const showRejectForm = (formRouteItem) => {
         setSelectedFormRoute(formRouteItem)
@@ -201,11 +200,16 @@ const ForwardedForm = (props) => {
             });
         }, 150);
         return false;
-       
     }
 
-    const proceedReject = (e) => {
+    const closeRejectForm = () => {
+        rejectFormRef.current.resetFields();
+        setModalRejectForm(false);
+    };
+
+    const submitRejectForm = debounce((e) => {
         setErrorMessage({});
+        setSubmit(true);
         let formData = {
             ...e,
         };
@@ -213,12 +217,11 @@ const ForwardedForm = (props) => {
         .then(res => {
             if (unmounted.current) { return false; }
             setSubmit(false);
+            closeRejectForm();
             setErrorMessage({});
-            setModalRejectForm(false);
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
-            rejectFormRef.current.resetFields()
         })
         .catch(err => {
             setSubmit(false);
@@ -227,41 +230,8 @@ const ForwardedForm = (props) => {
             setSubmit(false);
         })
         ;
-    }
+    }, 150);
 
-    const submitRejectForm = (e) => {
-        setSubmit(true);
-        api.Forms.getRoute(props.selectedFormRoute.id)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            if(res.data.status != "pending" && res.data.status != "with_issues"){
-                setSubmit(false);
-                setModalRejectForm(false);
-                notification.error({
-                    message: 'Error',
-                    description:
-                        'The form has already amended.',
-                    }
-                );
-                getForm();
-                setSelectedFormRoute({});
-                setCurrentRoute({});
-                return false;
-            }else{
-                proceedReject(e);
-            }
-        })
-        .catch(err => {
-            setSubmit(false);
-        })
-    };
-    const cancelRejectForm = () => {
-        rejectFormRef.current.setFieldsValue({
-            remarks: null,
-            to_office_id: null,
-        });
-        setModalRejectForm(false);
-    };
 
 
     const showResolveForm = (formRouteItem) => {
@@ -278,22 +248,27 @@ const ForwardedForm = (props) => {
        
     }
 
-    const proceedResolve = (e) => {
+    const closeResolveForm = () => {
+        resolveFormRef.current.resetFields();
+        setModalResolveForm(false);
+    };
+
+
+    const submitResolveForm = debounce((e) => {
+        setSubmit(true);
         setErrorMessage({});
         let formData = {
             ...e,
-
         };
-        api.Forms.resolve(props.selectedFormRoute.id, formData)
+        api.Forms.approve(props.selectedFormRoute.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
             setSubmit(false);
+            closeResolveForm();
             setErrorMessage({});
-            setModalResolveForm(false);
             getForm();
             setSelectedFormRoute({});
             setCurrentRoute({});
-            resolveFormRef.current.resetFields()
         })
         .catch(err => {
             setSubmit(false);
@@ -302,40 +277,61 @@ const ForwardedForm = (props) => {
             setSubmit(false);
         })
         ;
+    }, 150);
+
+
+    const closeBudgetForm = () => {
+        budgetFormRef.current.resetFields();
+        setModalBudgetForm(false);
     }
 
-    const submitResolveForm = (e) => {
+    const submitBudgetForm = debounce(async (e) => {
+        setErrorMessage({});
         setSubmit(true);
-        api.Forms.getRoute(props.selectedFormRoute.id)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            if(res.data.status != "pending" && res.data.status != "with_issues"){
+        let formData = {
+            ...e,
+            purchase_request_number: `${props.addOn}${e.purchase_request_number_last}`,
+            updater: "budget",
+        };
+        if(props.selectedFormRoute.route_type == "purchase_request"){
+            try {
+                await approve(props.selectedFormRoute, formData);
+                closeBudgetForm();
+                setErrorMessage({});
                 setSubmit(false);
-                setModalResolveForm(false);
-                notification.error({
-                    message: 'Error',
-                    description:
-                        'The form has already amended.',
-                    }
-                );
-                getForm();
-                setSelectedFormRoute({});
-                setCurrentRoute({});
-                return false;
-            }else{
-                proceedResolve(e);
+            } catch (error) {
+                setErrorMessage(error.response.data.errors);
+                setSubmit(false);
             }
-        })
-        .catch(err => {
-            setSubmit(false);
-        })
-    };
-    const cancelResolveForm = () => {
-        resolveFormRef.current.setFieldsValue({
-            remarks: null
-        });
-        setModalResolveForm(false);
-    };
+        }
+    }, 150);
+    
+    const closeProcurementForm = () => {
+        procurementFormRef.current.resetFields();
+        setProcurementFormType("");
+        setModalProcurementForm(false);
+    }
+
+    const submitProcurementForm = debounce(async (e) => {
+        setErrorMessage({});
+        setSubmit(true);
+        if(props.selectedFormRoute.route_type == "purchase_request"){
+            let formData = {
+                ...e,
+                type: props.procurementFormType,
+                updater: "procurement",
+            }
+            try {
+                await approve(props.selectedFormRoute, formData);
+                setSubmit(false);
+                setErrorMessage({});
+                closeProcurementForm();
+            } catch (error) {
+                setErrorMessage(error.response.data.errors);
+                setSubmit(false);
+            }
+        }
+    }, 150);
     
 
     const getForm = debounce((filters) => {
@@ -409,9 +405,6 @@ const ForwardedForm = (props) => {
                 break;
         }
     }
-    const respondForm = (item, index) => {
-        setSelectedFormRoute(item)
-    }
     const resolveForm = (item, index) => {
         setSelectedFormRoute(item);
         showResolveForm(item);
@@ -421,171 +414,16 @@ const ForwardedForm = (props) => {
     }
     
 
-    const cancelBudgetForm = () => {
-        budgetFormRef.current.setFieldsValue({
-            purchase_request_number_last: null,
-            fund_cluster: null,
-            center_code: null,
-            charge_to: null,
-            alloted_amount: null,
-            uacs_code: null,
-            sa_or: null,
-        });
-        setModalBudgetForm(false);
-    }
-
     const endUserFilter = cloneDeep(props.userSections).map(i => {
         i.value = i.id;
         return i;
     });
 
-    const proceedBudget = (e) => {
-        setErrorMessage({});
-        let formData = {
-            ...e,
-            id: props.selectedFormRoute.form_routable.id,
-            purchase_request_number: `${props.addOn}${e.purchase_request_number_last}`,
-            updater: "budget",
-        };
-        if(props.selectedFormRoute.route_type == "purchase_request"){
-            api.PurchaseRequest.save(formData, 'update')
-            .then(res => {
-                if (unmounted.current) { return false; }
-                setSubmit(false);
-                setErrorMessage({});
-                approve(props.selectedFormRoute);
-                setModalBudgetForm(false);
-                cancelBudgetForm();
-                budgetFormRef.current.resetFields()
-            })
-            .catch(err => {
-                setSubmit(false);
-                setErrorMessage(err.response.data.errors)
-                
-            })
-            .then(res => {});
-        }
-    }
-    const submitBudgetForm = async (e) => {
-        setSubmit(true);
-        api.Forms.getRoute(props.selectedFormRoute.id)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            if(res.data.status != "pending" && res.data.status != "with_issues"){
-                setSubmit(false);
-                setModalBudgetForm(false);
-                notification.error({
-                    message: 'Error',
-                    description:
-                        'The form has already amended.',
-                    }
-                );
-                getForm();
-                setSelectedFormRoute({});
-                setCurrentRoute({});
-                return false;
-            }else{
-                proceedBudget(e);
-            }
-        })
-        .catch(err => {
-            setSubmit(false);
-        })
-    }
-    
-    const cancelProcurementForm = () => {
-        procurementFormRef.current.setFieldsValue({
-            action_type: null,
-            technical_working_group_id: null,
-            account_classification: null,
-            account_id: null,
-            mode_of_procurement_id: null,
-        });
-        setProcurementFormType("");
-        setModalProcurementForm(false);
-    }
-
-    const proceedProcurement = (e) => {
-        setErrorMessage({});
-        if(props.selectedFormRoute.route_type == "purchase_request"){
-            if(props.procurementFormType == "approve"){
-                let formData = {
-                    ...e,
-                    id: props.selectedFormRoute.form_routable.id,
-                    updater: "procurement",
-                };
-
-                api.PurchaseRequest.save(formData, 'update')
-                .then(res => {
-                    if (unmounted.current) { return false; }
-                    setSubmit(false);
-                    setErrorMessage({});
-                    approve(props.selectedFormRoute);
-                    setModalProcurementForm(false);
-                    cancelProcurementForm();
-                    procurementFormRef.current.resetFields()
-                })
-                .catch(err => {
-                    setSubmit(false);
-                    setErrorMessage(err.response.data.errors)
-                    
-                })
-            }else if(props.procurementFormType == "twg"){
-                let formData = {
-                    ...e,
-                    id: props.selectedFormRoute.form_process.id,
-                    type: props.procurementFormType,
-                    updater: "procurement",
-                }                
-                api.Forms.updateProcess(formData)
-                .then(res => {
-                    if (unmounted.current) { return false; }
-                    setSubmit(false);
-                    approve(props.selectedFormRoute);
-                    setModalProcurementForm(false);
-                    cancelProcurementForm();
-                    procurementFormRef.current.resetFields()
-                })
-                .catch(err => {
-                    setSubmit(false);
-                    setErrorMessage(err.response.data.errors)
-                    
-                })
-            }
-        }
-    }
-    const submitProcurementForm = debounce(async (e) => {
-        setSubmit(true);
-        api.Forms.getRoute(props.selectedFormRoute.id)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            if(res.data.status != "pending" && res.data.status != "with_issues"){
-                setSubmit(false);
-                setModalProcurementForm(false);
-                notification.error({
-                    message: 'Error',
-                    description:
-                        'The form has already amended.',
-                    }
-                );
-                getForm();
-                setSelectedFormRoute({});
-                setCurrentRoute({});
-                return false;
-            }else{
-                proceedProcurement(e);
-            }
-        })
-        .catch(err => {
-            setSubmit(false);
-        })
-    }, 150);
 
 
-    const confirm = debounce((item) => {
+    const confirm = debounce(async (item) => {
         setSelectedFormRoute(item);
         let current_route = item.form_process.form_routes.filter(i => i.status == "pending");
-
         let procurement_user_office = props.user.user_offices.data.filter(i => i.office.title == "PS");
         let budget_user_office = props.user.user_offices.data.filter(i => i.office.title == "BS");
         setCurrentRoute(current_route[0]);
@@ -611,47 +449,34 @@ const ForwardedForm = (props) => {
             .catch(res => {})
             .then(res => {})
         }else{
-            approve(item);
+            setSubmit(true);
+            await approve(item);
+            setSubmit(false);
         }
-    }, 150)
+    }, 150);
 
-    const approve = debounce(async (item) => {
-        api.Forms.getRoute(item.id)
+    const approve = async (item, formData = {}) => {
+        return api.Forms.approve(item.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
-            if(res.data.status != "pending" && res.data.status != "with_issues"){
-                notification.error({
-                    message: 'Error',
-                    description:
-                        'The form has already amended.',
-                    }
-                );
-                getForm();
-                setSelectedFormRoute({});
-                setCurrentRoute({});
-                return false;
-            }else{
-                api.Forms.approve(item.id)
-                .then(res => {
-                    if (unmounted.current) { return false; }
-                    let nextRoute = res.data.next_route;
-                    notification.success({
-                        message: 'Purchase Request is approved.',
-                        description:
-                            `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
-                        }
-                    );
-                    getForm();
-                    setSelectedFormRoute({});
-                    setCurrentRoute({});
-                })
-                .catch(err => {})
-                .then(res => {})
-                ;
-            }
+            let nextRoute = res.data.next_route;
+            notification.success({
+                message: 'Purchase Request is approved.',
+                description:
+                    `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
+                }
+            );
+            getForm();
+            setSelectedFormRoute({});
+            setCurrentRoute({});
+            return Promise.resolve(res)
         })
-        .catch(err => {})
-    }, 150);
+        .catch(err => {
+            return Promise.reject(err)
+        })
+        .then(res => {})
+        ;
+    };
 
     const actionTypeProcurement = (e) => {
         setProcurementFormType(e);
@@ -689,6 +514,17 @@ const ForwardedForm = (props) => {
       
     const columns = [
         {
+            title: 'Description',
+            key: 'route_description',
+            width: 150,
+            ...onCell,
+            render: (text, item, index) => (
+                <span>
+                    { item.form_process.process_description }
+                </span>
+            ),
+        },
+        {
             title: 'Form Type',
             dataIndex: 'route_type_str',
             key: 'route_type_str',
@@ -696,7 +532,7 @@ const ForwardedForm = (props) => {
             ...onCell,
         },
         {
-            title: 'Forwareded on',
+            title: 'Forwarded on',
             key: 'created_at',
             width: 150,
             ...filter.search('created_at','date_range', setTableFilter, props.tableFilter, getForm),
@@ -860,7 +696,7 @@ const ForwardedForm = (props) => {
                     </Menu.Item>
             ) : (
                 <>
-                    <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }}>
+                    <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
                         Approve
                     </Menu.Item>
                     { item.from_office_id == item.to_office_id ? "" : (
@@ -880,11 +716,11 @@ const ForwardedForm = (props) => {
                     <Button type='primary' form="rejectForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
-                    <Button form="rejectForm" key="cancel" onClick={() => cancelRejectForm()}>
+                    <Button form="rejectForm" key="cancel" onClick={() => closeRejectForm()}>
                         Cancel
                     </Button>
                     ]}
-                onCancel={cancelRejectForm}>
+                onCancel={closeRejectForm}>
                 <Form
                     ref={rejectFormRef}
                     name="normal_login"
@@ -896,14 +732,14 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="remarks"
                         label="Remarks"
-                        rules={[{ required: true, message: 'Please add remarks' }]}
+                        // rules={[{ required: true, message: 'Please add remarks' }]}
                     >
                         <TextArea rows={4} />
                     </Form.Item>
                     <Form.Item
                         name="to_office_id"
                         label="Return to"
-                        rules={[{ required: true, message: 'Please select office.' }]}
+                        // rules={[{ required: true, message: 'Please select office.' }]}
                     >
                         <Select>
                             { props.routeOptions.map((item, index) => <Option value={item.office_id} key={index}>{item.office_name}</Option> ) }
@@ -918,11 +754,11 @@ const ForwardedForm = (props) => {
                     <Button type='primary' form="resolveForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
-                    <Button form="resolveForm" key="cancel" onClick={() => cancelResolveForm()}>
+                    <Button form="resolveForm" key="cancel" onClick={() => closeResolveForm()}>
                         Cancel
                     </Button>
                     ]}
-                onCancel={cancelResolveForm}>
+                onCancel={closeResolveForm}>
                 <Form
                     ref={resolveFormRef}
                     name="normal_login"
@@ -934,7 +770,7 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="remarks"
                         label="Remarks"
-                        rules={[{ required: true, message: 'Please add remarks' }]}
+                        // rules={[{ required: true, message: 'Please add remarks' }]}
                     >
                         <TextArea rows={4} />
                     </Form.Item>
@@ -946,11 +782,11 @@ const ForwardedForm = (props) => {
                     <Button type='primary' form="budgetForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
                         Submit
                     </Button>,
-                    <Button form="budgetForm" key="cancel" onClick={() => cancelBudgetForm()}>
+                    <Button form="budgetForm" key="cancel" onClick={() => closeBudgetForm()}>
                         Cancel
                     </Button>
                     ]}
-                onCancel={cancelBudgetForm}>
+                onCancel={closeBudgetForm}>
                 <Form
                     ref={budgetFormRef}
                     name="normal_login"
@@ -963,8 +799,8 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="purchase_request_number_last"
                         label="Purchase Request Number"
-                        rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...helpers.displayError(props.errorMessage, 'purchase_request_number_last') }
+                        // rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
+                        { ...helpers.displayError(props.errorMessage, 'purchase_request_number') }
                     >
                         <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
                             <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
@@ -977,7 +813,7 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="fund_cluster"
                         label="Fund Cluster"
-                        rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
+                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
                         { ...helpers.displayError(props.errorMessage, 'fund_cluster') }
                     >
                         <Input placeholder="Fund Cluster" />
@@ -994,21 +830,24 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="charge_to"
                         label="Charge To"
-                        rules={[{ required: true, message: 'Please where to charge' }]}
+                        // rules={[{ required: true, message: 'Please where to charge' }]}
+                        { ...helpers.displayError(props.errorMessage, 'charge_to') }
                     >
                         <Input placeholder='Charge to' />
                     </Form.Item>
                     <Form.Item
                         name="alloted_amount"
                         label="Amount"
-                        rules={[{ required: true, message: 'Please enter amount' }]}
+                        // rules={[{ required: true, message: 'Please enter amount' }]}
+                        { ...helpers.displayError(props.errorMessage, 'alloted_amount') }
                     >
                         <Input placeholder='Amount' type="number" min={0.01} step={0.01} />
                     </Form.Item>
                     <Form.Item
                         name="uacs_code_id"
                         label="UACS Code"
-                        rules={[{ required: true, message: 'Please enter UACS Code' }]}
+                        // rules={[{ required: true, message: 'Please enter UACS Code' }]}
+                        { ...helpers.displayError(props.errorMessage, 'uacs_code_id') }
                     >
                         {/* <Input placeholder='UACS CODE' /> */}
                         <Select
@@ -1024,7 +863,8 @@ const ForwardedForm = (props) => {
                     <Form.Item
                         name="sa_or"
                         label="SA/OR"
-                        rules={[{ required: true, message: 'Please enter SA/OR' }]}
+                        // rules={[{ required: true, message: 'Please enter SA/OR' }]}
+                        { ...helpers.displayError(props.errorMessage, 'sa_or') }
                     >
                         <Input placeholder='SA/OR' />
                     </Form.Item>
@@ -1039,11 +879,11 @@ const ForwardedForm = (props) => {
                         Submit
                     </Button>) : ""
                     ,
-                    <Button form="procurementForm" key="cancel" onClick={() => cancelProcurementForm()}>
+                    <Button form="procurementForm" key="cancel" onClick={() => closeProcurementForm()}>
                         Cancel
                     </Button>
                     ]}
-                onCancel={cancelProcurementForm}
+                onCancel={closeProcurementForm}
                 >
                 <Form
                     ref={procurementFormRef}
@@ -1056,9 +896,10 @@ const ForwardedForm = (props) => {
 
                     { props.currentRoute.description_code != "aprroval_from_proc" ? (
                         <Form.Item
-                            name="action_type"
+                            name="type"
                             label="Action"
-                            rules={[{ required: true, message: 'Please select Procurement Description.' }]}
+                            // rules={[{ required: true, message: 'Please select Procurement Description.' }]}
+                            { ...helpers.displayError(props.errorMessage, 'type') }
                         >
                             <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
                                 <Option value="twg">Forward to Technical Working Group</Option>
@@ -1071,7 +912,8 @@ const ForwardedForm = (props) => {
                         <Form.Item
                             name="technical_working_group_id"
                             label="Technical Working Groups"
-                            rules={[{ required: true, message: 'Please select Technical Working Group.' }]}
+                            // rules={[{ required: true, message: 'Please select Technical Working Group.' }]}
+                            { ...helpers.displayError(props.errorMessage, 'technical_working_group_id') }
                         >
                             <Select placeholder='Select Technical Working Groups'>
                                 { props.technicalWorkingGroups.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
@@ -1084,7 +926,7 @@ const ForwardedForm = (props) => {
                                 name="account_classification"
                                 label="Procurement Description Classification"
                                 { ...helpers.displayError(props.errorMessage, 'account_classification') }
-                                rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
+                                // rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
                             >
                                 <Select placeholder='Select Procurement Description Classification' onSelect={(e) => {
                                     procurementFormRef.current.setFieldsValue({
@@ -1102,7 +944,7 @@ const ForwardedForm = (props) => {
                                         name="account_id"
                                         label="Procurement Description"
                                         { ...helpers.displayError(props.errorMessage, 'account_id') }
-                                        rules={[{ required: true, message: 'Please select Procurement Description.' }]}
+                                        // rules={[{ required: true, message: 'Please select Procurement Description.' }]}
                                     >
                                         <Select placeholder='Select Procurement Description Classification' allowClear > 
                                             { props.accounts.filter(i => i.parent.id == props.selectedAccountClassification).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
@@ -1115,7 +957,7 @@ const ForwardedForm = (props) => {
                                 name="mode_of_procurement_id"
                                 label="Mode of Procurement"
                                 { ...helpers.displayError(props.errorMessage, 'mode_of_procurement_id') }
-                                rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
+                                // rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
                             >
                                 <Select placeholder='Select Mode of Procurement'>
                                     { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
@@ -1166,7 +1008,7 @@ const ForwardedForm = (props) => {
                                     ) : (
                                         <>
                                         <Tooltip placement="top" title={"Approve"}>
-                                            <Button size='small' type='default' onClick={() => { confirm(props.selectedFormRoute, 0) }}><LikeTwoTone twoToneColor="#0000FF" /></Button>
+                                            <Button size='small' type='default' onClick={() => { confirm(props.selectedFormRoute, 0) }} disabled={props.submit}><LikeTwoTone twoToneColor="#0000FF" /></Button>
                                         </Tooltip>
                                             
                                             { props.selectedFormRoute.from_office_id == props.selectedFormRoute.to_office_id ? "" : (

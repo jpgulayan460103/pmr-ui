@@ -27,7 +27,7 @@ const TableFooterPagination = ({pagination, paginationChange}) => {
     return (
         <div className="flex justify-between mt-2">
             {
-                count > 1 ? (
+                count >= 1 ? (
                     <span>
                         Showing {first} to {second}  of {total} entries
                     </span>

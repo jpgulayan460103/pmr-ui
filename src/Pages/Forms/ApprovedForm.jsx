@@ -146,6 +146,17 @@ const ApprovedForm = (props) => {
       
     const columns = [
         {
+            title: 'Description',
+            key: 'route_description',
+            width: 150,
+            ...onCell,
+            render: (text, item, index) => (
+                <span>
+                    { item.form_process.process_description }
+                </span>
+            ),
+        },
+        {
             title: 'Form Type',
             dataIndex: 'route_type_str',
             key: 'route_type_str',

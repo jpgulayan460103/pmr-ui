@@ -16,8 +16,8 @@ export default {
       params: formData
     });
   },
-  approve(id){
-    return axios.post(`api/forms/routes/requests/pending/${id}/approve`);
+  approve(id, formData){
+    return axios.post(`api/forms/routes/requests/pending/${id}/approve`, formData);
   },
   reject(id, formData){
     return axios.post(`api/forms/routes/requests/pending/${id}/reject`, formData);

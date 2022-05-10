@@ -114,6 +114,10 @@ const Loadlibraries = (props) => {
                 type: "SET_LIBRARY_UACS_CODE",
                 data: libraries.filter(library => library.library_type == "uacs_code")
             });
+            props.dispatch({
+                type: "SET_LIBRARY_PROCUREMENT_TYPE",
+                data: libraries.filter(library => library.library_type == "procurement_type")
+            });
             
         })
         .catch(err => {})
@@ -130,7 +134,11 @@ const Loadlibraries = (props) => {
             });
         })
         .catch(err => {
-            getUser();
+            if(err.response.status == 401){
+                
+            }else{
+                getUser();
+            }
         })
         .then(res => {})
     }
