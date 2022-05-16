@@ -140,6 +140,16 @@ const CreatePurchaseRequest = (props) => {
                         ),
                         onOk() {},
                       });
+                }else if(err.response.data.errors.update_error){
+                    Modal.error({
+                        title: 'Purchase Request update failed',
+                        content: (
+                          <div>
+                            <p>Unable to update. Purchase Request is already approved by the budget section.</p>
+                          </div>
+                        ),
+                        onOk() {},
+                      });
                 }else{
                     Modal.error({
                         title: 'Purchase Request creation failed',

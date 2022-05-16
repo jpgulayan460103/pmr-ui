@@ -279,7 +279,7 @@ const UserPermissions = (props) => {
           'purchase.requests.all',
           'users.all',
         ]);
-        let propUserRoles = props.user.roles.data[0].name;
+        let propUserRoles = props.user.roles?.data[0]?.name;
         setRole(propUserRoles);
         setPermissionsOnRole(propUserRoles);
         if(propUserRoles == "user"){
