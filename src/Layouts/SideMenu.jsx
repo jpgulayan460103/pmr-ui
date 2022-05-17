@@ -245,11 +245,11 @@ const Sidemenu = (props) => {
                             helpers.hasRole(props.user, ["admin","super-admin"])
                         )
                     && (
-                        // <Menu.Item key="/libraries/items">
-                        //     <Link to="/libraries/items"></Link>
-                        //     Items
-                        // </Menu.Item>
-                        ""
+                        <Menu.Item key="/libraries/items">
+                            <Link to="/libraries/items"></Link>
+                            Items
+                        </Menu.Item>
+                        // ""
                     ) }
 
                     {

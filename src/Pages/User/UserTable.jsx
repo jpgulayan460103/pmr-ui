@@ -42,6 +42,18 @@ const UserTable = (props) => {
     const dataSource = props.users;
     const columns = [
         {
+            title: 'Role',
+            key: 'role',
+            width: 150,
+            ...onCell,
+            sorter: (a, b) => a.roles.data[0].name?.localeCompare(b.roles.data[0].name),
+            render: (text, record, index) => (
+                <span>
+                    { record.roles.data[0].name }
+                </span>
+            ),
+        },
+        {
             title: 'Username',
             dataIndex: 'username',
             key: 'username',

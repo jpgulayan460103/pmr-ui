@@ -17,6 +17,7 @@ import Login from './Pages/Login/Login'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
 import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
+import ItemLibrary from './Pages/Library/ItemLibrary'
 import User from './Pages/User/User'
 import Echo from 'laravel-echo';
 import ForwardedForm from './Pages/Forms/ForwardedForm';
@@ -152,8 +153,8 @@ const App = (props) => {
           <Route exact path="/libraries"  >
               <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
           </Route>
-          <Route exact path="/libraries/items"  >
-              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+          <Route exact path="/libraries/items">
+              <PrivateRoute><Layout><ItemLibrary /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/libraries/items/categories"  >
               <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category"}} /></Layout></PrivateRoute>
@@ -172,9 +173,6 @@ const App = (props) => {
           </Route>
           <Route exact path="/libraries/user_offices/administrators/designations"  >
               <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_designation" options={{libraryName: "Office Administrator's Designation",parent: true, title: true, parentLabel: "Designation", parentType: "user_section"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/user_offices/purchase-requests"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" /></Layout></PrivateRoute>
           </Route>
           <Route exact path="/users"  >
               <PrivateRoute><Layout><User /></Layout></PrivateRoute>

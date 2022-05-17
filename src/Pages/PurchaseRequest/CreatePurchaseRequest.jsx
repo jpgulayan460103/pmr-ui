@@ -298,7 +298,8 @@ const CreatePurchaseRequest = (props) => {
         let newValue = cloneDeep(props.formData.items);
         newValue[index]["item_code"] = item.item_code;
         newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
-        newValue[index]["is_ppmp"] = true;
+        newValue[index]["is_ppmp"] = item.is_ppmp;
+        newValue[index]["in_libraries"] = true;
         newValue[index]["item_name"] = value;
         newValue[index]["item_id"] = item.id;
         props.dispatch({
@@ -418,7 +419,7 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
-                                { item.is_ppmp ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
+                                { item.in_libraries ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                     showSearch
                                     value={item.unit_of_measure_id}
                                     placeholder="Select a Unit"
@@ -440,7 +441,7 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
-                                { item.is_ppmp ? item.item_name : (
+                                { item.in_libraries ? item.item_name : (
                                     <AutoComplete
                                         style={{ width: "100%" }}
                                         allowClear
