@@ -81,8 +81,8 @@ const ForwardedForm = (props) => {
         document.title = "Forwarded Forms";
         if(props.isInitialized){
             if(isEmpty(props.forms)){
-                getForm();
             }
+            getForm();
         }
         // console.log("rerender");
     }, [props.isInitialized]);
@@ -518,6 +518,7 @@ const ForwardedForm = (props) => {
             key: 'route_description',
             width: 150,
             ...onCell,
+            ellipsis: true,
             render: (text, item, index) => (
                 <span>
                     { item.form_process.process_description }
@@ -530,6 +531,7 @@ const ForwardedForm = (props) => {
             key: 'route_type_str',
             width: 150,
             ...onCell,
+            ellipsis: true,
         },
         {
             title: 'Forwarded on',
@@ -537,6 +539,7 @@ const ForwardedForm = (props) => {
             width: 150,
             ...filter.search('created_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
             render: (text, item, index) => (
                 <span>
@@ -554,6 +557,7 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             width: 150,
             sorter: (a, b) => {},
         },
@@ -567,6 +571,7 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             width: 150,
             sorter: (a, b) => {},
         },
@@ -580,13 +585,13 @@ const ForwardedForm = (props) => {
                 </span>
             ),
             ...onCell,
+            ellipsis: true,
             width: 150,
             sorter: (a, b) => {},
         },
         {
             title: 'End User',
             key: 'end_user',
-            ellipsis: true,
             width: 250,
             filters: endUserFilter,
             ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getForm),
@@ -596,6 +601,7 @@ const ForwardedForm = (props) => {
                 </span>
             ),
             ...onCell,
+            ellipsis: true,
         },
         {
             title: 'Status',
@@ -613,6 +619,7 @@ const ForwardedForm = (props) => {
             filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
             ...filter.list('status','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
         {
@@ -626,6 +633,7 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
         {
@@ -639,21 +647,41 @@ const ForwardedForm = (props) => {
             ),
             ...filter.search('forwarded_remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
 
         {
-            title: "Action",
+            title: "Actions",
             key: "action",
             fixed: 'right',
-            width: 60,
+            width: 100,
             align: "center",
             render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <Button size='small'>
-                        <EllipsisOutlined />
-                    </Button>
-                </Dropdown>
+                <span>
+                    { item.status == "with_issues" ? (
+                            <Tooltip placement="bottom" title={"Resolve"}>
+                                <Button size='small' type='default' icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
+                    
+                                </Button>
+                            </Tooltip>
+                    ) : (
+                        <>
+                            <Tooltip placement="bottom" title={"Approve"}>
+                                <Button size='small' type='default' icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
+                    
+                                </Button>
+                            </Tooltip>
+                            { item.from_office_id == item.to_office_id ? "" : (
+                                <Tooltip placement="bottom" title={"Disapprove"}>
+                                    <Button size='small' type='default' icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
+                    
+                                    </Button>
+                                </Tooltip>
+                            ) }
+                        </>
+                    ) }
+                </span>
             ),
         },
     ];
@@ -685,29 +713,29 @@ const ForwardedForm = (props) => {
     }
 
 
-    const menu = (item, index) => (
-        <Menu onClick={() => setSelectedFormRoute(item) }>
-            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
-                View
-            </Menu.Item>
-            { item.status == "with_issues" ? (
-                    <Menu.Item key="menu-resolve" icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
-                        Resolve
-                    </Menu.Item>
-            ) : (
-                <>
-                    <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
-                        Approve
-                    </Menu.Item>
-                    { item.from_office_id == item.to_office_id ? "" : (
-                        <Menu.Item key="menu-reject" icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
-                            Disapprove
-                        </Menu.Item>
-                    ) }
-                </>
-            ) }
-        </Menu>
-      );
+    // const menu = (item, index) => (
+    //     <Menu onClick={() => setSelectedFormRoute(item) }>
+    //         <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
+    //             View
+    //         </Menu.Item>
+    //         { item.status == "with_issues" ? (
+    //                 <Menu.Item key="menu-resolve" icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
+    //                     Resolve
+    //                 </Menu.Item>
+    //         ) : (
+    //             <>
+    //                 <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
+    //                     Approve
+    //                 </Menu.Item>
+    //                 { item.from_office_id == item.to_office_id ? "" : (
+    //                     <Menu.Item key="menu-reject" icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
+    //                         Disapprove
+    //                     </Menu.Item>
+    //                 ) }
+    //             </>
+    //         ) }
+    //     </Menu>
+    //   );
     
     return (
         <div className='row' style={{minHeight: "50vh"}}>

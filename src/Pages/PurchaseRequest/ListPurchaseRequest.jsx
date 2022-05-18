@@ -72,8 +72,8 @@ const Listpurchaserequest = (props) => {
         document.title = "List of Purchase Request";
         if(props.isInitialized){
             if(isEmpty(props.purchaseRequests)){
-                getPurchaseRequests();
             }
+            getPurchaseRequests();
         }
     }, [props.isInitialized]);
     
@@ -395,11 +395,11 @@ const Listpurchaserequest = (props) => {
             width: 60,
             align: "center",
             render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['click']}>
-                    <Button size='small'>
-                        <EllipsisOutlined />
+                <Tooltip placement="bottom" title={"Edit"}>
+                    <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+
                     </Button>
-                </Dropdown>
+                </Tooltip>
               )
         },
     ];
@@ -484,9 +484,6 @@ const Listpurchaserequest = (props) => {
                                                 </p>
                                             </div>
                                         </TabPane>
-                                        <TabPane tab="Attachments" key="uploads">
-                                        <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
-                                        </TabPane>
                                         <TabPane tab="Routing" key="routing">
                                             { !isEmpty(props.timelines) ? (
                                                 <div className='pt-4'>
@@ -510,15 +507,24 @@ const Listpurchaserequest = (props) => {
                     )
                 }
             </Row>
+            { isEmpty(props.selectedPurchaseRequest) ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
-                <Col span={24}>
-                    <div className='purchase-request-card-content'>
-                        { isEmpty(props.selectedPurchaseRequest) ? "" : (
+                <Col md={24} lg={16} xl={18}>
+                    <Card size="small" title="Forwarded Form" bordered={false} loading={props.formLoading}>
+                        <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedPurchaseRequest.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
-                        ) }
-                    </div>
+                        </div>
+                    </Card>
                 </Col>
+                <Col md={24} lg={8} xl={6}>
+                        <Card size="small" title="Attachments" bordered={false} loading={props.formLoading}>
+                            <div className='forms-card-form-content'>
+                            <AttachmentUpload formId={props.selectedPurchaseRequest.id} formType="purchase_request" fileList={props.selectedPurchaseRequest.form_uploads?.data} />
+                            </div>
+                        </Card>
+                    </Col>
             </Row>
+            ) }
             
         </div>
     );

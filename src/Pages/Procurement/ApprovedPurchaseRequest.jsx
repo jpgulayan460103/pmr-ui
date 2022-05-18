@@ -71,8 +71,8 @@ const ApprovedPurchaseRequest = (props) => {
     useEffect(() => {
         if(props.isInitialized){
             if(isEmpty(props.purchaseRequests)){
-                props.getPurchaseRequests();
             }
+            props.getPurchaseRequests();
             props.dispatch({
                 type: "SET_PROCUREMENT_COLUMNS",
                 data: columns.map(i => (
@@ -607,7 +607,7 @@ const ApprovedPurchaseRequest = (props) => {
                     )
                 }
                 return(
-                    <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                    <Dropdown overlay={menu(item, index)} trigger={['hover']}>
                         <Button size='small'>
                             <EllipsisOutlined />
                         </Button>

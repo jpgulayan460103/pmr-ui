@@ -137,7 +137,7 @@ const UserTable = (props) => {
             width: 60,
             align: "center",
             render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['click']}>
+                <Dropdown overlay={menu(item, index)} trigger={['hover']}>
                     <EllipsisOutlined style={{ fontSize: '24px' }} />
                 </Dropdown>
             ),

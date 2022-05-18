@@ -61,7 +61,7 @@ const Sidemenu = (props) => {
         <React.Fragment>
             <Menu
                 theme="light"
-                mode="inline"
+                mode="vertical"
                 selectedKeys={[defaultKey]}
                 >
                 <Menu.Item key="/" icon={<DashboardOutlined />}>

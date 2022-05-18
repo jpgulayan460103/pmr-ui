@@ -419,7 +419,7 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
-                                { item.in_libraries ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
+                                { item.item_id ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                     showSearch
                                     value={item.unit_of_measure_id}
                                     placeholder="Select a Unit"
@@ -441,7 +441,7 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
-                                { item.in_libraries ? item.item_name : (
+                                { item.item_id ? item.item_name : (
                                     <AutoComplete
                                         style={{ width: "100%" }}
                                         allowClear
@@ -565,9 +565,16 @@ const CreatePurchaseRequest = (props) => {
                 {/* <p style={{color: "red"}}>
                     { helpers.displayError(props.formErrors,'items')?.help }
                 </p> */}
-                <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
-                <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined /> Save</Button>
-                <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />Cancel</Button>
+
+                { props.formType == "create" ? (
+                    <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
+                ) : ""}
+                <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined />
+                    { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
+                </Button>
+                <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />
+                    { props.formType == "create" ? "Reset Form" : "Clear Form and Create New"}
+                </Button>
 
             </div>
         </div>

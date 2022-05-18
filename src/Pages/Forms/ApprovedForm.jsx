@@ -10,6 +10,7 @@ import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
 import TableRefresh from '../../Components/TableRefresh';
 import TableResetFilter from '../../Components/TableResetFilter';
+import AttachmentUpload from '../../Components/AttachmentUpload';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -53,8 +54,8 @@ const ApprovedForm = (props) => {
         if(props.isInitialized){
             // getForm();
             if(isEmpty(props.forms)){
-                getForm();
             }
+            getForm();
         }
     }, [props.isInitialized]);
     
@@ -150,6 +151,7 @@ const ApprovedForm = (props) => {
             key: 'route_description',
             width: 150,
             ...onCell,
+            ellipsis: true,
             render: (text, item, index) => (
                 <span>
                     { item.form_process.process_description }
@@ -162,6 +164,7 @@ const ApprovedForm = (props) => {
             key: 'route_type_str',
             width: 150,
             ...onCell,
+            ellipsis: true,
         },
         {
             title: 'Requested on',
@@ -169,6 +172,7 @@ const ApprovedForm = (props) => {
             width: 150,
             ...filter.search('created_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
             render: (text, item, index) => (
                 <span>
@@ -186,6 +190,7 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             width: 150,
             sorter: (a, b) => {},
         },
@@ -199,6 +204,7 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             width: 150,
             sorter: (a, b) => {},
         },
@@ -211,6 +217,7 @@ const ApprovedForm = (props) => {
                 </span>
             ),
             ...onCell,
+            ellipsis: true,
             ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getForm),
             width: 150,
             sorter: (a, b) => {},
@@ -218,7 +225,6 @@ const ApprovedForm = (props) => {
         {
             title: 'End User',
             key: 'end_user',
-            ellipsis: true,
             width: 250,
             filters: endUserFilter,
             ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getForm),
@@ -228,6 +234,7 @@ const ApprovedForm = (props) => {
                 </span>
             ),
             ...onCell,
+            ellipsis: true,
         },
         {
             title: 'Approved on',
@@ -236,6 +243,7 @@ const ApprovedForm = (props) => {
             width: 250,
             ...filter.search('updated_at','date_range', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
         {
@@ -249,6 +257,7 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
         {
@@ -262,6 +271,7 @@ const ApprovedForm = (props) => {
             ),
             ...filter.search('forwarded_remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
+            ellipsis: true,
             sorter: (a, b) => {},
         },
     ];
@@ -369,13 +379,21 @@ const ApprovedForm = (props) => {
             </Row>
             { isEmpty(props.selectedFormRoute) || props.selectedFormRoute.form_routable.file == "" ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
-                <Col span={24}>
-                    <Card size="small" title="Approved Form" bordered={false}>
+                <Col md={24} lg={16} xl={18}>
+                    <Card size="small" title="Forwarded Form" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedFormRoute.form_routable?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
+
+                <Col md={24} lg={8} xl={6}>
+                        <Card size="small" title="Attachments" bordered={false} loading={props.formLoading}>
+                            <div className='forms-card-form-content'>
+                                <AttachmentUpload formId={props.selectedFormRoute.form_routable_id} formType={props.selectedFormRoute.route_type} fileList={props.attachments}></AttachmentUpload>
+                            </div>
+                        </Card>
+                    </Col>
             </Row>
             )  }
 
