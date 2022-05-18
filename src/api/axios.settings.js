@@ -5,8 +5,8 @@ import { Modal, Button, Space } from 'antd';
 const customAxios = axios.create({
   baseURL: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_URL : process.env.REACT_APP_PRODUCTION_URL)
 });
-if(sessionStorage.getItem("session")){
-  let token = JSON.parse(sessionStorage.getItem("session"));
+if(localStorage.getItem("session")){
+  let token = JSON.parse(localStorage.getItem("session"));
   let access_token = token.access_token;
   customAxios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
 }
@@ -23,7 +23,7 @@ customAxios.interceptors.response.use((response) => {
         if(error.request.responseURL === `${baseURL}/api/logout`){
           return false;
         }
-        sessionStorage.removeItem('session');
+        localStorage.removeItem('session');
         Modal.error({
           title: 'Session Expired',
           content: (

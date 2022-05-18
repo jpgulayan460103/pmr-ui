@@ -56,7 +56,7 @@ const UserForm = (props) => {
     const createUser = (values) => {
         api.User.registerAd(values)
         .then(res => {
-            sessionStorage.setItem('session',JSON.stringify(res.data));
+            localStorage.setItem('session',JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
             props.dispatch({
                 type: "SET_INITIALIZED",

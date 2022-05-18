@@ -46,7 +46,7 @@ const Loginform = (props) => {
                 props.getAdInfo(res.data.data);
                 props.setShowRegister(true);
             }else{
-                sessionStorage.setItem('session',JSON.stringify(res.data));
+                localStorage.setItem('session',JSON.stringify(res.data));
                 customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
                 props.dispatch({
                     type: "SET_INITIALIZED",

@@ -626,7 +626,7 @@ const ApprovedPurchaseRequest = (props) => {
     );
 
 
-    let token = JSON.parse(sessionStorage.getItem("session"));
+    let token = JSON.parse(localStorage.getItem("session"));
     let access_token = token.access_token;
     // customAxios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
 

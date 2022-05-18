@@ -42,7 +42,7 @@ const Loadlibraries = (props) => {
                 // getLibraries("procurement_type");
             }
             if(isEmpty(props.user)){
-                if (sessionStorage.getItem("session") !== null) {
+                if (localStorage.getItem("session") !== null) {
                     props.dispatch({
                         type: "SET_MAIN_LOADING_MESSAGE",
                         data: "Loading User Data..."

@@ -48,7 +48,7 @@ const auth = {
 };
 const PrivateRoute  = ({ children, ...props }) => {
   let location = useLocation();
-  if (sessionStorage.getItem("session") !== null) {
+  if (localStorage.getItem("session") !== null) {
     auth.isAuthenticated = true;
   }
   if (!auth.isAuthenticated) {

@@ -81,7 +81,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             type: "SET_INITIAL_STATE",
             data: {}
         });
-        sessionStorage.removeItem('session');
+        localStorage.removeItem('session');
         history.push("/login");
     }
     return (
