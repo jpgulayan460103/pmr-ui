@@ -25,21 +25,21 @@ const Loadlibraries = (props) => {
             });
             if(!props.isLibrariesLoaded){
                 // await getLibraries();
-                // await getAllLibraries();
-                getLibraries("user_division");
-                getLibraries("user_section");
-                getLibraries("unit_of_measure");
-                getLibraries("item_category");
-                getLibraries("user_position");
-                getLibraries("user_area_of_assignment");
-                getLibraries("account");
-                getLibraries("account_classification");
-                getLibraries("mode_of_procurement");
-                getLibraries("technical_working_group");
-                getLibraries("user_signatory_designation");
-                getLibraries("user_signatory_name");
-                getLibraries("uacs_code");
-                getLibraries("procurement_type");
+                await getAllLibraries();
+                // getLibraries("user_division");
+                // getLibraries("user_section");
+                // getLibraries("unit_of_measure");
+                // getLibraries("item_category");
+                // getLibraries("user_position");
+                // getLibraries("user_area_of_assignment");
+                // getLibraries("account");
+                // getLibraries("account_classification");
+                // getLibraries("mode_of_procurement");
+                // getLibraries("technical_working_group");
+                // getLibraries("user_signatory_designation");
+                // getLibraries("user_signatory_name");
+                // getLibraries("uacs_code");
+                // getLibraries("procurement_type");
             }
             if(isEmpty(props.user)){
                 if (sessionStorage.getItem("session") !== null) {
