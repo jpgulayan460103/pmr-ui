@@ -20,6 +20,7 @@
     "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-beforeunload": "^2.5.2",
+    "react-cache-buster": "^0.1.6",
     "react-css-theme-switcher": "^0.3.0",
     "react-dom": "^17.0.2",
     "react-image-lightbox": "^5.1.4",
@@ -35,9 +36,10 @@
   "scripts": {
     "start": "set PUBLIC_URL=/&&craco start",
     "build": "set PUBLIC_URL=/&&craco build",
-    "deploy": "craco build",
+    "deploy": "npm run generate-meta-tag && craco build",
     "test": "craco test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-meta-tag": "node ./node_modules/react-cache-buster/dist/generate-meta-tag.js"
   },
   "eslintConfig": {
     "extends": [

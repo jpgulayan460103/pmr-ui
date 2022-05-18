@@ -29,6 +29,9 @@ import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
 import Home from './Pages/Home/Home';
 import Suppliers from './Pages/Suppliers/Suppliers';
 
+import CacheBuster from 'react-cache-buster';
+import { version } from '../package.json';
+
 
 window.Pusher = require('pusher-js');
 
@@ -112,85 +115,97 @@ const App = (props) => {
             }
           });
     }, [props.user]); */
-  return (
+
+    const isProduction = process.env.NODE_ENV === 'production';
+    return (
+
+        <CacheBuster
+            currentVersion={version}
+            isEnabled={isProduction} //If false, the library is disabled.
+            isVerboseMode={false} //If true, the library writes verbose logs to console.
+            //   loadingComponent={<Loading />} //If not pass, nothing appears at the time of new version check.
+        >
+
         <Switch>
-          <Route exact path="/"  >
-              <PrivateRoute><Layout><Home /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement"  >
-              <PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement/suppliers"  >
-              <PrivateRoute><Layout><Suppliers /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement/quotations"  >
-              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement/quotations/form"  >
-              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement/quotations"  >
-              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/procurement/quotations/suppliers"  >
-              <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/forms/forwarded"  >
-              <PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/forms/approved"  >
-              <PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/forms/disapproved"  >
-              <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/purchase-requests/form"  >
-              <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/purchase-requests"  >
-              <PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries"  >
-              <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/items">
-              <PrivateRoute><Layout><ItemLibrary /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/items/categories"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/items/measures"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/offices/divisions"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_division" options={{libraryName: "Office Division",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/offices/sections"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_section" options={{libraryName: "Office Section",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/user_offices/administrators"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" options={{libraryName: "Office Administrators",parent: true, title: true, parentLabel: "Designation", parentType: "user_signatory_designation"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/libraries/user_offices/administrators/designations"  >
-              <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_designation" options={{libraryName: "Office Administrator's Designation",parent: true, title: true, parentLabel: "Designation", parentType: "user_section"}} /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/users"  >
-              <PrivateRoute><Layout><User /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/activity-logs"  >
-              <PrivateRoute><Layout><ActivityLogs /></Layout></PrivateRoute>
-          </Route>
-          <Route exact path="/login"  >
-              <Login />
-          </Route>
-          <Route exact path="/logout"  >
-              <Login />
-          </Route>
-          <Route exact path="*"  >
-            <PrivateRoute><Layout></Layout></PrivateRoute>
-          </Route>
-        </Switch>
-  );
+            <Route exact path="/"  >
+                <PrivateRoute><Layout><Home /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement"  >
+                <PrivateRoute><Layout><Procurement /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement/suppliers"  >
+                <PrivateRoute><Layout><Suppliers /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement/quotations"  >
+                <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement/quotations/form"  >
+                <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement/quotations"  >
+                <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement/quotations/suppliers"  >
+                <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/forms/forwarded"  >
+                <PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/forms/approved"  >
+                <PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/forms/disapproved"  >
+                <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/purchase-requests/form"  >
+                <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/purchase-requests"  >
+                <PrivateRoute><Layout><ListPurchaseRequest /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries"  >
+                <PrivateRoute><Layout><ListLibrary /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/items">
+                <PrivateRoute><Layout><ItemLibrary /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/items/categories"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/items/measures"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/offices/divisions"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_division" options={{libraryName: "Office Division",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/offices/sections"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_section" options={{libraryName: "Office Section",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/user_offices/administrators"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" options={{libraryName: "Office Administrators",parent: true, title: true, parentLabel: "Designation", parentType: "user_signatory_designation"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/user_offices/administrators/designations"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_designation" options={{libraryName: "Office Administrator's Designation",parent: true, title: true, parentLabel: "Designation", parentType: "user_section"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/users"  >
+                <PrivateRoute><Layout><User /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/activity-logs"  >
+                <PrivateRoute><Layout><ActivityLogs /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/login"  >
+                <Login />
+            </Route>
+            <Route exact path="/logout"  >
+                <Login />
+            </Route>
+            <Route exact path="*"  >
+                <PrivateRoute><Layout></Layout></PrivateRoute>
+            </Route>
+            </Switch>
+
+        </CacheBuster>
+    );
 }
 
 export default connect(
