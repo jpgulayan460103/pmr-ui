@@ -270,7 +270,7 @@ const CreatePurchaseRequest = (props) => {
         let newValue = cloneDeep(props.formData.items);
         switch (field) {
             case 'unit_cost':
-                value = isNaN(value) ? 1 : parseFloat(value);
+                // value = isNaN(value) ? 1 : parseFloat(value);
                 newValue[index]["total_unit_cost"] = value * newValue[index]["quantity"];
                 break;
             case 'quantity':

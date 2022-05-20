@@ -2,6 +2,13 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import api from '../api';
 import { isEmpty } from 'lodash';
+import customAxios from '../api/axios.settings';
+import dayjs from 'dayjs';
+import { Modal } from 'antd';
+import { useHistory } from 'react-router-dom'
+import {
+    ExclamationCircleOutlined,
+  } from '@ant-design/icons';
 
 function mapStateToProps(state) {
     return {
@@ -17,6 +24,8 @@ function mapStateToProps(state) {
 }
 
 const Loadlibraries = (props) => {
+    let history = useHistory();
+
     useEffect(async () => {
         if(!props.isInitialized){
             props.dispatch({
@@ -47,7 +56,13 @@ const Loadlibraries = (props) => {
                         type: "SET_MAIN_LOADING_MESSAGE",
                         data: "Loading User Data..."
                     });
-                    await getUser();
+                    if(localStorage.getItem("last_login") != dayjs().format('YYYY-MM-DD')){
+                        await refreshToken();
+                        await getUser(true);
+                    }else{
+                        await getUser();
+                    }
+                }else{
                 }
             }
             
@@ -69,6 +84,23 @@ const Loadlibraries = (props) => {
 
         }
     }, []);
+
+    const refreshToken = async () => {
+        let token = JSON.parse(localStorage.getItem("session"));
+        if(token){
+            let refresh_token = token.refresh_token
+            await api.User.refresh(refresh_token)
+            .then(res => {
+                localStorage.setItem('session',JSON.stringify(res.data));
+                localStorage.setItem('last_login', dayjs().format('YYYY-MM-DD'));
+                customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
+            })
+            .catch(err => {
+                console.log(err);
+            })
+            ;
+        }
+    }
 
     const getLibraries = async ($type) => {
         return api.Library.getLibraries($type)
@@ -237,7 +269,7 @@ const Loadlibraries = (props) => {
         ;
     }
 
-    const getUser = async () => {
+    const getUser = async (greet = false) => {
         return api.User.auth()
         .then(res => {
             props.dispatch({
@@ -246,6 +278,32 @@ const Loadlibraries = (props) => {
             });
             let userOffice = res?.data?.user_offices?.data[0]?.office?.id;
             sessionStorage.setItem("user_office", userOffice);
+            if(greet){
+                let username = res.data.username;
+                Modal.confirm({
+                    title: 'Welcome',
+                    icon: <ExclamationCircleOutlined />,
+                    content: (
+                      <div>
+                        <p>You are currently logged as <b>{username}</b>.</p>
+                      </div>
+                    ),
+                    onOk() {
+                      Modal.destroyAll();
+                    },
+                    cancelText: "Logout",
+                    okText: `Continue as ${username}`,
+                    onCancel(){
+                        api.User.logout();
+                        props.dispatch({
+                            type: "SET_INITIAL_STATE",
+                            data: {}
+                        });
+                        localStorage.removeItem('session');
+                        history.push("/login");
+                    }
+                  });
+            }
         })
         .catch(err => {
             if(err.response.status == 401 || err.response.status == 429){

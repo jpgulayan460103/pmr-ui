@@ -6,6 +6,7 @@ import api from '../../api';
 import customAxios from '../../api/axios.settings';
 import { useLocation, useHistory  } from "react-router-dom";
 import Themepicker from '../../Components/ThemePicker';
+import dayjs from 'dayjs';
 
 const { Title } = Typography;
 
@@ -47,6 +48,7 @@ const Loginform = (props) => {
                 props.setShowRegister(true);
             }else{
                 localStorage.setItem('session',JSON.stringify(res.data));
+                localStorage.setItem('last_login', dayjs().format('YYYY-MM-DD'));
                 customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
                 props.dispatch({
                     type: "SET_INITIALIZED",

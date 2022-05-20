@@ -29,6 +29,11 @@ export default {
   logout(){
     return axios.post(`api/logout`);
   },
+  refresh(refresh_token){
+    return axios.post(`api/auth/refresh`, {
+      'refresh_token': refresh_token
+    });
+  },
   toggleStatusUser(user){
     return axios.post(`api/users/active-status/${user.id}`);
   },
