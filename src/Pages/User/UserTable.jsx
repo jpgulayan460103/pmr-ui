@@ -130,18 +130,18 @@ const UserTable = (props) => {
             ),
             ...onCell,
         },
-        {
-            title: "Action",
-            key: "action",
-            fixed: 'right',
-            width: 60,
-            align: "center",
-            render: (text, item, index) => (
-                <Dropdown overlay={menu(item, index)} trigger={['hover']}>
-                    <EllipsisOutlined style={{ fontSize: '24px' }} />
-                </Dropdown>
-            ),
-        },
+        // {
+        //     title: "Action",
+        //     key: "action",
+        //     fixed: 'right',
+        //     width: 60,
+        //     align: "center",
+        //     render: (text, item, index) => (
+        //         <Dropdown overlay={menu(item, index)} trigger={['hover']}>
+        //             <EllipsisOutlined style={{ fontSize: '24px' }} />
+        //         </Dropdown>
+        //     ),
+        // },
     ];
 
     const menu = (item, index) => (

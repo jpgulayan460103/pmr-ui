@@ -5,9 +5,11 @@ import UserPermissions from './UserPermissions'
 import UserForm from './UserForm';
 import api from '../../api';
 import { debounce, map } from 'lodash'
-import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu  } from 'antd';
+import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown  } from 'antd';
 import helpers from '../../Utilities/helpers';
 import TableRefresh from '../../Components/TableRefresh';
+
+const { TabPane } = Tabs;
 
 
 
@@ -77,20 +79,19 @@ const User = (props) => {
                     </Card>
                 </Col>
                 <Col sm={24} md={8} lg={10} xl={10}>
-                    { editType=="edit" ?  (
-                        <Card size="small" title="Update User" bordered={false}>
-                            <div className='user-card-content'>
+                <Card size="small" title="User" bordered={false}>
+                    <div className='user-card-content'>
+
+                        <Tabs activeKey={props.tab} type="card" size="small">
+                            <TabPane tab="Information" key="information">
                                 <UserForm userInfo={formData} type="update" getUsers={getUsers} />
-                            </div>
-                        </Card>
-                    ) : "" }
-                    { editType=="permissions" ?  (
-                        <Card size="small" title="Roles and Permissions" bordered={false}  >
-                            <div className='user-card-content'>
+                            </TabPane>
+                            <TabPane tab="Roles and Permission" key="roles">
                                 <UserPermissions user={selectedUser} allowSuperAdmin={helpers.hasRole(props.user,['super-admin'])} getUsers={getUsers} />
-                            </div>
-                        </Card>
-                    ) : "" }
+                            </TabPane>
+                        </Tabs>
+                    </div>
+                    </Card>
                 </Col>
             </Row>
         </div>

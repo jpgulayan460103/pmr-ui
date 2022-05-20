@@ -13,6 +13,7 @@ import Icon, {
     LoadingOutlined,
     FormOutlined,
     EditOutlined,
+    StopOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
 import dayjs from 'dayjs';
@@ -248,13 +249,31 @@ const Listpurchaserequest = (props) => {
     }
 
     const timelineContent = (timeline) => {
-        let label = (<>
-            {timeline.status_str} on <i>{ timeline.updated_at }</i><br /> 
-            <b>{timeline.to_office?.name}</b> <br />
-            {timeline.status == 'with_issues' ? "For resolution" : timeline.remarks}
-        </>)
+        let created;
+        let tat_text;
+        let status;
+        let remarks;
+        let office;
+        let remarksUser;
+        let forwardedUser;
         let color =""
         let logo =""
+
+        /* 
+            {timeline.status_str != "Pending" ? <span>Created on <i>{ timeline.created_at }</i><br /></span> : ""}
+            <span>{timeline.status_str} on <i>{ timeline.updated_at }</i><br /></span>
+            {timeline.status_str != "Pending" ? <span>Turnaround Time: <i>{ helpers.turnAroundTime(timeline.updated_at_raw, timeline.created_at_raw) }</i><br /></span> : ""}
+            <b>{timeline.to_office?.name}</b> <br />
+            {timeline.status == 'with_issues' ? "For resolution" : timeline.remarks}
+        
+        */
+        created = <span>Created on <i>{ timeline.created_at }</i><br /></span>;
+        status = <span>{timeline.status_str} on <i>{ timeline.updated_at }</i><br /></span>;
+        tat_text = <span>Turnaround Time: <i>{ helpers.turnAroundTime(timeline.updated_at_raw, timeline.created_at_raw) }</i><br /></span>;
+        office = <span><b>{timeline.to_office?.name}</b> <br /></span>;
+        remarks = <span>Remarks: {timeline.remarks}<br /></span>;
+        forwardedUser = <span>From: {timeline.forwarded_by?.user_information?.fullname}<br /></span>;
+        remarksUser = <span>{timeline.status_str} by {timeline.processed_by?.user_information?.fullname}<br /></span>;
         switch (timeline.status) {
             case "approved":
                 color = "green";
@@ -273,10 +292,28 @@ const Listpurchaserequest = (props) => {
                 logo = <CheckCircleOutlined />;
                 break;
             default:
+                tat_text = "";
                 color = "gray";
                 logo = <LoadingOutlined />
                 break;
         }
+        if(timeline.action_taken == null){
+            color = "gray";
+            logo = <LoadingOutlined />
+            tat_text = "";
+            remarks = "";
+            forwardedUser = "";
+            remarksUser = "";
+        }
+        let label = (<>
+            { office }
+            { created }
+            { status }
+            { tat_text }
+            { remarks }
+            { forwardedUser }
+            { remarksUser }
+        </>)
         return { label, color, logo }
     }
 
@@ -392,14 +429,21 @@ const Listpurchaserequest = (props) => {
             title: "Action",
             key: "action",
             fixed: 'right',
-            width: 60,
+            width: 100,
             align: "center",
             render: (text, item, index) => (
-                <Tooltip placement="bottom" title={"Edit"}>
-                    <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+                <div className='space-x-0.5'>
+                    <Tooltip placement="bottom" title={"Edit"}>
+                        <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
 
-                    </Button>
-                </Tooltip>
+                        </Button>
+                    </Tooltip>
+                    {/* <Tooltip placement="bottom" title={"Cancel"}>
+                        <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+
+                        </Button>
+                    </Tooltip> */}
+                </div>
               )
         },
     ];
@@ -510,7 +554,7 @@ const Listpurchaserequest = (props) => {
             { isEmpty(props.selectedPurchaseRequest) ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Forwarded Form" bordered={false} loading={props.formLoading}>
+                    <Card size="small" title="Purchase Request Form" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedPurchaseRequest.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         </div>

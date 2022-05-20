@@ -134,7 +134,7 @@ const UserForm = (props) => {
                         placeholder="Section/Unit/Office"
                         optionFilterProp="children"
                         showSearch
-                        mode={props.type == "update" ? "multiple" : ""}
+                        // mode={props.type == "update" ? "multiple" : ""}
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }

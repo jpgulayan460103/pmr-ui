@@ -1,7 +1,32 @@
 const initialState = () => {
   return {
     data: {},
-    notifications: [],
+    notifications: [
+      // {
+      //   notification_title: 'For Approval Purchase Request',
+      //   notification_type: 'approved_form',
+      //   notification_message: 'Resolved123',
+      //   notification_data: {
+      //     status: 'Disapproved',
+      //     user: 'ict',
+      //     remarks: 'Resolved123',
+      //     datetime: 'datetime',
+      //     form: 'Blanditiis dolore enim in reprehenderit qui officiis est. Dolor sit minus maxime voluptate sit corporis mollitia. Aliquam consequatur corporis nesciunt ratione corrupti.'
+      //   }
+      // },
+      // {
+      //   notification_title: 'Disapproved Purchase Request',
+      //   notification_type: 'rejected_form',
+      //   notification_message: 'Reject123',
+      //   notification_data: {
+      //     status: 'Disapproved',
+      //     user: 'bacs',
+      //     remarks: 'Reject123',
+      //     datetime: "datetime",
+      //     form: 'Blanditiis dolore enim in reprehenderit qui officiis est. Dolor sit minus maxime voluptate sit corporis mollitia. Aliquam consequatur corporis nesciunt ratione corrupti.'
+      //   }
+      // }
+    ],
     collapsed: true,
     collapsedWidth: 50,
     mainLoading: true,

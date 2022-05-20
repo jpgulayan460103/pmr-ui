@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cloneDeep, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import api from '../../api';
-import { Table, Card, Col, Row, Form, Input, Select, Button, notification, Space  } from 'antd';
+import { Table, Card, Col, Row, Form, Input, Select, Button, notification, Space, Popconfirm  } from 'antd';
 import { UserOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import helpers from '../../Utilities/helpers';
 import filter from '../../Utilities/filter';
@@ -19,6 +19,7 @@ function mapStateToProps(state) {
         user_section: state.libraries.user_sections,
         user_signatory_name: state.libraries.user_signatory_names,
         user_signatory_designation: state.libraries.user_signatory_designations,
+        uacs_code: state.libraries.uacs_codes,
         user: state.user.data,
     };
 }
@@ -59,6 +60,12 @@ const ListLibrary = (props) => {
             if($type == "unit_of_measure"){
                 props.dispatch({
                     type: "SET_LIBRARY_UNIT_OF_MEASURES",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
+            if($type == "uacs_code"){
+                props.dispatch({
+                    type: "SET_LIBRARY_UACS_CODE",
                     data: libraries.filter(library => library.library_type == $type)
                 });
             }
@@ -212,9 +219,6 @@ const ListLibrary = (props) => {
 
     const onCell = {
         onCell: (record, colIndex) => {
-            if(!helpers.hasRole(props.user, ['super-admin'])){
-                return false;
-            }
             return {
                 onClick: event => {
                     setSelectedLibrary(record);
@@ -283,20 +287,25 @@ const ListLibrary = (props) => {
                 }
             );
         }
-        if(helpers.hasRole(props.user,["super-admin"])){
-            cols.push(
-                {
-                    title: "",
-                    key: 'action',
-                    width: 50,
-                    render: (text, item, index) => (
-                        <span className='custom-pointer' onClick={() => { setInactiveLibrary(item) }}>
+        cols.push(
+            {
+                title: "",
+                key: 'action',
+                width: 50,
+                render: (text, item, index) => (
+                    <Popconfirm
+                        title="Are you sure to delete?"
+                        onConfirm={() => { setInactiveLibrary(item) }}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <span className='custom-pointer'>
                             <DeleteOutlined />
                         </span>
-                    ),
-                }
-            );
-        }
+                    </Popconfirm>
+                ),
+            }
+        );
         return cols;
     };
 
@@ -353,9 +362,6 @@ const ListLibrary = (props) => {
                     </div>
                 </Card>
             </Col>
-            
-            { 
-                helpers.hasRole(props.user,["super-admin"]) && (
             
             <Col sm={24} md={8} lg={10} xl={10}>
                 <Card size="small" title={`${formType} ${props.options.libraryName}`} bordered={false}>
@@ -435,7 +441,6 @@ const ListLibrary = (props) => {
                     </div>
                 </Card>
             </Col>
-            )}
         </Row>
     );
 }

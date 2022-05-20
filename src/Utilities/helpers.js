@@ -39,6 +39,12 @@ var dateStart = currentDate.clone().subtract(2, 'month').format("YYYY-MM-DD");
 var dateEnd = currentDate.clone().format("YYYY-MM-DD");
 const defaultDateRange = [dateStart,dateEnd];
 
+const turnAroundTime = (updated, created) => {
+    const date1 = moment(updated)
+    const date2 = moment(created)
+    return date1.diff(date2, "minute") + " minute(s)";
+}
+
 export default {
     displayError,
     bytesToSize,
@@ -46,4 +52,5 @@ export default {
     hasRole,
     currencyFormat,
     defaultDateRange,
+    turnAroundTime,
 }

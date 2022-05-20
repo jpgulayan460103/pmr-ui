@@ -244,6 +244,8 @@ const Loadlibraries = (props) => {
                 type: "SET_USER_DATA",
                 data: res.data
             });
+            let userOffice = res?.data?.user_offices?.data[0]?.office?.id;
+            sessionStorage.setItem("user_office", userOffice);
         })
         .catch(err => {
             if(err.response.status == 401 || err.response.status == 429){

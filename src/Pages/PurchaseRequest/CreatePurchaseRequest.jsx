@@ -86,9 +86,11 @@ const CreatePurchaseRequest = (props) => {
     const getItems = async () => {
         return api.Library.getLibraries('items')
         .then(res => {
+            let items = res.data.data;
+            items = items.filter(i => i.is_active);
             props.dispatch({
                 type: "SET_LIBRARY_ITEMS",
-                data: res.data.data
+                data: items
             });
         })
         .catch(err => {})

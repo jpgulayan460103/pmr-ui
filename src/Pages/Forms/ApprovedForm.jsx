@@ -4,7 +4,6 @@ import { Table, Space, Divider, Button, Typography, Tooltip, notification, Modal
 import api from '../../api';
 import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
-import dayjs from 'dayjs';
 import filter from '../../Utilities/filter';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
@@ -370,6 +369,9 @@ const ApprovedForm = (props) => {
                                     <br />
                                     <span><b>Status:</b> <span>{ props.selectedFormRoute.status }</span></span><br />
                                     <span><b>Action Taken:</b> <span>{ props.selectedFormRoute.action_taken }</span></span><br />
+                                    <span><b>Created:</b> <span>{ props.selectedFormRoute.created_at }</span></span><br />
+                                    <span><b>Approved:</b> <span>{ props.selectedFormRoute.updated_at }</span></span><br />
+                                    <span><b>Turnaround Time:</b> <span>{ helpers.turnAroundTime(props.selectedFormRoute.updated_at_raw, props.selectedFormRoute.created_at_raw) }</span></span><br />
                                 </p>
                                 
                             </div>

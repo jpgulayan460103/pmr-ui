@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
   BrowserRouter as Router,
@@ -31,6 +31,7 @@ import Suppliers from './Pages/Suppliers/Suppliers';
 
 import CacheBuster from 'react-cache-buster';
 import { version } from '../package.json';
+import { cloneDeep } from 'lodash';
 
 
 window.Pusher = require('pusher-js');
@@ -73,48 +74,42 @@ function mapStateToProps(state) {
 
 const App = (props) => {
 
-/*     useEffect(() => {
+    useEffect(() => {
         window.Echo.channel('home').listen('NewMessage', (e) => {
-            // console.log(e);
             // var notification = new Notification(e.message);
-            // console.log(e);
-            // console.log(props.user.user_offices);
-            if(!isEmpty(props.user)){
-                console.log(e.message.notify_offices);
-                if(props.user?.user_offices?.data.filter(i => i.office_id == e.message.notify_offices).length != 0){
-                    console.log(e.message);
-                    let clonedNotif = cloneDeep(props.notifications)
-                    switch (e.message.notification_type) {
-                        case "approved_form":
-                            clonedNotif.push({
-                                notification_type: e.message.notification_type,
-                                notification_title: e.message.notification_title,
-                                notification_message: e.message.notification_message,
-                                // data: e.message.form_route,
-                            })
-                            break;
-                        case "rejected_form":
-                            clonedNotif.push({
-                                notification_title: e.message.notification_title,
-                                notification_type: e.message.notification_type,
-                                notification_message: e.message.notification_message,
-                                // data: e.message.form_route,
-                            })
-                            break;
-                    
-                        default:
-                            break;
-                    }
-                    props.dispatch({
-                        type: "ADD_NOTIFICATION",
-                        data: clonedNotif
-                    });
+            console.log(e);
+            if(sessionStorage.getItem("user_office") == e.message.notify_offices){
+                let clonedNotif = cloneDeep(props.notifications)
+                switch (e.message.notification_type) {
+                    case "approved_form":
+                        clonedNotif.push({
+                            notification_type: e.message.notification_type,
+                            notification_title: e.message.notification_title,
+                            notification_message: e.message.notification_message,
+                            notification_data: e.message.notification_data,
+                            // data: e.message.form_route,
+                        })
+                        break;
+                    case "rejected_form":
+                        clonedNotif.push({
+                            notification_title: e.message.notification_title,
+                            notification_type: e.message.notification_type,
+                            notification_message: e.message.notification_message,
+                            notification_data: e.message.notification_data,
+                            // // data: e.message.form_route,
+                        })
+                        break;
+                
+                    default:
+                        break;
                 }
-                // console.log(e.message.notify_offices);
-                // console.log("notify");
+                props.dispatch({
+                    type: "ADD_NOTIFICATION",
+                    data: clonedNotif
+                });
             }
           });
-    }, [props.user]); */
+    }, []);
 
     const isProduction = process.env.NODE_ENV === 'production';
     return (
@@ -174,6 +169,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/libraries/items/measures"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/libraries/uacs_code"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="uacs_code" options={{libraryName: "UACS Code", title: true}} /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/libraries/offices/divisions"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="user_division" options={{libraryName: "Office Division",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>

@@ -369,6 +369,9 @@ const DisapprovedForm = (props) => {
                                     <br />
                                     <span><b>Status:</b> <span>{ props.selectedFormRoute.status }</span></span><br />
                                     <span><b>Action Taken:</b> <span>{ props.selectedFormRoute.action_taken }</span></span><br />
+                                    <span><b>Created:</b> <span>{ props.selectedFormRoute.created_at }</span></span><br />
+                                    <span><b>Disapproved:</b> <span>{ props.selectedFormRoute.updated_at }</span></span><br />
+                                    <span><b>Turnaround Time:</b> <span>{ helpers.turnAroundTime(props.selectedFormRoute.updated_at_raw, props.selectedFormRoute.created_at_raw) }</span></span><br />
                                 </p>
                                 
                             </div>

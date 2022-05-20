@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cloneDeep, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import api from '../../api';
-import { Table, Card, Col, Row, Form, Input, Select, Button, notification, Checkbox, Space  } from 'antd';
+import { Table, Card, Col, Row, Form, Input, Select, Button, notification, Checkbox, Space, Popconfirm  } from 'antd';
 import { UserOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import helpers from '../../Utilities/helpers';
 
@@ -71,9 +71,11 @@ const ItemLibrary = (props) => {
     const getItems = async () => {
         return api.Library.getLibraries('items')
         .then(res => {
+            let items = res.data.data;
+            items = items.filter(i => i.is_active);
             props.dispatch({
                 type: "SET_LIBRARY_ITEMS",
-                data: res.data.data
+                data: items
             });
         })
         .catch(err => {})
@@ -263,7 +265,43 @@ const ItemLibrary = (props) => {
             ...onCell,
             sorter: (a, b) => a.is_ppmp_str.localeCompare(b.is_ppmp_str),
         },
+        {
+            title: "",
+            key: 'action',
+            width: 50,
+            render: (text, item, index) => (
+                <Popconfirm
+                title="Are you sure to delete?"
+                onConfirm={() => { setInactiveLibrary(item) }}
+                okText="Yes"
+                cancelText="No"
+            >
+                <span className='custom-pointer'>
+                    <DeleteOutlined />
+                </span>
+            </Popconfirm>
+            ),
+        }
     ];
+
+    const setInactiveLibrary = (item) => {
+        let values = {
+            id: item.id,
+            is_active: 0,
+        }
+        api.Library.save('items', values, "update")
+        .then(res => {
+                notification.success({
+                    message: 'Done',
+                    description:
+                      'The library has been updated',
+                });
+                getItems()
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
 
     return (
         <Row gutter={[16, 16]} className="mb-3">
@@ -346,7 +384,6 @@ const ItemLibrary = (props) => {
                                 name="item_code"
                                 label="Item Code"
                                 { ...helpers.displayError(formErrors, `item_code`)  }
-                                rules={[{ required: true, message: 'Name field is required' }]}
                             >
                                 <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Name" />
                             </Form.Item>

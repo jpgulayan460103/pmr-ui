@@ -378,7 +378,9 @@ const ForwardedForm = (props) => {
     var debouncedGetForm = React.useCallback(debounce(getFormNoLoading, 400), []);
     useEffect(() => {
         window.Echo.channel('home').listen('NewMessage', (e) => {
-            debouncedGetForm();
+            if(sessionStorage.getItem("user_office") == e.message.notify_offices){
+                debouncedGetForm();
+            }
         });
         return () => {
             debouncedGetForm = () => {
@@ -1068,6 +1070,7 @@ const ForwardedForm = (props) => {
                                     { props.selectedFormRoute.forwarded_remarks ? <span><b>Remarks:</b> <span>{props.selectedFormRoute.forwarded_remarks}</span><br /></span> : ""}
                                     <span><b>Status:</b> <span>{ props.selectedFormRoute.status != "pending" ? "Disapproved" : "Pending"}</span></span><br />
                                     { props.selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <span>{props.selectedFormRoute.user?.user_information?.fullname}</span><br /></span> : ""}
+                                    <span><b>Created:</b> <span>{ props.selectedFormRoute.created_at }</span></span><br />
                                 </p>
                                 
                             </div>

@@ -9,89 +9,6 @@ const UserPermissions = (props) => {
         return () => { unmounted.current = true }
     }, []);
     const treeData = [
-        {
-          title: 'Users Module',
-          key: 'users.all',
-          children: [
-            {
-              title: 'Permission to view the list of users.',
-              key: 'users.view',
-            },
-            {
-              title: 'Permission to update a user.',
-              key: 'users.update',
-            },
-            {
-              title: 'Permission to view the list of permissions of a user.',
-              key: 'users.permission.view',
-            },
-            {
-              title: 'Permission to update permissions of a user.',
-              key: 'users.permission.update',
-            },
-            {
-              title: 'Permission to delete a user.',
-              key: 'users.delete',
-            },
-          ],
-        },
-        {
-            title: 'Purchase Requests Module',
-            key: 'purchase.requests.all',
-            children: [
-              {
-                title: 'Permission to view the list of purchase requests.',
-                key: 'purchase.requests.view',
-              },
-              {
-                title: 'Permission to create a purchase request.',
-                key: 'purchase.requests.create',
-              },
-              {
-                title: 'Permission to update a purchase request.',
-                key: 'purchase.requests.update',
-              },
-              {
-                title: 'Permission to delete a purchase request.',
-                key: 'purchase.requests.delete',
-              },
-              {
-                title: 'Permission to view the attachments of a purchase request.',
-                key: 'purchase.requests.attachments.view',
-              },
-              {
-                title: 'Permission to add attachments to a purchase request.',
-                key: 'purchase.requests.attachments.create',
-              },
-              {
-                title: 'Permission to remove attachments of a purchase request.',
-                key: 'purchase.requests.attachments.delete',
-              },
-            ],
-          },
-          {
-            title: 'Procurement Module',
-            key: 'procurement.all',
-            children: [
-              {
-                title: 'Permission to view procument module.',
-                key: 'procurement.view',
-              },
-              {
-                title: 'Permission to view the attachments of a form.',
-                key: 'procurement.attachment.view',
-              },
-              {
-                title: 'Permission to add attachments to a form.',
-                key: 'procurement.attachment.create',
-              },
-              {
-                title: 'Permission to remove attachments of a form',
-                key: 'procurement.attachment.delete',
-              },
-            ],
-          },
-
           {
             title: 'Activity Logs Module',
             key: 'activitylogs.all',
@@ -165,32 +82,190 @@ const UserPermissions = (props) => {
             key: 'libraries.all',
             children: [
               {
+                title: 'Permission to view the list of items.',
+                key: 'libraries.items.view',
+              },
+              {
+                title: 'Permission to update the list of items.',
+                key: 'libraries.items.update',
+              },
+              {
+                title: 'Permission to add the list of items.',
+                key: 'libraries.items.add',
+              },
+              {
+                title: 'Permission to delete the list of items.',
+                key: 'libraries.items.delete',
+              },
+              {
                 title: 'Permission to view the list of item categories.',
                 key: 'libraries.items.categories.view',
               },
               {
-                title: 'Permission to view the list of items.',
-                key: 'libraries.items.view',
+                title: 'Permission to add the list of item categories.',
+                key: 'libraries.items.categories.add',
+              },
+              {
+                title: 'Permission to update the list of item categories.',
+                key: 'libraries.items.categories.update',
+              },
+              {
+                title: 'Permission to delete the list of item categories.',
+                key: 'libraries.items.categories.delete',
               },
               {
                 title: 'Permission to view the list of office divisions.',
                 key: 'libraries.office.divisions.view',
               },
               {
+                title: 'Permission to add the list of office divisions.',
+                key: 'libraries.office.divisions.add',
+              },
+              {
+                title: 'Permission to update the list of office divisions.',
+                key: 'libraries.office.divisions.update',
+              },
+              {
+                title: 'Permission to delete the list of office divisions.',
+                key: 'libraries.office.divisions.delete',
+              },
+              {
                 title: 'Permission to view the list of office sections.',
                 key: 'libraries.office.sections.view',
               },
               {
-                title: 'Permission to view the list of administrators signatories',
-                key: 'libraries.signatories.administrators.view',
+                title: 'Permission to add the list of office sections.',
+                key: 'libraries.office.sections.add',
+              },
+              {
+                title: 'Permission to update the list of office sections.',
+                key: 'libraries.office.sections.update',
+              },
+              {
+                title: 'Permission to delete the list of office sections.',
+                key: 'libraries.office.sections.delete',
               },
               {
                 title: 'Permission to view the list of unit of measures.',
                 key: 'libraries.uom.view',
               },
+              {
+                title: 'Permission to add the list of unit of measures.',
+                key: 'libraries.uom.add',
+              },
+              {
+                title: 'Permission to update the list of unit of measures.',
+                key: 'libraries.uom.update',
+              },
+              {
+                title: 'Permission to delete the list of unit of measures.',
+                key: 'libraries.uom.delete',
+              },
+              {
+                title: 'Permission to view the list of UACS Codes.',
+                key: 'libraries.uacs.view',
+              },
+              {
+                title: 'Permission to add the list of UACS Codes.',
+                key: 'libraries.uacs.add',
+              },
+              {
+                title: 'Permission to update the list of UACS Codes.',
+                key: 'libraries.uacs.update',
+              },
+              {
+                title: 'Permission to delete the list of UACS Codes.',
+                key: 'libraries.uacs.delete',
+              },
+            ],
+          },
+          {
+            title: 'Procurement Module',
+            key: 'procurement.all',
+            children: [
+              {
+                title: 'Permission to view procument module.',
+                key: 'procurement.view',
+              },
+              {
+                title: 'Permission to view the attachments of a form.',
+                key: 'procurement.attachment.view',
+              },
+              {
+                title: 'Permission to add attachments to a form.',
+                key: 'procurement.attachment.create',
+              },
+              {
+                title: 'Permission to remove attachments of a form',
+                key: 'procurement.attachment.delete',
+              },
             ],
           },
 
+          {
+            title: 'Purchase Requests Module',
+            key: 'purchase.requests.all',
+            children: [
+              {
+                title: 'Permission to view the list of purchase requests.',
+                key: 'purchase.requests.view',
+              },
+              {
+                title: 'Permission to create a purchase request.',
+                key: 'purchase.requests.create',
+              },
+              {
+                title: 'Permission to update a purchase request.',
+                key: 'purchase.requests.update',
+              },
+              {
+                title: 'Permission to delete a purchase request.',
+                key: 'purchase.requests.delete',
+              },
+              {
+                title: 'Permission to view the attachments of a purchase request.',
+                key: 'purchase.requests.attachments.view',
+              },
+              {
+                title: 'Permission to add attachments to a purchase request.',
+                key: 'purchase.requests.attachments.create',
+              },
+              {
+                title: 'Permission to remove attachments of a purchase request.',
+                key: 'purchase.requests.attachments.delete',
+              },
+              {
+                title: 'Permission to cancel a purchase request',
+                key: 'purchase.requests.cancellation',
+              },
+            ],
+          },
+          {
+            title: 'Users Module',
+            key: 'users.all',
+            children: [
+              {
+                title: 'Permission to view the list of users.',
+                key: 'users.view',
+              },
+              {
+                title: 'Permission to update a user.',
+                key: 'users.update',
+              },
+              {
+                title: 'Permission to view the list of permissions of a user.',
+                key: 'users.permission.view',
+              },
+              {
+                title: 'Permission to update permissions of a user.',
+                key: 'users.permission.update',
+              },
+              {
+                title: 'Permission to delete a user.',
+                key: 'users.delete',
+              },
+            ],
+          },
 
 
 
@@ -232,8 +307,9 @@ const UserPermissions = (props) => {
               'libraries.items.view',
               'libraries.office.divisions.view',
               'libraries.office.sections.view',
-              'libraries.signatories.administrators.view',
+              // 'libraries.signatories.administrators.view',
               'libraries.uom.view',
+              'libraries.uacs.view',
             ]);
             break;
         

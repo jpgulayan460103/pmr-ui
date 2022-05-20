@@ -241,8 +241,7 @@ const Sidemenu = (props) => {
 
                     {
                         (
-                            helpers.hasPermission(props.user, ['libraries.items.view','libraries.all']) || 
-                            helpers.hasRole(props.user, ["admin","super-admin"])
+                            helpers.hasPermission(props.user, ['libraries.items.view','libraries.all'])
                         )
                     && (
                         <Menu.Item key="/libraries/items">
@@ -254,8 +253,7 @@ const Sidemenu = (props) => {
 
                     {
                         (
-                            helpers.hasPermission(props.user, ['libraries.categories.view','libraries.all']) || 
-                            helpers.hasRole(props.user, ["admin","super-admin"])
+                            helpers.hasPermission(props.user, ['libraries.items.categories.view','libraries.all'])
                         )
                     && (
                         <Menu.Item key="/libraries/items/categories">
@@ -266,8 +264,7 @@ const Sidemenu = (props) => {
 
                     {
                         (
-                            helpers.hasPermission(props.user, ['libraries.uom.view','libraries.all']) || 
-                            helpers.hasRole(props.user, ["admin","super-admin"])
+                            helpers.hasPermission(props.user, ['libraries.uom.view','libraries.all'])
                         )
                     && (
                         <Menu.Item key="/libraries/items/measures">
@@ -278,8 +275,7 @@ const Sidemenu = (props) => {
 
                     {
                         (
-                            helpers.hasPermission(props.user, ['libraries.office.divisions.view','libraries.all']) || 
-                            helpers.hasRole(props.user, ["admin","super-admin"])
+                            helpers.hasPermission(props.user, ['libraries.office.divisions.view','libraries.all'])
                         )
                     && (
                         <Menu.Item key="/libraries/offices/divisions">
@@ -290,13 +286,24 @@ const Sidemenu = (props) => {
                     
                     {
                         (
-                            helpers.hasPermission(props.user, ['libraries.sections.view','libraries.all']) || 
-                            helpers.hasRole(props.user, ["admin","super-admin"])
+                            helpers.hasPermission(props.user, ['libraries.office.sections.view','libraries.all'])
                         )
                     && (
                         <Menu.Item key="/libraries/offices/sections">
                             <Link to="/libraries/offices/sections"></Link>
                             Office Sections
+                        </Menu.Item>
+                    ) }
+
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.uacs.view','libraries.all'])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/uacs_code">
+                            <Link to="/libraries/uacs_code"></Link>
+                            UACS Code
                         </Menu.Item>
                     ) }
                 </SubMenu>
