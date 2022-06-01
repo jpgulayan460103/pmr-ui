@@ -156,7 +156,12 @@ const Sidemenu = (props) => {
                     ) }
                 </SubMenu>
                 ) }
-
+                <SubMenu key="submenu-procurement-plan" icon={<ShoppingCartOutlined />} title="PPMP">
+                    <Menu.Item key="/procurement-plan/form">
+                        <Link to="/procurement-plan/form"></Link>
+                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } PPMP
+                    </Menu.Item>
+                </SubMenu>
                 {
                     (
                         helpers.hasPermission(props.user, [

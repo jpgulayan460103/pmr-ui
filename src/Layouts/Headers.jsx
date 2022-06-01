@@ -27,7 +27,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             type: "SET_INITIAL_STATE",
             data: {}
         });
-        localStorage.removeItem('session');
+        localStorage.removeItem("auth_token");
         history.push("/login");
     }
 

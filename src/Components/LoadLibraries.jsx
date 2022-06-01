@@ -51,7 +51,7 @@ const Loadlibraries = (props) => {
                 // getLibraries("procurement_type");
             }
             if(isEmpty(props.user)){
-                if (localStorage.getItem("session") !== null) {
+                if (localStorage.getItem("auth_token") !== null) {
                     props.dispatch({
                         type: "SET_MAIN_LOADING_MESSAGE",
                         data: "Loading User Data..."
@@ -86,12 +86,12 @@ const Loadlibraries = (props) => {
     }, []);
 
     const refreshToken = async () => {
-        let token = JSON.parse(localStorage.getItem("session"));
+        let token = JSON.parse(localStorage.getItem("auth_token"));
         if(token){
             let refresh_token = token.refresh_token
             await api.User.refresh(refresh_token)
             .then(res => {
-                localStorage.setItem('session',JSON.stringify(res.data));
+                localStorage.setItem("auth_token",JSON.stringify(res.data));
                 localStorage.setItem('last_login', dayjs().format('YYYY-MM-DD'));
                 customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
             })
@@ -299,7 +299,7 @@ const Loadlibraries = (props) => {
                             type: "SET_INITIAL_STATE",
                             data: {}
                         });
-                        localStorage.removeItem('session');
+                        localStorage.removeItem("auth_token");
                         history.push("/login");
                     }
                   });

@@ -625,11 +625,6 @@ const ApprovedPurchaseRequest = (props) => {
         </Menu>
     );
 
-
-    let token = JSON.parse(localStorage.getItem("session"));
-    let access_token = token.access_token;
-    // customAxios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-
   
     const handleMenuClick =() => {
 

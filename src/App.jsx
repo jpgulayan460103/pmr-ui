@@ -28,11 +28,12 @@ import Quotation from './Pages/Quotation/Quotation';
 import ActivityLogs from './Pages/ActivityLogs/ActivityLogs';
 import Home from './Pages/Home/Home';
 import Suppliers from './Pages/Suppliers/Suppliers';
+import { compare } from 'compare-versions';
 
-import CacheBuster from 'react-cache-buster';
 import { version } from '../package.json';
 import { cloneDeep } from 'lodash';
 
+const isProduction = process.env.NODE_ENV === 'production';
 
 window.Pusher = require('pusher-js');
 
@@ -49,7 +50,7 @@ const auth = {
 };
 const PrivateRoute  = ({ children, ...props }) => {
   let location = useLocation();
-  if (localStorage.getItem("session") !== null) {
+  if (localStorage.getItem("auth_token") !== null) {
     auth.isAuthenticated = true;
   }
   if (!auth.isAuthenticated) {
@@ -75,6 +76,21 @@ function mapStateToProps(state) {
 const App = (props) => {
 
     useEffect(() => {
+        if(isProduction){
+            let app_version = version;
+            if(localStorage.getItem("app_version") != null){
+                app_version = localStorage.getItem("app_version");
+            }else{
+                localStorage.setItem('app_version',version);
+            }
+            if(compare(version, app_version, ">")){
+                console.log("refresh");
+                localStorage.setItem('app_version',version);
+                setTimeout(() => {
+                    window.location.reload(true)
+                }, 500);
+            }
+        }
         window.Echo.channel('home').listen('NewMessage', (e) => {
             // var notification = new Notification(e.message);
             console.log(e);
@@ -111,17 +127,9 @@ const App = (props) => {
           });
     }, []);
 
-    const isProduction = process.env.NODE_ENV === 'production';
     return (
 
-        <CacheBuster
-            currentVersion={version}
-            isEnabled={isProduction} //If false, the library is disabled.
-            isVerboseMode={false} //If true, the library writes verbose logs to console.
-            //   loadingComponent={<Loading />} //If not pass, nothing appears at the time of new version check.
-        >
-
-        <Switch>
+    <Switch>
             <Route exact path="/"  >
                 <PrivateRoute><Layout><Home /></Layout></PrivateRoute>
             </Route>
@@ -151,6 +159,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/forms/disapproved"  >
                 <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement-plan/form"  >
+                <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/purchase-requests/form"  >
                 <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>
@@ -201,8 +212,6 @@ const App = (props) => {
                 <PrivateRoute><Layout></Layout></PrivateRoute>
             </Route>
             </Switch>
-
-        </CacheBuster>
     );
 }
 
