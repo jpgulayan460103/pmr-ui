@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import create from './CreateProcurementPlan'
+import create from './CreateProcurementPlanReducer'
 
 const rootReducer = combineReducers({
   create,

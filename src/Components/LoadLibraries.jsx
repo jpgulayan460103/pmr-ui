@@ -221,6 +221,10 @@ const Loadlibraries = (props) => {
                 data: libraries.filter(library => library.library_type == "item_category")
             });
             props.dispatch({
+                type: "SET_LIBRARY_ITEM_TYPES",
+                data: libraries.filter(library => library.library_type == "item_type")
+            });
+            props.dispatch({
                 type: "SET_LIBRARY_USER_POSITIONS",
                 data: libraries.filter(library => library.library_type == "user_position")
             });

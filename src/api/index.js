@@ -5,6 +5,7 @@ import UserOffice from './UserOffice'
 import Forms from './Forms'
 import Supplier from './Supplier'
 import Report from './Report'
+import ProcurementPlan from './ProcurementPlan'
 
 
 export default {
@@ -15,4 +16,5 @@ export default {
   Forms,
   Supplier,
   Report,
+  ProcurementPlan,
 }

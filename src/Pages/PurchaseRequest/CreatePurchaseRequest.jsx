@@ -564,9 +564,6 @@ const CreatePurchaseRequest = (props) => {
             <div className='text-center space-x-2'>
                 
                 <br />
-                {/* <p style={{color: "red"}}>
-                    { helpers.displayError(props.formErrors,'items')?.help }
-                </p> */}
 
                 { props.formType == "create" ? (
                     <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
