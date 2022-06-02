@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -45,7 +45,8 @@ const CreateProcurementPlan = (props) => {
                         data: {
                             ...props.formData,
                             end_user_id: props.user.user_offices?.data[0]?.office_id,
-                            procurement_plan_type: "Project Procurement Management Plan (PPMP)"
+                            procurement_plan_type: "Project Procurement Management Plan (PPMP)",
+                            item_type_id: props.item_types[0].id
                         }
                     });
                 }
@@ -200,6 +201,7 @@ const CreateProcurementPlan = (props) => {
             case 'mon10':
             case 'mon11':
             case 'mon12':
+                newValue[index][field] = parseInt(value);
                 newValue[index]["total_price"] = newValue[index]["price"] * newValue[index]["total_quantity"];
                 break;
         
@@ -332,16 +334,45 @@ const CreateProcurementPlan = (props) => {
     }
 
     const handleChangeType = (e) => {
-        changeFieldValue(e, 'procurement_plan_type', false);
-        // props.dispatch({
-        //     type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-        //     data: {
-        //         ...props.formData,
-        //         end_user_id: props.user.user_offices?.data[0]?.office_id,
-        //         procurement_plan_type: e,
-        //         items: []
-        //     }
-        // });
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                item_type_id: e,
+                items: []
+            }
+        });
+    }
+
+    const dropDownBadge = (index) => {
+        let mon1 = props.formErrors[`items.${index}.mon1`];
+        let mon2 = props.formErrors[`items.${index}.mon2`];
+        let mon3 = props.formErrors[`items.${index}.mon3`];
+        let mon4 = props.formErrors[`items.${index}.mon4`];
+        let mon5 = props.formErrors[`items.${index}.mon5`];
+        let mon6 = props.formErrors[`items.${index}.mon6`];
+        let mon7 = props.formErrors[`items.${index}.mon7`];
+        let mon8 = props.formErrors[`items.${index}.mon8`];
+        let mon9 = props.formErrors[`items.${index}.mon9`];
+        let mon10 = props.formErrors[`items.${index}.mon10`];
+        let mon11 = props.formErrors[`items.${index}.mon11`];
+        let mon12 = props.formErrors[`items.${index}.mon12`];
+        let months = [
+            mon1,
+            mon2,
+            mon3,
+            mon4,
+            mon5,
+            mon6,
+            mon7,
+            mon8,
+            mon9,
+            mon10,
+            mon11,
+            mon12,
+        ];
+        let filtered = months.filter(month => typeof month != "undefined");
+        return filtered.length;
     }
   
     
@@ -350,17 +381,27 @@ const CreateProcurementPlan = (props) => {
            <Title className='text-center' level={3}>Project Procurement Management Plan (PPMP)</Title>
            <Form layout='vertical'>
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Office/Section">
                             <Input placeholder="input placeholder" readOnly value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={14} lg={14} xl={14}>
-                        <Form.Item label="Item Type">
-                            <Select style={{ width: "100%" }} onChange={handleChangeType} value={props.formData.procurement_plan_type} placeholder="Select Item Type">
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Procurement Plan Type">
+                            <Select style={{ width: "100%" }} onChange={(e) => changeFieldValue(e, 'procurement_plan_type', false)} value={props.formData.procurement_plan_type} placeholder="Select Item Type">
                                 <Option value="Project Procurement Management Plan (PPMP)">Project Procurement Management Plan (PPMP)</Option>
                                 <Option value="Supplemental Project Procurement Management Plan (PPMP)">Supplemental Project Procurement Management Plan (PPMP)</Option>
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Item Type">
+                            <Select style={{ width: "100%" }} onChange={handleChangeType} value={props.formData.item_type_id} placeholder="Select Item Type">
+                                {
+                                    props.item_types.map(type => <Option value={type.id} key={type.id}>{ type.name }</Option>)
+                                }
                             </Select>
                         </Form.Item>
                     </Col>
@@ -419,7 +460,7 @@ const CreateProcurementPlan = (props) => {
                 {
                     props.formData.items.map((item, index) => (
                         <React.Fragment key={item.key}>
-                            <b>{ item.item_type_name }</b>
+                            {/* <b>{ item.item_type_name }</b> */}
                             <Row gutter={[8, 8]} className="pp-items-row">
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-center'>
@@ -445,7 +486,7 @@ const CreateProcurementPlan = (props) => {
                                             { props.item_categories.map(item_category =>  {
                                                 return (
                                                     <OptGroup label={item_category.name}  key={item_category.id}>
-                                                        { props.items?.filter(item => item.item_category.id == item_category.id).map(item => {
+                                                        { props.items?.filter(item => item.item_category.id == item_category.id && item.item_type.id == props.formData.item_type_id).map(item => {
                                                             return <Option value={item.id} key={item.id}>{item.item_name}</Option>
                                                         }) }
                                                     </OptGroup>
@@ -464,7 +505,7 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-center'>
-                                    <Form.Item>
+                                    <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.total_quantity`) }>
                                         { item.total_quantity }
                                     </Form.Item>
                                 </div>
@@ -493,13 +534,19 @@ const CreateProcurementPlan = (props) => {
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-right space-x-1'>
                                     <Tooltip placement="bottom" title={"Show or hide months"}>
-                                        <Button type="default" onClick={() => toggleItem(index, item)}>
-                                            { item.is_edit ? (
-                                                <DoubleLeftOutlined rotate={90} />
-                                            ) : (
-                                                <DoubleLeftOutlined rotate={-90} />
-                                            ) }
-                                        </Button>
+
+                                        { item.is_edit ? (
+                                                <Button type="default" onClick={() => toggleItem(index, item)}>
+                                                    <DoubleLeftOutlined rotate={90} />
+                                                </Button>
+                                        ) : (
+                                            <Badge size="default" count={ dropDownBadge(index) }>
+                                                <Button type="default" onClick={() => toggleItem(index, item)}>
+                                                    <DoubleLeftOutlined rotate={-90} />
+                                                </Button>
+                                            </Badge>
+                                            )
+                                        }
                                     </Tooltip>
                                     <Tooltip placement="bottom" title={"Delete Item"}>
                                         <Button type="danger" onClick={() => deleteItem(item.key)}><DeleteOutlined /></Button>
