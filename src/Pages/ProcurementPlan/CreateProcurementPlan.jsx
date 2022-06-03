@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -21,14 +21,13 @@ function mapStateToProps(state) {
         item_types: state.libraries.item_types,
         user_sections: state.libraries.user_sections,
         user_divisions: state.libraries.user_divisions,
+        user_positions: state.libraries.user_positions,
         user_signatory_designations: state.libraries.user_signatory_designations,
         user_signatory_names: state.libraries.user_signatory_names,
-        formData: state.procurementPlan.create.formData,
-        formType: state.procurementPlan.create.formType,
-        formErrors: state.procurementPlan.create.formErrors,
+        formData: state.procurementPlans.create.formData,
+        formType: state.procurementPlans.create.formType,
+        formErrors: state.procurementPlans.create.formErrors,
         formProccess: state.purchaseRequests.create.formProccess,
-        requestedBySignatory: state.purchaseRequests.create.requestedBySignatory,
-        approvedBySignatory: state.purchaseRequests.create.approvedBySignatory,
         user: state.user.data,
         isInitialized: state.user.isInitialized,
     };
@@ -40,13 +39,19 @@ const CreateProcurementPlan = (props) => {
             if(props.formData.end_user_id){
             }else{
                 if(!isEmpty(props.user)){
+                    let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
                     props.dispatch({
                         type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
                         data: {
                             ...props.formData,
                             end_user_id: props.user.user_offices?.data[0]?.office_id,
                             procurement_plan_type: "Project Procurement Management Plan (PPMP)",
-                            item_type_id: props.item_types[0].id
+                            item_type_id: props.item_types[0].id,
+                            prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
+                            prepared_by_position: position[0].name,
+                            calendar_year: dayjs().format("YYYY"),
+                            ppmp_date: dayjs().format('YYYY-MM-DD'),
+                            title: `Project Procurement Management Plan (PPMP) for CY ${dayjs().format("YYYY")}`,
                         }
                     });
                 }
@@ -248,11 +253,54 @@ const CreateProcurementPlan = (props) => {
         return total;
     }
 
-    const total_cost = () => {
+    const total_price = () => {
         return props.formData.items.reduce((sum, item) => {
             let total_price = isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price); 
             return sum += (total_price);
         }, 0);
+    }
+
+    const setSignatory = (e, type) => {
+        let user_office = props.user_signatory_names.filter(i => i.title == e);
+        console.log(user_office);
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                approved_by_name: user_office[0].name,
+                approved_by_position: user_office[0].parent.name,
+                approved_by_id: user_office[0].parent.parent.id,
+                approvedBy: e
+            }
+        });
+    }
+
+    const changeProcurementPlan = (e) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                procurement_plan_type: e,
+                title: `${e} for CY ${props.formData.calendar_year}`
+            }
+        });
+    }
+
+    const changeCalendarYear = (e) => {
+        let year = dayjs(e).format("YYYY");
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                calendar_year: year,
+                title: `${props.formData.procurement_plan_type} for CY ${year}`
+            }
+        });
+    }
+
+    const changeFooter = (e, field) => {
+        let value = e.target.value;
+        changeFieldValue(value.toUpperCase(), field, false)
     }
 
     const selectItem = (value, index) => {
@@ -378,31 +426,59 @@ const CreateProcurementPlan = (props) => {
     
     return (
         <div id="pp-container" className='container-fuild bg-white p-16'>
-           <Title className='text-center' level={3}>Project Procurement Management Plan (PPMP)</Title>
+           {/* <Title className='text-center' level={3}>Project Procurement Management Plan (PPMP)</Title> */}
+           <Title className='text-center' level={3}>{ props.formData.procurement_plan_type }</Title>
            <Form layout='vertical'>
+                
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
                         <Form.Item label="Office/Section">
-                            <Input placeholder="input placeholder" readOnly value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                            <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
                         <Form.Item label="Procurement Plan Type">
-                            <Select style={{ width: "100%" }} onChange={(e) => changeFieldValue(e, 'procurement_plan_type', false)} value={props.formData.procurement_plan_type} placeholder="Select Item Type">
+                            <Select style={{ width: "100%" }} onChange={changeProcurementPlan} value={props.formData.procurement_plan_type} placeholder="Select Item Type">
                                 <Option value="Project Procurement Management Plan (PPMP)">Project Procurement Management Plan (PPMP)</Option>
                                 <Option value="Supplemental Project Procurement Management Plan (PPMP)">Supplemental Project Procurement Management Plan (PPMP)</Option>
                             </Select>
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
                         <Form.Item label="Item Type">
                             <Select style={{ width: "100%" }} onChange={handleChangeType} value={props.formData.item_type_id} placeholder="Select Item Type">
                                 {
                                     props.item_types.map(type => <Option value={type.id} key={type.id}>{ type.name }</Option>)
                                 }
                             </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                        <Form.Item label="CY"  {...helpers.displayError(props.formErrors, `calendar_year`)}>
+                            {/* <Input placeholder="Date" /> */}
+                            <DatePicker style={{width: "100%"}} allowClear={false} format={"YYYY"} onChange={changeCalendarYear} picker="year" value={dayjs(props.formData.calendar_year)}/>
+                        </Form.Item>
+                    </Col>
+                    
+                </Row>
+
+                <Row gutter={[8, 8]}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Title"  {...helpers.displayError(props.formErrors, `title`)}>
+                            <Input placeholder="Title" value={props.formData.title} />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Purpose">
+                            <Input placeholder="Purpose" onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Date"  {...helpers.displayError(props.formErrors, `ppmp_date`)}>
+                            <Input placeholder="input placeholder" value={moment(props.formData.ppmp_date).format('MM/DD/YYYY')} />
                         </Form.Item>
                     </Col>
                     
@@ -473,7 +549,7 @@ const CreateProcurementPlan = (props) => {
                             
                                 <div className='text-center'>
                                     <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
-                                        <Select
+                                        { item.is_edit ? (<Select
                                             showSearch
                                             placeholder="Item name"
                                             optionFilterProp="children"
@@ -492,7 +568,9 @@ const CreateProcurementPlan = (props) => {
                                                     </OptGroup>
                                                 );
                                             }) }
-                                        </Select>
+                                        </Select>) : (
+                                            <span>{item.item_name}</span>
+                                        ) }
                                     </Form.Item>
                                 </div>
                             </Col>
@@ -685,13 +763,96 @@ const CreateProcurementPlan = (props) => {
                 </Col>
                 <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                     <div className='text-right'>
-                        <b>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(  total_cost() )}</b>
+                        <b>{ new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(  total_price() )}</b>
                     </div>
                 </Col>
                 <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                     <div  className='text-right'>
                         
                     </div>
+                </Col>
+            </Row>
+
+            <Row gutter={[8, 8]}>
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Prepared By" { ...helpers.displayError(props.formErrors, `prepared_by_name`) }>
+                        <Input onChange={(e) => changeFooter(e,'prepared_by_name')} value={props.formData.prepared_by_name} placeholder="FULL NAME" />
+                    </Form.Item>
+                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `prepared_by_position`) }>
+                        {/* <Input onChange={(e) => changeFieldValue(e, 'prepared_by_position')} value={props.formData.prepared_by_position} /> */}
+                        <AutoComplete
+                            style={{ width: "100%" }}
+                            allowClear
+                            options={props.user_positions}
+                            onSelect={(val, item) => {}}
+                            placeholder="Position/Designation"
+                            filterOption={(input, option) =>
+                                option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange={(e) => {
+                                changeFieldValue(e, 'prepared_by_position', false);
+                            }}
+                            value={props.formData.prepared_by_position}
+                        >
+                            <TextArea autoSize />
+                        </AutoComplete>
+                    </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Certified By" { ...helpers.displayError(props.formErrors, `certified_by_name`) }>
+                        <Input onChange={(e) => changeFooter(e,'certified_by_name')} value={props.formData.certified_by_name} placeholder="FULL NAME" />
+                    </Form.Item>
+                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `certified_by_position`) }>
+                        <AutoComplete
+                            style={{ width: "100%" }}
+                            allowClear
+                            options={props.user_positions}
+                            onSelect={(val, item) => {}}
+                            placeholder="Position/Designation"
+                            filterOption={(input, option) =>
+                                option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange={(e) => {
+                                changeFieldValue(e, 'certified_by_position', false);
+                            }}
+                            value={props.formData.certified_by_position}
+                        >
+                            <TextArea autoSize />
+                        </AutoComplete>
+                    </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
+                        <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e,'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
+                            { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO" || i.title == "ORD").map(i => <Option value={i.title} key={i.key}>{ i.parent.name }</Option>) }
+                        </Select>
+                    </Form.Item>
+                    {/* <p className='text-center'><b>{ props.approvedBySignatory?.name }</b></p> */}
+                    {/* <p className='text-center'>{ props.approvedBySignatory?.parent?.name }</p> */}
+
+                    <Form.Item label="Approved By" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
+                        <Input onChange={(e) => changeFooter(e,'approved_by_name')} value={props.formData.approved_by_name} placeholder="FULL NAME" />
+                    </Form.Item>
+                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `approved_by_position`) }>
+                        <AutoComplete
+                            style={{ width: "100%" }}
+                            allowClear
+                            options={props.user_positions}
+                            onSelect={(val, item) => {}}
+                            placeholder="Position/Designation"
+                            filterOption={(input, option) =>
+                                option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange={(e) => {
+                                changeFieldValue(e, 'approved_by_position', false);
+                            }}
+                            value={props.formData.approved_by_position}
+                        >
+                            <TextArea autoSize />
+                        </AutoComplete>
+                    </Form.Item>
                 </Col>
             </Row>
            </Form>

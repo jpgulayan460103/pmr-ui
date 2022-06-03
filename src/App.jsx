@@ -33,6 +33,7 @@ import { compare } from 'compare-versions';
 import { version } from '../package.json';
 import { cloneDeep } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
+import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -161,8 +162,11 @@ const App = (props) => {
             <Route exact path="/forms/disapproved"  >
                 <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/procurement-plan/form"  >
+            <Route exact path="/procurement-plans/form"  >
                 <PrivateRoute><Layout><CreateProcurementPlan /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement-plans"  >
+                <PrivateRoute><Layout><ListProcurementPlan /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/purchase-requests/form"  >
                 <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>

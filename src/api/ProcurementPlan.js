@@ -8,4 +8,16 @@ export default {
       return axios.post(`api/procurement-plans`,formdata);
     }
   },
+  all(formdata){
+    return axios.get(`api/procurement-plans`,{
+      params: formdata
+    });
+  },
+  get(id){
+    return axios.get(`api/procurement-plans/${id}`);
+  },
+
+  logger(id){
+    return axios.get(`api/logger/procurement-plan/${id}`);
+  },
 }

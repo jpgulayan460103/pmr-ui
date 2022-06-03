@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import user from './UserReducer'
 import libraries from './LibrariesReducer'
 import purchaseRequests from './PurchaseRequest'
-import procurementPlan from './ProcurementPlan'
+import procurementPlans from './ProcurementPlan'
 import procurements from './Procurement'
 import quotations from './QuotationReducer'
 import suppliers from './SupplierReducer'
@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
   libraries,
   purchaseRequests,
   procurements,
-  procurementPlan,
+  procurementPlans,
   quotations,
   suppliers,
   activtyLogs,

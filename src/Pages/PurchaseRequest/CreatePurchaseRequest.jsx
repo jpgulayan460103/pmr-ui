@@ -355,7 +355,7 @@ const CreatePurchaseRequest = (props) => {
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Date">
-                        <Input placeholder="input placeholder" readOnly value={moment().format('MM/DD/YYYY')} />
+                        <Input placeholder="input placeholder" value={moment().format('MM/DD/YYYY')} />
                     </Form.Item>
                 </Col>
             </Row>

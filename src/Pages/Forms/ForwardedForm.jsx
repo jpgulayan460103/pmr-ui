@@ -579,11 +579,11 @@ const ForwardedForm = (props) => {
         },
         {
             title: 'Amount',
-            key: 'total_cost',
-            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getForm),
+            key: 'common_amount',
+            ...filter.search('common_amount','number_range', setTableFilter, props.tableFilter, getForm),
             render: (text, item, index) => (
                 <span>
-                    { item.form_routable?.total_cost_formatted }
+                    { item.form_routable?.common_amount_formatted }
                 </span>
             ),
             ...onCell,
@@ -1063,7 +1063,7 @@ const ForwardedForm = (props) => {
                                     <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
                                     <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
                                     <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
+                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.common_amount_formatted}</span></span><br />
                                     <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
                                     <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
                                     <span><b>Remarks:</b> <span>{props.selectedFormRoute.remarks}</span></span><br />
