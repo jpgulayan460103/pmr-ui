@@ -70,7 +70,7 @@ const ListProcurementPlan = (props) => {
     }, []);
     let history = useHistory()
     useEffect(() => {
-        document.title = "List of Purchase Request";
+        document.title = "List of Procurement Plan";
         if(props.isInitialized){
             if(isEmpty(props.procurementPlans)){
             }
@@ -335,21 +335,54 @@ const ListProcurementPlan = (props) => {
       
     const columns = [
         {
-            title: 'PR Date',
-            dataIndex: 'pr_date',
-            key: 'pr_date',
-            width: 120,
+            title: 'PPMP Date',
+            dataIndex: 'ppmp_date',
+            key: 'ppmp_date',
+            width: 150,
             align: "center",
-            ...filter.search('pr_date','date_range', setTableFilter, props.tableFilter, getProcurementPlans),
+            ...filter.search('ppmp_date','date_range', setTableFilter, props.tableFilter, getProcurementPlans),
             ...onCell,
             sorter: (a, b) => {},
         },
         {
-            title: 'PR Number',
-            dataIndex: 'purchase_request_number',
-            key: 'purchase_request_number',
-            width: 450,
-            ...filter.search('purchase_request_number','text', setTableFilter, props.tableFilter, getProcurementPlans),
+            title: 'Item Type',
+            // dataIndex: 'item_type',
+            key: 'item_type',
+            width: 200,
+            ...filter.search('item_type_id','text', setTableFilter, props.tableFilter, getProcurementPlans),
+            ...onCell,
+            sorter: (a, b) => {},
+            render: (text, item, index) => (
+                <span>
+                    { item.item_type.name }
+                </span>
+            ),
+        },
+        {
+            title: 'PPMP Type',
+            // dataIndex: 'procurement_plan_type',
+            key: 'procurement_plan_type_id',
+            width: 200,
+            ...filter.search('procurement_plan_type_id','text', setTableFilter, props.tableFilter, getProcurementPlans),
+            ...onCell,
+            sorter: (a, b) => {},
+            render: (text, item, index) => (
+                <span>
+                    { item.procurement_plan_type.name }
+                </span>
+            ),
+        },
+        {
+            title: 'Total Amount',
+            key: 'total_estimated_budget',
+            width: 150,
+            align: "center",
+            ...filter.search('total_estimated_budget','number_range', setTableFilter, props.tableFilter, getProcurementPlans),
+            render: (text, item, index) => (
+                <span>
+                    { item.common_amount_formatted }
+                </span>
+            ),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -371,20 +404,7 @@ const ListProcurementPlan = (props) => {
             ...onCell,
             sorter: (a, b) => {},
         },
-        {
-            title: 'Total Cost',
-            key: 'total_cost',
-            width: 150,
-            align: "center",
-            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getProcurementPlans),
-            render: (text, item, index) => (
-                <span>
-                    { item.total_cost_formatted }
-                </span>
-            ),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
+
         {
             title: 'Status',
             key: 'status',
@@ -462,7 +482,7 @@ const ListProcurementPlan = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
-                    <Card size="small" title="Created Puchase Requests" bordered={false}>
+                    <Card size="small" title="Created Project Procurement Management Plan" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
                                 <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
@@ -486,7 +506,7 @@ const ListProcurementPlan = (props) => {
                 </Col>
                 { isEmpty(props.selectedProcurementPlan.file) ? "" : ( 
                     <Col md={24} lg={10} xl={8}>
-                            <Card size="small" bordered={false} title="Puchase Request Details" extra={(
+                            <Card size="small" bordered={false} title="Project Procurement Management Plan Details" extra={(
                                 <div className='text-right space-x-0.5'>
                                     <Tooltip placement="top" title={"Open in new window"}>
                                         <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
@@ -545,7 +565,7 @@ const ListProcurementPlan = (props) => {
             { isEmpty(props.selectedProcurementPlan) ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Purchase Request Form" bordered={false} loading={props.formLoading}>
+                    <Card size="small" title="Project Procurement Management Plan" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedProcurementPlan.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         </div>
@@ -554,7 +574,7 @@ const ListProcurementPlan = (props) => {
                 <Col md={24} lg={8} xl={6}>
                         <Card size="small" title="Attachments" bordered={false} loading={props.formLoading}>
                             <div className='forms-card-form-content'>
-                            <AttachmentUpload formId={props.selectedProcurementPlan.id} formType="purchase_request" fileList={props.selectedProcurementPlan.form_uploads?.data} />
+                            <AttachmentUpload formId={props.selectedProcurementPlan.id} formType="procurement_plan" fileList={props.selectedProcurementPlan.form_uploads?.data} />
                             </div>
                         </Card>
                     </Col>

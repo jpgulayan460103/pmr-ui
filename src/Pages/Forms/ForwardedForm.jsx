@@ -402,6 +402,9 @@ const ForwardedForm = (props) => {
             case "purchase_request":
                 viewPurchaseRequest(item.form_routable_id);
                 break;
+            case "procurement_plan":
+                viewProcurementPlan(item.form_routable_id);
+                break;
         
             default:
                 break;
@@ -487,6 +490,23 @@ const ForwardedForm = (props) => {
     const viewPurchaseRequest = (id) => {
         setFormLoading(true);
         api.PurchaseRequest.get(id)
+        .then(res => {
+            if (unmounted.current) { return false; }
+            setAttachments(res.data.form_uploads.data)
+            setFormLoading(false);
+            // setSelectedForm();
+        })
+        .catch(err => {
+            setFormLoading(false);
+        })
+        .then(res => {
+            setFormLoading(false);
+        })
+        ;
+    }
+    const viewProcurementPlan = (id) => {
+        setFormLoading(true);
+        api.ProcurementPlan.get(id)
         .then(res => {
             if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)

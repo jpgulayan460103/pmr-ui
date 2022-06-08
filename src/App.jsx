@@ -34,6 +34,7 @@ import { version } from '../package.json';
 import { cloneDeep } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
 import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
+import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -167,6 +168,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/procurement-plans"  >
                 <PrivateRoute><Layout><ListProcurementPlan /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/procurement-plans/summary"  >
+                <PrivateRoute><Layout><SummaryProcurementPlan /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/purchase-requests/form"  >
                 <PrivateRoute><Layout><CreatePurchaseRequest /></Layout></PrivateRoute>

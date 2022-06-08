@@ -193,6 +193,12 @@ const Loadlibraries = (props) => {
                     data: libraries.filter(library => library.library_type == $type)
                 });
             }
+            if($type == "procurement_plan_type"){
+                props.dispatch({
+                    type: "SET_LIBRARY_PROCUREMENT_PLAN_TYPE",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
             
         })
         .catch(err => {})
@@ -265,6 +271,11 @@ const Loadlibraries = (props) => {
             props.dispatch({
                 type: "SET_LIBRARY_PROCUREMENT_TYPE",
                 data: libraries.filter(library => library.library_type == "procurement_type")
+            });
+
+            props.dispatch({
+                type: "SET_LIBRARY_PROCUREMENT_PLAN_TYPE",
+                data: libraries.filter(library => library.library_type == "procurement_plan_type")
             });
             
         })

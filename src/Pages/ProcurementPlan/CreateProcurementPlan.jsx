@@ -19,6 +19,7 @@ function mapStateToProps(state) {
         items: state.libraries.items,
         item_categories: state.libraries.item_categories,
         item_types: state.libraries.item_types,
+        procurement_plan_types: state.libraries.procurement_plan_types,
         user_sections: state.libraries.user_sections,
         user_divisions: state.libraries.user_divisions,
         user_positions: state.libraries.user_positions,
@@ -45,13 +46,13 @@ const CreateProcurementPlan = (props) => {
                         data: {
                             ...props.formData,
                             end_user_id: props.user.user_offices?.data[0]?.office_id,
-                            procurement_plan_type: "Project Procurement Management Plan (PPMP)",
+                            procurement_plan_type_id: props.procurement_plan_types[0].id,
                             item_type_id: props.item_types[0].id,
                             prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
                             prepared_by_position: position[0].name,
                             calendar_year: dayjs().format("YYYY"),
                             ppmp_date: dayjs().format('YYYY-MM-DD'),
-                            title: `Project Procurement Management Plan (PPMP) for CY ${dayjs().format("YYYY")}`,
+                            title: `${props.procurement_plan_types[0].name} for CY ${dayjs().format("YYYY")}`,
                         }
                     });
                 }
@@ -114,10 +115,10 @@ const CreateProcurementPlan = (props) => {
     
                 if(err.response.data.errors.items){
                     Modal.error({
-                        title: 'Purchase Request creation failed',
+                        title: 'Project Procurement Plan creation failed',
                         content: (
                           <div>
-                            <p>Please add items on the purchase request.</p>
+                            <p>Please add items on the procurement plan.</p>
                           </div>
                         ),
                         onOk() {},
@@ -156,7 +157,7 @@ const CreateProcurementPlan = (props) => {
             data: {
                 ...props.formData,
                 end_user_id: props.user.user_offices?.data[0]?.office_id,
-                procurement_plan_type: "Project Procurement Management Plan (PPMP)",
+                procurement_plan_type_id: props.procurement_plan_types[0].id,
                 items: []
             }
         });
@@ -276,24 +277,39 @@ const CreateProcurementPlan = (props) => {
     }
 
     const changeProcurementPlan = (e) => {
+        let procurement_plan = props.procurement_plan_types.filter(item => item.id == e);
+        let item_type;
+        if(procurement_plan[0].title == "SPPMP"){
+            item_type = props.item_types.filter(item => item.title == "NON-CSE");
+        }else{
+            item_type = props.item_types.filter(item => item.title == "CSE");
+        }
+        let item_type_id = item_type[0].id;
+        let items = [];
+        if(item_type_id == props.formData.item_type_id){
+            items = props.formData.items;
+        }
         props.dispatch({
             type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
-                procurement_plan_type: e,
-                title: `${e} for CY ${props.formData.calendar_year}`
+                procurement_plan_type_id: e,
+                title: `${procurement_plan[0].name} for CY ${props.formData.calendar_year}`,
+                item_type_id: item_type_id,
+                items: items,
             }
         });
     }
 
     const changeCalendarYear = (e) => {
         let year = dayjs(e).format("YYYY");
+        let procurement_plan = props.procurement_plan_types.filter(item => item.id == props.formData.procurement_plan_type_id);
         props.dispatch({
             type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
             data: {
                 ...props.formData,
                 calendar_year: year,
-                title: `${props.formData.procurement_plan_type} for CY ${year}`
+                title: `${procurement_plan[0].name} for CY ${year}`
             }
         });
     }
@@ -303,9 +319,30 @@ const CreateProcurementPlan = (props) => {
         changeFieldValue(value.toUpperCase(), field, false)
     }
 
+    const changeItemType = (e) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                item_type_id: e,
+                items: []
+            }
+        });
+    }
+
     const selectItem = (value, index) => {
         let item = props.items.filter(item => item.id == value);
         item = item[0];
+        let existed_item = props.formData.items.filter(item => item.item_id == value);
+        if(!isEmpty(existed_item)){
+            notification.error({
+                message: 'Item existed!',
+                description:
+                    `The item ${existed_item[0].item_name} is already in the list`,
+                }
+            );
+            return false;
+        }
         let newValue = cloneDeep(props.formData.items);
         newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
         newValue[index]["item_type_id"] = item.item_type.id;
@@ -381,17 +418,6 @@ const CreateProcurementPlan = (props) => {
         changeTableFieldValue(!item.is_edit, item, 'is_edit', index);
     }
 
-    const handleChangeType = (e) => {
-        props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                item_type_id: e,
-                items: []
-            }
-        });
-    }
-
     const dropDownBadge = (index) => {
         let mon1 = props.formErrors[`items.${index}.mon1`];
         let mon2 = props.formErrors[`items.${index}.mon2`];
@@ -427,7 +453,7 @@ const CreateProcurementPlan = (props) => {
     return (
         <div id="pp-container" className='container-fuild bg-white p-16'>
            {/* <Title className='text-center' level={3}>Project Procurement Management Plan (PPMP)</Title> */}
-           <Title className='text-center' level={3}>{ props.formData.procurement_plan_type }</Title>
+           <Title className='text-center' level={3}>{ props.procurement_plan_types.filter(item => item.id == props.formData.procurement_plan_type_id)[0]?.name }</Title>
            <Form layout='vertical'>
                 
                 <Row gutter={[8, 8]}>
@@ -438,17 +464,16 @@ const CreateProcurementPlan = (props) => {
                     </Col>
 
                     <Col xs={24} sm={24} md={7} lg={7} xl={7}>
-                        <Form.Item label="Procurement Plan Type">
-                            <Select style={{ width: "100%" }} onChange={changeProcurementPlan} value={props.formData.procurement_plan_type} placeholder="Select Item Type">
-                                <Option value="Project Procurement Management Plan (PPMP)">Project Procurement Management Plan (PPMP)</Option>
-                                <Option value="Supplemental Project Procurement Management Plan (PPMP)">Supplemental Project Procurement Management Plan (PPMP)</Option>
+                        <Form.Item label="Procurement Plan Type"  {...helpers.displayError(props.formErrors, `procurement_plan_type_id`)}>
+                            <Select style={{ width: "100%" }} onChange={changeProcurementPlan} value={props.formData.procurement_plan_type_id} placeholder="Select Item Type">
+                                { props.procurement_plan_types.map(item => <Option value={item.id} key={item.key}>{item.name}</Option>) }
                             </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={24} md={7} lg={7} xl={7}>
                         <Form.Item label="Item Type">
-                            <Select style={{ width: "100%" }} onChange={handleChangeType} value={props.formData.item_type_id} placeholder="Select Item Type">
+                            <Select style={{ width: "100%" }} onChange={changeItemType} value={props.formData.item_type_id} placeholder="Select Item Type">
                                 {
                                     props.item_types.map(type => <Option value={type.id} key={type.id}>{ type.name }</Option>)
                                 }
@@ -466,17 +491,17 @@ const CreateProcurementPlan = (props) => {
                 </Row>
 
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
                         <Form.Item label="Title"  {...helpers.displayError(props.formErrors, `title`)}>
                             <Input placeholder="Title" value={props.formData.title} />
                         </Form.Item>
                     </Col>
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
                         <Form.Item label="Purpose">
                             <Input placeholder="Purpose" onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
                         </Form.Item>
                     </Col>
-                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Col xs={24} sm={24} md={4} lg={4} xl={4}>
                         <Form.Item label="Date"  {...helpers.displayError(props.formErrors, `ppmp_date`)}>
                             <Input placeholder="input placeholder" value={moment(props.formData.ppmp_date).format('MM/DD/YYYY')} />
                         </Form.Item>
