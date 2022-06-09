@@ -102,6 +102,7 @@ const ItemLibrary = (props) => {
     const resetForm = () => {
         formRef.current.resetFields();
         setFormType("Create");
+        setSelectedLibrary({});
     }
 
 
@@ -304,6 +305,7 @@ const ItemLibrary = (props) => {
     }
 
     return (
+        <React.Fragment>
         <Row gutter={[16, 16]} className="mb-3">
             <Col sm={24} md={16} lg={14} xl={14}>
                 <Card size="small" title="Items" bordered={false}  >
@@ -408,6 +410,18 @@ const ItemLibrary = (props) => {
             </Col>
             )}
         </Row>
+        { isEmpty(selectedLibrary) ? "" : (
+        <Row gutter={[16, 16]} className="mb-3">
+            <Col sm={24} md={24} lg={24} xl={24}>
+                <Card size="small" title="Items" bordered={false}  >
+                    <div className='user-card-content'>
+                        <iframe src={`${selectedLibrary.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                    </div>
+                </Card>
+            </Col>
+        </Row>
+        ) }
+        </React.Fragment>
     );
 }
 
