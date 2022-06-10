@@ -477,6 +477,7 @@ const ForwardedForm = (props) => {
             return Promise.resolve(res)
         })
         .catch(err => {
+            setSubmit(false);
             return Promise.reject(err)
         })
         .then(res => {})

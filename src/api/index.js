@@ -6,6 +6,7 @@ import Forms from './Forms'
 import Supplier from './Supplier'
 import Report from './Report'
 import ProcurementPlan from './ProcurementPlan'
+import RequisitionIssue from './RequisitionIssue'
 
 
 export default {
@@ -17,4 +18,5 @@ export default {
   Supplier,
   Report,
   ProcurementPlan,
+  RequisitionIssue,
 }

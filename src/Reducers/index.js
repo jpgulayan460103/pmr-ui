@@ -3,6 +3,7 @@ import user from './UserReducer'
 import libraries from './LibrariesReducer'
 import purchaseRequests from './PurchaseRequest'
 import procurementPlans from './ProcurementPlan'
+import requisitionIssues from './RequisitionIssue'
 import procurements from './Procurement'
 import quotations from './QuotationReducer'
 import suppliers from './SupplierReducer'
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   purchaseRequests,
   procurements,
   procurementPlans,
+  requisitionIssues,
   quotations,
   suppliers,
   activtyLogs,

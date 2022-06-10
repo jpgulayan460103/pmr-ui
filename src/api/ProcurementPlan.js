@@ -20,4 +20,8 @@ export default {
   logger(id){
     return axios.get(`api/logger/procurement-plan/${id}`);
   },
+
+  management(){
+    return axios.get(`api/procurement-managements/1`);
+  }
 }
