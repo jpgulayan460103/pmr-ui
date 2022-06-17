@@ -335,49 +335,22 @@ const ListRequisitionIssue = (props) => {
       
     const columns = [
         {
-            title: 'PPMP Date',
-            dataIndex: 'ppmp_date',
-            key: 'ppmp_date',
+            title: 'RIS Date',
+            dataIndex: 'ris_date',
+            key: 'ris_date',
             width: 150,
             align: "center",
-            ...filter.search('ppmp_date','date_range', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-        // {
-        //     title: 'PPMP Type',
-        //     // dataIndex: 'requisition_issue_type',
-        //     key: 'requisition_issue_type_id',
-        //     width: 200,
-        //     ...filter.search('requisition_issue_type_id','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-        //     ...onCell,
-        //     sorter: (a, b) => {},
-        //     render: (text, item, index) => (
-        //         <span>
-        //             { item.requisition_issue_type.name }
-        //         </span>
-        //     ),
-        // },
-        {
-            title: 'Total Amount',
-            key: 'total_estimated_budget',
-            width: 150,
-            align: "center",
-            ...filter.search('total_estimated_budget','number_range', setTableFilter, props.tableFilter, getRequisitionIssues),
-            render: (text, item, index) => (
-                <span>
-                    { item.common_amount_formatted }
-                </span>
-            ),
+            ...filter.search('ris_date','date_range', setTableFilter, props.tableFilter, getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },
         {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            width: 450,
-            ...filter.search('title','text', setTableFilter, props.tableFilter, getRequisitionIssues),
+            title: 'RIS No.',
+            dataIndex: 'ris_number',
+            key: 'ris_number',
+            width: 150,
+            align: "center",
+            ...filter.search('ris_number','text', setTableFilter, props.tableFilter, getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },

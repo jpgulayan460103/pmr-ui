@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory  } from 'react-router-dom'
 import style from './style.less'
 import { debounce, isEmpty, cloneDeep, map } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker, Switch  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -34,6 +35,7 @@ function mapStateToProps(state) {
 }
 
 const CreateRequisitionIssue = (props) => {
+    let history = useHistory();
     useEffect(() => {
         if(props.isInitialized){
             setItemTypeA(props.item_types[0].id);
@@ -52,9 +54,7 @@ const CreateRequisitionIssue = (props) => {
                             prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
                             requested_by_position: "Division Chief",
                             from_ppmp: 1,
-                            calendar_year: dayjs().format("YYYY"),
-                            ppmp_date: dayjs().format('YYYY-MM-DD'),
-                            title: `${props.procurement_plan_types[0].name} for CY ${dayjs().format("YYYY")}`,
+                            ris_date: dayjs().format('YYYY-MM-DD'),
                         }
                     });
                 }
@@ -102,9 +102,30 @@ const CreateRequisitionIssue = (props) => {
         .catch(res => {})
         .then(res => {})
     }
+    
 
+    const approveForm = async (id, formData) => {
+        return api.Forms.approve(id, formData)
+        .then(res => {
+            let nextRoute = res.data.next_route;
+            notification.success({
+                message: 'Purchase Request is approved.',
+                description:
+                    `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
+                }
+            );
+            return Promise.resolve(res)
+        })
+        .catch(err => {
+            setSubmit(false);
+            return Promise.reject(err)
+        })
+        .then(res => {})
+        ;
+    }
+    
 
-    const saveRequisitionIssue = debounce(() => {
+    const saveRequisitionIssue = () => {
         setSubmit(true);
         props.dispatch({
             type: "SET_REQUISITION_ISSUE_CREATE_FORM_ERRORS",
@@ -166,6 +187,23 @@ const CreateRequisitionIssue = (props) => {
         })
         .then(res => {})
         ;
+    }
+
+    const handleSave = debounce(async () => {
+        if(props.formType == "issue"){
+            try {
+                let formData = cloneDeep(props.formData);
+                await approveForm(props.formData.form_route_id, formData);
+                history.push("/forms/forwarded");
+                clearForm();
+                setSubmit(false);
+            } catch (error) {
+                setSubmit(false);
+                console.log(error);
+            }
+        }else{
+            saveRequisitionIssue();
+        }
     }, 200);
 
 
@@ -212,10 +250,13 @@ const CreateRequisitionIssue = (props) => {
             case 'request_quantity':
                 // newValue[index].max_quantity
                 let quantity = parseInt(value);
-                if(quantity > newValue[index].max_quantity){
+                if(quantity > newValue[index].max_quantity && props.formData.from_ppmp == 1){
                     quantity = newValue[index].max_quantity;
                 }
                 newValue[index]['request_quantity'] = quantity;
+                break;
+            case 'has_stock':
+                newValue[index]['issue_quantity'] = (newValue[index].has_stock ? newValue[index]['issue_quantity'] : 0 );
                 break;
         
             default:
@@ -482,51 +523,92 @@ const CreateRequisitionIssue = (props) => {
                     </Col>
                     
                 </Row> */}
-                <Row gutter={[8, 8]} className="pp-items-header">
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-center'>
-                            <b>Code</b>
-                        </div>
-                    </Col>
-                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                        <div className='text-center'>
-                            <b>Item</b>
-                        </div>
-                    </Col>
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-center'>
-                            <b>Unit Of Measure</b>
-                        </div>
-                    </Col>
+                { props.formType == "issue" ? (
+                    <Row gutter={[8, 8]} className="pp-items-header">
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Code</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={11} xl={11}>
+                            <div className='text-center'>
+                                <b>Item</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Unit Of Measure</b>
+                            </div>
+                        </Col>
 
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-center'>
-                            <b>Quantity</b>
-                        </div>
-                    </Col>
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-center'>
-                            <b>Max Quantity</b>
-                        </div>
-                    </Col>
-                    {/* <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-right'>
-                            <b>Estimated Budget</b>
-                        </div>
-                    </Col>
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div className='text-right'>
-                            <b>Total Amount</b>
-                        </div>
-                    </Col> */}
-                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div  className='text-right'>
-                            <Tooltip placement="left" title={"Add Item"}>
-                                <Button type="primary" onClick={() => addItem() }><PlusOutlined /></Button>
-                            </Tooltip>
-                        </div>
-                    </Col>
-                </Row>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Requested Quantity</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Stock Available?</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Issue Quantity</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Remarks</b>
+                            </div>
+                        </Col>
+                    </Row>
+                ) : (
+                    <Row gutter={[8, 8]} className="pp-items-header">
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Code</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            <div className='text-center'>
+                                <b>Item</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Unit Of Measure</b>
+                            </div>
+                        </Col>
+
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Quantity</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Max Quantity</b>
+                            </div>
+                        </Col>
+                        {/* <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-right'>
+                                <b>Estimated Budget</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div className='text-right'>
+                                <b>Total Amount</b>
+                            </div>
+                        </Col> */}
+                        <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                            <div  className='text-right'>
+                                <Tooltip placement="left" title={"Add Item"}>
+                                    <Button type="primary" onClick={() => addItem() }><PlusOutlined /></Button>
+                                </Tooltip>
+                            </div>
+                        </Col>
+                    </Row>
+                )}
 
                 { isEmpty(props.formData.items) && (
                     <Row gutter={[8, 8]} className="pp-items-row">
@@ -541,73 +623,123 @@ const CreateRequisitionIssue = (props) => {
                     props.formData.items.map((item, index) => (
                         <React.Fragment key={item.key}>
                             {/* <b>{ item.item_type_name }</b> */}
-                            <Row gutter={[8, 8]} className="pp-items-row">
-                            <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                                <div className='text-center'>
-                                    <Form.Item>
-                                        { item.item_code}
-                                    </Form.Item>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            
-                                <div className='text-center'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
-                                        <Select
-                                            showSearch
-                                            placeholder="Item name"
-                                            optionFilterProp="children"
-                                            onSelect={(value) => { selectItem(value, index, )}}
-                                            filterOption={(input, option) =>
-                                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                            }
-                                            value={item.item_id}
-                                        >
-                                            { props.item_categories.map(item_category =>  {
-                                                return (
-                                                    <OptGroup label={item_category.name}  key={item_category.id}>
-                                                        { props.items?.filter(item => item.item_category.id == item_category.id && (itemIds.includes(item.id) || props.formData.from_ppmp == 0)).map(item => {
-                                                            return <Option value={item.id} key={item.id}>{item.item_name}</Option>
-                                                        }) }
-                                                    </OptGroup>
-                                                );
-                                            }) }
-                                        </Select>
-                                    </Form.Item>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                                <div className='text-center'>
-                                    <Form.Item>
-                                        { item.unit_of_measure }
-                                    </Form.Item>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                                <div className='text-center'>
-                                    <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.request_quantity`) }>
-                                        { item.item_id && (
-                                            <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
-                                        ) }
-                                    </Form.Item>
-                                </div>
-                            </Col>
+                            { props.formType == "issue" ? (
+                                <Row gutter={[8, 8]} className="pp-items-row">
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item>
+                                                { item.item_code}
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={12} lg={11} xl={11}>
+                                    
+                                        <div className='text-center'>
+                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
+                                                { item.item.item_name }
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item>
+                                                { item.unit_of_measure ? item.unit_of_measure : item.item.unit_of_measure.name }
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            { item.request_quantity }
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={1} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.has_stock`) }>
+                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changeTableFieldValue(e, item, 'has_stock', index, ) } checked={item.has_stock == 1} />
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.issue_quantity`) }>
+                                            { item.has_stock ? (
+                                                <Input type="number" autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'issue_quantity', index, ) } value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
+                                            ) : item.issue_quantity }
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                                        <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.remarks`) }>
+                                            <Input  autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'remarks', index, ) } defaultValue={item.remarks} style={{ width: "100%" }} placeholder="Remarks" />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            ) : (
+                                <Row gutter={[8, 8]} className="pp-items-row">
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item>
+                                                { item.item_code}
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
 
-                            <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                                <div className='text-center'>
-                                    <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.max_quantity`) }>
-                                        { item.max_quantity }
-                                    </Form.Item>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                                <div className='text-right space-x-1'>
-                                    <Tooltip placement="bottom" title={"Delete Item"}>
-                                        <Button type="danger" onClick={() => deleteItem(item.key, )}><DeleteOutlined /></Button>
-                                    </Tooltip>
-                                </div>
-                            </Col>
-                        </Row>
+                                        <div className='text-center'>
+                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
+                                                <Select
+                                                    showSearch
+                                                    placeholder="Item name"
+                                                    optionFilterProp="children"
+                                                    onSelect={(value) => { selectItem(value, index, )}}
+                                                    filterOption={(input, option) =>
+                                                        option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    }
+                                                    value={item.item_id}
+                                                >
+                                                    { props.item_categories.map(item_category =>  {
+                                                        return (
+                                                            <OptGroup label={item_category.name}  key={item_category.id}>
+                                                                { props.items?.filter(item => item.item_category.id == item_category.id && (itemIds.includes(item.id) || props.formData.from_ppmp == 0)).map(item => {
+                                                                    return <Option value={item.id} key={item.id}>{item.item_name}</Option>
+                                                                }) }
+                                                            </OptGroup>
+                                                        );
+                                                    }) }
+                                                </Select>
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item>
+                                                { item.item_id && item.unit_of_measure }
+                                                
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.request_quantity`) }>
+                                            { item.item_id && (
+                                                <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
+                                            ) }
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.max_quantity`) }>
+                                                { item.max_quantity }
+                                            </Form.Item>
+                                        </div>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={2} lg={2} xl={2}>
+                                        <div className='text-right space-x-1'>
+                                            <Tooltip placement="bottom" title={"Delete Item"}>
+                                                <Button type="danger" onClick={() => deleteItem(item.key, )}><DeleteOutlined /></Button>
+                                            </Tooltip>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            ) }
+                            
                         </React.Fragment>
                 ))
             }
@@ -632,7 +764,7 @@ const CreateRequisitionIssue = (props) => {
            <div className='text-center space-x-2'>
                 
                 <br />
-                <Button type="primary" onClick={() => saveRequisitionIssue()} disabled={submit} loading={submit}><SaveOutlined />
+                <Button type="primary" onClick={() => handleSave()} disabled={submit} loading={submit}><SaveOutlined />
                     { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
                 </Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />

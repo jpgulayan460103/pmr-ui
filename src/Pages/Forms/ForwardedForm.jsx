@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useLocation  } from 'react-router-dom'
+import { useHistory  } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { Table, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
-import Icon, { CloseOutlined, FormOutlined, EllipsisOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
-import { cloneDeep, debounce, isEmpty } from 'lodash';
+import Icon, { CloseOutlined, FormOutlined, BankOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
+import _, { cloneDeep, debounce, isEmpty } from 'lodash';
 import api from '../../api';
 import filter from '../../Utilities/filter';
 import helpers from '../../Utilities/helpers';
@@ -32,7 +32,6 @@ function mapStateToProps(state) {
         selectedFormRoute: state.forms.forwardedForm.selectedFormRoute,
         routeOptions: state.forms.forwardedForm.routeOptions,
         procurementFormType: state.forms.forwardedForm.procurementFormType,
-        currentRoute: state.forms.forwardedForm.currentRoute,
         addOn: state.forms.forwardedForm.addOn,
         errorMessage: state.forms.forwardedForm.errorMessage,
         tableLoading: state.forms.forwardedForm.tableLoading,
@@ -53,6 +52,7 @@ const MaximizeSvg = () => (
 
 const ForwardedForm = (props) => {
     const unmounted = React.useRef(false);
+    let history = useHistory();
     useEffect(() => {
         return () => {
             unmounted.current = true;
@@ -61,7 +61,6 @@ const ForwardedForm = (props) => {
             // setSelectedFormRoute({});
             // setRouteOptions([]);
             // setProcurementFormType("");
-            // setCurrentRoute({});
             // setAddOn(`BUDRP-PR-${dayjs().format("YYYY-MM-")}`);
             // setErrorMessage({});
             // setTableLoading(false);
@@ -72,7 +71,6 @@ const ForwardedForm = (props) => {
         }
     }, []);
 
-    const location = useLocation();
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
     const budgetFormRef = React.useRef();
@@ -137,12 +135,6 @@ const ForwardedForm = (props) => {
     const setProcurementFormType = (value) => {
         props.dispatch({
             type: "SET_FORM_FORWARDED_PROCUREMENT_FORM_TYPE",
-            data: value,
-        });
-    }
-    const setCurrentRoute = (value) => {
-        props.dispatch({
-            type: "SET_FORM_FORWARDED_CURRENT_ROUTE",
             data: value,
         });
     }
@@ -221,7 +213,6 @@ const ForwardedForm = (props) => {
             setErrorMessage({});
             getForm();
             setSelectedFormRoute({});
-            setCurrentRoute({});
         })
         .catch(err => {
             setSubmit(false);
@@ -268,7 +259,6 @@ const ForwardedForm = (props) => {
             setErrorMessage({});
             getForm();
             setSelectedFormRoute({});
-            setCurrentRoute({});
         })
         .catch(err => {
             setSubmit(false);
@@ -404,6 +394,8 @@ const ForwardedForm = (props) => {
                 break;
             case "procurement_plan":
                 viewProcurementPlan(item.form_routable_id);
+            case "requisition_issue":
+                viewRequisitionIssue(item.form_routable_id);
                 break;
         
             default:
@@ -428,18 +420,16 @@ const ForwardedForm = (props) => {
 
     const confirm = debounce(async (item) => {
         setSelectedFormRoute(item);
-        let current_route = item.form_process.form_routes.filter(i => i.status == "pending");
         let procurement_user_office = props.user.user_offices.data.filter(i => i.office.title == "PS");
         let budget_user_office = props.user.user_offices.data.filter(i => i.office.title == "BS");
-        setCurrentRoute(current_route[0]);
         if(procurement_user_office.length != 0){
-            if(current_route[0].description_code == "select_action" || current_route[0].description_code == "aprroval_from_proc"){
+            if(item.route_code == "select_action" || item.route_code == "aprroval_from_proc"){
                 setModalProcurementForm(true);
-                if(current_route[0].description_code == "aprroval_from_proc"){
+                if(item.route_code == "aprroval_from_proc"){
                     setProcurementFormType("approve");
                 }
             }
-        }else if(budget_user_office.length != 0  && current_route[0].description_code == "aprroval_from_budget"){
+        }else if(budget_user_office.length != 0  && item.route_code.description_code == "aprroval_from_budget"){
             api.PurchaseRequest.getNextNumber()
             .then(res => {
                 if (unmounted.current) { return false; }
@@ -473,7 +463,6 @@ const ForwardedForm = (props) => {
             );
             getForm();
             setSelectedFormRoute({});
-            setCurrentRoute({});
             return Promise.resolve(res)
         })
         .catch(err => {
@@ -483,6 +472,32 @@ const ForwardedForm = (props) => {
         .then(res => {})
         ;
     };
+
+    const issueRis = (item) => {
+        loadRis(item.form_routable.id)
+        .then(res => {
+            let ris = res.data;
+            ris.items = ris.items.data;
+            ris.form_route_id = item.id;
+            props.dispatch({
+                type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
+                data: "issue"
+            });
+
+            props.dispatch({
+                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+                data: ris
+            });
+
+            history.push("/requisition-and-issues/form");
+        })
+        .catch(err => {})
+        .then(res => {})
+    }
+
+    const loadRis = (id) => {
+        return api.RequisitionIssue.get(id);
+    }
 
     const actionTypeProcurement = (e) => {
         setProcurementFormType(e);
@@ -508,6 +523,23 @@ const ForwardedForm = (props) => {
     const viewProcurementPlan = (id) => {
         setFormLoading(true);
         api.ProcurementPlan.get(id)
+        .then(res => {
+            if (unmounted.current) { return false; }
+            setAttachments(res.data.form_uploads.data)
+            setFormLoading(false);
+            // setSelectedForm();
+        })
+        .catch(err => {
+            setFormLoading(false);
+        })
+        .then(res => {
+            setFormLoading(false);
+        })
+        ;
+    }
+    const viewRequisitionIssue = (id) => {
+        setFormLoading(true);
+        api.RequisitionIssue.get(id)
         .then(res => {
             if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)
@@ -690,15 +722,23 @@ const ForwardedForm = (props) => {
                             </Tooltip>
                     ) : (
                         <>
-                            <Tooltip placement="bottom" title={"Approve"}>
-                                <Button size='small' type='default' icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
-                    
-                                </Button>
-                            </Tooltip>
+                            {item.route_code == "ris_issuance_from_property" ? (
+                                <Tooltip placement="bottom" title={"Issue supplies and properties"}>
+                                    <Button size='small' type='default' icon={<BankOutlined twoToneColor="#0000FF" />} onClick={() => { issueRis(item) }} disabled={props.submit}>
+                        
+                                    </Button>
+                                </Tooltip>
+                            ) : (
+                                <Tooltip placement="bottom" title={"Approve"}>
+                                    <Button size='small' type='default' icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
+                                    
+                                    </Button>
+                                </Tooltip>
+                            )}
                             {/* 
                                 { item.from_office_id == item.to_office_id ? "" : (
                             */}
-                            { ('ris_aprroval_from_enduser', 'aprroval_from_enduser', 'ppmp_aprroval_from_enduser').includes(props.currentRoute.description_code) ? "" : (
+                            { item.route_code == "route_origin" ? "" : (
                                 <Tooltip placement="bottom" title={"Disapprove"}>
                                     <Button size='small' type='default' icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
                     
@@ -948,7 +988,7 @@ const ForwardedForm = (props) => {
                     id="procurementForm"
                 >
 
-                    { props.currentRoute.description_code != "aprroval_from_proc" ? (
+                    { props.selectedFormRoute.route_code != "aprroval_from_proc" ? (
                         <Form.Item
                             name="type"
                             label="Action"
@@ -1065,7 +1105,7 @@ const ForwardedForm = (props) => {
                                             <Button size='small' type='default' onClick={() => { confirm(props.selectedFormRoute, 0) }} disabled={props.submit}><LikeTwoTone twoToneColor="#0000FF" /></Button>
                                         </Tooltip>
                                             
-                                            { props.selectedFormRoute.from_office_id == props.selectedFormRoute.to_office_id ? "" : (
+                                            { props.selectedFormRoute.route_code == "route_origin" ? "" : (
                                                 <Tooltip placement="top" title={"Disapprove"}>
                                                     <Button size='small' type='default' onClick={() => { showRejectForm(props.selectedFormRoute, 0) }}><DislikeTwoTone twoToneColor="#FF0000" /></Button>
                                                 </Tooltip>

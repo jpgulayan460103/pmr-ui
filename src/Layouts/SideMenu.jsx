@@ -170,18 +170,14 @@ const Sidemenu = (props) => {
                         View Created PPMP
                     </Menu.Item>
                 </SubMenu>
-                <SubMenu key="submenu-requisition-and-issue" icon={<ShoppingCartOutlined />} title="PPMP">
-                    <Menu.Item key="/requisition-and-issues/summary">
-                        <Link to="/requisition-and-issues/summary"></Link>
-                        Summary of PPMP
-                    </Menu.Item>
+                <SubMenu key="submenu-requisition-and-issue" icon={<ShoppingCartOutlined />} title="RIS">
                     <Menu.Item key="/requisition-and-issues/form">
                         <Link to="/requisition-and-issues/form"></Link>
-                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } PPMP
+                        { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } RIS
                     </Menu.Item>
                     <Menu.Item key="/requisition-and-issues">
                         <Link to="/requisition-and-issues"></Link>
-                        View Created PPMP
+                        View Created RIS
                     </Menu.Item>
                 </SubMenu>
                 {

@@ -12,7 +12,6 @@ const initialState = () => {
         selectedFormRoute: {},
         routeOptions: [],
         procurementFormType: "",
-        currentRoute: {},
         addOn: `BUDRP-PR-${dayjs().format("YYYY-MM-")}`,
         errorMessage: {},
         tableLoading: false,
@@ -51,12 +50,7 @@ const initialState = () => {
         return {
           ...state,
           procurementFormType: action.data,
-        };    
-      case 'SET_FORM_FORWARDED_CURRENT_ROUTE':
-        return {
-          ...state,
-          currentRoute: action.data,
-        };    
+        };  
       case 'SET_FORM_FORWARDED_ADD_ON':
         return {
           ...state,
