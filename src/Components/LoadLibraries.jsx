@@ -223,6 +223,14 @@ const Loadlibraries = (props) => {
                 data: libraries.filter(library => library.library_type == "unit_of_measure")
             });
             props.dispatch({
+                type: "SET_LIBRARY_ITEM_CLASSIFICATION",
+                data: libraries.filter(library => library.library_type == "item_classification")
+            });
+            props.dispatch({
+                type: "SET_LIBRARY_ITEM_CATEGORY_CSE",
+                data: libraries.filter(library => library.library_type == "item_category_cse")
+            });
+            props.dispatch({
                 type: "SET_LIBRARY_ITEM_CATEGORIES",
                 data: libraries.filter(library => library.library_type == "item_category")
             });

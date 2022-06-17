@@ -1,8 +1,7 @@
 const initialState = () => {
     return {
       formData: {
-        itemsA: [],
-        itemsB: [],
+        items: [],
         end_user_id: null,
         type_id: null,
       },

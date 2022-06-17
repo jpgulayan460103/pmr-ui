@@ -5,8 +5,8 @@ const initialState = () => {
       page: 1,
     }
     return {
-      selectedProcurementPlan: {},
-      procurementPlans: [],
+      selectedRequisitionIssue: {},
+      requisitionIssues: [],
       paginationMeta: {
         current_page: 1,
         total: 1,
@@ -26,12 +26,12 @@ const initialState = () => {
       case 'SET_REQUISITION_ISSUE_LIST_SELECTED_PURCHASE_REQUEST':
         return {
           ...state,
-          selectedProcurementPlan: action.data,
+          selectedRequisitionIssue: action.data,
         };
       case 'SET_REQUISITION_ISSUE_LIST_PURCHASE_REQUESTS':
         return {
           ...state,
-          procurementPlans: action.data,
+          requisitionIssues: action.data,
         };
       case 'SET_REQUISITION_ISSUE_LIST_PAGINATION_META':
         return {

@@ -18,6 +18,7 @@ function mapStateToProps(state) {
         unit_of_measures: state.libraries.unit_of_measures,
         items: state.libraries.items,
         item_categories: state.libraries.item_categories,
+        item_category_cses: state.libraries.item_category_cses,
         item_types: state.libraries.item_types,
         procurement_plan_types: state.libraries.procurement_plan_types,
         user_sections: state.libraries.user_sections,
@@ -39,6 +40,9 @@ const CreateProcurementPlan = (props) => {
         if(props.isInitialized){
             setItemTypeA(props.item_types[0].id);
             setItemTypeB(props.item_types[1].id);
+            let dn = props.item_categories.filter(item => item.name == "Donations");
+            console.log(dn);
+            setDonation(dn[0]);
             if(props.formData.end_user_id){
             }else{
                 if(!isEmpty(props.user)){
@@ -72,6 +76,7 @@ const CreateProcurementPlan = (props) => {
     const [submit, setSubmit] = useState(false);
     const [itemTypeA, setItemTypeA] = useState(null);
     const [itemTypeB, setItemTypeB] = useState(null);
+    const [donation, setDonation] = useState(null);
 
 
     const getItems = async () => {
@@ -371,7 +376,9 @@ const CreateProcurementPlan = (props) => {
         newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
         newValue[index]["item_type_id"] = item.item_type.id;
         newValue[index]["item_type_name"] = item.item_type.name;
-        newValue[index]["unit_of_measure"] = item.unit_of_measure.name;
+        newValue[index]["unit_of_measure"] = item.unit_of_measure?.name;
+        newValue[index]["item_category_cse"] = item.item_category_cse?.name;
+        newValue[index]["item_category"] = item.item_category.name;
         // newValue[index]["is_ppmp"] = item.is_ppmp;
         // newValue[index]["in_libraries"] = true;
         newValue[index]["item_code"] = item.item_code;
@@ -628,6 +635,7 @@ const CreateProcurementPlan = (props) => {
                             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             
                                 <div className='text-center'>
+                                    { item['item_category_cse'] }
                                     <Form.Item { ...helpers.displayError(props.formErrors, `itemsA.${index}.item_id`) }>
                                         { item.is_edit ? (<Select
                                             showSearch
@@ -639,10 +647,10 @@ const CreateProcurementPlan = (props) => {
                                             }
                                             value={item.item_id}
                                         >
-                                            { props.item_categories.map(item_category =>  {
+                                            { props.item_category_cses.map(item_category_cse =>  {
                                                 return (
-                                                    <OptGroup label={item_category.name}  key={item_category.id}>
-                                                        { props.items?.filter(item => item.item_category.id == item_category.id && item.item_type.id == itemTypeA).map(item => {
+                                                    <OptGroup label={item_category_cse.name}  key={item_category_cse.id}>
+                                                        { props.items?.filter(item => item.item_category_cse?.id == item_category_cse?.id && item.item_type.id == itemTypeA).map(item => {
                                                             return <Option value={item.id} key={item.id}>{item.item_name}</Option>
                                                         }) }
                                                     </OptGroup>
@@ -907,6 +915,7 @@ const CreateProcurementPlan = (props) => {
                             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             
                                 <div className='text-center'>
+                                { item['item_category'] }
                                     <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.item_id`) }>
                                         { item.is_edit ? (<Select
                                             showSearch
@@ -918,7 +927,7 @@ const CreateProcurementPlan = (props) => {
                                             }
                                             value={item.item_id}
                                         >
-                                            { props.item_categories.map(item_category =>  {
+                                            { props.item_categories.filter(category => category.id != donation.id).map(item_category =>  {
                                                 return (
                                                     <OptGroup label={item_category.name}  key={item_category.id}>
                                                         { props.items?.filter(item => item.item_category.id == item_category.id && item.item_type.id == itemTypeB).map(item => {
@@ -931,6 +940,13 @@ const CreateProcurementPlan = (props) => {
                                             <span>{item.item_name}</span>
                                         ) }
                                     </Form.Item>
+                                    {/* <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.item_id`) }>
+                                        { item.is_edit ? (
+                                            <TextArea placeholder='Description' autoSize={{ minRows: 2, maxRows: 6 }} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'description', index, "B") } defaultValue={item.description} />
+                                        ) : (
+                                            <span>{item.description}</span>
+                                        ) }
+                                    </Form.Item> */}
                                 </div>
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
@@ -1120,7 +1136,7 @@ const CreateProcurementPlan = (props) => {
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Prepared By" { ...helpers.displayError(props.formErrors, `prepared_by_name`) }>
-                        <Input onChange={(e) => changeFooter(e,'prepared_by_name')} value={props.formData.prepared_by_name} placeholder="FULL NAME" />
+                        <Input onBlur={(e) => changeFooter(e,'prepared_by_name')} defaultValue={props.formData.prepared_by_name} placeholder="FULL NAME" />
                     </Form.Item>
                     <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `prepared_by_position`) }>
                         {/* <Input onChange={(e) => changeFieldValue(e, 'prepared_by_position')} value={props.formData.prepared_by_position} /> */}
@@ -1145,7 +1161,7 @@ const CreateProcurementPlan = (props) => {
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Certified By" { ...helpers.displayError(props.formErrors, `certified_by_name`) }>
-                        <Input onChange={(e) => changeFooter(e,'certified_by_name')} value={props.formData.certified_by_name} placeholder="FULL NAME" />
+                        <Input onBlur={(e) => changeFooter(e,'certified_by_name')} defaultValue={props.formData.certified_by_name} placeholder="FULL NAME" />
                     </Form.Item>
                     <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `certified_by_position`) }>
                         <AutoComplete
@@ -1177,7 +1193,7 @@ const CreateProcurementPlan = (props) => {
                     {/* <p className='text-center'>{ props.approvedBySignatory?.parent?.name }</p> */}
 
                     <Form.Item label="Approved By" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
-                        <Input onChange={(e) => changeFooter(e,'approved_by_name')} value={props.formData.approved_by_name} placeholder="FULL NAME" />
+                        <Input onBlur={(e) => changeFooter(e,'approved_by_name')} defaultValue={props.formData.approved_by_name} placeholder="FULL NAME" />
                     </Form.Item>
                     <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `approved_by_position`) }>
                         <AutoComplete

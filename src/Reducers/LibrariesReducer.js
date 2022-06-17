@@ -3,6 +3,8 @@ const initialState = () => {
       items: [],
       unit_of_measures: [],
       item_categories: [],
+      item_classifications: [],
+      item_category_cses: [],
       item_types: [],
       user_sections: [],
       user_divisions: [],
@@ -45,6 +47,16 @@ const initialState = () => {
         return {
           ...state,
           item_categories: action.data,
+        };
+      case 'SET_LIBRARY_ITEM_CLASSIFICATION':
+        return {
+          ...state,
+          item_classifications: action.data,
+        };
+      case 'SET_LIBRARY_ITEM_CATEGORY_CSE':
+        return {
+          ...state,
+          item_category_cses: action.data,
         };
       case 'SET_LIBRARY_ITEM_TYPES':
         return {

@@ -695,7 +695,10 @@ const ForwardedForm = (props) => {
                     
                                 </Button>
                             </Tooltip>
-                            { item.from_office_id == item.to_office_id ? "" : (
+                            {/* 
+                                { item.from_office_id == item.to_office_id ? "" : (
+                            */}
+                            { ('ris_aprroval_from_enduser', 'aprroval_from_enduser', 'ppmp_aprroval_from_enduser').includes(props.currentRoute.description_code) ? "" : (
                                 <Tooltip placement="bottom" title={"Disapprove"}>
                                     <Button size='small' type='default' icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
                     
