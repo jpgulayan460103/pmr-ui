@@ -369,65 +369,34 @@ const CreateRequisitionIssue = (props) => {
 
 
     const selectItem = (value, index) => {
-        if(props.formData.from_ppmp == 1){
-            let item = items.filter(item => item.item.id == value);
-            item = item[0];
-            console.log(item);
-            let existed_item = props.formData[`items`].filter(item => item.item_id == value);
-            if(!isEmpty(existed_item)){
-                notification.error({
-                    message: 'Item existed!',
-                    description:
-                        `The item ${existed_item[0].item_name} is already in the list`,
-                    }
-                );
-                return false;
-            }
-            let newValue = cloneDeep(props.formData[`items`]);
-            newValue[index]["unit_of_measure_id"] = item.item.unit_of_measure.id;
-            newValue[index]["unit_of_measure"] = item.item.unit_of_measure.name;
-            newValue[index]["item_code"] = item.item.item_code;
-            newValue[index]["item_name"] = item.item.item_name;
-            newValue[index]["request_quantity"] = 0;
-            newValue[index]["max_quantity"] = item.total_quantity;
-            newValue[index]["item_id"] = item.item.id;
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-                data: {
-                    ...props.formData,
-                    items: newValue
+        let item = items.filter(item => item.procurement_plan_item_id == value);
+        item = item[0];
+        let existed_item = props.formData[`items`].filter(item => item.procurement_plan_item_id == value);
+        if(!isEmpty(existed_item)){
+            notification.error({
+                message: 'Item existed!',
+                description:
+                    `The item ${existed_item[0].description} is already in the list`,
                 }
-            });
-        }else{
-            let item = props.items.filter(item => item.id == value);
-            item = item[0];
-            console.log(item);
-            let existed_item = props.formData[`items`].filter(item => item.item_id == value);
-            if(!isEmpty(existed_item)){
-                notification.error({
-                    message: 'Item existed!',
-                    description:
-                        `The item ${existed_item[0].item_name} is already in the list`,
-                    }
-                );
-                return false;
-            }
-            let newValue = cloneDeep(props.formData[`items`]);
-            newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
-            newValue[index]["unit_of_measure"] = item.unit_of_measure.name;
-            newValue[index]["item_code"] = item.item_code;
-            newValue[index]["item_name"] = item.item_name;
-            newValue[index]["request_quantity"] = 0;
-            newValue[index]["max_quantity"] = 0;
-            newValue[index]["item_id"] = item.id;
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-                data: {
-                    ...props.formData,
-                    items: newValue
-                }
-            });
+            );
+            return false;
         }
+        let newValue = cloneDeep(props.formData[`items`]);
+        newValue[index]["unit_of_measure_id"] = item.procurement_plan_item.unit_of_measure.id;
+        newValue[index]["unit_of_measure"] = item.procurement_plan_item.unit_of_measure.name;
+        newValue[index]["item_code"] = "";
+        newValue[index]["item_id"] = item.procurement_plan_item.item_id;
+        newValue[index]["description"] = item.procurement_plan_item.description;
+        newValue[index]["request_quantity"] = 0;
+        newValue[index]["max_quantity"] = item.total_quantity;
+        newValue[index]["procurement_plan_item_id"] = item.procurement_plan_item_id;
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                items: newValue
+            }
+        });
     }
     
 
@@ -440,8 +409,9 @@ const CreateRequisitionIssue = (props) => {
             total_quantity: 0,
             total_price: 0,
             item_code: null,
-            item_name: null,
             item_id: null,
+            description: null,
+            procurement_plan_item_id: null,
             is_edit: true,
             request_quantity: 0,
         };
@@ -636,14 +606,14 @@ const CreateRequisitionIssue = (props) => {
                                     
                                         <div className='text-center'>
                                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
-                                                { item.item.item_name }
+                                                { item.procurement_plan_item.description }
                                             </Form.Item>
                                         </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <div className='text-center'>
                                             <Form.Item>
-                                                { item.unit_of_measure ? item.unit_of_measure : item.item.unit_of_measure.name }
+                                                { item.unit_of_measure ? item.unit_of_measure : item.procurement_plan_item.unit_of_measure.name }
                                             </Form.Item>
                                         </div>
                                     </Col>
@@ -684,41 +654,40 @@ const CreateRequisitionIssue = (props) => {
                                     <Col xs={24} sm={24} md={12} lg={12} xl={12}>
 
                                         <div className='text-center'>
-                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
-                                                <Select
-                                                    showSearch
-                                                    placeholder="Item name"
-                                                    optionFilterProp="children"
-                                                    onSelect={(value) => { selectItem(value, index, )}}
-                                                    filterOption={(input, option) =>
-                                                        option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                                    }
-                                                    value={item.item_id}
-                                                >
-                                                    { props.item_categories.map(item_category =>  {
-                                                        return (
-                                                            <OptGroup label={item_category.name}  key={item_category.id}>
-                                                                { props.items?.filter(item => item.item_category.id == item_category.id && (itemIds.includes(item.id) || props.formData.from_ppmp == 0)).map(item => {
-                                                                    return <Option value={item.id} key={item.id}>{item.item_name}</Option>
-                                                                }) }
-                                                            </OptGroup>
-                                                        );
-                                                    }) }
-                                                </Select>
+                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.procurement_plan_item_id`) }>
+                                                { props.formData.from_ppmp == 1 ? (
+
+                                                    <Select
+                                                        showSearch
+                                                        placeholder="Item name"
+                                                        optionFilterProp="children"
+                                                        onSelect={(value) => { selectItem(value, index, )}}
+                                                        filterOption={(input, option) =>
+                                                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                        }
+                                                        value={item.procurement_plan_item_id}
+                                                        >
+                                                        { items.map(item =>  (
+                                                            <Option value={item.procurement_plan_item_id} key={item.key}>{item.procurement_plan_item.description}</Option>
+                                                        )) }
+                                                    </Select>
+                                                ) : (
+                                                    <TextArea placeholder='Description' autoSize={{ minRows: 1, maxRows: 6 }} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'description', index) } defaultValue={item.description} />
+                                                ) }
                                             </Form.Item>
                                         </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <div className='text-center'>
                                             <Form.Item>
-                                                { item.item_id && item.unit_of_measure }
+                                                { item.procurement_plan_item_id && item.unit_of_measure }
                                                 
                                             </Form.Item>
                                         </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.request_quantity`) }>
-                                            { item.item_id && (
+                                            { item.procurement_plan_item_id && (
                                                 <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
                                             ) }
                                         </Form.Item>
@@ -745,20 +714,14 @@ const CreateRequisitionIssue = (props) => {
             }
                 <br />
             <Row gutter={[8, 8]} className="pp-items-footer">
-            </Row>
-            {/* END OF PART I */}
-
-            {/* END OF PART II */}
-            <Row gutter={[8, 8]}>
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Form.Item label="Requested By" { ...helpers.displayError(props.formErrors, `requested_by_name`) }>
-                        <Input onBlur={(e) => changeFooter(e,'requested_by_name')} defaultValue={props.formData.requested_by_name} placeholder="FULL NAME" />
-                    </Form.Item>
-                    <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `requested_by_position`) }>
-                        <Input onChange={(e) => changeFieldValue(e, 'requested_by_position')} value={props.formData.requested_by_position} placeholder="Designation" />
+            <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
+                        <Input onBlur={(e) => changeFieldValue(e, 'purpose')} defaultValue={props.formData.purpose} placeholder="Purpose" />
+                        {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                     </Form.Item>
                 </Col>
             </Row>
+
            </Form>
 
            <div className='text-center space-x-2'>

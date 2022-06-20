@@ -95,7 +95,7 @@ const SummaryProcurementPlan = (props) => {
                                 {
                                     summary?.items?.data.map( item => (
                                         <tr key={item.key}>
-                                            <td>{item?.item?.item_name}</td>
+                                            <td>{item?.procurement_plan_item?.description}</td>
                                             <td>{item.total_quantity}</td>
                                             <td>{item.mon1}</td>
                                             <td>{item.mon2}</td>
