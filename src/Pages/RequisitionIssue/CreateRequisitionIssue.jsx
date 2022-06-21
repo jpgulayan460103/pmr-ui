@@ -50,10 +50,10 @@ const CreateRequisitionIssue = (props) => {
                             ...props.formData,
                             end_user_id: props.user.user_offices?.data[0]?.office_id,
                             procurement_plan_type_id: props.procurement_plan_types[0].id,
-                            item_type_id: props.item_types[0].id,
+                            // item_type_id: props.item_types[0].id,
                             prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
                             requested_by_position: "Division Chief",
-                            from_ppmp: 1,
+                            // from_ppmp: 0,
                             ris_date: dayjs().format('YYYY-MM-DD'),
                         }
                     });
@@ -61,7 +61,7 @@ const CreateRequisitionIssue = (props) => {
             }
             if(isEmpty(props.items)){
                 getItems();
-                getPpmpItems();
+                // getPpmpItems();
             }
         }
     }, [props.isInitialized]);
@@ -154,10 +154,10 @@ const CreateRequisitionIssue = (props) => {
     
                 if(err.response.data.errors.items){
                     Modal.error({
-                        title: 'Project R  equisition and Issue creation failed',
+                        title: 'Requisition and Issue creation failed',
                         content: (
                           <div>
-                            <p>Please add items on the R   equisition and Issue.</p>
+                            <p>Please add items on the Requisition and Issue.</p>
                           </div>
                         ),
                         onOk() {},
@@ -197,9 +197,47 @@ const CreateRequisitionIssue = (props) => {
                 history.push("/forms/forwarded");
                 clearForm();
                 setSubmit(false);
-            } catch (error) {
+            } catch (err) {
                 setSubmit(false);
-                console.log(error);
+                console.log(err);
+                if(err.response.status == "422"){
+                    props.dispatch({
+                        type: "SET_REQUISITION_ISSUE_CREATE_FORM_ERRORS",
+                        data: err.response.data.errors
+                    });
+        
+                    if(err.response.data.errors.items){
+                        Modal.error({
+                            title: 'Requisition and Issue creation failed',
+                            content: (
+                              <div>
+                                <p>Please add items on the Requisition and Issue.</p>
+                              </div>
+                            ),
+                            onOk() {},
+                          });
+                    }else if(err.response.data.errors.update_error){
+                        Modal.error({
+                            title: 'Purchase Request update failed',
+                            content: (
+                              <div>
+                                <p>Unable to update. Purchase Request is already approved by the budget section.</p>
+                              </div>
+                            ),
+                            onOk() {},
+                          });
+                    }else{
+                        Modal.error({
+                            title: 'Purchase Request creation failed',
+                            content: (
+                              <div>
+                                <p>Please review the form before saving.</p>
+                              </div>
+                            ),
+                            onOk() {},
+                          });
+                    }
+                }
             }
         }else{
             saveRequisitionIssue();
@@ -249,14 +287,22 @@ const CreateRequisitionIssue = (props) => {
         switch (field) {
             case 'request_quantity':
                 // newValue[index].max_quantity
-                let quantity = parseInt(value);
-                if(quantity > newValue[index].max_quantity && props.formData.from_ppmp == 1){
-                    quantity = newValue[index].max_quantity;
+                let request_quantity = parseInt(value);
+                if(request_quantity > newValue[index].max_quantity && props.formData.from_ppmp == 1){
+                    request_quantity = newValue[index].max_quantity;
                 }
-                newValue[index]['request_quantity'] = quantity;
+                newValue[index]['request_quantity'] = request_quantity;
                 break;
             case 'has_stock':
                 newValue[index]['issue_quantity'] = (newValue[index].has_stock ? newValue[index]['issue_quantity'] : 0 );
+                break;
+            case 'issue_quantity':
+                // newValue[index].max_quantity
+                let issue_quantity = parseInt(value);
+                if(issue_quantity >= newValue[index]['request_quantity']){
+                    issue_quantity = newValue[index]['request_quantity'] ;
+                }
+                newValue[index]['issue_quantity'] = issue_quantity;
                 break;
         
             default:
@@ -367,6 +413,21 @@ const CreateRequisitionIssue = (props) => {
         changeFieldValue(value.toUpperCase(), field, false)
     }
 
+    const changeIfPpmp = (e) => {
+        if(e == "1"){
+            getPpmpItems();
+        }
+        // changeFieldValue(e, 'from_ppmp', false);
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                from_ppmp: e,
+                items: []
+            }
+        });
+    }
+
 
     const selectItem = (value, index) => {
         let item = items.filter(item => item.procurement_plan_item_id == value);
@@ -450,7 +511,7 @@ const CreateRequisitionIssue = (props) => {
 
                     <Col xs={24} sm={24} md={7} lg={7} xl={7}>
                         <Form.Item label="Items From PPMP?"  {...helpers.displayError(props.formErrors, `from_ppmp`)}>
-                            <Select style={{ width: "100%" }} onChange={(e) => changeFieldValue(e, 'from_ppmp', false)} value={props.formData.from_ppmp} placeholder="Select Item Type">
+                            <Select style={{ width: "100%" }} onChange={changeIfPpmp} value={props.formData.from_ppmp} placeholder="Select Item Type">
                                 <Option value={1}>Yes</Option>
                                 <Option value={0}>No</Option>
                             </Select>
@@ -573,7 +634,7 @@ const CreateRequisitionIssue = (props) => {
                         <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                             <div  className='text-right'>
                                 <Tooltip placement="left" title={"Add Item"}>
-                                    <Button type="primary" onClick={() => addItem() }><PlusOutlined /></Button>
+                                    <Button type="primary" onClick={() => addItem() }  disabled={props.formData.from_ppmp == null}><PlusOutlined /></Button>
                                 </Tooltip>
                             </div>
                         </Col>
@@ -584,7 +645,7 @@ const CreateRequisitionIssue = (props) => {
                     <Row gutter={[8, 8]} className="pp-items-row">
                         <Col span={24}>
                             <div className='text-center mb-3'>
-                                Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem() } }><PlusOutlined /></Button> button to add item.
+                                Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem() } } disabled={props.formData.from_ppmp == null}><PlusOutlined /></Button> button to add item.
                             </div>
                         </Col>
                     </Row>
@@ -606,14 +667,14 @@ const CreateRequisitionIssue = (props) => {
                                     
                                         <div className='text-center'>
                                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
-                                                { item.procurement_plan_item.description }
+                                                { item.description }
                                             </Form.Item>
                                         </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <div className='text-center'>
                                             <Form.Item>
-                                                { item.unit_of_measure ? item.unit_of_measure : item.procurement_plan_item.unit_of_measure.name }
+                                                { item.unit_of_measure.name }
                                             </Form.Item>
                                         </div>
                                     </Col>
@@ -654,7 +715,7 @@ const CreateRequisitionIssue = (props) => {
                                     <Col xs={24} sm={24} md={12} lg={12} xl={12}>
 
                                         <div className='text-center'>
-                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.procurement_plan_item_id`) }>
+                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.description`) }>
                                                 { props.formData.from_ppmp == 1 ? (
 
                                                     <Select
@@ -679,17 +740,29 @@ const CreateRequisitionIssue = (props) => {
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <div className='text-center'>
-                                            <Form.Item>
-                                                { item.procurement_plan_item_id && item.unit_of_measure }
+                                            <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
+                                                { props.formData.from_ppmp == 1 ? (
+                                                    <span>{ item.procurement_plan_item_id && item.unit_of_measure }</span>
+                                                ) : (
+                                                    <Select
+                                                        style={{ width: "100%" }}
+                                                        placeholder={`Select Unit of Measure`}
+                                                        filterOption={(input, option) =>
+                                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                        }
+                                                        showSearch
+                                                        onChange={(e) => changeTableFieldValue(e, item, 'unit_of_measure_id', index)}
+                                                    >
+                                                        { props.unit_of_measures.map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
+                                                    </Select>
+                                                ) }
                                                 
                                             </Form.Item>
                                         </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.request_quantity`) }>
-                                            { item.procurement_plan_item_id && (
-                                                <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
-                                            ) }
+                                            <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
