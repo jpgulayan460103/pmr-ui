@@ -20,6 +20,7 @@ function mapStateToProps(state) {
         items: state.libraries.items,
         item_categories: state.libraries.item_categories,
         item_types: state.libraries.item_types,
+        user_section_signatories: state.libraries.user_section_signatories,
         procurement_plan_types: state.libraries.procurement_plan_types,
         user_sections: state.libraries.user_sections,
         user_divisions: state.libraries.user_divisions,
@@ -107,13 +108,11 @@ const CreateRequisitionIssue = (props) => {
     const approveForm = async (id, formData) => {
         return api.Forms.approve(id, formData)
         .then(res => {
-            let nextRoute = res.data.next_route;
+            let alertMessage = res.data.alert_message;
             notification.success({
-                message: 'Purchase Request is approved.',
-                description:
-                    `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
-                }
-            );
+                message: `${alertMessage.message} ${alertMessage.status}`,
+                description: alertMessage.action_taken,
+            });
             return Promise.resolve(res)
         })
         .catch(err => {
@@ -317,6 +316,33 @@ const CreateRequisitionIssue = (props) => {
         });
     }
 
+    const changeRequestedBy = (e) => {
+        let requestedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                requested_by_id: e,
+                requested_by_name: requestedSignatory[0].name,
+                requested_by_designation: requestedSignatory[0].title,
+                requested_by_office: requestedSignatory[0].parent.title,
+            }
+        });
+    }
+    const changeApprovedBy = (e) => {
+        let approvedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                approved_by_id: e,
+                approved_by_name: approvedSignatory[0].name,
+                approved_by_designation: approvedSignatory[0].title,
+                approved_by_office: approvedSignatory[0].parent.title,
+            }
+        });
+    }
+
     const addAllMon = (item) => {
         let mon1 = isNaN(parseInt(item['mon1'])) ? 0 : parseInt(item['mon1']); 
         let mon2 = isNaN(parseInt(item['mon2'])) ? 0 : parseInt(item['mon2']); 
@@ -363,7 +389,7 @@ const CreateRequisitionIssue = (props) => {
             data: {
                 ...props.formData,
                 approved_by_name: user_office[0].name,
-                approved_by_position: user_office[0].parent.name,
+                approved_by_designation: user_office[0].parent.name,
                 approved_by_id: user_office[0].parent.parent.id,
                 approvedBy: e
             }
@@ -503,18 +529,26 @@ const CreateRequisitionIssue = (props) => {
            <Form layout='vertical'>
                 
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Office/Section">
-                            <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                            { props.formType == "issue" ? (
+                                <b>{ props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name }</b>
+                            ) : (
+                                <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                            )}
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Items From PPMP?"  {...helpers.displayError(props.formErrors, `from_ppmp`)}>
-                            <Select style={{ width: "100%" }} onChange={changeIfPpmp} value={props.formData.from_ppmp} placeholder="Select Item Type">
-                                <Option value={1}>Yes</Option>
-                                <Option value={0}>No</Option>
-                            </Select>
+                            { props.formType == "issue" ? (
+                                <b>{ props.formData.from_ppmp == "1" ? "Yes" : "No" }</b>
+                            ) : (
+                                <Select style={{ width: "100%" }} onChange={changeIfPpmp} value={props.formData.from_ppmp} placeholder="Select Item Type">
+                                    <Option value={1}>Yes</Option>
+                                    <Option value={0}>No</Option>
+                                </Select>
+                            )}
                         </Form.Item>
                     </Col>
 
@@ -645,7 +679,12 @@ const CreateRequisitionIssue = (props) => {
                     <Row gutter={[8, 8]} className="pp-items-row">
                         <Col span={24}>
                             <div className='text-center mb-3'>
-                                Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem() } } disabled={props.formData.from_ppmp == null}><PlusOutlined /></Button> button to add item.
+                                { props.formData.from_ppmp == null ? "Please select if items is from PPMP above. " : (
+                                    <React.Fragment>
+                                        <span> Please add items before saving the form. </span>
+                                        Click <Button type="primary" onClick={() => { addItem() } } disabled={props.formData.from_ppmp == null}><PlusOutlined /></Button> button to add item.
+                                    </React.Fragment>
+                                )  }
                             </div>
                         </Col>
                     </Row>
@@ -787,11 +826,68 @@ const CreateRequisitionIssue = (props) => {
             }
                 <br />
             <Row gutter={[8, 8]} className="pp-items-footer">
-            <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                     <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
-                        <Input onBlur={(e) => changeFieldValue(e, 'purpose')} defaultValue={props.formData.purpose} placeholder="Purpose" />
-                        {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
+                        { props.formType == "issue" ? (
+                            <b>{ props.formData.purpose }</b>
+                        ) : (
+                            <Input onBlur={(e) => changeFieldValue(e, 'purpose')} defaultValue={props.formData.purpose} placeholder="Purpose" />
+                        ) }
                     </Form.Item>
+                </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+                    <Form.Item label="Requested by" { ...helpers.displayError(props.formErrors, `requested_by_name`) }>
+                        { props.formType == "issue" ? (
+                            <p>
+                                <b>{ props.formData.requested_by_name }</b><br />
+                                <span>{ props.formData.requested_by_designation }</span><br />
+                                <span>{ props.formData.requested_by_date }</span><br />
+                            </p>
+                        )  : (
+                            <Select style={{ width: "100%" }} onSelect={changeRequestedBy} value={props.formData.requested_by_id} placeholder="Select Signatory" optionLabelProp="label">
+                                { props.user_section_signatories.filter(item => item.parent.title == props.user.user_offices?.data[0]?.office.parent.title || item.parent.title == props.user.user_offices?.data[0]?.office.title).map(i => (
+                                    <Option value={i.id} key={i.key} label={ i.name }>
+                                        <div className="demo-option-label-item">
+                                            { i.parent.name }
+                                        </div>
+                                    </Option>
+                                )) }
+                            </Select>
+                        )}
+                    </Form.Item>
+                    { props.formType != "issue" && (
+                        <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `requested_by_designation`) }>
+                            <Input value={props.formData.requested_by_designation} placeholder="Designation" />
+                        </Form.Item>
+                    )}
+                </Col>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+                    <Form.Item label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
+                        { props.formType == "issue" ? (
+                            <p>
+                                <b>{ props.formData.approved_by_name }</b><br />
+                                <span>{ props.formData.approved_by_designation }</span><br />
+                                <span>{ props.formData.approved_by_date }</span><br />
+                            </p>
+                        )  : (
+                            <Select style={{ width: "100%" }} onSelect={changeApprovedBy} value={props.formData.approved_by_id} placeholder="Select Signatory" optionLabelProp="label">
+                                { props.user_section_signatories.filter(item => item.parent.title == "PSAMS").map(i => (
+                                    <Option value={i.id} key={i.key} label={ i.name }>
+                                        <div className="demo-option-label-item">
+                                            { i.parent.name }
+                                        </div>
+                                    </Option>
+                                )) }
+                            </Select>
+                        )}
+                    </Form.Item>
+                    { props.formType != "issue" && (
+                        <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `approved_by_designation`) }>
+                            <Input value={props.formData.approved_by_designation} placeholder="Designation" />
+                        </Form.Item>
+                    )}
                 </Col>
             </Row>
 

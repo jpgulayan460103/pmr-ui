@@ -23,6 +23,7 @@ function mapStateToProps(state) {
         procurement_plan_types: state.libraries.procurement_plan_types,
         user_sections: state.libraries.user_sections,
         user_divisions: state.libraries.user_divisions,
+        user_section_signatories: state.libraries.user_section_signatories,
         user_positions: state.libraries.user_positions,
         user_signatory_designations: state.libraries.user_signatory_designations,
         user_signatory_names: state.libraries.user_signatory_names,
@@ -55,7 +56,7 @@ const CreateProcurementPlan = (props) => {
                             procurement_plan_type_id: props.procurement_plan_types[0].id,
                             item_type_id: props.item_types[0].id,
                             prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
-                            prepared_by_position: position[0].name,
+                            prepared_by_designation: position[0].name,
                             calendar_year: dayjs().format("YYYY"),
                             ppmp_date: dayjs().format('YYYY-MM-DD'),
                             title: `${props.procurement_plan_types[0].name} for CY ${dayjs().format("YYYY")}`,
@@ -167,7 +168,8 @@ const CreateProcurementPlan = (props) => {
                 ...props.formData,
                 end_user_id: props.user.user_offices?.data[0]?.office_id,
                 procurement_plan_type_id: props.procurement_plan_types[0].id,
-                items: []
+                itemsA: [],
+                itemsB: []
             }
         });
         props.dispatch({
@@ -242,6 +244,33 @@ const CreateProcurementPlan = (props) => {
         }
     }
 
+    const changeCertifiedBy = (e) => {
+        let certifiedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                certified_by_id: e,
+                certified_by_name: certifiedSignatory[0].name,
+                certified_by_designation: certifiedSignatory[0].title,
+                certified_by_office: certifiedSignatory[0].parent.title,
+            }
+        });
+    }
+    const changeApprovedBy = (e) => {
+        let approvedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                approved_by_id: e,
+                approved_by_name: approvedSignatory[0].name,
+                approved_by_designation: approvedSignatory[0].title,
+                approved_by_office: approvedSignatory[0].parent.title,
+            }
+        });
+    }
+
     const addAllMon = (item) => {
         let mon1 = isNaN(parseInt(item['mon1'])) ? 0 : parseInt(item['mon1']); 
         let mon2 = isNaN(parseInt(item['mon2'])) ? 0 : parseInt(item['mon2']); 
@@ -298,7 +327,7 @@ const CreateProcurementPlan = (props) => {
             data: {
                 ...props.formData,
                 approved_by_name: user_office[0].name,
-                approved_by_position: user_office[0].parent.name,
+                approved_by_designation: user_office[0].parent.name,
                 approved_by_id: user_office[0].parent.parent.id,
                 approvedBy: e
             }
@@ -473,6 +502,31 @@ const CreateProcurementPlan = (props) => {
         changeTableFieldValue(!item.is_edit, item, 'is_edit', index, itemType);
     }
 
+    const handleHideQuantities = (itemType = "A") => {
+        let newValue = cloneDeep(props.formData[`items${itemType}`]);
+        let newItems = newValue.map(item => {
+            item.is_edit = false;
+            return item;
+        });
+        if(itemType == "A"){
+            props.dispatch({
+                type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+                data: {
+                    ...props.formData,
+                    itemsA: newValue
+                }   
+            });
+        }else{
+            props.dispatch({
+                type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+                data: {
+                    ...props.formData,
+                    itemsB: newValue
+                }   
+            });
+        }
+    }
+
     const dropDownBadge = (index, itemType = "A") => {
         let mon1 = props.formErrors[`items${itemType}.${index}.mon1`];
         let mon2 = props.formErrors[`items${itemType}.${index}.mon2`];
@@ -597,7 +651,12 @@ const CreateProcurementPlan = (props) => {
                         </div>
                     </Col>
                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div  className='text-right'>
+                        <div  className='text-right space-x-1'>
+                            <Tooltip placement="left" title={"Hide quantities"}>
+                                <Button type="default" onClick={ () => handleHideQuantities("A") }>
+                                    <DoubleLeftOutlined rotate={90} />
+                                </Button>
+                            </Tooltip>
                             <Tooltip placement="left" title={"Add Item"}>
                                 <Button type="primary" onClick={() => addItem("A") }><PlusOutlined /></Button>
                             </Tooltip>
@@ -645,7 +704,7 @@ const CreateProcurementPlan = (props) => {
                                                 );
                                             }) }
                                         </Select>) : (
-                                            <span>{item.item_name}</span>
+                                            <span>{item.description}</span>
                                         ) }
                                     </Form.Item>
                                 </div>
@@ -675,7 +734,6 @@ const CreateProcurementPlan = (props) => {
                                 <div className='text-center'>
                                     <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.total_quantity`) }>
                                         { item.total_quantity }
-                                        {/* <Input type="number"  className='text-right' autoComplete='off'  onChange={(e) => changeTableFieldValue(e.target.value, item, 'price', index, "B") } value={item.total_quantity} style={{ width: "100%" }} step="0.01" placeholder="Estimated Budget" /> */}
                                     </Form.Item>
                                 </div>
                             </Col>
@@ -695,21 +753,23 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-right space-x-1'>
-                                    <Tooltip placement="bottom" title={"Show or hide months"}>
 
                                         { item.is_edit ? (
+                                            <Tooltip placement="bottom" title={"Hide quantities"}>
                                                 <Button type="default" onClick={() => toggleItem(index, item, "A")}>
                                                     <DoubleLeftOutlined rotate={90} />
                                                 </Button>
+                                            </Tooltip>
                                         ) : (
-                                            <Badge size="default" count={ dropDownBadge(index) }>
-                                                <Button type="default" onClick={() => toggleItem(index, item, "A")}>
-                                                    <DoubleLeftOutlined rotate={-90} />
-                                                </Button>
-                                            </Badge>
+                                            <Tooltip placement="bottom" title={"Show quantities"}>
+                                                <Badge size="default" count={ dropDownBadge(index) }>
+                                                    <Button type="default" onClick={() => toggleItem(index, item, "A")}>
+                                                        <DoubleLeftOutlined rotate={-90} />
+                                                    </Button>
+                                                </Badge>
+                                            </Tooltip>
                                             )
                                         }
-                                    </Tooltip>
                                     <Tooltip placement="bottom" title={"Delete Item"}>
                                         <Button type="danger" onClick={() => deleteItem(item.key, "A")}><DeleteOutlined /></Button>
                                     </Tooltip>
@@ -822,7 +882,7 @@ const CreateProcurementPlan = (props) => {
             <Row gutter={[8, 8]} className="pp-items-row">
                 <Col span={24}>
                     <div className='text-center mb-3'>
-                        Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem("A") } }><PlusOutlined /></Button> button to add item.
+                    <Button type="primary" onClick={() => { addItem("A") } }><PlusOutlined /> Add Annex A item</Button>
                     </div>
                 </Col>
             </Row>
@@ -886,7 +946,12 @@ const CreateProcurementPlan = (props) => {
                         </div>
                     </Col>
                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
-                        <div  className='text-right'>
+                        <div  className='text-right space-x-1'>
+                            <Tooltip placement="left" title={"Hide quantities"}>
+                                <Button type="default" onClick={ () => handleHideQuantities("B") }>
+                                    <DoubleLeftOutlined rotate={90} />
+                                </Button>
+                            </Tooltip>
                             <Tooltip placement="left" title={"Add Item"}>
                                 <Button type="primary" onClick={() => addItem("B") }><PlusOutlined /></Button>
                             </Tooltip>
@@ -912,16 +977,14 @@ const CreateProcurementPlan = (props) => {
                             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             
                                 <div className='text-center'>
-                                    <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.item_id`) }>
-                                        <TextArea placeholder='Description' autoSize={{ minRows: 1, maxRows: 6 }} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'description', index, "B") } defaultValue={item.description} />
-                                    </Form.Item>
-                                    {/* <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.item_id`) }>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.description`) }>
                                         { item.is_edit ? (
-                                            <TextArea placeholder='Description' autoSize={{ minRows: 2, maxRows: 6 }} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'description', index, "B") } defaultValue={item.description} />
+                                            <TextArea placeholder='Description' autoSize={{ minRows: 1, maxRows: 6 }} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'description', index, "B") } defaultValue={item.description} />
                                         ) : (
-                                            <span>{item.description}</span>
+                                            <span style={{whiteSpace: "pre-line"}}>{item.description}</span>
                                         ) }
-                                    </Form.Item> */}
+                                    </Form.Item>
+
                                 </div>
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
@@ -976,21 +1039,23 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-right space-x-1'>
-                                    <Tooltip placement="bottom" title={"Show or hide months"}>
 
                                         { item.is_edit ? (
+                                            <Tooltip placement="bottom" title={"Hide quantities"}>
                                                 <Button type="default" onClick={() => toggleItem(index, item, "B")}>
                                                     <DoubleLeftOutlined rotate={90} />
                                                 </Button>
+                                            </Tooltip>
                                         ) : (
-                                            <Badge size="default" count={ dropDownBadge(index) }>
-                                                <Button type="default" onClick={() => toggleItem(index, item, "B")}>
-                                                    <DoubleLeftOutlined rotate={-90} />
-                                                </Button>
-                                            </Badge>
+                                            <Tooltip placement="bottom" title={"Show quantities"}>
+                                                <Badge size="default" count={ dropDownBadge(index) }>
+                                                    <Button type="default" onClick={() => toggleItem(index, item, "B")}>
+                                                        <DoubleLeftOutlined rotate={-90} />
+                                                    </Button>
+                                                </Badge>
+                                            </Tooltip>
                                             )
                                         }
-                                    </Tooltip>
                                     <Tooltip placement="bottom" title={"Delete Item"}>
                                         <Button type="danger" onClick={() => deleteItem(item.key, "B")}><DeleteOutlined /></Button>
                                     </Tooltip>
@@ -1104,7 +1169,7 @@ const CreateProcurementPlan = (props) => {
             <Row gutter={[8, 8]} className="pp-items-row">
                 <Col span={24}>
                     <div className='text-center mb-3'>
-                        Please add items before saving the form. Click <Button type="primary" onClick={() => { addItem("B") } }><PlusOutlined /></Button> button to add item.
+                        <Button type="primary" onClick={() => { addItem("B") } }><PlusOutlined /> Add Annex B item</Button>
                     </div>
                 </Col>
             </Row>
@@ -1134,10 +1199,10 @@ const CreateProcurementPlan = (props) => {
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Prepared By" { ...helpers.displayError(props.formErrors, `prepared_by_name`) }>
-                        <Input onBlur={(e) => changeFooter(e,'prepared_by_name')} defaultValue={props.formData.prepared_by_name} placeholder="FULL NAME" />
+                        <Input onChange={(e) => changeFooter(e,'prepared_by_name')} value={props.formData.prepared_by_name} placeholder="FULL NAME" />
                     </Form.Item>
-                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `prepared_by_position`) }>
-                        {/* <Input onChange={(e) => changeFieldValue(e, 'prepared_by_position')} value={props.formData.prepared_by_position} /> */}
+                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `prepared_by_designation`) }>
+                        {/* <Input onChange={(e) => changeFieldValue(e, 'prepared_by_designation')} value={props.formData.prepared_by_designation} /> */}
                         <AutoComplete
                             style={{ width: "100%" }}
                             allowClear
@@ -1148,9 +1213,9 @@ const CreateProcurementPlan = (props) => {
                                 option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             onChange={(e) => {
-                                changeFieldValue(e, 'prepared_by_position', false);
+                                changeFieldValue(e, 'prepared_by_designation', false);
                             }}
-                            value={props.formData.prepared_by_position}
+                            value={props.formData.prepared_by_designation}
                         >
                             <TextArea autoSize />
                         </AutoComplete>
@@ -1159,55 +1224,35 @@ const CreateProcurementPlan = (props) => {
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Certified By" { ...helpers.displayError(props.formErrors, `certified_by_name`) }>
-                        <Input onBlur={(e) => changeFooter(e,'certified_by_name')} defaultValue={props.formData.certified_by_name} placeholder="FULL NAME" />
+                        <Select style={{ width: "100%" }} onSelect={changeCertifiedBy} value={props.formData.certified_by_id} placeholder="Select Signatory" optionLabelProp="label">
+                            { props.user_section_signatories.filter(item => item.parent.title == "BS").map(i => (
+                            <Option value={i.id} key={i.key} label={ i.name }>
+                                <div className="demo-option-label-item">
+                                    { i.parent.name }
+                                </div>
+                            </Option>
+                            )) }
+                        </Select>
                     </Form.Item>
-                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `certified_by_position`) }>
-                        <AutoComplete
-                            style={{ width: "100%" }}
-                            allowClear
-                            options={props.user_positions}
-                            onSelect={(val, item) => {}}
-                            placeholder="Position/Designation"
-                            filterOption={(input, option) =>
-                                option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onChange={(e) => {
-                                changeFieldValue(e, 'certified_by_position', false);
-                            }}
-                            value={props.formData.certified_by_position}
-                        >
-                            <TextArea autoSize />
-                        </AutoComplete>
+                    <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `certified_by_designation`) }>
+                        <Input value={props.formData.certified_by_designation} placeholder="Designation" />
                     </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Form.Item label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
-                        <Select style={{ width: "100%" }} onSelect={(e) => { setSignatory(e,'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
-                            { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO" || i.title == "ORD").map(i => <Option value={i.title} key={i.key}>{ i.parent.name }</Option>) }
+                    <Form.Item label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
+                        <Select style={{ width: "100%" }} onSelect={changeApprovedBy} value={props.formData.approved_by_id} placeholder="Select Signatory"  optionLabelProp="label">
+                            { props.user_section_signatories.filter(item =>  item.parent.title == "OARDA" || item.parent.title == "OARDO" || item.parent.title == "ORD").map(i => (
+                                <Option value={i.id} key={i.key} label={ i.name }>
+                                    <div className="demo-option-label-item">
+                                        { i.parent.name }
+                                    </div>
+                                </Option>
+                                )) }
                         </Select>
                     </Form.Item>
-
-                    <Form.Item label="Approved By" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
-                        <Input onBlur={(e) => changeFooter(e,'approved_by_name')} defaultValue={props.formData.approved_by_name} placeholder="FULL NAME" />
-                    </Form.Item>
-                    <Form.Item label="Position/Designation" { ...helpers.displayError(props.formErrors, `approved_by_position`) }>
-                        <AutoComplete
-                            style={{ width: "100%" }}
-                            allowClear
-                            options={props.user_positions}
-                            onSelect={(val, item) => {}}
-                            placeholder="Position/Designation"
-                            filterOption={(input, option) =>
-                                option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onChange={(e) => {
-                                changeFieldValue(e, 'approved_by_position', false);
-                            }}
-                            value={props.formData.approved_by_position}
-                        >
-                            <TextArea autoSize />
-                        </AutoComplete>
+                    <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `approved_by_designation`) }>
+                        <Input value={props.formData.approved_by_designation} placeholder="Designation" />
                     </Form.Item>
                 </Col>
             </Row>

@@ -441,7 +441,7 @@ const ListRequisitionIssue = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
-                    <Card size="small" title="Created Project Requisition and Issue Management Plan" bordered={false}>
+                    <Card size="small" title="Created Requisition and Issue Slips" bordered={false}>
                         <div className='purchase-request-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
                                 <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
@@ -465,7 +465,7 @@ const ListRequisitionIssue = (props) => {
                 </Col>
                 { isEmpty(props.selectedRequisitionIssue.file) ? "" : ( 
                     <Col md={24} lg={10} xl={8}>
-                            <Card size="small" bordered={false} title="Project Requisition and Issue Management Plan Details" extra={(
+                            <Card size="small" bordered={false} title="Requisition and Issue Slip Details" extra={(
                                 <div className='text-right space-x-0.5'>
                                     <Tooltip placement="top" title={"Open in new window"}>
                                         <Button size='small' type='primary' onClick={() => openInFull() }><Icon component={MaximizeSvg} /></Button>
@@ -524,7 +524,7 @@ const ListRequisitionIssue = (props) => {
             { isEmpty(props.selectedRequisitionIssue) ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Project Requisition and Issue Management Plan" bordered={false} loading={props.formLoading}>
+                    <Card size="small" title="Requisition and Issue Slip" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedRequisitionIssue.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         </div>

@@ -219,6 +219,10 @@ const Loadlibraries = (props) => {
                 data: libraries.filter(library => library.library_type == "user_section")
             });
             props.dispatch({
+                type: "SET_LIBRARY_USER_SECTION_SIGNATORY",
+                data: libraries.filter(library => library.library_type == "user_section_signatory")
+            });
+            props.dispatch({
                 type: "SET_LIBRARY_UNIT_OF_MEASURES",
                 data: libraries.filter(library => library.library_type == "unit_of_measure")
             });

@@ -254,6 +254,11 @@ const ForwardedForm = (props) => {
         api.Forms.approve(props.selectedFormRoute.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
+            let alertMessage = res.data.alert_message;
+            notification.success({
+                message: `${alertMessage.message} ${alertMessage.status}`,
+                description: alertMessage.action_taken,
+            });
             setSubmit(false);
             closeResolveForm();
             setErrorMessage({});
@@ -454,13 +459,11 @@ const ForwardedForm = (props) => {
         return api.Forms.approve(item.id, formData)
         .then(res => {
             if (unmounted.current) { return false; }
-            let nextRoute = res.data.next_route;
+            let alertMessage = res.data.alert_message;
             notification.success({
-                message: 'Purchase Request is approved.',
-                description:
-                    `The form has been forwarded to ${nextRoute.office_name} for ${nextRoute.description}`,
-                }
-            );
+                message: `${alertMessage.message} ${alertMessage.status}`,
+                description: alertMessage.action_taken,
+            });
             getForm();
             setSelectedFormRoute({});
             return Promise.resolve(res)

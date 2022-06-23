@@ -7,6 +7,7 @@ const initialState = () => {
       item_category_cses: [],
       item_types: [],
       user_sections: [],
+      user_section_signatories: [],
       user_divisions: [],
       divisions_sections_tree: [],
       user_positions: [],
@@ -42,6 +43,11 @@ const initialState = () => {
         return {
           ...state,
           user_sections: action.data,
+        };
+      case 'SET_LIBRARY_USER_SECTION_SIGNATORY':
+        return {
+          ...state,
+          user_section_signatories: action.data,
         };
       case 'SET_LIBRARY_ITEM_CATEGORIES':
         return {
