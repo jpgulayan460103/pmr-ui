@@ -42,6 +42,10 @@ const CreateRequisitionIssue = (props) => {
             setItemTypeA(props.item_types[0].id);
             setItemTypeB(props.item_types[1].id);
             if(props.formData.end_user_id){
+                if(props.formData.from_ppmp == 1){
+                    getPpmpItems();
+                }
+                setTableKey(props.formData.items.length);
             }else{
                 if(!isEmpty(props.user)){
                     let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
@@ -67,7 +71,7 @@ const CreateRequisitionIssue = (props) => {
         }
     }, [props.isInitialized]);
     useEffect(() => {
-        document.title = "Create Purchase Request";
+        document.title = "Create Requisition and Issue Slip";
     }, []);
 
     const [tableKey, setTableKey] = useState(0);
@@ -75,7 +79,6 @@ const CreateRequisitionIssue = (props) => {
     const [itemTypeA, setItemTypeA] = useState(null);
     const [itemTypeB, setItemTypeB] = useState(null);
     const [items, setItems] = useState([]);
-    const [itemIds, setItemIds] = useState([]);
 
 
     const getItems = async () => {
@@ -97,8 +100,6 @@ const CreateRequisitionIssue = (props) => {
         .then(res => {
             let responseItems = res.data.items.data;
             setItems(responseItems);
-            setItemIds(map(responseItems, "item_id"));
-            console.log(map(responseItems, "item_id"));
         })
         .catch(res => {})
         .then(res => {})
@@ -135,7 +136,7 @@ const CreateRequisitionIssue = (props) => {
         .then(res => {
             setSubmit(false);
             notification.success({
-                message: 'Purchase Request is successfully saved.',
+                message: 'Requisition and Issue Slip is successfully saved.',
                 description:
                     'Please wait for approval from your unit/section head.',
                 }
@@ -163,17 +164,17 @@ const CreateRequisitionIssue = (props) => {
                       });
                 }else if(err.response.data.errors.update_error){
                     Modal.error({
-                        title: 'Purchase Request update failed',
+                        title: 'Requisition and Issue Slip update failed',
                         content: (
                           <div>
-                            <p>Unable to update. Purchase Request is already approved by the budget section.</p>
+                            <p>Unable to update. Requisition and Issue Slip is already approved by the budget section.</p>
                           </div>
                         ),
                         onOk() {},
                       });
                 }else{
                     Modal.error({
-                        title: 'Purchase Request creation failed',
+                        title: 'Requisition and Issue Slip creation failed',
                         content: (
                           <div>
                             <p>Please review the form before saving.</p>
@@ -217,17 +218,17 @@ const CreateRequisitionIssue = (props) => {
                           });
                     }else if(err.response.data.errors.update_error){
                         Modal.error({
-                            title: 'Purchase Request update failed',
+                            title: 'Requisition and Issue Slip update failed',
                             content: (
                               <div>
-                                <p>Unable to update. Purchase Request is already approved by the budget section.</p>
+                                <p>Unable to update. Requisition and Issue Slip is already approved by the budget section.</p>
                               </div>
                             ),
                             onOk() {},
                           });
                     }else{
                         Modal.error({
-                            title: 'Purchase Request creation failed',
+                            title: 'Requisition and Issue Slip creation failed',
                             content: (
                               <div>
                                 <p>Please review the form before saving.</p>
@@ -820,10 +821,21 @@ const CreateRequisitionIssue = (props) => {
                                     </Col>
                                 </Row>
                             ) }
+
+                       
                             
                         </React.Fragment>
                 ))
             }
+                { !isEmpty(props.formData.items) && (
+                <Row gutter={[8, 8]} className="pp-items-row">
+                    <Col span={24}>
+                        <div className='text-center mb-3'>
+                            <Button type="primary" onClick={() => { addItem() } } disabled={props.formData.from_ppmp == null}><PlusOutlined /> Add item</Button>
+                        </div>
+                    </Col>
+                </Row>
+                )}
                 <br />
             <Row gutter={[8, 8]} className="pp-items-footer">
                 <Col xs={24} sm={24} md={24} lg={24} xl={24}>
@@ -897,7 +909,7 @@ const CreateRequisitionIssue = (props) => {
                 
                 <br />
                 <Button type="primary" onClick={() => handleSave()} disabled={submit} loading={submit}><SaveOutlined />
-                    { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
+                    { props.formType == "create" ? "Create Requisition and Issue Slip" : "Update Requisition and Issue Slip"}
                 </Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />
                     { props.formType == "create" ? "Reset Form" : "Clear Form and Create New"}

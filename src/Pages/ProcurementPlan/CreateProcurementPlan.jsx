@@ -45,6 +45,9 @@ const CreateProcurementPlan = (props) => {
             console.log(dn);
             setDonation(dn[0]);
             if(props.formData.end_user_id){
+                let itemALength = props.formData.itemsA.length;
+                let itemBLength = props.formData.itemsB.length;
+                setTableKey(itemALength+itemBLength);
             }else{
                 if(!isEmpty(props.user)){
                     let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
@@ -70,7 +73,7 @@ const CreateProcurementPlan = (props) => {
         }
     }, [props.isInitialized]);
     useEffect(() => {
-        document.title = "Create Purchase Request";
+        document.title = "Create Project Procurement Plan";
     }, []);
 
     const [tableKey, setTableKey] = useState(0);
@@ -107,7 +110,7 @@ const CreateProcurementPlan = (props) => {
         .then(res => {
             setSubmit(false);
             notification.success({
-                message: 'Purchase Request is successfully saved.',
+                message: 'Project Procurement Plan is successfully saved.',
                 description:
                     'Please wait for approval from your unit/section head.',
                 }
@@ -135,17 +138,17 @@ const CreateProcurementPlan = (props) => {
                       });
                 }else if(err.response.data.errors.update_error){
                     Modal.error({
-                        title: 'Purchase Request update failed',
+                        title: 'Project Procurement Plan update failed',
                         content: (
                           <div>
-                            <p>Unable to update. Purchase Request is already approved by the budget section.</p>
+                            <p>Unable to update. Project Procurement Plan is already approved by the budget section.</p>
                           </div>
                         ),
                         onOk() {},
                       });
                 }else{
                     Modal.error({
-                        title: 'Purchase Request creation failed',
+                        title: 'Project Procurement Plan creation failed',
                         content: (
                           <div>
                             <p>Please review the form before saving.</p>
@@ -1262,7 +1265,7 @@ const CreateProcurementPlan = (props) => {
                 
                 <br />
                 <Button type="primary" onClick={() => saveProcurementPlan()} disabled={submit} loading={submit}><SaveOutlined />
-                    { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
+                    { props.formType == "create" ? "Create Project Procurement Plan" : "Update Project Procurement Plan"}
                 </Button>
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />
                     { props.formType == "create" ? "Reset Form" : "Clear Form and Create New"}

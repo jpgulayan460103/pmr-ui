@@ -22,6 +22,6 @@ export default {
   },
 
   management(){
-    return axios.get(`api/procurement-managements/1`);
+    return axios.get(`api/summaries/procurement-management`);
   }
 }

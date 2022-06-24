@@ -36,6 +36,7 @@ const CreatePurchaseRequest = (props) => {
     useEffect(() => {
         if(props.isInitialized){
             if(props.formData.end_user_id){
+                setTableKey(props.formData.items.length);
             }else{
                 if(!isEmpty(props.user)){
                     let reqBy = "OARDA";
