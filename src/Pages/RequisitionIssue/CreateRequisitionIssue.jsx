@@ -4,7 +4,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep, map } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker, Switch  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker, Switch, InputNumber   } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -79,6 +79,11 @@ const CreateRequisitionIssue = (props) => {
     const [itemTypeA, setItemTypeA] = useState(null);
     const [itemTypeB, setItemTypeB] = useState(null);
     const [items, setItems] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState([]);
+    const [inventoryModal, setInventoryModal] = useState(false);
+    const [selectedRequestItem, setSelectedRequestItem] = useState({});
+    const [selectedInventoryItems, setSelectedInventoryItems] = useState([]);
+    const [searchString, setSearchString] = useState("");
 
 
     const getItems = async () => {
@@ -104,6 +109,18 @@ const CreateRequisitionIssue = (props) => {
         .catch(res => {})
         .then(res => {})
     }
+
+    const loadInventory = debounce(async (search) => {
+        return api.ItemSupply.all({
+            search
+        })
+        .then(res => {
+            setInventoryItems(res.data.data);
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }, 700);
     
 
     const approveForm = async (id, formData) => {
@@ -344,6 +361,14 @@ const CreateRequisitionIssue = (props) => {
         });
     }
 
+    const changehasStock = (e, item, index) => {
+        changeTableFieldValue(e, item, 'has_stock', index);
+        setInventoryModal(e);
+        console.log(item);
+        setSelectedRequestItem(item);
+        loadInventory();
+    }
+
     const addAllMon = (item) => {
         let mon1 = isNaN(parseInt(item['mon1'])) ? 0 : parseInt(item['mon1']); 
         let mon2 = isNaN(parseInt(item['mon2'])) ? 0 : parseInt(item['mon2']); 
@@ -521,6 +546,33 @@ const CreateRequisitionIssue = (props) => {
                 items: newValue
             }   
         });
+    }
+
+    const issueQuantity = (e, inventoryitem) => {
+        let cloned = cloneDeep(selectedInventoryItems);
+        let item = {
+            id: inventoryitem.id,
+            item_name: inventoryitem.item_name,
+            quantity: e,
+            unit_of_measure: inventoryitem.unit_of_measure.name,
+        };
+        let index = cloned.findIndex(item => item.id === inventoryitem.id);
+        if(index < 0){
+            setSelectedInventoryItems([...cloned, item]);
+        }else{
+            cloned[index] = item;
+            setSelectedInventoryItems(cloned);
+        }
+    }
+
+    const totalIssuedQuantity = () => {
+        if (isEmpty(selectedInventoryItems)) {
+            return 0;
+        }else{
+            return selectedInventoryItems.reduce((sum, item) => {
+                return sum += item.quantity;
+            }, 0);
+        }
     }
 
     return (
@@ -726,7 +778,7 @@ const CreateRequisitionIssue = (props) => {
                                     <Col xs={24} sm={24} md={1} lg={2} xl={2}>
                                         <div className='text-center'>
                                             <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.has_stock`) }>
-                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changeTableFieldValue(e, item, 'has_stock', index, ) } checked={item.has_stock == 1} />
+                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changehasStock(e, item, index )} checked={item.has_stock == 1} />
                                             </Form.Item>
                                         </div>
                                     </Col>
@@ -904,6 +956,106 @@ const CreateRequisitionIssue = (props) => {
             </Row>
 
            </Form>
+
+            <Modal title="Inventory" visible={inventoryModal} onCancel={() => setInventoryModal(false)} width="60vw">
+                <div>
+                    Requested Item: <b>{ selectedRequestItem.description }</b><br />
+                    Requested Quantity: <b>{ selectedRequestItem.request_quantity } { selectedRequestItem.unit_of_measure?.name }</b><br />
+                    Issued Quantity: <b>{ totalIssuedQuantity() }</b><br />
+                    <br />
+                    <Input placeholder="Search Item" onChange={(e) => loadInventory(e.target.value) } />
+                    <br />
+                    {searchString}
+                    <br />
+                </div>
+                <div style={{height: "45vh", overflowY: "auto", overflowX: "hidden"}}>
+
+                <Row gutter={[8, 8]} className="p-2">
+                    <Col xs={24} sm={24} md={9} lg={9} xl={9}>
+                        <div className='text-left'>
+                            <b>Item Name</b>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+                        <div className='text-left'>
+                            <b>Category</b>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                        <div className='text-center'>
+                            <b>Unit Of Measure</b>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                        <div className='text-center'>
+                            <b>Remaining Qty</b>
+                        </div>
+                    </Col>
+                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                        <div className='text-center'>
+                            <b>Issue Qty</b>
+                        </div>
+                    </Col>
+                </Row>
+                    
+
+                { inventoryItems.map(item => (
+                    <Row gutter={[8, 8]} key={item.key} className="inventory-items p-2">
+                        <Col xs={24} sm={24} md={9} lg={9} xl={9}>
+                            <div className='text-left'>
+                                <span>{ item.item_name }</span>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+                            <div className='text-left'>
+                                <span>{ item.item_category.name }</span>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div className='text-center'>
+                                <span>{ item.unit_of_measure.name }</span>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div className='text-center'>
+                                <span>{ item.remaining_quantity.quantity }</span>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                            <div className='text-center'>
+                                <InputNumber size='small' min={1} max={item.remaining_quantity.quantity} onChange={(e) => issueQuantity(e, item)}  placeholder="Quantity" />
+                            </div>
+                        </Col>
+                    </Row>
+                )) }
+                {/* <table style={{
+                    width: "100%"
+                }}>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th style={{textAlign: "center"}}>Unit Of Measure</th>
+                            <th style={{textAlign: "center"}}>Remaining Qty</th>
+                            <th>Issue Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { inventoryItems.map(item => (
+                            <tr key={item.key}>
+                                <td>{ item.item_name }</td>
+                                <td>{ item.item_category.name }</td>
+                                <td style={{textAlign: "center"}}>{ item.unit_of_measure.name }</td>
+                                <td style={{textAlign: "center"}}>{ item.remaining_quantity.quantity }</td>
+                                <td>
+                                    <Input placeholder="Issue Quantity" />
+                                </td>
+                            </tr>
+                        )) }
+                    </tbody>
+                </table> */}
+                </div>
+            </Modal>
 
            <div className='text-center space-x-2'>
                 

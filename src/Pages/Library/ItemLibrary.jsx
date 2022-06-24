@@ -184,14 +184,14 @@ const ItemLibrary = (props) => {
                         item_code: record.item_code,
                         is_ppmp: record.is_ppmp,
                         unit_of_measure_id: record.unit_of_measure.id,
-                        item_category_id: record.item_category.id,
+                        item_category_cse_id: record.item_category_cse.id,
                     })
                     console.log({
                         item_name: record.item_name,
                         item_code: record.item_code,
                         is_ppmp: record.is_ppmp,
                         unit_of_measure_id: record.unit_of_measure.id,
-                        item_category_id: record.item_category.id,
+                        item_category_cse_id: record.item_category_cse.id,
                     });
                     setFormType("Update");
                 },
@@ -224,7 +224,7 @@ const ItemLibrary = (props) => {
             sorter: (a, b) => a.item_category.name.localeCompare(b.item_category.name),
             render: (text, item, index) => (
                 <span>
-                    { item.item_category.name }
+                    { item.item_category_cse.name }
                 </span>
             ),
         },
