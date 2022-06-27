@@ -37,6 +37,7 @@ import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
 import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
 import CreateRequisitionIssue from './Pages/RequisitionIssue/CreateRequisitionIssue';
 import ListRequisitionIssue from './Pages/RequisitionIssue/ListRequisitionIssue';
+import Inventory from './Pages/Inventory/Inventory';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -218,6 +219,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/activity-logs"  >
                 <PrivateRoute><Layout><ActivityLogs /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/inventory"  >
+                <PrivateRoute><Layout><Inventory /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/login"  >
                 <Login />

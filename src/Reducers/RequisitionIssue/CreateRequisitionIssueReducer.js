@@ -2,6 +2,7 @@ const initialState = () => {
     return {
       formData: {
         items: [],
+        issued_items: [],
         end_user_id: null,
         type_id: null,
       },

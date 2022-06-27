@@ -246,6 +246,11 @@ const Sidemenu = (props) => {
                     </Menu.Item>
                 ) }
 
+                <Menu.Item key="/inventory"  icon={<Icon component={LogsSvg} />}>
+                    <Link to="/inventory"></Link>
+                    Inventory
+                </Menu.Item>
+
 
                 {
                     (

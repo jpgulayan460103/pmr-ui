@@ -481,6 +481,7 @@ const ForwardedForm = (props) => {
         .then(res => {
             let ris = res.data;
             ris.items = ris.items.data;
+            ris.issued_items = [];
             ris.form_route_id = item.id;
             props.dispatch({
                 type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
