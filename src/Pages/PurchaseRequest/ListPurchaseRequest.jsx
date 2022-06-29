@@ -203,8 +203,6 @@ const Listpurchaserequest = (props) => {
         .then(res => {
             let purchaseRequest = res.data;
             purchaseRequest.items = res.data.items.data;
-            purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
-            purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
                 data: purchaseRequest
@@ -212,6 +210,10 @@ const Listpurchaserequest = (props) => {
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_CREATE_FORM_TYPE",
                 data: "update"
+            });
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
+                data: {}
             });
             history.push("/purchase-requests/form");
         })
@@ -357,7 +359,7 @@ const Listpurchaserequest = (props) => {
             title: 'PR Number',
             dataIndex: 'purchase_request_number',
             key: 'purchase_request_number',
-            width: 450,
+            width: 150,
             ...filter.search('purchase_request_number','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
@@ -366,7 +368,7 @@ const Listpurchaserequest = (props) => {
             title: 'Title',
             dataIndex: 'title',
             key: 'title',
-            width: 450,
+            width: 200,
             ...filter.search('title','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
@@ -375,7 +377,7 @@ const Listpurchaserequest = (props) => {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
-            width: 450,
+            width: 200,
             ...filter.search('purpose','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},

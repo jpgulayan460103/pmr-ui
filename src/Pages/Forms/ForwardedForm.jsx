@@ -428,13 +428,13 @@ const ForwardedForm = (props) => {
         let procurement_user_office = props.user.user_offices.data.filter(i => i.office.title == "PS");
         let budget_user_office = props.user.user_offices.data.filter(i => i.office.title == "BS");
         if(procurement_user_office.length != 0){
-            if(item.route_code == "select_action" || item.route_code == "aprroval_from_proc"){
+            if(item.route_code == "pr_select_action" || item.route_code == "pr_approval_from_proc"){
                 setModalProcurementForm(true);
-                if(item.route_code == "aprroval_from_proc"){
+                if(item.route_code == "pr_approval_from_proc"){
                     setProcurementFormType("approve");
                 }
             }
-        }else if(budget_user_office.length != 0  && item.route_code.description_code == "aprroval_from_budget"){
+        }else if(budget_user_office.length != 0  && item.route_code == "pr_approval_from_budget"){
             api.PurchaseRequest.getNextNumber()
             .then(res => {
                 if (unmounted.current) { return false; }
@@ -722,7 +722,7 @@ const ForwardedForm = (props) => {
                             </Tooltip>
                     ) : (
                         <>
-                            {item.route_code == "last_route" ? (
+                            {item.route_code == "last_route" && item.route_type == "requisition_issue" ? (
                                 <Tooltip placement="bottom" title={"Issue supplies and properties"}>
                                     <Button size='small' type='default' icon={<BankOutlined twoToneColor="#0000FF" />} onClick={() => { issueRis(item) }} disabled={props.submit}>
                         
@@ -988,7 +988,7 @@ const ForwardedForm = (props) => {
                     id="procurementForm"
                 >
 
-                    { props.selectedFormRoute.route_code != "aprroval_from_proc" ? (
+                    { props.selectedFormRoute.route_code != "pr_approval_from_proc" ? (
                         <Form.Item
                             name="type"
                             label="Action"

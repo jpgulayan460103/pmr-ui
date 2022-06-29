@@ -3,7 +3,7 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, InputNumber  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
@@ -14,6 +14,7 @@ function mapStateToProps(state) {
         unit_of_measures: state.libraries.unit_of_measures,
         items: state.libraries.items,
         user_sections: state.libraries.user_sections,
+        user_section_signatories: state.libraries.user_section_signatories,
         user_divisions: state.libraries.user_divisions,
         user_signatory_designations: state.libraries.user_signatory_designations,
         user_signatory_names: state.libraries.user_signatory_names,
@@ -33,39 +34,18 @@ const { Option, OptGroup } = Select;
 const { Title } = Typography;
 
 const CreatePurchaseRequest = (props) => {
+    const formRef = React.useRef();
     useEffect(() => {
         if(props.isInitialized){
             if(props.formData.end_user_id){
                 setTableKey(props.formData.items.length);
+                setTimeout(() => {
+                    formRef.current.setFieldsValue(props.formData);
+                }, 150);
             }else{
                 if(!isEmpty(props.user)){
-                    let reqBy = "OARDA";
-                    if(props.user.user_offices?.data[0]?.office?.parent?.title === "OARDA" || props.user.user_offices?.data[0]?.office?.parent?.title === "OARDO"){
-                        reqBy = props.user.user_offices.data[0].office.parent.title;
-                    }
-                    props.dispatch({
-                        type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
-                        data: {
-                            ...props.formData,
-                            end_user_id: props.user.user_offices?.data[0]?.office_id,
-                            requestedBy: reqBy
-                        }
-                    });
+                    initiailzeForm();
                 }
-            }
-            if(isEmpty(props.requestedBySignatory)){
-                let reqBy = "OARDA";
-                if(props.user.user_offices?.data[0]?.office?.parent?.title === "OARDA" || props.user.user_offices?.data[0]?.office?.parent?.title === "OARDO"){
-                    reqBy = props.user.user_offices?.data[0]?.office?.parent?.title;
-                }
-                setSignatory(reqBy,'requestedBy');
-            }
-            if(isEmpty(props.approvedBySignatory)){
-                setSignatory("ORD", 'approvedBy');
-            }
-            if(props.formType == "update"){
-                setSignatory(props.formData.requestedBy, 'requestedBy');
-                setSignatory(props.formData.approvedBy, 'approvedBy');
             }
             if(isEmpty(props.items)){
                 getItems();
@@ -83,6 +63,20 @@ const CreatePurchaseRequest = (props) => {
     
     const [tableKey, setTableKey] = useState(0);
     const [submit, setSubmit] = useState(false);
+
+    const initiailzeForm = () => {
+        let formData = {
+            end_user_id: props.user.user_offices?.data[0]?.office_id,
+            purpose: "For the implementation of ",
+        };
+        props.dispatch({
+            type: "RESET_PURCHASE_REQUEST_CREATE_FORM_DATA",
+            data: formData
+        });
+        if(formRef.current){
+            formRef.current?.setFieldsValue(formData);
+        }
+    }
 
     const getItems = async () => {
         return api.Library.getLibraries('items')
@@ -106,20 +100,14 @@ const CreatePurchaseRequest = (props) => {
             data: {}
         });
         let formData = cloneDeep(props.formData);
-        formData.requested_by_id = props.requestedBySignatory.id;
-        formData.approved_by_id = props.approvedBySignatory.id;
-        if(props.formType == "update"){
-
-        }else{
-            // formData.purpose = `For the implementation of ${props.formData.purpose}`;
-        }
         api.PurchaseRequest.save(formData,props.formType)
         .then(res => {
             setSubmit(false);
             notification.success({
                 message: 'Purchase Request is successfully saved.',
-                description:
-                    'Please wait for approval from your unit/section head.',
+                description: props.formType == "create" ?
+                    'Please wait for approval from your unit/section head.' :
+                    '',
                 }
             );
 
@@ -171,12 +159,10 @@ const CreatePurchaseRequest = (props) => {
     }, 200);
 
     const clearForm = async () => {
-        props.dispatch({
-            type: "RESET_PURCHASE_REQUEST_CREATE_FORM_DATA",
-            data: {
-                end_user_id: props.user.user_offices.data[0].office_id,
-            }
-        });
+        if(formRef.current){
+            formRef.current?.resetFields();
+        }
+        initiailzeForm();
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_CREATE_FORM_TYPE",
             data: "create"
@@ -185,35 +171,32 @@ const CreatePurchaseRequest = (props) => {
             type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
             data: {}
         });
-
-        setSignatory("OARDA",'requestedBy');
-        setSignatory("ORD", 'approvedBy');
     }
 
     const previewPurchaseRequest = debounce(() => {
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
-            data: {}
-        });
-        let formData = cloneDeep(props.formData);
-        formData.requested_by_id = props.requestedBySignatory.id;
-        formData.approved_by_id = props.approvedBySignatory.id;
-        api.PurchaseRequest.preview(formData,"create")
-        .then(res => {
-            let json = encodeURIComponent(JSON.stringify(formData));
-            window.open(`${res.data.url}?json=${json}`,
-                'newwindow',
-                'width=960,height=1080');
-            return false;
-        })
-        .catch(err => {
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
-                data: err.response.data.errors
-            });
-        })
-        .then(res => {})
-        ;
+        // props.dispatch({
+        //     type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
+        //     data: {}
+        // });
+        // let formData = cloneDeep(props.formData);
+        // formData.requested_by_id = props.requestedBySignatory.id;
+        // formData.approved_by_id = props.approvedBySignatory.id;
+        // api.PurchaseRequest.preview(formData,"create")
+        // .then(res => {
+        //     let json = encodeURIComponent(JSON.stringify(formData));
+        //     window.open(`${res.data.url}?json=${json}`,
+        //         'newwindow',
+        //         'width=960,height=1080');
+        //     return false;
+        // })
+        // .catch(err => {
+        //     props.dispatch({
+        //         type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
+        //         data: err.response.data.errors
+        //     });
+        // })
+        // .then(res => {})
+        // ;
     }, 200);
 
 
@@ -320,43 +303,53 @@ const CreatePurchaseRequest = (props) => {
         }, 0);
     }
 
-    const setSignatory = (e, type) => {
-        if(type == "requestedBy"){
-            let user_office = props.user_signatory_names.filter(i => i.title == e);
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_CREATE_REQUESTED_BY_SIGNATORY",
-                data: user_office[0]
-            });
-        }else{
-            let user_office = props.user_signatory_names.filter(i => i.title == e);
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_CREATE_APPROVED_BY_SIGNATORY",
-                data: user_office[0]
-            });
-        }
+    const changeRequestedBy = (e) => {
+        let requestedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                requested_by_id: e,
+                requested_by_name: requestedSignatory[0].name,
+                requested_by_designation: requestedSignatory[0].title,
+                requested_by_office: requestedSignatory[0].parent.title,
+            }
+        });
+    }
+    const changeApprovedBy = (e) => {
+        let approvedSignatory = props.user_section_signatories.filter(item => item.id == e);
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                approved_by_id: e,
+                approved_by_name: approvedSignatory[0].name,
+                approved_by_designation: approvedSignatory[0].title,
+                approved_by_office: approvedSignatory[0].parent.title,
+            }
+        });
     }
     
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
-            {/* <p className="text-right ...">Appendix 60</p> */}
-            {/* <p className="text-center ..."><b>PURCHASE REQUEST</b></p> */}
+            <p className="text-right ...">Appendix 60</p>
             <Title className='text-center' level={3}>PURCHASE REQUEST</Title>
-            <Form layout='vertical'>
+            <Form layout='vertical' ref={formRef}>
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Office/Section">
-                        <Input placeholder="input placeholder" readOnly value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                        <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
                     </Form.Item>
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                        <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) }>
-                            <Input placeholder="Title"  onChange={(e) => changeFieldValue(e, 'title')} value={props.formData.title} />
+                        <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) } name="title">
+                            <Input placeholder="Title"  onBlur={(e) => changeFieldValue(e, 'title')} />
                         </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Date">
-                        <Input placeholder="input placeholder" value={moment().format('MM/DD/YYYY')} />
+                        <Input placeholder="input placeholder" value={props.formData.pr_date} />
                     </Form.Item>
                 </Col>
             </Row>
@@ -415,7 +408,6 @@ const CreatePurchaseRequest = (props) => {
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_code`) }>
                                 { item.item_code }
-                                {/* <Input placeholder="Type here..." onChange={(e) => changeTableFieldValue(e.target.value, item, 'item_code', index) } value={item.item_code} disabled /> */}
                             </Form.Item>
                             </div>
                         </Col>
@@ -427,9 +419,8 @@ const CreatePurchaseRequest = (props) => {
                                     value={item.unit_of_measure_id}
                                     placeholder="Select a Unit"
                                     optionFilterProp="children"
-                                    onChange={(e) => selectUnit(e, index)}
+                                    onSelect={(e) => selectUnit(e, index)}
                                     style={{ width: "100%" }}
-                                    // disabled={  }/*  */
                                     filterOption={(input, option) =>
                                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
@@ -454,10 +445,11 @@ const CreatePurchaseRequest = (props) => {
                                         filterOption={(input, option) =>
                                             option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
-                                        onChange={(e) => {
-                                            changeTableFieldValue(e, {}, 'item_name', index);
+                                        onBlur={(e) => {
+                                            // console.log(e);
+                                            changeTableFieldValue(e.target.value, {}, 'item_name', index);
                                         }}
-                                        value={item.item_name}
+                                        defaultValue={item.item_name}
                                     >
                                         <TextArea autoSize />
                                     </AutoComplete>
@@ -468,14 +460,14 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
-                                <Input type="number" className='text-center' min={1} autoComplete='off' style={{ width: "100%" }} placeholder="Quantity" onChange={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index) } value={item.quantity} />
+                                <InputNumber style={{width: "100%"}} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index)}  defaultValue={item.quantity}  placeholder="Quantity" />
                             </Form.Item>
                             </div>
                         </Col>
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
-                                <Input type="number"  className='text-right' autoComplete='off' style={{ width: "100%" }} step="0.01" placeholder="Unit Cost"  onChange={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } value={item.unit_cost} />
+                                <InputNumber style={{width: "100%"}} step={0.01} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } defaultValue={item.unit_cost}  placeholder="Quantity" />
                             </Form.Item>
                             </div>
                         </Col>
@@ -535,30 +527,44 @@ const CreatePurchaseRequest = (props) => {
             <br />
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
-                        <Input onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
-                        {/* <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
-                        {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
+                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) } name="purpose">
+                        <Input onBlur={(e) => changeFieldValue(e, 'purpose')} placeholder="Purpose" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Form.Item label="Requested by" { ...helpers.displayError(props.formErrors, `requested_by_id`) }>
-                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'requestedBy', false); setSignatory(e,'requestedBy') }} value={props.formData.requestedBy} placeholder="Select Signatory">
-                            { props.user_signatory_designations.filter(i => i.title == "OARDA" || i.title == "OARDO").map(i => <Option value={i.title} key={i.key}>{ i.name }</Option>) }
+
+                    <Form.Item label="Requested by" { ...helpers.displayError(props.formErrors, `requested_by_name`) }>
+                        <Select style={{ width: "100%" }} onSelect={changeRequestedBy} value={props.formData.requested_by_id} placeholder="Select Signatory" optionLabelProp="label">
+                            { props.user_section_signatories.filter(item => item.parent.title == "OARDA" || item.parent.title == "OARDO").map(i => (
+                                <Option value={i.id} key={i.key} label={ i.name }>
+                                    <div className="demo-option-label-item">
+                                        { i.parent.name }
+                                    </div>
+                                </Option>
+                            )) }
                         </Select>
                     </Form.Item>
-                    <p className='text-center'><b>{ props.requestedBySignatory?.name }</b></p>
-                    <p className='text-center'>{ props.requestedBySignatory?.parent?.name }</p>
+                    <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `requested_by_designation`) }>
+                        <Input value={props.formData.requested_by_designation} placeholder="Designation" />
+                    </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Form.Item  label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_id`) }>
-                        <Select style={{ width: "100%" }} onSelect={(e) => { changeFieldValue(e, 'approvedBy', false); setSignatory(e, 'approvedBy') }} value={props.formData.approvedBy} placeholder="Select Signatory">
-                            { props.user_signatory_designations.filter(i => i.title == "ORD").map(i => <Option value={i.title} key={i.name}>{ i.name }</Option>) }
+
+                    <Form.Item label="Approved by" { ...helpers.displayError(props.formErrors, `approved_by_name`) }>
+                        <Select style={{ width: "100%" }} onSelect={changeApprovedBy} value={props.formData.approved_by_id} placeholder="Select Signatory" optionLabelProp="label">
+                            { props.user_section_signatories.filter(item => item.parent.title == "ORD").map(i => (
+                                <Option value={i.id} key={i.key} label={ i.name }>
+                                    <div className="demo-option-label-item">
+                                        { i.parent.name }
+                                    </div>
+                                </Option>
+                            )) }
                         </Select>
                     </Form.Item>
-                    <p className='text-center'><b>{ props.approvedBySignatory?.name }</b></p>
-                    <p className='text-center'>{ props.approvedBySignatory?.parent?.name }</p>
+                    <Form.Item label="Designation" { ...helpers.displayError(props.formErrors, `approved_by_designation`) }>
+                        <Input value={props.formData.approved_by_designation} placeholder="Designation" />
+                    </Form.Item>
                 </Col>
             </Row>
 
@@ -567,9 +573,9 @@ const CreatePurchaseRequest = (props) => {
                 
                 <br />
 
-                { props.formType == "create" ? (
+                {/* { props.formType == "create" ? (
                     <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
-                ) : ""}
+                ) : ""} */}
                 <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined />
                     { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
                 </Button>

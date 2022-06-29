@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const initialState = () => {
     return {
       formData: {
@@ -5,6 +7,7 @@ const initialState = () => {
         issued_items: [],
         end_user_id: null,
         type_id: null,
+        ris_date: dayjs().format('YYYY-MM-DD'),
       },
       formErrors: {},
       formType: "create",
@@ -17,6 +20,11 @@ const initialState = () => {
         return {
           ...state,
           formData: action.data,
+        };
+      case 'RESET_REQUISITION_ISSUE_CREATE_FORM_DATA':
+        return {
+          ...state,
+          formData: {...initialState().formData, ...action.data},
         };
       case 'SET_REQUISITION_ISSUE_CREATE_FORM_ERRORS':
         return {

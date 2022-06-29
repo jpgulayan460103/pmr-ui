@@ -4,18 +4,10 @@ const initialState = () => {
     return {
       formData: {
         items: [],
-        updater: "end_user",
-        requestedBy: "OARDA",
-        approvedBy: "ORD",
-        fund_cluster: "",
-        purchase_request_number: "",
-        center_code: "",
         end_user_id: null,
         pr_date: customDayJs().format('YYYY-MM-DD')
       },
       formErrors: {},
-      requestedBySignatory: {},
-      approvedBySignatory: {},
       formType: "create",
     }
   }
@@ -31,16 +23,6 @@ const initialState = () => {
         return {
           ...state,
           formErrors: action.data,
-        };
-      case 'SET_PURCHASE_REQUEST_CREATE_REQUESTED_BY_SIGNATORY':
-        return {
-          ...state,
-          requestedBySignatory: action.data,
-        };
-      case 'SET_PURCHASE_REQUEST_CREATE_APPROVED_BY_SIGNATORY':
-        return {
-          ...state,
-          approvedBySignatory: action.data,
         };
       case 'SET_PURCHASE_REQUEST_CREATE_FORM_TYPE':
         return {

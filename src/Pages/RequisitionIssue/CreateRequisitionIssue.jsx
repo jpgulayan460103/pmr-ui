@@ -37,15 +37,17 @@ function mapStateToProps(state) {
 
 const CreateRequisitionIssue = (props) => {
     let history = useHistory();
-    useEffect(() => {
+    const formRef = React.useRef();
+    useEffect(async () => {
         if(props.isInitialized){
-            setItemTypeA(props.item_types[0].id);
-            setItemTypeB(props.item_types[1].id);
             if(props.formData.end_user_id){
                 if(props.formData.from_ppmp == 1){
-                    getPpmpItems();
+                    getPpmpItems(true);
                 }
                 setTableKey(props.formData.items.length);
+                setTimeout(() => {
+                    formRef.current.setFieldsValue(props.formData);
+                }, 150);
             }else{
                 if(!isEmpty(props.user)){
                     initiailzeForm();
@@ -53,18 +55,20 @@ const CreateRequisitionIssue = (props) => {
             }
             if(isEmpty(props.items)){
                 getItems();
-                // getPpmpItems();
             }
         }
     }, [props.isInitialized]);
     useEffect(() => {
         document.title = "Create Requisition and Issue Slip";
+        return function cleanup() {
+            if(props.formType != "create"){
+                clearForm();
+            }
+        };
     }, []);
 
     const [tableKey, setTableKey] = useState(0);
     const [submit, setSubmit] = useState(false);
-    const [itemTypeA, setItemTypeA] = useState(null);
-    const [itemTypeB, setItemTypeB] = useState(null);
     const [items, setItems] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([]);
     const [issueItemModal, setIssueItemModal] = useState(false);
@@ -76,19 +80,22 @@ const CreateRequisitionIssue = (props) => {
 
     const initiailzeForm = () => {
         let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
+        let formData = {
+            items: [],
+            issued_items: [],
+            end_user_id: props.user.user_offices?.data[0]?.office_id,
+            received_by_name: props.user.user_information?.fullname?.toUpperCase(),
+            received_by_designation: position[0].name,
+            purpose: "For the implementation of ",
+        }
         props.dispatch({
-            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-            data: {
-                items: [],
-                issued_items: [],
-                end_user_id: props.user.user_offices?.data[0]?.office_id,
-                procurement_plan_type_id: props.procurement_plan_types[0].id,
-                received_by_name: props.user.user_information?.fullname?.toUpperCase(),
-                received_by_designation: position[0].name,
-                requested_by_position: "Division Chief",
-                ris_date: dayjs().format('YYYY-MM-DD'),
-            }
+            type: "RESET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: formData
         });
+
+        if(formRef.current){
+            formRef.current?.setFieldsValue(formData);
+        }
     }
     
 
@@ -107,14 +114,35 @@ const CreateRequisitionIssue = (props) => {
         .then(res => {})
         ;
     }
-    const getPpmpItems = async () => {
+    const getPpmpItems = async (updateItem = false) => {
         return api.ProcurementPlan.management()
         .then(res => {
             let responseItems = res.data.items.data;
+            if(props.formType == "update" && !isEmpty(props.formData.items) && updateItem){
+                updateRisItems(responseItems);
+            }
             setItems(responseItems);
         })
         .catch(res => {})
         .then(res => {})
+    }
+
+    const updateRisItems = (responseItems) => {
+        let items = cloneDeep(props.formData.items);
+        items = items.map(item => {
+            let procurement_plan_item = responseItems.filter(responseItem => responseItem.procurement_plan_item_id == item.procurement_plan_item_id);
+            if(!isEmpty(procurement_plan_item)){
+                item.max_quantity = procurement_plan_item[0].total_quantity;
+            }
+            return item;
+        });
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                ...props.formData,
+                items
+            }
+        });
     }
 
     const loadInventory = debounce(async (search) => {
@@ -175,8 +203,9 @@ const CreateRequisitionIssue = (props) => {
             setSubmit(false);
             notification.success({
                 message: 'Requisition and Issue Slip is successfully saved.',
-                description:
-                    'Please wait for approval from your unit/section head.',
+                description: props.formType == "create" ?
+                    'Please wait for approval from your unit/section head.' :
+                    '',
                 }
             );
 
@@ -205,7 +234,7 @@ const CreateRequisitionIssue = (props) => {
                         title: 'Requisition and Issue Slip update failed',
                         content: (
                           <div>
-                            <p>Unable to update. Requisition and Issue Slip is already approved by the budget section.</p>
+                            <p>Unable to update, items have been issued.</p>
                           </div>
                         ),
                         onOk() {},
@@ -263,7 +292,7 @@ const CreateRequisitionIssue = (props) => {
                             title: 'Requisition and Issue Slip update failed',
                             content: (
                               <div>
-                                <p>Unable to update. Requisition and Issue Slip is already approved by the budget section.</p>
+                                <p>Unable to update, items have been issued</p>
                               </div>
                             ),
                             onOk() {},
@@ -288,6 +317,9 @@ const CreateRequisitionIssue = (props) => {
 
 
     const clearForm = async () => {
+        if(formRef.current){
+            formRef.current?.resetFields();
+        }
         initiailzeForm();
         props.dispatch({
             type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
@@ -393,105 +425,11 @@ const CreateRequisitionIssue = (props) => {
         }
     }
 
-    const addAllMon = (item) => {
-        let mon1 = isNaN(parseInt(item['mon1'])) ? 0 : parseInt(item['mon1']); 
-        let mon2 = isNaN(parseInt(item['mon2'])) ? 0 : parseInt(item['mon2']); 
-        let mon3 = isNaN(parseInt(item['mon3'])) ? 0 : parseInt(item['mon3']); 
-        let mon4 = isNaN(parseInt(item['mon4'])) ? 0 : parseInt(item['mon4']); 
-        let mon5 = isNaN(parseInt(item['mon5'])) ? 0 : parseInt(item['mon5']); 
-        let mon6 = isNaN(parseInt(item['mon6'])) ? 0 : parseInt(item['mon6']); 
-        let mon7 = isNaN(parseInt(item['mon7'])) ? 0 : parseInt(item['mon7']); 
-        let mon8 = isNaN(parseInt(item['mon8'])) ? 0 : parseInt(item['mon8']); 
-        let mon9 = isNaN(parseInt(item['mon9'])) ? 0 : parseInt(item['mon9']); 
-        let mon10 = isNaN(parseInt(item['mon10'])) ? 0 : parseInt(item['mon10']); 
-        let mon11 = isNaN(parseInt(item['mon11'])) ? 0 : parseInt(item['mon11']); 
-        let mon12 = isNaN(parseInt(item['mon12'])) ? 0 : parseInt(item['mon12']);
-        let total = 0;
-        
-        total += mon1;
-        total += mon2;
-        total += mon3;
-        total += mon4;
-        total += mon5;
-        total += mon6;
-        total += mon7;
-        total += mon8;
-        total += mon9;
-        total += mon10;
-        total += mon11;
-        total += mon12;
-
-        return total;
-    }
-
-    const total_price = () => {
-        return  props.formData.items.reduce((sum, item) => {
-            let total_price = isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price); 
-            return sum += (total_price);
-        }, 0);
-    }
-
-    const setSignatory = (e, type) => {
-        let user_office = props.user_signatory_names.filter(i => i.title == e);
-        console.log(user_office);
-        props.dispatch({
-            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                approved_by_name: user_office[0].name,
-                approved_by_designation: user_office[0].parent.name,
-                approved_by_id: user_office[0].parent.parent.id,
-                approvedBy: e
-            }
-        });
-    }
-
-    const changeRequisitionIssue = (e) => {
-        let procurement_plan = props.procurement_plan_types.filter(item => item.id == e);
-        let item_type;
-        if(procurement_plan[0].title == "SPPMP"){
-            item_type = props.item_types.filter(item => item.title == "NON-CSE");
-        }else{
-            item_type = props.item_types.filter(item => item.title == "CSE");
-        }
-        let item_type_id = item_type[0].id;
-        let items = [];
-        if(item_type_id == props.formData.item_type_id){
-            items = props.formData.items;
-        }
-        props.dispatch({
-            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                procurement_plan_type_id: e,
-                title: `${procurement_plan[0].name} for CY ${props.formData.calendar_year}`,
-                item_type_id: item_type_id,
-                // items: items,
-            }
-        });
-    }
-
-    const changeCalendarYear = (e) => {
-        let year = dayjs(e).format("YYYY");
-        let procurement_plan = props.procurement_plan_types.filter(item => item.id == props.formData.procurement_plan_type_id);
-        props.dispatch({
-            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                calendar_year: year,
-                title: `${procurement_plan[0].name} for CY ${year}`
-            }
-        });
-    }
-
-    const changeFooter = (e, field) => {
-        let value = e.target.value;
-        changeFieldValue(value.toUpperCase(), field, false)
-    }
-
     const changeIfPpmp = (e) => {
         if(e == "1"){
             getPpmpItems();
+        }else{
+            
         }
         // changeFieldValue(e, 'from_ppmp', false);
         props.dispatch({
@@ -632,6 +570,7 @@ const CreateRequisitionIssue = (props) => {
         let requisitionItemIndex = clonedItems.findIndex(requisition_item => requisition_item.id === selectedRequestItem.id);
         clonedItems[requisitionItemIndex].issue_quantity = inventoryOpen ? totalIssuedQuantity() : issuedQuantity;
         clonedItems[requisitionItemIndex].is_pr_recommended = totalIssuedQuantity() != selectedRequestItem.request_quantity;
+        clonedItems[requisitionItemIndex].has_issued_item = inventoryOpen ? 1 : 0;
 
         let filteredIssueItems = clonedIssueItems.filter(item => item.requisition_item_id != selectedRequestItem.id);
         props.dispatch({
@@ -662,9 +601,9 @@ const CreateRequisitionIssue = (props) => {
 
     return (
         <div id="pp-container" className='container-fuild bg-white p-16'>
+            <p className="text-right ...">Appendix 63</p>
            <Title className='text-center' level={3}>REQUISITION AND ISSUE SLIP</Title>
-           {/* <Title className='text-center' level={3}>{ props.procurement_plan_types.filter(item => item.id == props.formData.procurement_plan_type_id)[0]?.name }</Title> */}
-           <Form layout='vertical'>
+           <Form layout='vertical' ref={formRef}>
                 
                 <Row gutter={[8, 8]}>
                     <Col xs={24} sm={24} md={8} lg={8} xl={8}>
@@ -673,6 +612,16 @@ const CreateRequisitionIssue = (props) => {
                                 <b>{ props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name }</b>
                             ) : (
                                 <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                            )}
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Title"  {...helpers.displayError(props.formErrors, `title`)} name="title">
+                            { props.formType == "issue" ? (
+                                <b>{ props.formData.title }</b>
+                            ) : (
+                                <Input placeholder="Title" onBlur={(e) => changeFieldValue(e, 'title')} />
                             )}
                         </Form.Item>
                     </Col>
@@ -689,43 +638,9 @@ const CreateRequisitionIssue = (props) => {
                             )}
                         </Form.Item>
                     </Col>
-
-                    {/* <Col xs={24} sm={24} md={7} lg={7} xl={7}>
-                        <Form.Item label="Item Type">
-                            <Select style={{ width: "100%" }} onChange={changeItemType} value={props.formData.item_type_id} placeholder="Select Item Type">
-                                {
-                                    props.item_types.map(type => <Option value={type.id} key={type.id}>{ type.name }</Option>)
-                                }
-                            </Select>
-                        </Form.Item>
-                    </Col> */}
-
-                    {/* <Col xs={24} sm={24} md={3} lg={3} xl={3}>
-                        <Form.Item label="CY"  {...helpers.displayError(props.formErrors, `calendar_year`)}>
-                            <DatePicker style={{width: "100%"}} allowClear={false} format={"YYYY"} onChange={changeCalendarYear} picker="year" value={dayjs(props.formData.calendar_year)}/>
-                        </Form.Item>
-                    </Col> */}
                     
                 </Row>
-{/* 
-                <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
-                        <Form.Item label="Title"  {...helpers.displayError(props.formErrors, `title`)}>
-                            <Input placeholder="Title" value={props.formData.title} />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
-                        <Form.Item label="Purpose">
-                            <Input placeholder="Purpose" onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={4} lg={4} xl={4}>
-                        <Form.Item label="Date"  {...helpers.displayError(props.formErrors, `ppmp_date`)}>
-                            <Input placeholder="input placeholder" value={moment(props.formData.ppmp_date).format('MM/DD/YYYY')} />
-                        </Form.Item>
-                    </Col>
-                    
-                </Row> */}
+
                 { props.formType == "issue" ? (
                     <React.Fragment>
                     <Row gutter={[8, 8]} className="pp-items-header">
@@ -866,7 +781,6 @@ const CreateRequisitionIssue = (props) => {
                                     <Col xs={24} sm={24} md={3} lg={2} xl={2}>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.issue_quantity`) }>
                                             { item.has_stock ? (
-                                                // <Input type="number" autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'issue_quantity', index, ) } value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
                                                 <Input type="number" autoComplete='off' min={0} onClick={() => changeIssueQuantity(true, item, index)} onKeyUp={() => changeIssueQuantity(true, item, index)} value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
                                             ) : item.issue_quantity }
                                         </Form.Item>
@@ -946,7 +860,7 @@ const CreateRequisitionIssue = (props) => {
                                                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                                         }
                                                         showSearch
-                                                        onChange={(e) => changeTableFieldValue(e, item, 'unit_of_measure_id', index)}
+                                                        onSelect={(e) => changeTableFieldValue(e, item, 'unit_of_measure_id', index)}
                                                         value={item.unit_of_measure_id}
                                                     >
                                                         { props.unit_of_measures.map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
@@ -958,7 +872,7 @@ const CreateRequisitionIssue = (props) => {
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.request_quantity`) }>
-                                            <Input type="number"  className='text-right' autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity} style={{ width: "100%" }} placeholder="Quantity" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Quantity" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'request_quantity', index, ) } value={item.request_quantity}/>
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={24} md={2} lg={2} xl={2}>
@@ -995,11 +909,11 @@ const CreateRequisitionIssue = (props) => {
                 <br />
             <Row gutter={[8, 8]} className="pp-items-footer">
                 <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
+                    <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) } name="purpose">
                         { props.formType == "issue" ? (
                             <b>{ props.formData.purpose }</b>
                         ) : (
-                            <Input onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} placeholder="Purpose" />
+                            <Input onBlur={(e) => changeFieldValue(e, 'purpose')} placeholder="Purpose" />
                         ) }
                     </Form.Item>
                 </Col>

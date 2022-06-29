@@ -25,6 +25,7 @@ import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
 import TableRefresh from '../../Components/TableRefresh';
 import TableResetFilter from '../../Components/TableResetFilter';
+import customDayJs from "./../../customDayJs";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -318,20 +319,27 @@ const ListRequisitionIssue = (props) => {
     const addToPurchaseRequest = (item, index) => {
         api.RequisitionIssue.get(item.id)
         .then(res => {
-            let ris = res.data;
-            ris.items = ris.items.data.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
+            let risRes = res.data;
+            let ris = {
+                purpose: risRes.purpose,
+                end_user_id: risRes.end_user_id,
+                items: risRes.items.data,
+                pr_date: customDayJs().format('YYYY-MM-DD'),
+            };
+            ris.items = ris.items.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
                 risItem.item_name = risItem.description;
                 risItem.item_code = risItem.item?.item_code;
-                risItem.quantity = risItem.is_pr_recommended == 1 ? risItem.issue_quantity : risItem.request_quantity - risItem.issue_quantity;
+                risItem.quantity = risItem.request_quantity - risItem.issue_quantity;
                 risItem.unit_cost = risItem.procurement_plan_item ? risItem.procurement_plan_item.price : 0;
                 return risItem;
             });
-            ris.issued_items = [];
-            ris.form_route_id = item.id;
-
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
                 data: ris
+            });
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
+                data: {}
             });
 
             history.push("/purchase-requests/form");
@@ -366,7 +374,7 @@ const ListRequisitionIssue = (props) => {
             title: 'RIS Date',
             dataIndex: 'ris_date',
             key: 'ris_date',
-            width: 150,
+            width: 120,
             align: "center",
             ...filter.search('ris_date','date_range', setTableFilter, props.tableFilter, getRequisitionIssues),
             ...onCell,
@@ -383,10 +391,19 @@ const ListRequisitionIssue = (props) => {
             sorter: (a, b) => {},
         },
         {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+            width: 200,
+            ...filter.search('title','text', setTableFilter, props.tableFilter, getRequisitionIssues),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
+        {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
-            width: 450,
+            width: 400,
             ...filter.search('purpose','text', setTableFilter, props.tableFilter, getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
