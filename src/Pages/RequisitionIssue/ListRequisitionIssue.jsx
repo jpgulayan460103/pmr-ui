@@ -13,7 +13,7 @@ import Icon, {
     LoadingOutlined,
     FormOutlined,
     EditOutlined,
-    StopOutlined,
+    ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
 import dayjs from 'dayjs';
@@ -201,18 +201,20 @@ const ListRequisitionIssue = (props) => {
     const editRequisitionIssue = (item, index) => {
         api.RequisitionIssue.get(item.id)
         .then(res => {
-            let purchaseRequest = res.data;
-            purchaseRequest.items = res.data.items.data;
-            // purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
-            // purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-                data: purchaseRequest
-            });
+            let ris = res.data;
+            ris.items = ris.items.data;
+            ris.issued_items = [];
+            ris.form_route_id = item.id;
             props.dispatch({
                 type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
                 data: "update"
             });
+
+            props.dispatch({
+                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+                data: ris
+            });
+
             history.push("/requisition-and-issues/form");
         })
         .catch(err => {})
@@ -313,6 +315,32 @@ const ListRequisitionIssue = (props) => {
         return i;
     });
 
+    const addToPurchaseRequest = (item, index) => {
+        api.RequisitionIssue.get(item.id)
+        .then(res => {
+            let ris = res.data;
+            ris.items = ris.items.data.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
+                risItem.item_name = risItem.description;
+                risItem.item_code = risItem.item?.item_code;
+                risItem.quantity = risItem.is_pr_recommended == 1 ? risItem.issue_quantity : risItem.request_quantity - risItem.issue_quantity;
+                risItem.unit_cost = risItem.procurement_plan_item ? risItem.procurement_plan_item.price : 0;
+                return risItem;
+            });
+            ris.issued_items = [];
+            ris.form_route_id = item.id;
+
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
+                data: ris
+            });
+
+            history.push("/purchase-requests/form");
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
 
     const dataSource = props.requisitionIssues;
 
@@ -408,6 +436,13 @@ const ListRequisitionIssue = (props) => {
 
                         </Button>
                     </Tooltip>
+                    { item.status == "Issued" && (
+                        <Tooltip placement="bottom" title={"Create Purchase Request"}>
+                            <Button size='small' type='default' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
+
+                            </Button>
+                        </Tooltip>
+                    ) }
                     {/* <Tooltip placement="bottom" title={"Cancel"}>
                         <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
 
@@ -481,20 +516,10 @@ const ListRequisitionIssue = (props) => {
                                         <TabPane tab="Information" key="information">
                                             <div className='p-2'>
                                                 <p>
-                                                    <b>PR No.:</b> {props.selectedRequisitionIssue?.purchase_request_number || ""} <br />
-                                                    <b>PR Date:</b> {props.selectedRequisitionIssue?.pr_date || ""} <br />
-                                                    <b>Requisition and Issue Description Classification:</b> {props.selectedRequisitionIssue.account?.parent?.name || ""} <br />
-                                                    <b>Requisition and Issue Description:</b> {props.selectedRequisitionIssue.account?.name || ""} <br />
-                                                    <b>Mode of Requisition and Issue:</b> {props.selectedRequisitionIssue.mode_of_procurement?.name || ""} <br />
+                                                    <b>RIS No.:</b> {props.selectedRequisitionIssue?.ris_number || ""} <br />
+                                                    <b>RIS Date:</b> {props.selectedRequisitionIssue?.ris_date || ""} <br />
                                                     <b>End User:</b> {props.selectedRequisitionIssue?.end_user?.name || ""} <br />
-                                                    <b>Fund Cluster:</b> {props.selectedRequisitionIssue?.fund_cluster || ""} <br />
-                                                    <b>Responsibility Center Code:</b> {props.selectedRequisitionIssue?.center_code || ""} <br />
-                                                    <b>Total Unit Cost:</b> {props.selectedRequisitionIssue?.total_cost_formatted || ""} <br />
                                                     <b>Purpose:</b> {props.selectedRequisitionIssue?.purpose || ""} <br />
-                                                    <b>Charge To:</b> {props.selectedRequisitionIssue?.charge_to || ""} <br />
-                                                    <b>Alloted Amount:</b> {props.selectedRequisitionIssue?.alloted_amount || ""} <br />
-                                                    <b>UACS Code:</b> {props.selectedRequisitionIssue?.uacs_code?.name || ""} <br />
-                                                    <b>SA/OR:</b> {props.selectedRequisitionIssue?.sa_or || ""} <br />
                                                 </p>
                                             </div>
                                         </TabPane>

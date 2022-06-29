@@ -48,20 +48,7 @@ const CreateRequisitionIssue = (props) => {
                 setTableKey(props.formData.items.length);
             }else{
                 if(!isEmpty(props.user)){
-                    let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
-                    props.dispatch({
-                        type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-                        data: {
-                            ...props.formData,
-                            end_user_id: props.user.user_offices?.data[0]?.office_id,
-                            procurement_plan_type_id: props.procurement_plan_types[0].id,
-                            // item_type_id: props.item_types[0].id,
-                            prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
-                            requested_by_position: "Division Chief",
-                            // from_ppmp: 0,
-                            ris_date: dayjs().format('YYYY-MM-DD'),
-                        }
-                    });
+                    initiailzeForm();
                 }
             }
             if(isEmpty(props.items)){
@@ -80,10 +67,29 @@ const CreateRequisitionIssue = (props) => {
     const [itemTypeB, setItemTypeB] = useState(null);
     const [items, setItems] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([]);
-    const [inventoryModal, setInventoryModal] = useState(false);
+    const [issueItemModal, setIssueItemModal] = useState(false);
     const [selectedRequestItem, setSelectedRequestItem] = useState({});
     const [selectedInventoryItems, setSelectedInventoryItems] = useState([]);
     const [searchString, setSearchString] = useState("");
+    const [inventoryOpen, setInventoryOpen] = useState(true);
+    const [issuedQuantity, setIssuedQuantity] = useState(0);
+
+    const initiailzeForm = () => {
+        let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
+        props.dispatch({
+            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
+            data: {
+                items: [],
+                issued_items: [],
+                end_user_id: props.user.user_offices?.data[0]?.office_id,
+                procurement_plan_type_id: props.procurement_plan_types[0].id,
+                received_by_name: props.user.user_information?.fullname?.toUpperCase(),
+                received_by_designation: position[0].name,
+                requested_by_position: "Division Chief",
+                ris_date: dayjs().format('YYYY-MM-DD'),
+            }
+        });
+    }
     
 
 
@@ -282,15 +288,7 @@ const CreateRequisitionIssue = (props) => {
 
 
     const clearForm = async () => {
-        props.dispatch({
-            type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                end_user_id: props.user.user_offices?.data[0]?.office_id,
-                procurement_plan_type_id: props.procurement_plan_types[0].id,
-                items: []
-            }
-        });
+        initiailzeForm();
         props.dispatch({
             type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
             data: "create"
@@ -380,12 +378,9 @@ const CreateRequisitionIssue = (props) => {
         });
     }
 
-    const changehasStock = (e, item, index) => {
-        changeTableFieldValue(e, item, 'has_stock', index);
-    }
 
     const changeIssueQuantity = (e, item, index) => {
-        setInventoryModal(e);
+        setIssueItemModal(e);
         setSelectedRequestItem(item);
         
         let clonedIssueItems = cloneDeep(props.formData.issued_items);
@@ -525,7 +520,9 @@ const CreateRequisitionIssue = (props) => {
         }
         let newValue = cloneDeep(props.formData[`items`]);
         newValue[index]["unit_of_measure_id"] = item.procurement_plan_item.unit_of_measure.id;
-        newValue[index]["unit_of_measure"] = item.procurement_plan_item.unit_of_measure.name;
+        newValue[index]["unit_of_measure"] = {
+            name: item.procurement_plan_item.unit_of_measure.name
+        };
         newValue[index]["item_code"] = "";
         newValue[index]["item_id"] = item.procurement_plan_item.item_id;
         newValue[index]["description"] = item.procurement_plan_item.description;
@@ -633,7 +630,8 @@ const CreateRequisitionIssue = (props) => {
         let clonedIssueItems = cloneDeep(props.formData.issued_items);
         let clonedItems = cloneDeep(props.formData.items);
         let requisitionItemIndex = clonedItems.findIndex(requisition_item => requisition_item.id === selectedRequestItem.id);
-        clonedItems[requisitionItemIndex].issue_quantity = totalIssuedQuantity();
+        clonedItems[requisitionItemIndex].issue_quantity = inventoryOpen ? totalIssuedQuantity() : issuedQuantity;
+        clonedItems[requisitionItemIndex].is_pr_recommended = totalIssuedQuantity() != selectedRequestItem.request_quantity;
 
         let filteredIssueItems = clonedIssueItems.filter(item => item.requisition_item_id != selectedRequestItem.id);
         props.dispatch({
@@ -645,14 +643,21 @@ const CreateRequisitionIssue = (props) => {
             }
         });
 
-        closeInventoryModal();
+        closeIssueItemModal();
     }
 
-    const closeInventoryModal = () => {
-        setInventoryModal(false);
+    const closeIssueItemModal = () => {
+        setIssueItemModal(false);
         setSelectedRequestItem({})
         setSelectedInventoryItems([]);
         setInventoryItems([]);
+        setIssuedQuantity(0);
+        setInventoryOpen(true);
+    }
+
+    const handleInventorySwitch = (e) => {
+        setInventoryOpen(e);
+        setSelectedInventoryItems([]);
     }
 
     return (
@@ -724,11 +729,6 @@ const CreateRequisitionIssue = (props) => {
                 { props.formType == "issue" ? (
                     <React.Fragment>
                     <Row gutter={[8, 8]} className="pp-items-header">
-                        <Col xs={24} sm={24} md={3} lg={2} xl={2}>
-                            <div className='text-center'>
-                                <b>Code</b>
-                            </div>
-                        </Col>
                         <Col xs={24} sm={24} md={5} lg={11} xl={11}>
                             <div className='text-center'>
                                 <b>Item</b>
@@ -753,6 +753,11 @@ const CreateRequisitionIssue = (props) => {
                         <Col xs={24} sm={24} md={3} lg={2} xl={2}>
                             <div className='text-center'>
                                 <b>Issue Quantity</b>
+                            </div>
+                        </Col>
+                        <Col xs={24} sm={24} md={3} lg={2} xl={2}>
+                            <div className='text-center'>
+                                <b>Recommend for Purchase Request?</b>
                             </div>
                         </Col>
                         <Col xs={24} sm={24} md={4} lg={2} xl={2}>
@@ -832,13 +837,6 @@ const CreateRequisitionIssue = (props) => {
                             { props.formType == "issue" ? (
                                 <React.Fragment>
                                 <Row gutter={[8, 8]} className="pp-items-row">
-                                    <Col xs={24} sm={24} md={3} lg={2} xl={2}>
-                                        <div className='text-center'>
-                                            <Form.Item>
-                                                { item.item_code}
-                                            </Form.Item>
-                                        </div>
-                                    </Col>
                                     <Col xs={24} sm={24} md={5} lg={11} xl={11}>
                                         <div className='text-center'>
                                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_id`) }>
@@ -861,7 +859,7 @@ const CreateRequisitionIssue = (props) => {
                                     <Col xs={24} sm={24} md={3} lg={2} xl={2}>
                                         <div className='text-center'>
                                             <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.has_stock`) }>
-                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changehasStock(e, item, index )} checked={item.has_stock == 1} />
+                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changeTableFieldValue(e, item, 'has_stock', index)} checked={item.has_stock == 1} />
                                             </Form.Item>
                                         </div>
                                     </Col>
@@ -869,9 +867,16 @@ const CreateRequisitionIssue = (props) => {
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.issue_quantity`) }>
                                             { item.has_stock ? (
                                                 // <Input type="number" autoComplete='off' min={0}  onChange={(e) => changeTableFieldValue(e.target.value, item, 'issue_quantity', index, ) } value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
-                                                <Input type="number" autoComplete='off' min={0} onClick={() => changeIssueQuantity(true, item, index)} value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
+                                                <Input type="number" autoComplete='off' min={0} onClick={() => changeIssueQuantity(true, item, index)} onKeyUp={() => changeIssueQuantity(true, item, index)} value={item.issue_quantity} style={{ width: "100%" }} placeholder="Quantity" />
                                             ) : item.issue_quantity }
                                         </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={24} md={3} lg={2} xl={2}>
+                                        <div className='text-center'>
+                                            <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.is_pr_recommended`) }>
+                                                <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={(e) => changeTableFieldValue(e, item, 'is_pr_recommended', index)} checked={item.is_pr_recommended == 1} />
+                                            </Form.Item>
+                                        </div>
                                     </Col>
                                     <Col xs={24} sm={24} md={4} lg={3} xl={3}>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `items.${index}.remarks`) }>
@@ -932,7 +937,7 @@ const CreateRequisitionIssue = (props) => {
                                         <div className='text-center'>
                                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
                                                 { props.formData.from_ppmp == 1 ? (
-                                                    <span>{ item.procurement_plan_item_id && item.unit_of_measure }</span>
+                                                    <span>{ item.procurement_plan_item_id && item.unit_of_measure.name }</span>
                                                 ) : (
                                                     <Select
                                                         style={{ width: "100%" }}
@@ -942,6 +947,7 @@ const CreateRequisitionIssue = (props) => {
                                                         }
                                                         showSearch
                                                         onChange={(e) => changeTableFieldValue(e, item, 'unit_of_measure_id', index)}
+                                                        value={item.unit_of_measure_id}
                                                     >
                                                         { props.unit_of_measures.map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
                                                     </Select>
@@ -977,7 +983,7 @@ const CreateRequisitionIssue = (props) => {
                         </React.Fragment>
                 ))
             }
-                { !isEmpty(props.formData.items) && (
+                { (!isEmpty(props.formData.items) && props.formType != "issue") && (
                 <Row gutter={[8, 8]} className="pp-items-row">
                     <Col span={24}>
                         <div className='text-center mb-3'>
@@ -993,7 +999,7 @@ const CreateRequisitionIssue = (props) => {
                         { props.formType == "issue" ? (
                             <b>{ props.formData.purpose }</b>
                         ) : (
-                            <Input onBlur={(e) => changeFieldValue(e, 'purpose')} defaultValue={props.formData.purpose} placeholder="Purpose" />
+                            <Input onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} placeholder="Purpose" />
                         ) }
                     </Form.Item>
                 </Col>
@@ -1056,15 +1062,16 @@ const CreateRequisitionIssue = (props) => {
            </Form>
 
             <Modal
-                title="Inventory"
-                visible={inventoryModal}
-                onCancel={closeInventoryModal}
+                title="Issue Items"
+                visible={issueItemModal}
+                onCancel={closeIssueItemModal}
                 onOk={addInventoryItems}
                 width="60vw"
                 footer={[
-                    <Button key="back" onClick={closeInventoryModal}>
+                    <Button key="back" onClick={closeIssueItemModal}>
                       Cancel
                     </Button>,
+                    inventoryOpen ? (
                     <Popconfirm
                         key="submit"
                         title={(
@@ -1079,28 +1086,38 @@ const CreateRequisitionIssue = (props) => {
                             </div>
                         )}
                         onConfirm={addInventoryItems}
-                        // onCancel={}
                         okText="Confirm"
                         cancelText="No"
                     >
                         <Button type="primary">
                             Confirm
                         </Button>
-                    </Popconfirm>,
+                    </Popconfirm>
+                    ) : (
+                    <Button type="primary" key="submit" onClick={addInventoryItems}>
+                        Confirm
+                    </Button>
+                    ),
                   ]}
                 >
                 <div>
                     Requested Item: <b>{ selectedRequestItem.description }</b><br />
                     Requested Quantity: <b>{ selectedRequestItem.request_quantity } { selectedRequestItem.unit_of_measure?.name }</b><br />
-                    Issued Quantity: <b>{ totalIssuedQuantity() }</b><br />
-
-                    { selectedInventoryItems.map((item, index) => <Tag closable onClose={(e) => deleteInventoryItem(e, item)} key={index}>{item.item_name} <b>({ item.quantity } { item.unit_of_measure })</b></Tag>) }
+                    Issued Quantity: <b>{ inventoryOpen ? totalIssuedQuantity() : (<InputNumber min={0} max={selectedRequestItem.request_quantity} placeholder="Quantity" value={issuedQuantity} onChange={setIssuedQuantity} />) }</b><br />
                 </div>
+                Issue items from inventory? <Switch checkedChildren="Yes" unCheckedChildren="No" onChange={handleInventorySwitch} checked={inventoryOpen} />
+                {inventoryOpen && (
+                <React.Fragment>
+                    
+
                 <div className='my-2'>
                     <Input placeholder="Search Item" onChange={handleSearch} onKeyDown={handleEnterSearch} value={searchString} />
                 </div>
+                <div className='my-2'>
+                { selectedInventoryItems.map((item, index) => <Tag closable onClose={(e) => deleteInventoryItem(e, item)} key={index}>{item.item_name} <b>({ item.quantity } { item.unit_of_measure })</b></Tag>) }
+                </div>
                 <div style={{height: "45vh", overflowY: "auto", overflowX: "hidden"}}>
-
+                
                 <Row gutter={[8, 8]} className="p-2">
                     <Col xs={24} sm={24} md={9} lg={9} xl={9}>
                         <div className='text-left'>
@@ -1186,6 +1203,8 @@ const CreateRequisitionIssue = (props) => {
                     </tbody>
                 </table> */}
                 </div>
+                </React.Fragment>
+                )}
             </Modal>
 
            <div className='text-center space-x-2'>

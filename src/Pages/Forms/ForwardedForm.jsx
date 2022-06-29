@@ -477,7 +477,7 @@ const ForwardedForm = (props) => {
     };
 
     const issueRis = (item) => {
-        loadRis(item.form_routable.id)
+        api.RequisitionIssue.get(item.form_routable.id)
         .then(res => {
             let ris = res.data;
             ris.items = ris.items.data;
@@ -497,10 +497,6 @@ const ForwardedForm = (props) => {
         })
         .catch(err => {})
         .then(res => {})
-    }
-
-    const loadRis = (id) => {
-        return api.RequisitionIssue.get(id);
     }
 
     const actionTypeProcurement = (e) => {
@@ -726,7 +722,7 @@ const ForwardedForm = (props) => {
                             </Tooltip>
                     ) : (
                         <>
-                            {item.route_code == "ris_issuance_from_property" ? (
+                            {item.route_code == "last_route" ? (
                                 <Tooltip placement="bottom" title={"Issue supplies and properties"}>
                                     <Button size='small' type='default' icon={<BankOutlined twoToneColor="#0000FF" />} onClick={() => { issueRis(item) }} disabled={props.submit}>
                         

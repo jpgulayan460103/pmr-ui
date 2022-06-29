@@ -111,7 +111,7 @@ const CreatePurchaseRequest = (props) => {
         if(props.formType == "update"){
 
         }else{
-            formData.purpose = `For the implementation of ${props.formData.purpose}`;
+            // formData.purpose = `For the implementation of ${props.formData.purpose}`;
         }
         api.PurchaseRequest.save(formData,props.formType)
         .then(res => {
@@ -536,7 +536,8 @@ const CreatePurchaseRequest = (props) => {
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) }>
-                        <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                        <Input onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} />
+                        {/* <Input addonBefore={props.formType == 'update' ? "" : "For the implementation of "} onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                         {/* <TextArea addonBefore="+" autoSize placeholder="Type here..."  onChange={(e) => changeFieldValue(e, 'purpose')} value={props.formData.purpose} /> */}
                     </Form.Item>
                 </Col>
