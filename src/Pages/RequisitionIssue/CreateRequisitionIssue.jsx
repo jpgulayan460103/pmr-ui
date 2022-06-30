@@ -604,7 +604,7 @@ const CreateRequisitionIssue = (props) => {
         <div id="pp-container" className='container-fuild bg-white p-16'>
 
             <RouterPrompt
-                when={props.formType != "create"}
+                when={props.formType == "update"}
                 title="Leave this form?"
                 content="There are unsaved changes, do you wish to discard them?"
                 type="confirm"

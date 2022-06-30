@@ -325,6 +325,8 @@ const ListRequisitionIssue = (props) => {
                 end_user_id: risRes.end_user_id,
                 items: risRes.items.data,
                 pr_date: customDayJs().format('YYYY-MM-DD'),
+                requisition_issue_id: risRes.id,
+                requisition_issue_file: risRes.file,
             };
             ris.items = ris.items.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
                 risItem.item_name = risItem.description;

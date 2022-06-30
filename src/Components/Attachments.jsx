@@ -63,7 +63,7 @@ const Attachments = (props) => {
         setFiles(props.fileList);
     }, [props.fileList]);
     const handleConfirm = (item) => {
-        api.Forms.deleteUpload(item.upload_type, item.id)
+        api.Forms.deleteUpload(item.form_type, item.id)
         .then(res => {
             if (!unmounted.current) {
                 setFiles(prev => prev.filter(i => i.id != item.id));
@@ -76,22 +76,25 @@ const Attachments = (props) => {
     const attachmentActions = (item, index) => {
         let actions = [];
         actions.push(<Tooltip placement="top" title="Download">
-        <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
-    </Tooltip>);
-        actions.push(
-            <Popconfirm
-                title="Are you sure to delete this attachment?"
-                onConfirm={() => handleConfirm(item) }
-                // onCancel={cancel}
-                okText="Yes"
-                cancelText="No"
-                placement='left'
-            >
-                <Tooltip placement="top" title="Delete">
-                    <Button size='small' icon={<DeleteOutlined />} type="link" />
-                </Tooltip>
-            </Popconfirm>
-        );
+            <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
+        </Tooltip>);
+        
+        if(item.is_removable){
+            actions.push(
+                <Popconfirm
+                    title="Are you sure to delete this attachment?"
+                    onConfirm={() => handleConfirm(item) }
+                    // onCancel={cancel}
+                    okText="Yes"
+                    cancelText="No"
+                    placement='left'
+                >
+                    <Tooltip placement="top" title="Delete">
+                        <Button size='small' icon={<DeleteOutlined />} type="link" />
+                    </Tooltip>
+                </Popconfirm>
+            );
+        }
         return actions;
     }
 
@@ -100,7 +103,7 @@ const Attachments = (props) => {
         return (
             <div>
                 <p>
-                    <b>Size:</b> <span>{helpers.bytesToSize(item.filesize)}</span><br />
+                    <b>Size:</b> <span>{item.is_removable ? helpers.bytesToSize(item.filesize) : ""}</span><br />
                     <b>Uploaded by:</b> <span>{item.uploader?.user_information?.fullname}</span><br />
                     <b>Uploaded on:</b> <span>{item.created_at}</span><br />
                 </p>

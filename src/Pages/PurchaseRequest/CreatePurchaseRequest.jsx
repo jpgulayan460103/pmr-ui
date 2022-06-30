@@ -334,7 +334,7 @@ const CreatePurchaseRequest = (props) => {
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
             <RouterPrompt
-                when={props.formType != "create"}
+                when={props.formType == "update"}
                 title="Leave this form?"
                 content="There are unsaved changes, do you wish to discard them?"
                 type="confirm"
@@ -598,6 +598,11 @@ const CreatePurchaseRequest = (props) => {
                 </Button>
 
             </div>
+            { props.formData.requisition_issue_file && (
+                <div className='forms-card-form-content mt-6'>
+                    <iframe src={`${props.formData.requisition_issue_file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
+                </div>
+            )  }
         </div>
     );
 }
