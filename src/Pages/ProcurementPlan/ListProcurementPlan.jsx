@@ -348,20 +348,6 @@ const ListProcurementPlan = (props) => {
             sorter: (a, b) => {},
         },
         {
-            title: 'Item Type',
-            // dataIndex: 'item_type',
-            key: 'item_type',
-            width: 200,
-            ...filter.search('item_type_id','text', setTableFilter, props.tableFilter, getProcurementPlans),
-            ...onCell,
-            sorter: (a, b) => {},
-            render: (text, item, index) => (
-                <span>
-                    { item.item_type.name }
-                </span>
-            ),
-        },
-        {
             title: 'PPMP Type',
             // dataIndex: 'procurement_plan_type',
             key: 'procurement_plan_type_id',
