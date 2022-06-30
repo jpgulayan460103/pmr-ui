@@ -45,6 +45,7 @@ function mapStateToProps(state) {
         defaultTableFilter: state.procurementPlans.list.defaultTableFilter,
         tab: state.procurementPlans.list.tab,
         user_sections: state.libraries.user_sections,
+        item_types: state.libraries.item_types,
     };
 }
 
@@ -201,19 +202,21 @@ const ListProcurementPlan = (props) => {
     const editProcurementPlan = (item, index) => {
         api.ProcurementPlan.get(item.id)
         .then(res => {
-            let purchaseRequest = res.data;
-            purchaseRequest.items = res.data.items.data;
-            purchaseRequest.requestedBy = purchaseRequest.requested_by.title;
-            purchaseRequest.approvedBy = purchaseRequest.approved_by.title;
+            let procurementPlan = res.data;
+            let itemTypeA = props.item_types[0].id;
+            let itemTypeB = props.item_types[1].id;
+            procurementPlan.itemsA = res.data.items.data.filter(item => item.item_type_id == itemTypeA);
+            procurementPlan.itemsB = res.data.items.data.filter(item => item.item_type_id == itemTypeB);
+            console.log(procurementPlan);
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-                data: purchaseRequest
+                data: procurementPlan
             });
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_CREATE_FORM_TYPE",
                 data: "update"
             });
-            history.push("/purchase-requests/form");
+            history.push("/procurement-plans/form");
         })
         .catch(err => {})
         .then(res => {})

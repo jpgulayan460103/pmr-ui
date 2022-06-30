@@ -8,6 +8,7 @@ import Icon, { PlusOutlined, DeleteOutlined, SaveOutlined, FolderViewOutlined } 
 import dayjs from 'dayjs'
 import moment from 'moment';
 import helpers from '../../Utilities/helpers';
+import { RouterPrompt } from '../../Components/RouterPrompt';
 
 function mapStateToProps(state) {
     return {
@@ -332,6 +333,17 @@ const CreatePurchaseRequest = (props) => {
     
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
+            <RouterPrompt
+                when={props.formType != "create"}
+                title="Leave this form?"
+                content="There are unsaved changes, do you wish to discard them?"
+                type="confirm"
+                cancelText="Cancel"
+                okText="Confirm"
+                onOK={() => true}
+                onCancel={() => false}
+                hasConfirm={false}
+            />
             <p className="text-right ...">Appendix 60</p>
             <Title className='text-center' level={3}>PURCHASE REQUEST</Title>
             <Form layout='vertical' ref={formRef}>
@@ -342,9 +354,9 @@ const CreatePurchaseRequest = (props) => {
                     </Form.Item>
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                        <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) } name="title">
-                            <Input placeholder="Title"  onBlur={(e) => changeFieldValue(e, 'title')} />
-                        </Form.Item>
+                    <Form.Item label="Title" { ...helpers.displayError(props.formErrors, `title`) } name="title">
+                        <Input placeholder="Title"  onBlur={(e) => changeFieldValue(e, 'title')} />
+                    </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
@@ -526,11 +538,13 @@ const CreatePurchaseRequest = (props) => {
             <br />
             <br />
             <Row gutter={[8, 8]}>
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                     <Form.Item label="Purpose" { ...helpers.displayError(props.formErrors, `purpose`) } name="purpose">
                         <Input onBlur={(e) => changeFieldValue(e, 'purpose')} placeholder="Purpose" />
                     </Form.Item>
                 </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
 
                     <Form.Item label="Requested by" { ...helpers.displayError(props.formErrors, `requested_by_name`) }>

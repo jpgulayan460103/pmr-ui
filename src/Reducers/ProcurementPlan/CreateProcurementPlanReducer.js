@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const initialState = () => {
     return {
       formData: {
@@ -5,6 +7,8 @@ const initialState = () => {
         itemsB: [],
         end_user_id: null,
         type_id: null,
+        ppmp_date: dayjs().format('YYYY-MM-DD'),
+        calendar_year: dayjs().format("YYYY"),
       },
       formErrors: {},
       formType: "create",
@@ -17,6 +21,11 @@ const initialState = () => {
         return {
           ...state,
           formData: action.data,
+        };
+      case 'RESET_PROCUREMENT_PLAN_CREATE_FORM_DATA':
+        return {
+          ...state,
+          formData: {...initialState().formData, ...action.data},
         };
       case 'SET_PROCUREMENT_PLAN_CREATE_FORM_ERRORS':
         return {

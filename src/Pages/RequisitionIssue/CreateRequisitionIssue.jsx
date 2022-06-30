@@ -9,6 +9,7 @@ import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } 
 import dayjs from 'dayjs'
 import moment from 'moment';
 import helpers from '../../Utilities/helpers';
+import { RouterPrompt } from '../../Components/RouterPrompt';
 
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
@@ -601,6 +602,18 @@ const CreateRequisitionIssue = (props) => {
 
     return (
         <div id="pp-container" className='container-fuild bg-white p-16'>
+
+            <RouterPrompt
+                when={props.formType != "create"}
+                title="Leave this form?"
+                content="There are unsaved changes, do you wish to discard them?"
+                type="confirm"
+                cancelText="Cancel"
+                okText="Confirm"
+                onOK={() => true}
+                onCancel={() => false}
+                hasConfirm={false}
+            />
             <p className="text-right ...">Appendix 63</p>
            <Title className='text-center' level={3}>REQUISITION AND ISSUE SLIP</Title>
            <Form layout='vertical' ref={formRef}>

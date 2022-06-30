@@ -3,11 +3,12 @@ import style from './style.less'
 import { debounce, isEmpty, cloneDeep } from 'lodash'
 import api from './../../api';
 import { connect } from 'react-redux';
-import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker  } from 'antd';
+import { Button, Input, Select, AutoComplete, Typography, Form, notification, Modal, Row, Col, Tooltip, Badge, DatePicker, InputNumber  } from 'antd';
 import Icon, { PlusOutlined, DeleteOutlined, DoubleLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs'
 import moment from 'moment';
 import helpers from '../../Utilities/helpers';
+import { RouterPrompt } from '../../Components/RouterPrompt';
 
 const { TextArea } = Input;
 const { Option, OptGroup } = Select;
@@ -37,6 +38,7 @@ function mapStateToProps(state) {
 }
 
 const CreateProcurementPlan = (props) => {
+    const formRef = React.useRef();
     useEffect(() => {
         if(props.isInitialized){
             setItemTypeA(props.item_types[0].id);
@@ -48,23 +50,12 @@ const CreateProcurementPlan = (props) => {
                 let itemALength = props.formData.itemsA.length;
                 let itemBLength = props.formData.itemsB.length;
                 setTableKey(itemALength+itemBLength);
+                setTimeout(() => {
+                    formRef.current.setFieldsValue(props.formData);
+                }, 150);
             }else{
                 if(!isEmpty(props.user)){
-                    let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
-                    props.dispatch({
-                        type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-                        data: {
-                            ...props.formData,
-                            end_user_id: props.user.user_offices?.data[0]?.office_id,
-                            procurement_plan_type_id: props.procurement_plan_types[0].id,
-                            item_type_id: props.item_types[0].id,
-                            prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
-                            prepared_by_designation: position[0].name,
-                            calendar_year: dayjs().format("YYYY"),
-                            ppmp_date: dayjs().format('YYYY-MM-DD'),
-                            title: `${props.procurement_plan_types[0].name} for CY ${dayjs().format("YYYY")}`,
-                        }
-                    });
+                    initiailzeForm();
                 }
             }
             if(isEmpty(props.items)){
@@ -74,6 +65,11 @@ const CreateProcurementPlan = (props) => {
     }, [props.isInitialized]);
     useEffect(() => {
         document.title = "Create Project Procurement Plan";
+        return function cleanup() {
+            if(props.formType != "create"){
+                clearForm();
+            }
+        };
     }, []);
 
     const [tableKey, setTableKey] = useState(0);
@@ -81,6 +77,22 @@ const CreateProcurementPlan = (props) => {
     const [itemTypeA, setItemTypeA] = useState(null);
     const [itemTypeB, setItemTypeB] = useState(null);
     const [donation, setDonation] = useState(null);
+
+    const initiailzeForm = () => {
+        let position = props.user_positions.filter(position => position.key == props.user.user_information?.position_id);
+        let formData = {
+            end_user_id: props.user.user_offices?.data[0]?.office_id,
+            prepared_by_name: props.user.user_information?.fullname?.toUpperCase(),
+            prepared_by_designation: position[0].name,
+        };
+        props.dispatch({
+            type: "RESET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
+            data: formData
+        });
+        if(formRef.current){
+            formRef.current?.setFieldsValue(formData);
+        }
+    }
 
 
     const getItems = async () => {
@@ -141,7 +153,7 @@ const CreateProcurementPlan = (props) => {
                         title: 'Project Procurement Plan update failed',
                         content: (
                           <div>
-                            <p>Unable to update. Project Procurement Plan is already approved by the budget section.</p>
+                            <p>Unable to update. Project Procurement Plan is already approved.</p>
                           </div>
                         ),
                         onOk() {},
@@ -165,16 +177,10 @@ const CreateProcurementPlan = (props) => {
 
 
     const clearForm = async () => {
-        props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                end_user_id: props.user.user_offices?.data[0]?.office_id,
-                procurement_plan_type_id: props.procurement_plan_types[0].id,
-                itemsA: [],
-                itemsB: []
-            }
-        });
+        if(formRef.current){
+            formRef.current?.resetFields();
+        }
+        initiailzeForm();
         props.dispatch({
             type: "SET_PROCUREMENT_PLAN_CREATE_FORM_TYPE",
             data: "create"
@@ -202,9 +208,9 @@ const CreateProcurementPlan = (props) => {
 
     const changeTableFieldValue = (e, item, field, index, itemType = "A") => {
         let value = e;
+        console.log(value);
         let newValue = cloneDeep(props.formData[`items${itemType}`]);
         newValue[index][field] = value;
-        newValue[index]["total_quantity"] = addAllMon(newValue[index]);
         switch (field) {
             case 'price':
                 newValue[index]["total_price"] = value * newValue[index]["total_quantity"];
@@ -221,6 +227,8 @@ const CreateProcurementPlan = (props) => {
             case 'mon10':
             case 'mon11':
             case 'mon12':
+                newValue[index][field] = Number(value);
+                newValue[index]["total_quantity"] = addAllMon(newValue[index]);
                 // newValue[index][field] = parseInt(value);
                 newValue[index]["total_price"] = newValue[index]["price"] * newValue[index]["total_quantity"];
                 break;
@@ -322,20 +330,6 @@ const CreateProcurementPlan = (props) => {
         return itemA + itemB;
     }
 
-    const setSignatory = (e, type) => {
-        let user_office = props.user_signatory_names.filter(i => i.title == e);
-        console.log(user_office);
-        props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
-            data: {
-                ...props.formData,
-                approved_by_name: user_office[0].name,
-                approved_by_designation: user_office[0].parent.name,
-                approved_by_id: user_office[0].parent.parent.id,
-                approvedBy: e
-            }
-        });
-    }
 
     const changeProcurementPlan = (e) => {
         let procurement_plan = props.procurement_plan_types.filter(item => item.id == e);
@@ -564,18 +558,25 @@ const CreateProcurementPlan = (props) => {
     
     return (
         <div id="pp-container" className='container-fuild bg-white p-16'>
+
+            <RouterPrompt
+                when={props.formType != "create"}
+                title="Leave this form?"
+                content="There are unsaved changes, do you wish to discard them?"
+                type="confirm"
+                cancelText="Cancel"
+                okText="Confirm"
+                onOK={() => true}
+                onCancel={() => false}
+                hasConfirm={false}
+            />
            {/* <Title className='text-center' level={3}>Project Procurement Management Plan (PPMP)</Title> */}
            <Title className='text-center' level={3}>{ props.procurement_plan_types.filter(item => item.id == props.formData.procurement_plan_type_id)[0]?.name }</Title>
-           <Form layout='vertical'>
+           <Form layout='vertical' ref={formRef}>
                 
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
-                        <Form.Item label="Office/Section">
-                            <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
-                        </Form.Item>
-                    </Col>
 
-                    <Col xs={24} sm={24} md={7} lg={7} xl={7}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Procurement Plan Type"  {...helpers.displayError(props.formErrors, `procurement_plan_type_id`)}>
                             <Select style={{ width: "100%" }} onChange={changeProcurementPlan} value={props.formData.procurement_plan_type_id} placeholder="Select Item Type">
                                 { props.procurement_plan_types.map(item => <Option value={item.id} key={item.key}>{item.name}</Option>) }
@@ -583,37 +584,28 @@ const CreateProcurementPlan = (props) => {
                         </Form.Item>
                     </Col>
 
-                    {/* <Col xs={24} sm={24} md={7} lg={7} xl={7}>
-                        <Form.Item label="Item Type">
-                            <Select style={{ width: "100%" }} onChange={changeItemType} value={props.formData.item_type_id} placeholder="Select Item Type">
-                                {
-                                    props.item_types.map(type => <Option value={type.id} key={type.id}>{ type.name }</Option>)
-                                }
-                            </Select>
-                        </Form.Item>
-                    </Col> */}
-
-                    <Col xs={24} sm={24} md={3} lg={3} xl={3}>
+                    <Col xs={24} sm={24} md={4} lg={4} xl={4}>
                         <Form.Item label="CY"  {...helpers.displayError(props.formErrors, `calendar_year`)}>
                             {/* <Input placeholder="Date" /> */}
                             <DatePicker style={{width: "100%"}} allowClear={false} format={"YYYY"} onChange={changeCalendarYear} picker="year" value={dayjs(props.formData.calendar_year)}/>
                         </Form.Item>
                     </Col>
-                    
                 </Row>
 
                 <Row gutter={[8, 8]}>
-                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                        <Form.Item label="Office/Section">
+                            <Input placeholder="input placeholder" value={props.user_sections?.filter(i => i.id == props.formData.end_user_id)[0]?.name} />
+                        </Form.Item>
+                    </Col>
+                
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Title"  {...helpers.displayError(props.formErrors, `title`)}>
-                            <Input placeholder="Title" value={props.formData.title} />
+                            <Input placeholder="Title" value={props.formData.title} readOnly/>
                         </Form.Item>
                     </Col>
-                    <Col xs={24} sm={24} md={10} lg={10} xl={10}>
-                        <Form.Item label="Purpose">
-                            <Input placeholder="Purpose" onBlur={(e) => changeFieldValue(e, 'purpose')} defaultValue={props.formData.purpose} />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={4} lg={4} xl={4}>
+                    
+                    <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                         <Form.Item label="Date"  {...helpers.displayError(props.formErrors, `ppmp_date`)}>
                             <Input placeholder="input placeholder" value={moment(props.formData.ppmp_date).format('MM/DD/YYYY')} />
                         </Form.Item>
@@ -749,7 +741,7 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-right'>
-                                    <Form.Item>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `itemsA.${index}.total_price`) }>
                                         { helpers.currencyFormat(item.total_price) }
                                     </Form.Item>
                                 </div>
@@ -784,7 +776,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon1`) }>
                                             <b>Jan</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon1', index, "A") } defaultValue={item.mon1} style={{ width: "100%" }} min="0" placeholder="Jan" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Jan" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon1', index, "A") } value={item.mon1} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -792,7 +784,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon2`) }>
                                             <b>Feb</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon2', index, "A") } defaultValue={item.mon2} style={{ width: "100%" }} min="0" placeholder="Feb" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Feb" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon2', index, "A") } value={item.mon2} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -800,7 +792,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon3`) }>
                                             <b>Mar</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon3', index, "A") } defaultValue={item.mon3} style={{ width: "100%" }} min="0" placeholder="Mar" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Mar" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon3', index, "A") } value={item.mon3} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -808,7 +800,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon4`) }>
                                             <b>Apr</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon4', index, "A") } defaultValue={item.mon4} style={{ width: "100%" }} min="0" placeholder="Apr" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Apr" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon4', index, "A") } value={item.mon4} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -816,7 +808,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon5`) }>
                                             <b>May</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon5', index, "A") } defaultValue={item.mon5} style={{ width: "100%" }} min="0" placeholder="May" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="May" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon5', index, "A") } value={item.mon5} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -824,7 +816,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon6`) }>
                                             <b>Jun</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon6', index, "A") } defaultValue={item.mon6} style={{ width: "100%" }} min="0" placeholder="Jun" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Jun" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon6', index, "A") } value={item.mon6} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -832,7 +824,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon7`) }>
                                             <b>July</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon7', index, "A") } defaultValue={item.mon7} style={{ width: "100%" }} min="0" placeholder="July" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="July" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon7', index, "A") } value={item.mon7} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -840,7 +832,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon8`) }>
                                             <b>Aug</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon8', index, "A") } defaultValue={item.mon8} style={{ width: "100%" }} min="0" placeholder="Aug" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Aug" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon8', index, "A") } value={item.mon8} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -848,7 +840,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon9`) }>
                                             <b>Sept</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon9', index, "A") } defaultValue={item.mon9} style={{ width: "100%" }} min="0" placeholder="Sept" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Sept" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon9', index, "A") } value={item.mon9} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -856,7 +848,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon10`) }>
                                             <b>Oct</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon10', index, "A") } defaultValue={item.mon10} style={{ width: "100%" }} min="0" placeholder="Oct" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Oct" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon10', index, "A") } value={item.mon10} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -864,7 +856,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon11`) }>
                                             <b>Nov</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon11', index, "A") } defaultValue={item.mon11} style={{ width: "100%" }} min="0" placeholder="Nov" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Nov" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon11', index, "A") } value={item.mon11} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -872,7 +864,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsA.${index}.mon12`) }>
                                             <b>Dec</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon12', index, "A") } defaultValue={item.mon12} style={{ width: "100%" }} min="0" placeholder="Dec" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Dec" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon12', index, "A") } value={item.mon12} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -992,7 +984,7 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-center'>
-                                    <Form.Item>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.unit_of_measure_id`) }>
                                         <Select
                                             showSearch
                                             value={item.unit_of_measure_id}
@@ -1026,7 +1018,7 @@ const CreateProcurementPlan = (props) => {
                                             item.is_price_fix ? (
                                                 <span>{ helpers.currencyFormat(item.price) }</span>
                                             ) : (
-                                                <Input type="number"  className='text-right' autoComplete='off'  onBlur={(e) => changeTableFieldValue(e.target.value, item, 'price', index, "B") } defaultValue={item.price} style={{ width: "100%" }} step="0.01" placeholder="Estimated Budget" />
+                                                <InputNumber style={{ width: "100%" }} step="0.01" placeholder="Estimated Budget"  onBlur={(e) => changeTableFieldValue(e.target.value, item, 'price', index, "B") } defaultValue={item.price} />
                                             )
                                         }
                                         
@@ -1035,7 +1027,7 @@ const CreateProcurementPlan = (props) => {
                             </Col>
                             <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                                 <div className='text-right'>
-                                    <Form.Item>
+                                    <Form.Item { ...helpers.displayError(props.formErrors, `itemsB.${index}.total_price`) }>
                                         { helpers.currencyFormat(item.total_price) }
                                     </Form.Item>
                                 </div>
@@ -1070,7 +1062,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon1`) }>
                                             <b>Jan</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon1', index, "B") } defaultValue={item.mon1} style={{ width: "100%" }} min="0" placeholder="Jan" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Jan" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon1', index, "B") } value={item.mon1} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1078,7 +1070,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon2`) }>
                                             <b>Feb</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon2', index, "B") } defaultValue={item.mon2} style={{ width: "100%" }} min="0" placeholder="Feb" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Feb" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon2', index, "B") } value={item.mon2} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1086,7 +1078,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon3`) }>
                                             <b>Mar</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon3', index, "B") } defaultValue={item.mon3} style={{ width: "100%" }} min="0" placeholder="Mar" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Mar" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon3', index, "B") } value={item.mon3} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1094,7 +1086,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon4`) }>
                                             <b>Apr</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon4', index, "B") } defaultValue={item.mon4} style={{ width: "100%" }} min="0" placeholder="Apr" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Apr" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon4', index, "B") } value={item.mon4} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1102,7 +1094,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon5`) }>
                                             <b>May</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon5', index, "B") } defaultValue={item.mon5} style={{ width: "100%" }} min="0" placeholder="May" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="May" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon5', index, "B") } value={item.mon5} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1110,7 +1102,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon6`) }>
                                             <b>Jun</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon6', index, "B") } defaultValue={item.mon6} style={{ width: "100%" }} min="0" placeholder="Jun" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Jun" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon6', index, "B") } value={item.mon6} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1118,7 +1110,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon7`) }>
                                             <b>July</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon7', index, "B") } defaultValue={item.mon7} style={{ width: "100%" }} min="0" placeholder="July" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="July" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon7', index, "B") } value={item.mon7} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1126,7 +1118,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon8`) }>
                                             <b>Aug</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon8', index, "B") } defaultValue={item.mon8} style={{ width: "100%" }} min="0" placeholder="Aug" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Aug" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon8', index, "B") } value={item.mon8} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1134,7 +1126,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon9`) }>
                                             <b>Sept</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon9', index, "B") } defaultValue={item.mon9} style={{ width: "100%" }} min="0" placeholder="Sept" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Sept" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon9', index, "B") } value={item.mon9} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1142,7 +1134,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon10`) }>
                                             <b>Oct</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon10', index, "B") } defaultValue={item.mon10} style={{ width: "100%" }} min="0" placeholder="Oct" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Oct" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon10', index, "B") } value={item.mon10} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1150,7 +1142,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon11`) }>
                                             <b>Nov</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon11', index, "B") } defaultValue={item.mon11} style={{ width: "100%" }} min="0" placeholder="Nov" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Nov" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon11', index, "B") } value={item.mon11} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1158,7 +1150,7 @@ const CreateProcurementPlan = (props) => {
                                     <div className='text-center'>
                                         <Form.Item  { ...helpers.displayError(props.formErrors, `itemsB.${index}.mon12`) }>
                                             <b>Dec</b>
-                                            <Input type="number" className='text-center' autoComplete='off' onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon12', index, "B") } defaultValue={item.mon12} style={{ width: "100%" }} min="0" placeholder="Dec" />
+                                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Dec" onBlur={(e) => changeTableFieldValue(e.target.value, item, 'mon12', index, "B") } value={item.mon12} />
                                         </Form.Item>
                                     </div>
                                 </Col>
@@ -1199,6 +1191,13 @@ const CreateProcurementPlan = (props) => {
             </Row>
 
             {/* END OF PART II */}
+            <Row gutter={[8, 8]}>
+                <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                    <Form.Item label="Purpose" name="purpose">
+                        <Input placeholder="Purpose" onBlur={(e) => changeFieldValue(e, 'purpose')} />
+                    </Form.Item>
+                </Col>
+            </Row>
             <Row gutter={[8, 8]}>
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Form.Item label="Prepared By" { ...helpers.displayError(props.formErrors, `prepared_by_name`) }>
