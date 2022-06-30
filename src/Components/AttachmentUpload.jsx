@@ -232,6 +232,7 @@ const AttachmentUpload = (props) => {
                 title="Uploading your files"
                 content="Please wait for the system to finish uploading."
                 cancelText="Cancel"
+                type="warning"
                 okText="Confirm"
                 onOK={() => true}
                 onCancel={() => false}

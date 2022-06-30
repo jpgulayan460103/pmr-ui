@@ -36,7 +36,6 @@ import {
 
 import { cloneDeep, isEmpty,  } from 'lodash';
 import api from '../api';
-import { RouterPrompt } from './RouterPrompt';
 import helpers from '../Utilities/helpers';
 
 const { TabPane } = Tabs;
