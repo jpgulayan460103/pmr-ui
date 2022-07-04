@@ -25,6 +25,7 @@ import TableFooterPagination from '../../Components/TableFooterPagination';
 import helpers from '../../Utilities/helpers';
 import TableRefresh from '../../Components/TableRefresh';
 import TableResetFilter from '../../Components/TableResetFilter';
+import AuditBatches from '../../Components/AuditBatches';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -541,7 +542,7 @@ const ListProcurementPlan = (props) => {
                                         </TabPane>
                                         <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
                                             { !isEmpty(props.logger) ? (
-                                                <AuditTrail logger={props.logger} tableScroll="65vh" hasChild childProp="purchase_request"  displayProp="display_log" />
+                                                <AuditBatches logger={props.logger} />
                                             ) : <Skeleton active /> }
                                         </TabPane>
                                     </Tabs>
