@@ -27,7 +27,7 @@ import {
 import {
     UploadOutlined,
     DeleteOutlined,
-    InboxOutlined,
+    SolutionOutlined,
     DownloadOutlined,
     CloudUploadOutlined,
     QuestionCircleOutlined,
@@ -75,9 +75,15 @@ const Attachments = (props) => {
 
     const attachmentActions = (item, index) => {
         let actions = [];
-        actions.push(<Tooltip placement="top" title="Download">
-            <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
-        </Tooltip>);
+        if(item.upload_type == "database"){
+            actions.push(<Tooltip placement="top" title="View">
+                <Button size='small' icon={<SolutionOutlined />} type="link" onClick={()=> handleDownload(item)} />
+            </Tooltip>);
+        }else{
+            actions.push(<Tooltip placement="top" title="Download">
+                <Button size='small' icon={<DownloadOutlined />} type="link" onClick={()=> handleDownload(item)} />
+            </Tooltip>);
+        }
         
         if(item.is_removable){
             actions.push(

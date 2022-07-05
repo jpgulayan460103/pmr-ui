@@ -132,6 +132,16 @@ const CreatePurchaseRequest = (props) => {
                         ),
                         onOk() {},
                       });
+                }else if(err.response.data.errors.requisition_issue_id){
+                    Modal.error({
+                        title: 'Purchase Request update failed',
+                        content: (
+                          <div>
+                            <p>No Requisition and Issue Slip (RIS) selected.</p>
+                          </div>
+                        ),
+                        onOk() {},
+                      });
                 }else if(err.response.data.errors.update_error){
                     Modal.error({
                         title: 'Purchase Request update failed',
