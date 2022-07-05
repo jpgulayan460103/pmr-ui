@@ -72,6 +72,16 @@ function registerValidSW(swUrl, config) {
                   'tabs for this page are closed. See https://cra.link/PWA.'
               );
 
+              const pushState = window.history.pushState;
+
+              window.history.pushState = function () {
+                // make sure that the user lands on the "next" page
+                pushState.apply(window.history, arguments);
+            
+                // makes the new service worker active
+                installingWorker.postMessage('SKIP_WAITING');
+              };
+
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration);

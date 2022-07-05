@@ -82,21 +82,6 @@ function mapStateToProps(state) {
 const App = (props) => {
 
     useEffect(() => {
-        if(isProduction){
-            let app_version = version;
-            if(localStorage.getItem("app_version") != null){
-                app_version = localStorage.getItem("app_version");
-            }else{
-                localStorage.setItem('app_version',version);
-            }
-            if(compare(version, app_version, ">")){
-                console.log("refresh");
-                localStorage.setItem('app_version',version);
-                setTimeout(() => {
-                    window.location.reload(true)
-                }, 500);
-            }
-        }
         window.Echo.channel('home').listen('NewMessage', (e) => {
             // var notification = new Notification(e.message);
             console.log(e);
