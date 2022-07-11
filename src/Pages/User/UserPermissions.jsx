@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tree, Button, notification, Radio } from 'antd';
-import { map } from 'lodash';
+import { isEmpty, map } from 'lodash';
 import api from '../../api';
 
 const UserPermissions = (props) => {
@@ -8,6 +8,13 @@ const UserPermissions = (props) => {
     useEffect(() => {
         return () => { unmounted.current = true }
     }, []);
+    const [expandedKeys, setExpandedKeys] = useState();
+    const [checkedKeys, setCheckedKeys] = useState();
+    const [selectedKeys, setSelectedKeys] = useState([]);
+    const [autoExpandParent, setAutoExpandParent] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [office, setOffice] = useState("");
+
     const treeData = [
           {
             title: 'Activity Logs Module',
@@ -27,10 +34,6 @@ const UserPermissions = (props) => {
               {
                 title: 'Permission to view the list of approved forms.',
                 key: 'form.routing.approved.view',
-              },
-              {
-                title: 'Permission to update approved forms.',
-                key: 'form.routing.approved.update',
               },
             ],
           },
@@ -55,24 +58,61 @@ const UserPermissions = (props) => {
                 key: 'form.routing.pending.view',
               },
               {
-                title: 'Permission to approve forwarded forms.',
-                key: 'form.routing.pending.approve',
+                title: 'Permission to review and finailize created project procurement plans.',
+                key: 'form.routing.pending.review.procurement.plan',
               },
               {
-                title: 'Permission to disapprove the forwarded form.',
-                key: 'form.routing.pending.disapprove',
+                title: 'Permission to approve or disapprove project procurement plans.',
+                key: 'form.routing.pending.approve.procurement.plan',
               },
               {
-                title: 'Permission to view the attachments of the forwarded form.',
-                key: 'form.routing.pending.attachment.view',
+                title: 'Permission to review and finailize created purchase requests.',
+                key: 'form.routing.pending.review.purchase.request',
               },
               {
-                title: 'Permission to add attachments to the forwarded form.',
-                key: 'form.routing.pending.attachment.create',
+                title: 'Permission to approve or disapprove purchase requests.',
+                key: 'form.routing.pending.approve.purchase.request',
               },
               {
-                title: 'Permission to remove attachments of the forwarded form.',
-                key: 'form.routing.pending.attachment.delete',
+                title: 'Permission to review and finailize created requisition and issue slips.',
+                key: 'form.routing.pending.review.requisition.issue',
+              },
+              {
+                title: 'Permission to approve or disapprove requisition and issue slips.',
+                key: 'form.routing.pending.approve.requisition.issue',
+              },
+              {
+                title: 'Permission to issue items using requisition and issue slips. (Inventory permission is required)',
+                key: 'form.routing.pending.issue.requisition.issue',
+                disabled: office != "PSAMS",
+              },
+            ],
+          },
+
+          {
+            title: 'Inventory Module',
+            key: 'inventories.all',
+            disabled: office != "PSAMS",
+            children: [
+              {
+                title: 'Permission to view the list of items in the inventory.',
+                key: 'inventories.items.view',
+                disabled: office != "PSAMS",
+              },
+              {
+                title: 'Permission to create items in the inventory.',
+                key: 'inventories.items.create',
+                disabled: office != "PSAMS",
+              },
+              {
+                title: 'Permission to update items in the inventory.',
+                key: 'inventories.items.update',
+                disabled: office != "PSAMS",
+              },
+              {
+                title: 'Permission to update quantity of items in the inventory.',
+                key: 'inventories.items.quantity.update',
+                disabled: office != "PSAMS",
               },
             ],
           },
@@ -82,68 +122,20 @@ const UserPermissions = (props) => {
             key: 'libraries.all',
             children: [
               {
-                title: 'Permission to view the list of items.',
-                key: 'libraries.items.view',
+                title: 'Permission to view the list of user positions.',
+                key: 'libraries.positions.view',
               },
               {
-                title: 'Permission to update the list of items.',
-                key: 'libraries.items.update',
+                title: 'Permission to add the list of user positions.',
+                key: 'libraries.positions.add',
               },
               {
-                title: 'Permission to add the list of items.',
-                key: 'libraries.items.add',
+                title: 'Permission to update the list of user positions.',
+                key: 'libraries.positions.update',
               },
               {
-                title: 'Permission to delete the list of items.',
-                key: 'libraries.items.delete',
-              },
-              {
-                title: 'Permission to view the list of item categories.',
-                key: 'libraries.items.categories.view',
-              },
-              {
-                title: 'Permission to add the list of item categories.',
-                key: 'libraries.items.categories.add',
-              },
-              {
-                title: 'Permission to update the list of item categories.',
-                key: 'libraries.items.categories.update',
-              },
-              {
-                title: 'Permission to delete the list of item categories.',
-                key: 'libraries.items.categories.delete',
-              },
-              {
-                title: 'Permission to view the list of office divisions.',
-                key: 'libraries.office.divisions.view',
-              },
-              {
-                title: 'Permission to add the list of office divisions.',
-                key: 'libraries.office.divisions.add',
-              },
-              {
-                title: 'Permission to update the list of office divisions.',
-                key: 'libraries.office.divisions.update',
-              },
-              {
-                title: 'Permission to delete the list of office divisions.',
-                key: 'libraries.office.divisions.delete',
-              },
-              {
-                title: 'Permission to view the list of office sections.',
-                key: 'libraries.office.sections.view',
-              },
-              {
-                title: 'Permission to add the list of office sections.',
-                key: 'libraries.office.sections.add',
-              },
-              {
-                title: 'Permission to update the list of office sections.',
-                key: 'libraries.office.sections.update',
-              },
-              {
-                title: 'Permission to delete the list of office sections.',
-                key: 'libraries.office.sections.delete',
+                title: 'Permission to delete the list of user positions.',
+                key: 'libraries.positions.delete',
               },
               {
                 title: 'Permission to view the list of unit of measures.',
@@ -164,18 +156,22 @@ const UserPermissions = (props) => {
               {
                 title: 'Permission to view the list of UACS Codes.',
                 key: 'libraries.uacs.view',
+                disabled: office != "BS",
               },
               {
                 title: 'Permission to add the list of UACS Codes.',
                 key: 'libraries.uacs.add',
+                disabled: office != "BS",
               },
               {
                 title: 'Permission to update the list of UACS Codes.',
                 key: 'libraries.uacs.update',
+                disabled: office != "BS",
               },
               {
                 title: 'Permission to delete the list of UACS Codes.',
                 key: 'libraries.uacs.delete',
+                disabled: office != "BS",
               },
             ],
           },
@@ -187,17 +183,32 @@ const UserPermissions = (props) => {
                 title: 'Permission to view procument module.',
                 key: 'procurement.view',
               },
+            ],
+          },
+
+          {
+            title: 'Project Procurement Plan Module',
+            key: 'procurement.plan.all',
+            children: [
               {
-                title: 'Permission to view the attachments of a form.',
-                key: 'procurement.attachment.view',
+                title: 'Permission to view project procument plan.',
+                key: 'procurement.plan.view',
               },
               {
-                title: 'Permission to add attachments to a form.',
-                key: 'procurement.attachment.create',
+                title: 'Permission to create project procument plan.',
+                key: 'procurement.plan.create',
               },
               {
-                title: 'Permission to remove attachments of a form',
-                key: 'procurement.attachment.delete',
+                title: 'Permission to update project procument plan.',
+                key: 'procurement.plan.update',
+              },
+              {
+                title: 'Permission to delete project procument plan.',
+                key: 'procurement.plan.delete',
+              },
+              {
+                title: 'Permission to have full access of attachments in the project procument plan module.',
+                key: 'procurement.plan.attachments',
               },
             ],
           },
@@ -223,23 +234,39 @@ const UserPermissions = (props) => {
                 key: 'purchase.requests.delete',
               },
               {
-                title: 'Permission to view the attachments of a purchase request.',
-                key: 'purchase.requests.attachments.view',
-              },
-              {
-                title: 'Permission to add attachments to a purchase request.',
-                key: 'purchase.requests.attachments.create',
-              },
-              {
-                title: 'Permission to remove attachments of a purchase request.',
-                key: 'purchase.requests.attachments.delete',
-              },
-              {
-                title: 'Permission to cancel a purchase request',
-                key: 'purchase.requests.cancellation',
+                title: 'Permission to have full access of attachments in the purchase request module.',
+                key: 'purchase.requests.attachments',
               },
             ],
           },
+
+          {
+            title: 'Requisition and Issue Module',
+            key: 'requisition.issue.all',
+            children: [
+              {
+                title: 'Permission to view the list of requisition and issue slips.',
+                key: 'requisition.issue.view',
+              },
+              {
+                title: 'Permission to create a requisition and issue slip.',
+                key: 'requisition.issue.create',
+              },
+              {
+                title: 'Permission to update a requisition and issue slip.',
+                key: 'requisition.issue.update',
+              },
+              {
+                title: 'Permission to delete a requisition and issue slip.',
+                key: 'requisition.issue.delete',
+              },
+              {
+                title: 'Permission to have full access of attachments in the requisition and issue slip module.',
+                key: 'requisition.issue.attachments',
+              },
+            ],
+          },
+
           {
             title: 'Users Module',
             key: 'users.all',
@@ -253,12 +280,8 @@ const UserPermissions = (props) => {
                 key: 'users.update',
               },
               {
-                title: 'Permission to view the list of permissions of a user.',
-                key: 'users.permission.view',
-              },
-              {
-                title: 'Permission to update permissions of a user.',
-                key: 'users.permission.update',
+                title: 'Permission to update the permissions of a user.',
+                key: 'users.permissions',
               },
               {
                 title: 'Permission to delete a user.',
@@ -270,11 +293,7 @@ const UserPermissions = (props) => {
 
 
       ];
-      const [expandedKeys, setExpandedKeys] = useState();
-      const [checkedKeys, setCheckedKeys] = useState();
-      const [selectedKeys, setSelectedKeys] = useState([]);
-      const [autoExpandParent, setAutoExpandParent] = useState(true);
-      const [loading, setLoading] = useState(false);
+
 
       const [role, setRole] = useState("");
 
@@ -297,17 +316,15 @@ const UserPermissions = (props) => {
               'procurement.all',
               'purchase.requests.all',
               'users.all',
+              'procurement.plan.all',
+              'requisition.issue.all',
             ]);
             break;
           case "user":
             setCheckedKeys([
               'purchase.requests.view',
               'purchase.requests.create',
-              'libraries.items.categories.view',
               'libraries.items.view',
-              'libraries.office.divisions.view',
-              'libraries.office.sections.view',
-              // 'libraries.signatories.administrators.view',
               'libraries.uom.view',
               'libraries.uacs.view',
             ]);
@@ -345,22 +362,34 @@ const UserPermissions = (props) => {
       }
 
       useEffect(() => {
+        let officeTitle = props.user?.user_offices?.data[0]?.office?.title;
+        setOffice(officeTitle);
+
+        let propUserRoles = props.user.roles?.data[0]?.name;
+        setRole(propUserRoles);
+        setPermissionsOnRole(propUserRoles);
+
         setExpandedKeys([
           'activitylogs.all',
           'form.routing.approved.all',
           'form.routing.disapproved.all',
           'form.routing.pending.all',
           'libraries.all',
+          'inventories.all',
           'procurement.all',
+          'procurement.plan.all',
+          'requisition.issue.all',
           'purchase.requests.all',
           'users.all',
         ]);
-        let propUserRoles = props.user.roles?.data[0]?.name;
-        setRole(propUserRoles);
-        setPermissionsOnRole(propUserRoles);
-        if(propUserRoles == "user"){
+        // console.log(props.user.permissions.data);
+        if(!isEmpty(props.user)){
           setCheckedKeys(map(props.user.permissions.data, 'name'));
         }
+        if(propUserRoles == "user"){
+        }
+
+        // if(officeTitle == "PSAMS")
       }, [props.user]);
     
       const onExpand = (expandedKeysValue) => {
@@ -405,7 +434,7 @@ const UserPermissions = (props) => {
             // checkedKeys={['users.delete', 'purchase.requests.all']}
             checkedKeys={checkedKeys}
             treeData={treeData}
-            disabled={role != 'user'}
+            // disabled={role != 'user'}
             />
             <Button type='primary' loading={loading} disabled={loading} onClick={() => {
               savePermission()

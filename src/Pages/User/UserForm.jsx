@@ -12,6 +12,7 @@ const { Option, OptGroup } = Select;
 
 function mapStateToProps(state) {
     return {
+        user: state.user.data,
         user_sections: state.libraries.user_sections,
         user_divisions: state.libraries.user_divisions,
         user_positions: state.libraries.user_positions,
@@ -124,32 +125,34 @@ const UserForm = (props) => {
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
                 </Form.Item>
-                <Form.Item
-                    name="office_id"
-                    label="Section/Unit/Office"
-                    { ...helpers.displayError(formErrors, `office_id`) }
-                    rules={[{ required: true, message: 'Please select section/unit/office' }]}
-                >
-                    <Select
-                        placeholder="Section/Unit/Office"
-                        optionFilterProp="children"
-                        showSearch
-                        // mode={props.type == "update" ? "multiple" : ""}
-                        filterOption={(input, option) =>
-                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
+                { (props.user?.roles?.data[0]?.name == "super-admin" || props.type == "create") && (
+                    <Form.Item
+                        name="office_id"
+                        label="Section/Unit/Office"
+                        { ...helpers.displayError(formErrors, `office_id`) }
+                        rules={[{ required: true, message: 'Please select section/unit/office' }]}
                     >
-                        { props.user_divisions.map(division =>  {
-                            return (
-                                <OptGroup label={division.name}  key={division.id}>
-                                    { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
-                                        return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
-                                    }) }
-                                </OptGroup>
-                            );
-                        }) }
-                    </Select>
-                </Form.Item>
+                        <Select
+                            placeholder="Section/Unit/Office"
+                            optionFilterProp="children"
+                            showSearch
+                            // mode={props.type == "update" ? "multiple" : ""}
+                            filterOption={(input, option) =>
+                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            { props.user_divisions.map(division =>  {
+                                return (
+                                    <OptGroup label={division.name}  key={division.id}>
+                                        { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
+                                            return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
+                                        }) }
+                                    </OptGroup>
+                                );
+                            }) }
+                        </Select>
+                    </Form.Item>
+                ) }
                 {props.type == "update" ? (
                     <Form.Item
                         name="group_id"
