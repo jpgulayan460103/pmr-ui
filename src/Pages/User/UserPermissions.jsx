@@ -324,7 +324,6 @@ const UserPermissions = (props) => {
             setCheckedKeys([
               'purchase.requests.view',
               'purchase.requests.create',
-              'libraries.items.view',
               'libraries.uom.view',
               'libraries.uacs.view',
             ]);
@@ -338,9 +337,16 @@ const UserPermissions = (props) => {
 
       const savePermission = () => {
         setLoading(true);
+        let permissions = checkedKeys.map((perm, index) => {
+          let position = perm.search(".all");
+          if(position > 0){
+            perm = "";
+          }
+          return perm;
+        })
         let formData = {
           user_id: props.user.key,
-          permissions: checkedKeys,
+          permissions,
           role: role,
         };
         api.User.updatePermission(formData)
