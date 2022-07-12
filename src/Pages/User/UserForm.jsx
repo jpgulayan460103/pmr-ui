@@ -125,34 +125,33 @@ const UserForm = (props) => {
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
                 </Form.Item>
-                { (props.user?.roles?.data[0]?.name == "super-admin" || props.type == "create") && (
-                    <Form.Item
-                        name="office_id"
-                        label="Section/Unit/Office"
-                        { ...helpers.displayError(formErrors, `office_id`) }
-                        rules={[{ required: true, message: 'Please select section/unit/office' }]}
+                <Form.Item
+                    name="office_id"
+                    label="Section/Unit/Office"
+                    { ...helpers.displayError(formErrors, `office_id`) }
+                    rules={[{ required: true, message: 'Please select section/unit/office' }]}
+                >
+                    <Select
+                        placeholder="Section/Unit/Office"
+                        optionFilterProp="children"
+                        showSearch
+                        // mode={props.type == "update" ? "multiple" : ""}
+                        filterOption={(input, option) =>
+                            option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        disabled={props.user?.roles?.data[0]?.name != "super-admin" && props.type != "create"}
                     >
-                        <Select
-                            placeholder="Section/Unit/Office"
-                            optionFilterProp="children"
-                            showSearch
-                            // mode={props.type == "update" ? "multiple" : ""}
-                            filterOption={(input, option) =>
-                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            { props.user_divisions.map(division =>  {
-                                return (
-                                    <OptGroup label={division.name}  key={division.id}>
-                                        { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
-                                            return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
-                                        }) }
-                                    </OptGroup>
-                                );
-                            }) }
-                        </Select>
-                    </Form.Item>
-                ) }
+                        { props.user_divisions.map(division =>  {
+                            return (
+                                <OptGroup label={division.name}  key={division.id}>
+                                    { props.user_sections?.filter(section => section.parent.name == division.name).map(section => {
+                                        return <Option value={section.id} key={section.id}>{`${section.name} - ${section.title}`}</Option>
+                                    }) }
+                                </OptGroup>
+                            );
+                        }) }
+                    </Select>
+                </Form.Item>
                 {props.type == "update" ? (
                     <Form.Item
                         name="group_id"
