@@ -1,3 +1,5 @@
+// https://mail.google.com/mail/?view=cm&fs=1&to=ictsupport.fo11@dswd.gov.ph&su=Request%20technical%20assistance%20for%20&body=Issue:%0AName:%0AOffice:
+
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -179,7 +181,7 @@ const App = (props) => {
                 <PrivateRoute><Layout><ItemLibrary /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/libraries/items/categories"  >
-                <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category"}} /></Layout></PrivateRoute>
+                <PrivateRoute><Layout><ListLibrary libraryType="item_category" options={{libraryName: "Item Category", parent: true, parentLabel: "Item Classification", parentType: "item_classification"}} /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/libraries/items/measures"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>

@@ -67,6 +67,15 @@ const Loginform = (props) => {
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+
+    const requestResetPassword = () => {
+        let subject = "Request for Technical Assistance on Procurement System";
+        let body = "Issue: Account Login Problem%0AFull Name:%0ADivision:%0AUnit/Section:%0AConcern:";
+        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${process.env.REACT_APP_ICT_SUPPORT}&su=${subject}&body=${body}`,
+                'newwindow',
+                'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+            return false;
+    }
     return (
         <div>
             <Form
@@ -106,12 +115,18 @@ const Loginform = (props) => {
                     </Button>                  
                     {/* &nbsp;<span className='custom-pointer' href=""> Forgot password?</span> */}
                 </Form.Item>
-                <Themepicker />
-            </Form>
+                
             <Divider>or</Divider>
-            <Button type="ghost" block onClick={() => { props.setShowRegister(true) }  }>
-                Request password reset
+            <Form.Item>
+            &nbsp;<span className='custom-pointer' href=""> Having trouble logging in?</span>
+            <Button type="ghost" block onClick={() => requestResetPassword()} >
+                Request for Technical Assistance
             </Button>
+            </Form.Item>
+            </Form>
+            {/* <br /> */}
+            <br />
+            <Themepicker />
         </div>
     );
 }

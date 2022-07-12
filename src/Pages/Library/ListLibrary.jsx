@@ -14,6 +14,7 @@ function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
         item_category: state.libraries.item_categories,
+        item_classification: state.libraries.item_classifications,
         unit_of_measure: state.libraries.unit_of_measures,
         user_division: state.libraries.user_divisions,
         user_section: state.libraries.user_sections,
@@ -424,7 +425,7 @@ const ListLibrary = (props) => {
                                 
                             </Form.Item>  ) } 
 
-                            { ((props.options.parent && props.libraryType != "user_section_signatory" )|| role == 'super-admin') && (<Form.Item
+                            { ((props.options.parent && props.libraryType != "user_section_signatory" )|| (role == 'super-admin' && props.options.parent)) && (<Form.Item
                                 name="parent_id"
                                 label={props.options.parentLabel}
                                 { ...helpers.displayError(formErrors, `title`)  }
