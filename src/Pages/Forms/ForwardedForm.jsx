@@ -568,23 +568,23 @@ const ForwardedForm = (props) => {
     const dataSource = props.forms
       
     const columns = [
-        {
-            title: 'Description',
-            key: 'route_description',
-            width: 150,
-            ...onCell,
-            ellipsis: true,
-            render: (text, item, index) => (
-                <span>
-                    { item.form_process.process_description }
-                </span>
-            ),
-        },
+        // {
+        //     title: 'Description',
+        //     key: 'route_description',
+        //     width: 150,
+        //     ...onCell,
+        //     ellipsis: true,
+        //     render: (text, item, index) => (
+        //         <span>
+        //             { item.form_process.process_description }
+        //         </span>
+        //     ),
+        // },
         {
             title: 'Form Type',
             dataIndex: 'route_type_str',
             key: 'route_type_str',
-            width: 150,
+            width: 200,
             ...onCell,
             ellipsis: true,
         },
@@ -631,20 +631,6 @@ const ForwardedForm = (props) => {
             sorter: (a, b) => {},
         },
         {
-            title: 'Amount',
-            key: 'common_amount',
-            ...filter.search('common_amount','number_range', setTableFilter, props.tableFilter, getForm),
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.common_amount_formatted }
-                </span>
-            ),
-            ...onCell,
-            ellipsis: true,
-            width: 150,
-            sorter: (a, b) => {},
-        },
-        {
             title: 'End User',
             key: 'end_user',
             width: 250,
@@ -657,6 +643,20 @@ const ForwardedForm = (props) => {
             ),
             ...onCell,
             ellipsis: true,
+        },
+        {
+            title: 'Description',
+            key: 'remarks',
+            width: 250,
+            render: (text, item, index) => (
+                <span>
+                    <span>{item.remarks }</span>
+                </span>
+            ),
+            ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
+            ...onCell,
+            ellipsis: true,
+            sorter: (a, b) => {},
         },
         {
             title: 'Status',
@@ -673,20 +673,6 @@ const ForwardedForm = (props) => {
             ),
             filters: [{text: "Pending", value: "pending"},{text: "Disapproved", value: "disapproved"}],
             ...filter.list('status','text', setTableFilter, props.tableFilter, getForm),
-            ...onCell,
-            ellipsis: true,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Description',
-            key: 'remarks',
-            width: 250,
-            render: (text, item, index) => (
-                <span>
-                    <span>{item.remarks }</span>
-                </span>
-            ),
-            ...filter.search('remarks','text', setTableFilter, props.tableFilter, getForm),
             ...onCell,
             ellipsis: true,
             sorter: (a, b) => {},
@@ -1127,7 +1113,7 @@ const ForwardedForm = (props) => {
                                     <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
                                     <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
                                     <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.common_amount_formatted}</span></span><br />
+                                    {/* <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.common_amount_formatted}</span></span><br /> */}
                                     <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
                                     <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
                                     <span><b>Remarks:</b> <span>{props.selectedFormRoute.remarks}</span></span><br />

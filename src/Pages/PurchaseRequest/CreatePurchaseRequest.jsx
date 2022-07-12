@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import moment from 'moment';
 import helpers from '../../Utilities/helpers';
 import { RouterPrompt } from '../../Components/RouterPrompt';
+import { useHistory } from 'react-router-dom'
 
 function mapStateToProps(state) {
     return {
@@ -35,6 +36,7 @@ const { Option, OptGroup } = Select;
 const { Title } = Typography;
 
 const CreatePurchaseRequest = (props) => {
+    let history = useHistory();
     const formRef = React.useRef();
     useEffect(() => {
         if(props.isInitialized){
@@ -600,9 +602,15 @@ const CreatePurchaseRequest = (props) => {
                 {/* { props.formType == "create" ? (
                     <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 ) : ""} */}
-                <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined />
-                    { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
-                </Button>
+                { !props.formData.requisition_issue_file ? (
+                    <Button type="default" onClick={() => history.push("/requisition-and-issues")} disabled={submit} loading={submit}><SaveOutlined />
+                        Select Requistion and Issue Slip
+                    </Button>
+                ) : (
+                    <Button type="primary" onClick={() => savePurchaseRequest()} disabled={submit} loading={submit}><SaveOutlined />
+                        { props.formType == "create" ? "Create Purchase Request" : "Update Purchase Request"}
+                    </Button>
+                ) }
                 <Button type="danger" onClick={() => clearForm()}><DeleteOutlined />
                     { props.formType == "create" ? "Reset Form" : "Clear Form and Create New"}
                 </Button>

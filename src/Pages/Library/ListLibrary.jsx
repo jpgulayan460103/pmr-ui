@@ -18,7 +18,9 @@ function mapStateToProps(state) {
         user_division: state.libraries.user_divisions,
         user_section: state.libraries.user_sections,
         user_signatory_name: state.libraries.user_signatory_names,
+        user_section_signatory: state.libraries.user_section_signatories,
         user_signatory_designation: state.libraries.user_signatory_designations,
+        user_position: state.libraries.user_positions,
         uacs_code: state.libraries.uacs_codes,
         user: state.user.data,
     };
@@ -31,12 +33,17 @@ const ListLibrary = (props) => {
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const [office, setOffice] = useState("");
+    const [role, setRole] = useState("");
     var searchInput;
 
     const formRef = React.useRef();
     useEffect(() => {
         if(props.isInitialized){
-
+            let officeId = props.user?.user_offices?.data[0]?.office?.id;
+            let userRole = props.user.roles?.data[0]?.name;
+            setRole(userRole);
+            setOffice(officeId);
         }
     }, [props.isInitialized]);
 
@@ -137,6 +144,12 @@ const ListLibrary = (props) => {
                     data: libraries.filter(library => library.library_type == $type)
                 });
             }
+            if($type == "user_section_signatory"){
+                props.dispatch({
+                    type: "SET_LIBRARY_USER_SECTION_SIGNATORY",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
             
         })
         .catch(err => {})
@@ -144,12 +157,14 @@ const ListLibrary = (props) => {
         ;
     }
 
-    const dataSource = props[props.libraryType] && props[props.libraryType].map(i => {
+    let src = props[props.libraryType] && props[props.libraryType].map(i => {
             let newI = cloneDeep(i);
             delete newI.children
             return newI;
         }
     );
+
+    const dataSource = props.libraryType == "user_section_signatory" && role != 'super-admin' ? src.filter(i => i.parent.id == office) : src;
 
 
     const getColumnSearchProps = dataIndex => ({
@@ -267,7 +282,7 @@ const ListLibrary = (props) => {
                     width: 150,
                     ...onCell,
                     ...getColumnSearchProps("title"),
-                    sorter: (a, b) => a.title.localeCompare(b.title)
+                    sorter: (a, b) => a?.title?.localeCompare(b?.title)
                 },
             );
         }
@@ -321,7 +336,8 @@ const ListLibrary = (props) => {
                     description:
                       'The library has been updated',
                 });
-                getLibraries(props.libraryType)
+                resetForm();
+                getLibraries(props.libraryType);
         })
         .catch(err => {})
         .then(res => {})

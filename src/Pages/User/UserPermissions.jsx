@@ -14,6 +14,7 @@ const UserPermissions = (props) => {
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [loading, setLoading] = useState(false);
     const [office, setOffice] = useState("");
+    const [role, setRole] = useState("");
 
     const treeData = [
           {
@@ -122,20 +123,22 @@ const UserPermissions = (props) => {
             key: 'libraries.all',
             children: [
               {
-                title: 'Permission to view the list of user positions.',
-                key: 'libraries.positions.view',
+                title: 'Permission to view the list of office signatories.',
+                key: 'libraries.user.signatories.view',
               },
               {
-                title: 'Permission to add the list of user positions.',
-                key: 'libraries.positions.add',
+                title: 'Permission to add the list of office signatories.',
+                key: 'libraries.user.signatories.add',
+                disabled: role != 'super-admin',
               },
               {
-                title: 'Permission to update the list of user positions.',
-                key: 'libraries.positions.update',
+                title: 'Permission to update the list of office signatories.',
+                key: 'libraries.user.signatories.update',
               },
               {
-                title: 'Permission to delete the list of user positions.',
-                key: 'libraries.positions.delete',
+                title: 'Permission to delete the list of office signatories.',
+                key: 'libraries.user.signatories.delete',
+                disabled: role != 'super-admin',
               },
               {
                 title: 'Permission to view the list of unit of measures.',
@@ -270,22 +273,27 @@ const UserPermissions = (props) => {
           {
             title: 'Users Module',
             key: 'users.all',
+            disabled: role == 'user',
             children: [
               {
                 title: 'Permission to view the list of users.',
                 key: 'users.view',
+                disabled: role == 'user',
               },
               {
                 title: 'Permission to update a user.',
                 key: 'users.update',
+                disabled: role == 'user',
               },
               {
                 title: 'Permission to update the permissions of a user.',
                 key: 'users.permissions',
+                disabled: role == 'user',
               },
               {
                 title: 'Permission to delete a user.',
                 key: 'users.delete',
+                disabled: role == 'user',
               },
             ],
           },
@@ -293,9 +301,6 @@ const UserPermissions = (props) => {
 
 
       ];
-
-
-      const [role, setRole] = useState("");
 
       const handleChangeRole = e => {
         let selectedRole = e.target.value;
@@ -307,25 +312,72 @@ const UserPermissions = (props) => {
         switch (selectedRole) {
           case "admin":
           case "super-admin":
-            setCheckedKeys([
-              'activitylogs.all',
-              'form.routing.approved.all',
-              'form.routing.disapproved.all',
-              'form.routing.pending.all',
-              'libraries.all',
-              'procurement.all',
-              'purchase.requests.all',
-              'users.all',
-              'procurement.plan.all',
-              'requisition.issue.all',
-            ]);
+            let perms = [
+              'activitylogs.view',
+              'form.routing.approved.view',
+              'form.routing.disapproved.view',
+              'form.routing.pending.view',
+              'form.routing.pending.review.procurement.plan',
+              'form.routing.pending.approve.procurement.plan',
+              'form.routing.pending.review.purchase.request',
+              'form.routing.pending.approve.purchase.request',
+              'form.routing.pending.review.requisition.issue',
+              'form.routing.pending.approve.requisition.issue',
+              'libraries.user.signatories.view',
+              'libraries.user.signatories.update',
+              'libraries.uom.view',
+              'libraries.uom.add',
+              'libraries.uom.update',
+              'libraries.uom.delete',
+              'procurement.view',
+              'procurement.plan.view',
+              'procurement.plan.create',
+              'procurement.plan.update',
+              'procurement.plan.delete',
+              'procurement.plan.attachments',
+              'purchase.requests.view',
+              'purchase.requests.create',
+              'purchase.requests.update',
+              'purchase.requests.delete',
+              'purchase.requests.attachments',
+              'requisition.issue.view',
+              'requisition.issue.create',
+              'requisition.issue.update',
+              'requisition.issue.delete',
+              'requisition.issue.attachments',
+              'users.view',
+              'users.update',
+              'users.delete',
+              'users.permissions',
+            ]
+
+            if(office == "PSAMS" || selectedRole == "super-admin"){
+              perms.push('form.routing.pending.issue.requisition.issue');
+              perms.push('inventories.items.view');
+              perms.push('inventories.items.create');
+              perms.push('inventories.items.update');
+              perms.push('inventories.items.quantity.update');
+            }
+            if(office == "BS" || selectedRole == "super-admin"){
+              perms.push('libraries.uacs.view');
+              perms.push('libraries.uacs.add');
+              perms.push('libraries.uacs.update');
+              perms.push('libraries.uacs.delete');
+            }
+
+            if(selectedRole == 'super-admin'){
+              perms.push('libraries.user.signatories.add');
+              perms.push('libraries.user.signatories.delete');
+            }
+            setCheckedKeys(perms);
             break;
           case "user":
             setCheckedKeys([
               'purchase.requests.view',
-              'purchase.requests.create',
+              'requisition.issue.view',
+              'procurement.plan.view',
+              'libraries.user.signatories.view',
               'libraries.uom.view',
-              'libraries.uacs.view',
             ]);
             break;
         
@@ -337,13 +389,14 @@ const UserPermissions = (props) => {
 
       const savePermission = () => {
         setLoading(true);
-        let permissions = checkedKeys.map((perm, index) => {
+        let mapped = checkedKeys.map((perm, index) => {
           let position = perm.search(".all");
           if(position > 0){
             perm = "";
           }
           return perm;
         })
+        let permissions = mapped.filter(perm => perm != "");
         let formData = {
           user_id: props.user.key,
           permissions,
@@ -351,7 +404,7 @@ const UserPermissions = (props) => {
         };
         api.User.updatePermission(formData)
         .then(res => {
-            if (unmounted.current) { return false; }
+            // if (unmounted.current) { return false; }
             setLoading(false);
             props.getUsers();
             notification.success({

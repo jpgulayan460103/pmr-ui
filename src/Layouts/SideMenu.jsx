@@ -308,11 +308,9 @@ const Sidemenu = (props) => {
                 {
                     (
                         helpers.hasPermission(props.user, [
-                            'libraries.items.view',
-                            'libraries.categories.view',
+                            'libraries.user.signatories.view',
                             'libraries.uom.view',
-                            'libraries.office.divisions.view',
-                            'libraries.sections.view',
+                            'libraries.uacs.view',
                         ]) || 
                         helpers.hasRole(props.user, ["admin","super-admin"])
                     )
@@ -340,6 +338,56 @@ const Sidemenu = (props) => {
                             UACS Code
                         </Menu.Item>
                     ) }
+
+                    {
+                        (
+                            helpers.hasPermission(props.user, ['libraries.user.signatories.view'])
+                        )
+                    && (
+                        <Menu.Item key="/libraries/offices/signatories">
+                            <Link to="/libraries/offices/signatories"></Link>
+                            Office Signatories
+                        </Menu.Item>
+                    ) }
+
+
+
+                    {
+                        (
+                            helpers.hasRole(props.user, ["super-admin"])
+                        )
+                    && (
+                        <React.Fragment>
+
+                            <Menu.Item key="/libraries/user/positions">
+                                <Link to="/libraries/user/positions"></Link>
+                                User Positions
+                            </Menu.Item>
+
+                            <Menu.Item key="/libraries/offices/divisions">
+                                <Link to="/libraries/offices/divisions"></Link>
+                                Office Divisions
+                            </Menu.Item>
+
+                            <Menu.Item key="/libraries/offices/sections">
+                                <Link to="/libraries/offices/sections"></Link>
+                                Office Sections
+                            </Menu.Item>
+
+                            <Menu.Item key="/libraries/items/categories">
+                                <Link to="/libraries/items/categories"></Link>
+                                Item Categories
+                            </Menu.Item>
+
+                            <Menu.Item key="/libraries/items">
+                                <Link to="/libraries/items"></Link>
+                                Item
+                            </Menu.Item>
+
+
+                        </React.Fragment>
+                    ) }
+
                 </SubMenu>
                 ) }
 

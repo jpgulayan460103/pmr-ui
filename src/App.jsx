@@ -193,11 +193,11 @@ const App = (props) => {
             <Route exact path="/libraries/offices/sections"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="user_section" options={{libraryName: "Office Section",parent: true, title: true, parentLabel: "Division", parentType: "user_division"}} /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/libraries/user_offices/administrators"  >
-                <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_name" options={{libraryName: "Office Administrators",parent: true, title: true, parentLabel: "Designation", parentType: "user_signatory_designation"}} /></Layout></PrivateRoute>
+            <Route exact path="/libraries/offices/signatories"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_section_signatory" options={{libraryName: "Office Signatories",parent: true, title: true, parentLabel: "Section", parentType: "user_section"}} /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/libraries/user_offices/administrators/designations"  >
-                <PrivateRoute><Layout><ListLibrary libraryType="user_signatory_designation" options={{libraryName: "Office Administrator's Designation",parent: true, title: true, parentLabel: "Designation", parentType: "user_section"}} /></Layout></PrivateRoute>
+            <Route exact path="/libraries/user/positions"  >
+                <PrivateRoute><Layout><ListLibrary libraryType="user_position" options={{libraryName: "User Positions", title: true}} /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/users"  >
                 <PrivateRoute><Layout><User /></Layout></PrivateRoute>

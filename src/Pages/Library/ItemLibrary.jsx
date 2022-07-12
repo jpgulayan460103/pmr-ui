@@ -14,7 +14,7 @@ function mapStateToProps(state) {
         isInitialized: state.user.isInitialized,
         items: state.libraries.items,
         unit_of_measures: state.libraries.unit_of_measures,
-        item_categories: state.libraries.item_categories,
+        item_category_cses: state.libraries.item_category_cses,
     };
 }
 
@@ -36,23 +36,7 @@ const ItemLibrary = (props) => {
         if(props.isInitialized){
             if(isEmpty(props.items)){
                 getItems();
-                console.log(
-                    cloneDeep(props.item_categories).map(i => {
-                        return {
-                            text: i.text,
-                            value: i.id,
-                        };
-                    })
-                );
-                console.log(
-                    cloneDeep(props.unit_of_measures).map(i => {
-                        return {
-                            text: i.text,
-                            value: i.id,
-                        };
-                    })
-                );
-                setItemCategoryFilter(cloneDeep(props.item_categories).map(i => {
+                setItemCategoryFilter(cloneDeep(props.item_category_cses).map(i => {
                         return {
                             text: i.text,
                             value: i.id,
@@ -182,17 +166,10 @@ const ItemLibrary = (props) => {
                     formRef.current.setFieldsValue({
                         item_name: record.item_name,
                         item_code: record.item_code,
-                        is_ppmp: record.is_ppmp,
+                        price: record.price,
                         unit_of_measure_id: record.unit_of_measure.id,
                         item_category_cse_id: record.item_category_cse.id,
                     })
-                    console.log({
-                        item_name: record.item_name,
-                        item_code: record.item_code,
-                        is_ppmp: record.is_ppmp,
-                        unit_of_measure_id: record.unit_of_measure.id,
-                        item_category_cse_id: record.item_category_cse.id,
-                    });
                     setFormType("Update");
                 },
             };
@@ -201,7 +178,7 @@ const ItemLibrary = (props) => {
 
     const dataSource = props.items;
 
-    // const itemCategoryFilter = !isEmpty(props.item_categories) ? [] : [];
+    // const itemCategoryFilter = !isEmpty(props.item_category_cses) ? [] : [];
     // const unitOfMeasureFilter = !isEmpty(props.unit_of_measures) ? [] : [];
 
     const columns = [
@@ -250,7 +227,7 @@ const ItemLibrary = (props) => {
             ),
         },
         {
-            title: 'item_code',
+            title: 'Item Code',
             dataIndex: 'item_code',
             key: 'item_code',
             width: 100,
@@ -259,12 +236,11 @@ const ItemLibrary = (props) => {
             sorter: (a, b) => a.item_code.localeCompare(b.item_code)
         },
         {
-            title: 'PPMP',
-            dataIndex: 'is_ppmp_str',
-            key: 'is_ppmp_str',
+            title: 'Price',
+            dataIndex: 'price',
+            key: 'price',
             width: 50,
             ...onCell,
-            sorter: (a, b) => a.is_ppmp_str.localeCompare(b.is_ppmp_str),
         },
         {
             title: "",
@@ -335,7 +311,7 @@ const ItemLibrary = (props) => {
                         >
 
                             <Form.Item
-                                name="item_category_id"
+                                name="item_category_cse_id"
                                 label="Item Category"
                                 { ...helpers.displayError(formErrors, `title`)  }
                                 rules={[{ required: true, message: `Item Category field is required` }]}
@@ -349,7 +325,7 @@ const ItemLibrary = (props) => {
                                     }
                                     showSearch
                                 >
-                                    { props.item_categories.map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
+                                    { props.item_category_cses.map(i => <Option value={i.id} key={i.key}>{ i.name }</Option>  ) }
                                 </Select>
                             </Form.Item>
 
@@ -387,13 +363,17 @@ const ItemLibrary = (props) => {
                                 label="Item Code"
                                 { ...helpers.displayError(formErrors, `item_code`)  }
                             >
-                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Name" />
+                                <Input placeholder="Name" />
                             </Form.Item>
 
-                            <Form.Item name="is_ppmp" valuePropName="checked">
-                                <Checkbox>From PPMP</Checkbox>
+                            <Form.Item
+                                name="price"
+                                label="Price"
+                                { ...helpers.displayError(formErrors, `price`)  }
+                            >
+                                <Input placeholder="Name" type="number" step={0.01} />
                             </Form.Item>
-                            
+                           
 
                             <Form.Item>
                                 <Button type="primary" htmlType="submit" className="login-form-button">
@@ -410,17 +390,6 @@ const ItemLibrary = (props) => {
             </Col>
             )}
         </Row>
-        { isEmpty(selectedLibrary) ? "" : (
-        <Row gutter={[16, 16]} className="mb-3">
-            <Col sm={24} md={24} lg={24} xl={24}>
-                <Card size="small" title="Items" bordered={false}  >
-                    <div className='user-card-content'>
-                        <iframe src={`${selectedLibrary.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
-                    </div>
-                </Card>
-            </Col>
-        </Row>
-        ) }
         </React.Fragment>
     );
 }
