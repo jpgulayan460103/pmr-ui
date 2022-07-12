@@ -3,10 +3,12 @@ import { connect } from 'react-redux';
 import { Menu } from 'antd';
 import Icon, {
     UserOutlined,
-    UploadOutlined,
-    FormOutlined,
+    FileSearchOutlined,
+    DatabaseOutlined,
     DashboardOutlined,
     ShoppingCartOutlined,
+    ReconciliationOutlined,
+    ShopOutlined,
   } from '@ant-design/icons';
 import { Link, useLocation  } from 'react-router-dom'
 import helpers from '../Utilities/helpers';
@@ -75,7 +77,7 @@ const Sidemenu = (props) => {
                         helpers.hasRole(props.user, ["admin","super-admin"])
                     )
                 && (
-                <SubMenu key="submenu-procurement" icon={<Icon component={ProcurementSvg} />} title="Procurement">
+                <SubMenu key="submenu-procurement" icon={<ShopOutlined />} title="Procurement">
                     {
                         (
                             helpers.hasPermission(props.user, ['procurement.view']) || 
@@ -161,7 +163,7 @@ const Sidemenu = (props) => {
                         helpers.hasRole(props.user, ["admin","super-admin"])
                     )
                 && (
-                    <SubMenu key="submenu-procurement-plan" icon={<ShoppingCartOutlined />} title="PPMP">
+                    <SubMenu key="submenu-procurement-plan" icon={<DatabaseOutlined />} title="PPMP">
                         <Menu.Item key="/procurement-plans/summary">
                             <Link to="/procurement-plans/summary"></Link>
                             Summary of PPMP
@@ -201,7 +203,7 @@ const Sidemenu = (props) => {
                         helpers.hasRole(props.user, ["admin","super-admin"])
                     )
                 && (
-                    <SubMenu key="submenu-requisition-and-issue" icon={<ShoppingCartOutlined />} title="RIS">
+                    <SubMenu key="submenu-requisition-and-issue" icon={<FileSearchOutlined />} title="RIS">
                         {
                             (
                                 helpers.hasPermission(props.user, ['requisition.issue.create','requisition.issue.update']) || 
@@ -298,7 +300,7 @@ const Sidemenu = (props) => {
                         helpers.hasRole(props.user, ["admin","super-admin"])
                     )
                 && (
-                    <Menu.Item key="/inventory"  icon={<Icon component={LogsSvg} />}>
+                    <Menu.Item key="/inventory"  icon={<ReconciliationOutlined />}>
                         <Link to="/inventory"></Link>
                         Inventory
                     </Menu.Item>

@@ -34,6 +34,7 @@ const ListLibrary = (props) => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const [office, setOffice] = useState("");
+    const [officeParent, setOfficeParent] = useState("");
     const [role, setRole] = useState("");
     var searchInput;
 
@@ -41,8 +42,11 @@ const ListLibrary = (props) => {
     useEffect(() => {
         if(props.isInitialized){
             let officeId = props.user?.user_offices?.data[0]?.office?.id;
+            let parentTitle = props.user?.user_offices?.data[0]?.office?.parent?.title;
             let userRole = props.user.roles?.data[0]?.name;
+            console.log(parentTitle);
             setRole(userRole);
+            setOfficeParent(parentTitle);
             setOffice(officeId);
         }
     }, [props.isInitialized]);
@@ -164,7 +168,8 @@ const ListLibrary = (props) => {
         }
     );
 
-    const dataSource = props.libraryType == "user_section_signatory" && role != 'super-admin' ? src.filter(i => i.parent.id == office) : src;
+    const dataSource = props.libraryType == "user_section_signatory" && role != 'super-admin' ? src.filter(i => i.parent.id == office || i.parent.title == officeParent || i.parent.title == 'ORD' || i.parent.title == 'OARDA' || i.parent.title == 'OARDO') : src;
+    // const dataSource = props.libraryType == "user_section_signatory" && role != 'super-admin' ? src.filter(i => i.parent.id == office) : src;
 
 
     const getColumnSearchProps = dataIndex => ({
@@ -419,7 +424,7 @@ const ListLibrary = (props) => {
                                 
                             </Form.Item>  ) } 
 
-                            { props.options.parent && (<Form.Item
+                            { ((props.options.parent && props.libraryType != "user_section_signatory" )|| role == 'super-admin') && (<Form.Item
                                 name="parent_id"
                                 label={props.options.parentLabel}
                                 { ...helpers.displayError(formErrors, `title`)  }
