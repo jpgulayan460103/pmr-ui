@@ -512,7 +512,7 @@ const ListProcurementPlan = (props) => {
                                         <TabPane tab="Information" key="information">
                                             <div className='p-2'>
                                                 <p>
-                                                    <b>PR No.:</b> {props.selectedProcurementPlan?.purchase_request_number || ""} <br />
+                                                    <b>PR No.:</b> {props.selectedProcurementPlan?.pr_number || ""} <br />
                                                     <b>PR Date:</b> {props.selectedProcurementPlan?.pr_date || ""} <br />
                                                     <b>Procurement Description Classification:</b> {props.selectedProcurementPlan.account?.parent?.name || ""} <br />
                                                     <b>Procurement Description:</b> {props.selectedProcurementPlan.account?.name || ""} <br />

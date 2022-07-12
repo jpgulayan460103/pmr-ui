@@ -358,10 +358,10 @@ const Listpurchaserequest = (props) => {
         },
         {
             title: 'PR Number',
-            dataIndex: 'purchase_request_number',
-            key: 'purchase_request_number',
+            dataIndex: 'pr_number',
+            key: 'pr_number',
             width: 150,
-            ...filter.search('purchase_request_number','text', setTableFilter, props.tableFilter, getPurchaseRequests),
+            ...filter.search('pr_number','text', setTableFilter, props.tableFilter, getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -514,7 +514,7 @@ const Listpurchaserequest = (props) => {
                                         <TabPane tab="Information" key="information">
                                             <div className='p-2'>
                                                 <p>
-                                                    <b>PR No.:</b> {props.selectedPurchaseRequest?.purchase_request_number || ""} <br />
+                                                    <b>PR No.:</b> {props.selectedPurchaseRequest?.pr_number || ""} <br />
                                                     <b>PR Date:</b> {props.selectedPurchaseRequest?.pr_date || ""} <br />
                                                     <b>Procurement Description Classification:</b> {props.selectedPurchaseRequest.account?.parent?.name || ""} <br />
                                                     <b>Procurement Description:</b> {props.selectedPurchaseRequest.account?.name || ""} <br />

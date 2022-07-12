@@ -285,7 +285,7 @@ const ForwardedForm = (props) => {
         setSubmit(true);
         let formData = {
             ...e,
-            purchase_request_number: `${props.addOn}${e.purchase_request_number_last}`,
+            pr_number: `${props.addOn}${e.pr_number_last}`,
             updater: "budget",
         };
         if(props.selectedFormRoute.route_type == "purchase_request"){
@@ -441,7 +441,7 @@ const ForwardedForm = (props) => {
                 setModalBudgetForm(true);
                 setTimeout(() => {
                     budgetFormRef.current.setFieldsValue({
-                        purchase_request_number_last: res.data.next_number,
+                        pr_number_last: res.data.next_number,
                         alloted_amount: item.form_routable.common_amount,
                     });
                 }, 150);
@@ -759,8 +759,8 @@ const ForwardedForm = (props) => {
         let pr_last = e.target.value;
         let padded_pr_last = pr_last.padStart(5, '0');
         budgetFormRef.current.setFieldsValue({
-            // purchase_request_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
-            purchase_request_number_last: padded_pr_last,
+            // pr_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
+            pr_number_last: padded_pr_last,
         });
     }
 
@@ -877,10 +877,10 @@ const ForwardedForm = (props) => {
                 >
 
                     <Form.Item
-                        name="purchase_request_number_last"
+                        name="pr_number_last"
                         label="Purchase Request Number"
                         // rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...helpers.displayError(props.errorMessage, 'purchase_request_number') }
+                        { ...helpers.displayError(props.errorMessage, 'pr_number') }
                     >
                         <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
                             <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
