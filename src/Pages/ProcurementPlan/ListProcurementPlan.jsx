@@ -554,14 +554,14 @@ const ListProcurementPlan = (props) => {
             </Row>
             { isEmpty(props.selectedProcurementPlan) ? "" : (
             <Row gutter={[16, 16]} className="mb-3">
-                <Col md={24} lg={16} xl={18}>
+                <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Project Procurement Management Plan" bordered={false} loading={props.formLoading}>
                         <div className='forms-card-form-content'>
                             <iframe src={`${props.selectedProcurementPlan.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
                         </div>
                     </Card>
                 </Col>
-                <Col md={24} lg={8} xl={6}>
+                <Col md={24} lg={10} xl={8}>
                         <Card size="small" title="Attachments" bordered={false} loading={props.formLoading}>
                             <div className='forms-card-form-content'>
                             <AttachmentUpload formId={props.selectedProcurementPlan.id} formType="procurement_plan" fileList={props.selectedProcurementPlan.form_uploads?.data} />

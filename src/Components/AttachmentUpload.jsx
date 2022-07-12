@@ -71,7 +71,15 @@ const AttachmentUpload = (props) => {
     useEffect(() => {
         setfileList([]);
     }, [props.formId]);
+
+    useEffect(() => {
+        setUploadedFiles(props.fileList);
+        return () => {
+            setUploadedFiles([]);
+        };
+    }, [props.fileList]);
     const [fileList, setfileList] = useState([]);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
 
     const uploadProps = {
         multiple: true,
@@ -129,11 +137,6 @@ const AttachmentUpload = (props) => {
             type: "SET_UPLOADING_FILES",
             data: false,
         });
-        // notification.success({
-        //     message: 'Done',
-        //     description:
-        //       'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-        // });
     }
 
     const uploadProgress = (progressEvent, index) => {
@@ -151,6 +154,9 @@ const AttachmentUpload = (props) => {
                 response: "Uploaded",
                 uploading: "done",
             });
+            let uploaded_file = res.data.uploaded_file;
+            setUploadedFiles(prev => [uploaded_file, ...prev])
+            message.success(`The file ${uploaded_file.display_log} has been uploaded.`);
         })
         .catch(error => {
             if (error.response) {
@@ -272,13 +278,20 @@ const AttachmentUpload = (props) => {
                                     actions={uploadingAction(item, index)}
                                     className="form-upload-selected-files"
                                 >
-                                    <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "60%"}}>
-                                        <Tooltip placement="left" title={item.response}>
-                                            <PaperClipOutlined />
-                                            <span className='ml-2'>{item.name}</span>
-                                        </Tooltip>
+                                    <div className={item.status == 'error' ? 'truncate text-red-500' : (item.status == 'done' ? 'truncate text-blue-500' : 'truncate')} style={{width: "40%"}}>
+                                        { item.response ? (
+                                            <Tooltip placement="left" title={item.response}>
+                                                <PaperClipOutlined />
+                                                <span className='ml-2'>{item.name}</span>
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip placement="left" title={item.name}>
+                                                <PaperClipOutlined />
+                                                <span className='ml-2'>{item.name}</span>
+                                            </Tooltip>
+                                        ) }
                                     </div>
-                                    <div className="truncate" style={{width: "30%"}}>
+                                    <div className="truncate" style={{width: "60%"}}>
                                         { props.uploadingFiles ? (<>{item.description}</>) : (<Input placeholder="Description" value={item.description} onChange={(e) => updateFile(index, {description: e.target.value})} size="small" />) }
                                     </div>
 
@@ -312,7 +325,7 @@ const AttachmentUpload = (props) => {
             ) : (
                 <>
                     <div className='mb-2'>
-                        <Attachments fileList={props.fileList} setShowUpload={setShowUpload} />
+                        <Attachments fileList={uploadedFiles} setShowUpload={setShowUpload} />
                     </div>
                 </>
             ) }
