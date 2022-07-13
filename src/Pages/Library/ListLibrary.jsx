@@ -338,7 +338,7 @@ const ListLibrary = (props) => {
         api.Library.save(props.libraryType, values, "update")
         .then(res => {
                 notification.success({
-                    message: 'Done',
+                    message: 'Success',
                     description:
                       'The library has been updated',
                 });
@@ -355,7 +355,7 @@ const ListLibrary = (props) => {
         api.Library.save(props.libraryType, values, formType)
         .then(res => {
                 notification.success({
-                    message: 'Done',
+                    message: 'Success',
                     description:
                       'The library has been updated',
                 });

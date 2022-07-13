@@ -408,7 +408,7 @@ const UserPermissions = (props) => {
             setLoading(false);
             props.getUsers();
             notification.success({
-                message: 'Done',
+                message: 'Success',
                 description:
                   'Your changes have been successfully saved!',
             });

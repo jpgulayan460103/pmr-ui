@@ -227,7 +227,7 @@ const Suppliers = (props) => {
             setSubmit(false);
             getSuppliers();
             notification.success({
-                message: 'Done',
+                message: 'Success',
                 description:
                   'Your changes have been successfully saved!',
             });

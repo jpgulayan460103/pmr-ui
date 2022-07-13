@@ -72,7 +72,7 @@ const ItemLibrary = (props) => {
         api.Library.save('items', values, formType)
         .then(res => {
                 notification.success({
-                    message: 'Done',
+                    message: 'Success',
                     description:
                       'The library has been updated',
                 });
@@ -269,7 +269,7 @@ const ItemLibrary = (props) => {
         api.Library.save('items', values, "update")
         .then(res => {
                 notification.success({
-                    message: 'Done',
+                    message: 'Success',
                     description:
                       'The library has been updated',
                 });

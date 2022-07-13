@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Table,
@@ -10,6 +10,9 @@ import {
 } from '@ant-design/icons';
 
 const AuditTrail = ({audit}) => {
+    useEffect(() => {
+        setShowLoggerDetails(false);
+    }, [audit]);
     const [showLoggerDetails, setShowLoggerDetails] = useState(false);
     const [selectedLogger, setSelectedLogger] = useState([]);
     const columns = [

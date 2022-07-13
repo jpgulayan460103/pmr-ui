@@ -18,7 +18,7 @@ export default {
   },
 
   logger(id){
-    return axios.get(`api/logger/procurement-plan/${id}`);
+    return axios.get(`api/logger/item-supply/${id}`);
   },
 
   management(){

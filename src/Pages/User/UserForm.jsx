@@ -77,7 +77,7 @@ const UserForm = (props) => {
         .then(res => {
             props.getUsers();
             notification.success({
-                message: 'Done',
+                message: 'Success',
                 description:
                     'Your changes have been successfully saved!',
                 }

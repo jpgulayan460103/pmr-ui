@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Table,
@@ -12,7 +12,6 @@ import {
 import AuditTrail from './AuditTrail';
 
 const AuditBatches = ({logger}) => {
-
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [audit, setAudit] = useState([]);
 
