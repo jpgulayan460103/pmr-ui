@@ -63,7 +63,7 @@ const AuditTrail = ({audit}) => {
             ) : (
                 <div>
                     <Timeline>
-                        { audit.logs.data.map(i => (
+                        { audit?.logs?.data.map(i => (
                         <Timeline.Item key={i.key}>
                             <div className="flex">
                                 <div className='truncate' style={{width: "70%"}}>

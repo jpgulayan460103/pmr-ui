@@ -15,6 +15,7 @@ import api from '../../api';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import filter from '../../Utilities/filter';
 import TableRefresh from '../../Components/TableRefresh'
+import AuditTrail from '../../Components/AuditTrail';
 
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const ActivityLogs = (props) => {
     }, []);
     const [tableFilter, setTableFilter] = useState({});
     const [paginationMeta, setPaginationMeta] = useState([]);
+    // const [audit, setAudit] = useState({});
 
     useEffect(() => {
         document.title = "Activity Logs";
@@ -121,18 +123,6 @@ const ActivityLogs = (props) => {
         return i;
     });
 
-    const logTypeFilters = [
-        {text: "BAC Task", value: "bac_task"},
-        {text: "Form Routing", value: "form_routing"},
-        {text: "Form Upload", value: "form_upload"},
-        {text: "Purchase Request", value: "purchase_request"},
-        {text: "Purchase Request Item", value: "purchase_request_item"},
-        {text: "Supplier", value: "supplier"},
-        {text: "Supplier Contact Person", value: "supplier_contact_person"},
-        {text: "User Login", value: "user_login"},
-        {text: "User Logout", value: "user_logout"},
-    ];
-
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -143,128 +133,43 @@ const ActivityLogs = (props) => {
             };
           }
     }
-    const logsDataSource = props.activityLogs;
-    const logsColumns = [
+
+    const dataSource = props.activityLogs;
+    const columns = [
         {
-            title: 'Date & Time',
+            title: 'Timestamp',
             dataIndex: 'created_at',
             key: 'created_at',
-            width: 150,
-            ...onCell,
-            // sorter: (a, b) => a.created_at?.localeCompare(b.created_at),
-        },
-        {
-            title: 'Activity Category',
-            dataIndex: 'log_type',
-            key: 'log_type',
-            width: 150,
-            // sorter: (a, b) => a.log_type?.localeCompare(b.log_type),
-            ...onCell,
-            filters: logTypeFilters,
-            ...filter.list('log_type','text', setTableFilter, tableFilter, getLogs),
-        },
-        {
-            title: 'Action Taken',
-            dataIndex: 'description_str',
-            key: 'description_str',
-            width: 150,
-            // sorter: (a, b) => a.description_str?.localeCompare(b.description_str),
             ...onCell,
         },
         {
-            title: 'Subject',
-            key: 'subject',
-            width: 250,
-            // sorter: (a, b) => {
-            //     if(a.subject?.parent){
-            //         return a.subject?.parent?.display_log?.localeCompare(b.subject?.parent?.display_log)
-            //     }else{
-            //         return a.subject?.display_log?.localeCompare(b.subject?.display_log)
-
-            //     }
-            // },
-            render: (text, record, index) => (
-                <span>
-                    { record.subject?.parent ? record.subject?.parent?.display_log : record.subject?.display_log }
-                </span>
-            ),
-            ...onCell,
-        },
-        {
-            title: 'Contents',
-            key: 'target',
-            width: 250,
-            // sorter: (a, b) => {
-            //     if(a.subject?.parent){
-            //         return a.description_str?.localeCompare(b.description_str);
-            //     }else{
-            //         return a.subject.display_log?.localeCompare(b.subject.display_log);
-            //     }
-            // },
-            render: (text, record, index) => (
-                <span>
-                    { record.subject?.parent ? record.subject.display_log : "" }
-                </span>
-            ),
+            title: 'Activity',
+            dataIndex: 'form_type_header',
+            key: 'form_type_header',
             ...onCell,
         },
         {
             title: 'User',
-            key: 'causer_id',
-            width: 250,
-            filters: usersFilter,
-            ...filter.list('causer_id','text', setTableFilter, tableFilter, getLogs),
-            // sorter: (a, b) => a.user?.user_information?.fullname?.localeCompare(b.user?.user_information?.fullname),
+            key: 'user',
+            ...onCell,
             render: (text, record, index) => (
                 <span>
-                    { record.user?.user_information?.fullname }
+                    { record.causer?.user_information?.fullname }
                 </span>
             ),
+        },
+        {
+            title: '',
+            key: 'view',
             ...onCell,
-        },
-    ];
-
-
-    const logPropertiesColumns = [
-        {
-          title: 'Field',
-          dataIndex: 'label',
-          key: 'label',
-          width: 100,
-        },
-        {
-          title: 'Old',
-        //   dataIndex: 'old',
-          key: 'old',
-          render: (text, record, index) => (
-                <span>
-                    { record.is_url && record.old ? (<a href={record.old} target="_blank">Download</a>) : record.old }
+            render: (text, record, index) => (
+                <span className='custom-pointer'>
+                    View
                 </span>
             ),
         },
-        {
-          title: 'New',
-        //   dataIndex: 'new',
-          key: 'new',
-          render: (text, record, index) => (
-            <span>
-                { record.is_url && record.new ? (<a href={record.new} target="_blank">Download</a>) : record.new }
-            </span>
-        ),
-        },
     ];
 
-
-    const menu = (item, index) => (
-        <Menu>
-            <Menu.Item key="menu-view" icon={<UserOutlined />}  onClick={() => { setSelectedLogger(item) }}>
-                Edit
-            </Menu.Item>
-            <Menu.Item key="menu-edit" icon={<KeyOutlined />}  onClick={() => { setSelectedLogger(item) }}>
-                Permissions
-            </Menu.Item>
-        </Menu>
-    );
     return (
         <div>
             <Row gutter={[16, 16]} className="mb-3">
@@ -275,8 +180,8 @@ const ActivityLogs = (props) => {
                                 <TableRefresh getData={getLogs} />
                             </div>
                             <Table
-                                dataSource={logsDataSource}
-                                columns={logsColumns}
+                                dataSource={dataSource}
+                                columns={columns}
                                 size={"small"}
                                 loading={{spinning: props.loading, tip: "Loading..."}}
                                 pagination={false}
@@ -296,33 +201,27 @@ const ActivityLogs = (props) => {
                     <Card size="small" title="Information" bordered={false}  >
                         <div className='forms-card-content'>
                             <div>
-                                <p>
-                                    <b>Action Taken:</b> <span>{ props.selectedLogger?.description_str }</span><br />
-                                    <b>Subject:</b> <span>{ ( props.selectedLogger?.subject?.parent ) ? props.selectedLogger?.subject?.parent?.display_log : props.selectedLogger?.subject?.display_log }</span><br />
-                                    <b>Content:</b> <span>{ ( props.selectedLogger?.subject?.parent ) ? props.selectedLogger?.subject?.display_log : "" }</span><br />
-                                    <b>User:</b> <span>{ props.selectedLogger?.user?.user_information?.fullname }</span><br />
-                                    <b>Date and Time:</b> <span>{props.selectedLogger?.created_at}</span><br />
-                                </p>
+                            Timestamp: <b>{ props.selectedLogger?.created_at }</b> <br />
+                            Activity: <b>{ props.selectedLogger?.form_type_header }</b> <br />
+                            User: <b>{ props.selectedLogger?.causer?.user_information?.fullname }</b><br />
+                                <AuditTrail audit={props.selectedLogger} tableScroll="65vh" />
                             </div>
-                                <Table size='small' dataSource={props.selectedLogger?.properties} columns={logPropertiesColumns} pagination={false} />
+                                {/* <Table size='small' dataSource={props.selectedLogger?.properties} columns={logPropertiesColumns} pagination={false} /> */}
                         </div>
                     </Card>
                 </Col>
             </Row>
-            { props.selectedLogger?.description == "" ? (
-                <Row gutter={[16, 16]} className="mb-3">
-                    <Col span={24}>
-                        { props.selectedLogger?.subject?.parent?.file || props.selectedLogger?.subject?.file ? (
-                            <Card size="small" title="" bordered={false}  >
-                                <div className='forms-card-content'>
-                                    { props.selectedLogger?.subject?.parent?.file ? (<iframe src={`${props.selectedLogger?.subject?.parent?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
-                                    { props.selectedLogger?.subject?.file ? (<iframe src={`${props.selectedLogger?.subject?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>) : "" }
-                                </div>
-                            </Card>
-                        ) : "" }
-                    </Col>
-                </Row>
-            ) : ""}
+            <Row gutter={[16, 16]} className="mb-3">
+                <Col span={24}>
+                    { props.selectedLogger?.subject?.file  ? (
+                        <Card size="small" title="" bordered={false}  >
+                            <div className='forms-card-content'>
+                                <iframe src={`${props.selectedLogger?.subject?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
+                            </div>
+                        </Card>
+                    ) : "" }
+                </Col>
+            </Row>
         </div>
     );
 }
