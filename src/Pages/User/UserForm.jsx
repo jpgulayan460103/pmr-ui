@@ -25,6 +25,7 @@ function mapStateToProps(state) {
 const UserForm = (props) => {
     const formRef = React.useRef();
     let history = useHistory();
+    const [submit, setSubmit] = useState(false);
     useEffect(() => {
         formRef.current.setFieldsValue({
             firstname: props.userInfo.firstname,
@@ -55,8 +56,10 @@ const UserForm = (props) => {
     }, 150);
 
     const createUser = (values) => {
+        setSubmit(true);
         api.User.registerAd(values)
         .then(res => {
+            setSubmit(false);
             localStorage.setItem("auth_token",JSON.stringify(res.data));
             customAxios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access_token}`
             props.dispatch({
@@ -66,15 +69,20 @@ const UserForm = (props) => {
             history.push("/");
         })
         .catch(err => {
+            setSubmit(false);
             setFormErrors(err.response.data.errors);
         })
-        .then(res => {})
+        .then(res => {
+            setSubmit(false);
+        })
         ;
     }
 
     const updateUser = (values) => {
+        setSubmit(true);
         api.User.save(values, 'update')
         .then(res => {
+            setSubmit(false);
             props.getUsers();
             notification.success({
                 message: 'Success',
@@ -84,9 +92,12 @@ const UserForm = (props) => {
             );
         })
         .catch(err => {
+            setSubmit(false);
             setFormErrors(err.response.data.errors);
         })
-        .then(res => {})
+        .then(res => {
+            setSubmit(false);
+        })
         ;
     }
 
@@ -108,14 +119,22 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `firstname`)  }
                     rules={[{ required: true, message: 'Please input your Firstname!' }]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Firstname" />
+                    <Input
+                        prefix={<UserOutlined className="site-form-item-icon"/>}
+                        placeholder="Firstname"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 <Form.Item
                     name="middlename"
-                    label="Middle Initial"
+                    label="Middle Name"
                     { ...helpers.displayError(formErrors, `middlename`) }
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="middlename" />
+                    <Input
+                        prefix={<UserOutlined className="site-form-item-icon" />}
+                        placeholder="middlename"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 <Form.Item
                     name="lastname"
@@ -123,7 +142,11 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `lastname`) }
                     rules={[{ required: true, message: 'Please input your Lastname!' }]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Lastname" />
+                    <Input
+                        prefix={<UserOutlined className="site-form-item-icon" />}
+                        placeholder="Lastname"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 <Form.Item
                     name="office_id"
@@ -131,6 +154,7 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `office_id`) }
                     rules={[{ required: true, message: 'Please select section/unit/office' }]}
                 >
+                    
                     <Select
                         placeholder="Section/Unit/Office"
                         optionFilterProp="children"
@@ -139,7 +163,7 @@ const UserForm = (props) => {
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        disabled={props.user?.roles?.data[0]?.name != "super-admin" && props.type != "create"}
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.office.update']) }
                     >
                         { props.user_divisions.map(division =>  {
                             return (
@@ -167,6 +191,7 @@ const UserForm = (props) => {
                             filterOption={(input, option) =>
                                 option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
+                            disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.twg.update']) }
                         >
                             { props.technical_working_groups.map(group =>  {
                                 return (
@@ -190,6 +215,7 @@ const UserForm = (props) => {
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
                     >
                         { props.user_positions.map(position =>  {
                             return (
@@ -205,7 +231,10 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `designation`) }
                     // rules={[{ required: true, message: 'Please input your Designation!' }]}
                 >
-                    <Input placeholder="Designation" />
+                    <Input
+                        placeholder="Designation"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 <Form.Item
                     name="cellphone_number"
@@ -213,7 +242,11 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `cellphone_number`) }
                     rules={[{ required: true, message: 'Please input your Cellphone Number!' }]}
                 >
-                    <Input prefix={<PhoneOutlined className="site-form-item-icon" />} placeholder="Cellphone Number" />
+                    <Input
+                        prefix={<PhoneOutlined className="site-form-item-icon" />}
+                        placeholder="Cellphone Number"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 <Form.Item
                     name="email_address"
@@ -221,11 +254,16 @@ const UserForm = (props) => {
                     { ...helpers.displayError(formErrors, `email_address`) }
                     rules={[{ required: true, message: 'Please input your Email Address!' }]}
                 >
-                    <Input type="email" prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email Address" />
+                    <Input
+                        type="email"
+                        prefix={<MailOutlined className="site-form-item-icon" />}
+                        placeholder="Email Address"
+                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.information.update']) }
+                    />
                 </Form.Item>
                 { props.type == "create" ? (
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        <Button type="primary" htmlType="submit" className="login-form-button" loading={submit} disabled={submit}>
                         Register
                         </Button>
                         &nbsp;&nbsp;&nbsp;
@@ -235,7 +273,7 @@ const UserForm = (props) => {
                     </Form.Item>
                 ) : (
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        <Button type="primary" htmlType="submit" className="login-form-button" loading={submit} disabled={submit}>
                         Update
                         </Button>
                     </Form.Item>
@@ -246,6 +284,10 @@ const UserForm = (props) => {
 }
 
 // export default UserForm;
+
+UserForm.defaultProps = {
+    page: "users",
+}
 
 export default connect(
     mapStateToProps,

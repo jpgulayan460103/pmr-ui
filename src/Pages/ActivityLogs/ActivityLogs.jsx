@@ -198,7 +198,7 @@ const ActivityLogs = (props) => {
                     </Card>
                 </Col>
                 <Col xs={24} sm={24} md={8} lg={10} xl={10}>
-                    <Card size="small" title="Information" bordered={false}  >
+                    <Card size="small" title="Activity Information" bordered={false}  >
                         <div className='forms-card-content'>
                             <div>
                             Timestamp: <b>{ props.selectedLogger?.created_at }</b> <br />

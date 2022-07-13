@@ -40,6 +40,7 @@ import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPl
 import CreateRequisitionIssue from './Pages/RequisitionIssue/CreateRequisitionIssue';
 import ListRequisitionIssue from './Pages/RequisitionIssue/ListRequisitionIssue';
 import Inventory from './Pages/Inventory/Inventory';
+import Profile from './Pages/User/Profile';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -203,6 +204,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/users"  >
                 <PrivateRoute><Layout><User /></Layout></PrivateRoute>
+            </Route>
+            <Route exact path="/profile"  >
+                <PrivateRoute><Layout><Profile /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/activity-logs"  >
                 <PrivateRoute><Layout><ActivityLogs /></Layout></PrivateRoute>

@@ -33,6 +33,9 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
         localStorage.removeItem("auth_token");
         history.push("/login");
     }
+    const userProfile = () => {
+        history.push("/profile");
+    }
 
     const handleOpen = (item) => {
         // console.log(item);
@@ -147,8 +150,8 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     const MenuItems = ({userLogout}) => {
         return (
             <Menu>
-                <Menu.Item icon={<UserOutlined />} key="1">
-                    <span style={{fontSize: 18}}>Profile</span>
+                <Menu.Item icon={<UserOutlined />} key="1"  onClick={userProfile}>
+                    <span style={{fontSize: 18}}>User Profile</span>
                 </Menu.Item>
                 <Menu.Item icon={<MessageOutlined />} key="3" onClick={() => setTicketModal(true)}>
                     <span style={{fontSize: 18}}>Create IT Support Ticket</span>

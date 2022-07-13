@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tree, Button, notification, Radio } from 'antd';
 import { isEmpty, map } from 'lodash';
 import api from '../../api';
+import helpers from '../../Utilities/helpers';
 
 const UserPermissions = (props) => {
     const unmounted = React.useRef(false);
@@ -17,6 +18,24 @@ const UserPermissions = (props) => {
     const [role, setRole] = useState("");
 
     const treeData = [
+          {
+            title: 'User Profile',
+            key: 'profile.all',
+            children: [
+              {
+                title: 'Permission to update user information.',
+                key: 'profile.information.update',
+              },
+              {
+                title: 'Permission to update user technical working group.',
+                key: 'profile.twg.update',
+              },
+              {
+                title: 'Permission to update user office/division/section/unit.',
+                key: 'profile.office.update',
+              },
+            ],
+          },
           {
             title: 'Activity Logs Module',
             key: 'activitylogs.all',
@@ -429,6 +448,7 @@ const UserPermissions = (props) => {
         setPermissionsOnRole(propUserRoles);
 
         setExpandedKeys([
+          'profile.all',
           'activitylogs.all',
           'form.routing.approved.all',
           'form.routing.disapproved.all',
@@ -495,9 +515,10 @@ const UserPermissions = (props) => {
             treeData={treeData}
             // disabled={role != 'user'}
             />
+            <br />
             <Button type='primary' loading={loading} disabled={loading} onClick={() => {
-              savePermission()
-            }}>Save</Button>
+                savePermission()
+              }}>Save</Button>
         </div>
     );
 }
