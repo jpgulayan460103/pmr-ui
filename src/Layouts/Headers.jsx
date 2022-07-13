@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Menu, Dropdown, Badge, List, Tooltip, Button, Popover } from 'antd';
-import { QuestionCircleOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, SettingOutlined, BellFilled, DeleteOutlined, ExclamationCircleOutlined   } from '@ant-design/icons';
+import { Layout, Menu, Dropdown, Badge, List, Tooltip, Button, Popover, Modal, Form, Input, Select  } from 'antd';
+import { QuestionCircleOutlined , CaretDownOutlined, LogoutOutlined, UserOutlined, MessageOutlined, BellFilled, DeleteOutlined, ExclamationCircleOutlined   } from '@ant-design/icons';
 import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
 import api from '../api';
 import { cloneDeep } from 'lodash';
 
 const { Header } = Layout;
+const { Option } = Select;
+const { TextArea } = Input;
 
 
 function mapStateToProps(state) {
@@ -20,6 +22,7 @@ function mapStateToProps(state) {
 
 const Headers = ({ notifications, dispatch, collapsed, user }) => {
     let history = useHistory();
+    const formRef = React.useRef();
 
     const userLogout = () => {
         api.User.logout();
@@ -32,12 +35,12 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     }
 
     const handleOpen = (item) => {
-        console.log(item);
+        // console.log(item);
         history.push("/forms/forwarded");
     }
     
     const handleDelete = (index) => {
-        console.log(index);
+        // console.log(index);
         let clonedNotif = cloneDeep(notifications)
         clonedNotif.splice(index, 1)
         dispatch({
@@ -45,6 +48,21 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             data: clonedNotif
         });
     }
+
+    const [ticketModal, setTicketModal] = useState(false);
+
+    const showTicketModal = () => {
+        setTicketModal(true);
+    };
+  
+    const handleOk = () => {
+        setTicketModal(false);
+    };
+  
+    const handleCancel = () => {
+        formRef.current.resetFields();
+        setTicketModal(false);
+    };
     
     const handleActions = (item, index) => {
         return [
@@ -89,7 +107,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                         actions={handleActions(item, index)}
                         className="notificaton-items"
                     >
-                        <div className="truncate" style={{width: "80%"}} onClick={() => handleOpen(item)}>
+                        <div className="truncate" style={{width: "80%"}} onClick={showTicketModal}>
                             <Popover placement="left" title={item.title} content={popOverContent(item)} trigger="hover">
                                 { item.notification_type == "rejected_form" ?  (
                                     <Button size='small' icon={<ExclamationCircleOutlined />} type="link" style={{ color: "red" }} />
@@ -106,16 +124,36 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
             </div>
         );
     };
+
+    const requestSupport = (issue, concern) => {
+        let subject = "Request for Technical Assistance on Procurement System";
+        let body = `Issue: ${issue}%0AFull Name: ${user?.user_information?.fullname}%0ADivision: ${user?.user_offices?.data[0]?.office?.parent?.name}%0AUnit/Section: ${user?.user_offices?.data[0]?.office?.name}%0AConcern: ${concern}`;
+        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${process.env.REACT_APP_ICT_SUPPORT}&su=${subject}&body=${body}`,
+                'newwindow',
+                'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+            return false;
+    }
+
+    const onFinish = (values) => {
+        let { concern, issue } = values;
+        handleCancel();
+        requestSupport(issue, encodeURI(concern))
+    };
+    
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
     const MenuItems = ({userLogout}) => {
         return (
             <Menu>
                 <Menu.Item icon={<UserOutlined />} key="1">
                     <span style={{fontSize: 18}}>Profile</span>
                 </Menu.Item>
-                <Menu.Item icon={<SettingOutlined />} key="3">
-                    <span style={{fontSize: 18}}>Settings</span>
+                <Menu.Item icon={<MessageOutlined />} key="3" onClick={() => setTicketModal(true)}>
+                    <span style={{fontSize: 18}}>Create IT Support Ticket</span>
                 </Menu.Item>
-                <Menu.Item icon={<LogoutOutlined />} key="4" danger onClick={() => { userLogout() }}>
+                <Menu.Item icon={<LogoutOutlined />} key="4" danger onClick={userLogout}>
                 <span style={{fontSize: 18}}>Logout</span>
                 </Menu.Item>
             </Menu>
@@ -131,6 +169,57 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     }
     return (
         <React.Fragment>
+            <Modal title="Create IT Support Ticket" visible={ticketModal} onOk={handleOk} onCancel={handleCancel}
+                footer={[
+                    <Button key="cancel" onClick={handleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button form="myForm" key="submit" htmlType="submit"  type='primary'>
+                        Submit
+                    </Button>
+                ]}
+            >
+                <Form
+                    ref={formRef}
+                    name="normal_login"
+                    className="login-form"
+                    layout="vertical"
+                    onFinish={onFinish}
+                    id="myForm"
+                >
+                    <Form.Item
+                        label="Issue"
+                        name="issue"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your issue!',
+                            },
+                        ]}
+                    >
+                        <Select placeholder="Select an Issue" style={{ width: "100%" }}>
+                            <Option value="Account Problem">Account Problem</Option>
+                            <Option value="Bug and Error Report">Bug and Error Report (Please attach the screenshot of the error)</Option>
+                            <Option value="User Training">User Training</Option>
+                            <Option value="Suggestions and Recommendations">Suggestions and Recommendations</Option>
+                            <Option value="Others">Others</Option>
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Concern"
+                        name="concern"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your concern!',
+                            },
+                        ]}
+                    >
+                        <TextArea rows={4} />
+                    </Form.Item>
+                </Form>
+            </Modal>
             <Header className="site-layout-sub-header-background p-0" style={{ height: "45px"}}>
                 {/* { showSide ? <img src={logo} className="h-full bg-white p-1 custom-pointer float-left" onClick={() => { toggleSide() }} /> : "" } */}
                 {/* { collapsed ? <span className='header-items' style={{color: "white", marginLeft: 10, fontSize: 20, cursor: "pointer", top: "-12px"}} onClick={() => { toggleSide() }}>{ !showSide ? <MenuFoldOutlined /> : "" }</span> : "" } */}

@@ -70,7 +70,7 @@ const Loginform = (props) => {
 
     const requestResetPassword = () => {
         let subject = "Request for Technical Assistance on Procurement System";
-        let body = "Issue: Account Login Problem%0AFull Name:%0ADivision:%0AUnit/Section:%0AConcern:";
+        let body = "Issue: Account Problem%0AFull Name:%0ADivision:%0AUnit/Section:%0AConcern:";
         window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${process.env.REACT_APP_ICT_SUPPORT}&su=${subject}&body=${body}`,
                 'newwindow',
                 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
