@@ -43,6 +43,7 @@ const UserForm = (props) => {
     const [formErrors, setFormErrors] = useState({});
 
     const onFinish = debounce((values) => {
+        setFormErrors([]);
         values.username = props.userInfo.username;
         values.user_dn = props.userInfo.user_dn;
         if(props.type == "update"){

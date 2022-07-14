@@ -764,31 +764,6 @@ const ForwardedForm = (props) => {
         });
     }
 
-
-    // const menu = (item, index) => (
-    //     <Menu onClick={() => setSelectedFormRoute(item) }>
-    //         <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
-    //             View
-    //         </Menu.Item>
-    //         { item.status == "with_issues" ? (
-    //                 <Menu.Item key="menu-resolve" icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
-    //                     Resolve
-    //                 </Menu.Item>
-    //         ) : (
-    //             <>
-    //                 <Menu.Item key="menu-approve" icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
-    //                     Approve
-    //                 </Menu.Item>
-    //                 { item.from_office_id == item.to_office_id ? "" : (
-    //                     <Menu.Item key="menu-reject" icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
-    //                         Disapprove
-    //                     </Menu.Item>
-    //                 ) }
-    //             </>
-    //         ) }
-    //     </Menu>
-    //   );
-    
     return (
         <div className='row' style={{minHeight: "50vh"}}>
             <Modal title="Disapproval Form" visible={modalRejectForm} 

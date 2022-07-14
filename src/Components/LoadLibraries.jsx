@@ -32,26 +32,16 @@ const Loadlibraries = (props) => {
                 type: "SET_MAIN_LOADING_MESSAGE",
                 data: "Loading Libraries..."
             });
-            if(!props.isLibrariesLoaded){
-                // await getLibraries();
-                await getAllLibraries();
-                // getLibraries("user_division");
-                // getLibraries("user_section");
-                // getLibraries("unit_of_measure");
-                // getLibraries("item_category");
-                // getLibraries("user_position");
-                // getLibraries("user_area_of_assignment");
-                // getLibraries("account");
-                // getLibraries("account_classification");
-                // getLibraries("mode_of_procurement");
-                // getLibraries("technical_working_group");
-                // getLibraries("user_signatory_designation");
-                // getLibraries("user_signatory_name");
-                // getLibraries("uacs_code");
-                // getLibraries("procurement_type");
-            }
             if(isEmpty(props.user)){
                 if (localStorage.getItem("auth_token") !== null) {
+
+                    if(!props.isLibrariesLoaded){
+                        await getAllLibraries();
+                        await props.dispatch({
+                            type: "LOAD_LIBRARIES",
+                            data: []
+                        });
+                    }
                     props.dispatch({
                         type: "SET_MAIN_LOADING_MESSAGE",
                         data: "Loading User Data..."
@@ -63,14 +53,37 @@ const Loadlibraries = (props) => {
                         await getUser();
                     }
                 }else{
+                    if(!props.isLibrariesLoaded){
+
+                    }
+                }
+            }else{
+                if(!props.isLibrariesLoaded){
+                    // await getLibraries();
+                    await getAllLibraries();
+                    // await props.dispatch({
+                    //     type: "LOAD_LIBRARIES",
+                    //     data: []
+                    // });
+            
+                    // getLibraries("user_division");
+                    // getLibraries("user_section");
+                    // getLibraries("unit_of_measure");
+                    // getLibraries("item_category");
+                    // getLibraries("user_position");
+                    // getLibraries("user_area_of_assignment");
+                    // getLibraries("account");
+                    // getLibraries("account_classification");
+                    // getLibraries("mode_of_procurement");
+                    // getLibraries("technical_working_group");
+                    // getLibraries("user_signatory_designation");
+                    // getLibraries("user_signatory_name");
+                    // getLibraries("uacs_code");
+                    // getLibraries("procurement_type");
                 }
             }
             
-            await props.dispatch({
-                type: "LOAD_LIBRARIES",
-                data: []
-            });
-    
+            
             await props.dispatch({
                 type: "SET_MAIN_LOADING",
                 data: false

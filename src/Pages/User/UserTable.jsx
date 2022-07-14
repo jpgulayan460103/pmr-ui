@@ -144,14 +144,6 @@ const UserTable = (props) => {
         // },
     ];
 
-    const menu = (item, index) => (
-        <Menu>
-            <Menu.Item key="menu-edit" icon={<LockOutlined />}  onClick={() => { props.selectUser(item, 'permissions'); setSelectedIndex(index) }}>
-                Roles and Permissions
-            </Menu.Item>
-        </Menu>
-      );
-
     return (
         <div>
             <Table dataSource={dataSource} columns={columns} scroll={{ y: "70vh" }} rowClassName={(record, index) => {

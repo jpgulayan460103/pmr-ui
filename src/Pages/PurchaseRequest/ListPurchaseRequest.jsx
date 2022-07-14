@@ -451,23 +451,6 @@ const Listpurchaserequest = (props) => {
         },
     ];
     
-    const menu = (item, index) => (
-        <Menu>
-            <Menu.Item key="menu-route" icon={<Icon component={RouteSvg} />}  onClick={() => { setTabKey('routing');openPurchaseRequest(item, 0) }}>
-                Routing
-            </Menu.Item>
-            <Menu.Item key="menu-audit" icon={<Icon component={HistorySvg} />}  onClick={() => { setTabKey('audit-trail');openPurchaseRequest(item, 0) }}>
-                Audit Trail
-            </Menu.Item>
-            <Menu.Item key="menu-items-audit" icon={<Icon component={HistorySvg} />}  onClick={() => { setTabKey('items-audit-trail');openPurchaseRequest(item, 0) }}>
-                Items Audit Trail
-            </Menu.Item>
-            <Menu.Item key="menu-edit" icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
-                Edit
-            </Menu.Item>
-        </Menu>
-      );
-
 
     return (
         <div>

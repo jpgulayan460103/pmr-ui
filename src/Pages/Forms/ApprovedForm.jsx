@@ -275,13 +275,6 @@ const ApprovedForm = (props) => {
         },
     ];
 
-    const menu = (item, index) => (
-        <Menu onClick={() => setSelectedFormRoute(item) }>
-            <Menu.Item key="menu-view" icon={<FormOutlined />}  onClick={() => { viewForm(item, index) }}>
-                View
-            </Menu.Item>
-        </Menu>
-      );
 
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);

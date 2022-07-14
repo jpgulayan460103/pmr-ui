@@ -33,6 +33,11 @@ const initialState = () => {
     mainLoadingMessage: "",
     isInitialized: false,
     uploadingFiles: false,
+    profile: {
+      loading: false,
+      activity_logs: [],
+      paginationMeta: {},
+    },
   }
 }
 
@@ -77,6 +82,11 @@ export default function reducer(state = initialState(), action) {
       return {
         ...state,
         uploadingFiles: action.data,
+      };    
+    case 'SET_USER_PROFILE_DATA':
+      return {
+        ...state,
+        profile: action.data,
       };    
     case 'SET_INITIAL_STATE':
       state = initialState();

@@ -8,6 +8,7 @@ import Report from './Report'
 import ProcurementPlan from './ProcurementPlan'
 import RequisitionIssue from './RequisitionIssue'
 import ItemSupply from './ItemSupply'
+import ActivityLogs from './ActivityLogs'
 
 
 export default {
@@ -21,4 +22,5 @@ export default {
   ProcurementPlan,
   RequisitionIssue,
   ItemSupply,
+  ActivityLogs,
 }

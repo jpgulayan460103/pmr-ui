@@ -233,27 +233,27 @@ const UserPermissions = (props) => {
 
           {
             title: 'Purchase Requests Module',
-            key: 'purchase.requests.all',
+            key: 'purchase.request.all',
             children: [
               {
                 title: 'Permission to view the list of purchase requests.',
-                key: 'purchase.requests.view',
+                key: 'purchase.request.view',
               },
               {
                 title: 'Permission to create a purchase request.',
-                key: 'purchase.requests.create',
+                key: 'purchase.request.create',
               },
               {
                 title: 'Permission to update a purchase request.',
-                key: 'purchase.requests.update',
+                key: 'purchase.request.update',
               },
               {
                 title: 'Permission to delete a purchase request.',
-                key: 'purchase.requests.delete',
+                key: 'purchase.request.delete',
               },
               {
                 title: 'Permission to have full access of attachments in the purchase request module.',
-                key: 'purchase.requests.attachments',
+                key: 'purchase.request.attachments',
               },
             ],
           },
@@ -350,11 +350,11 @@ const UserPermissions = (props) => {
               'procurement.plan.update',
               'procurement.plan.delete',
               'procurement.plan.attachments',
-              'purchase.requests.view',
-              'purchase.requests.create',
-              'purchase.requests.update',
-              'purchase.requests.delete',
-              'purchase.requests.attachments',
+              'purchase.request.view',
+              'purchase.request.create',
+              'purchase.request.update',
+              'purchase.request.delete',
+              'purchase.request.attachments',
               'requisition.issue.view',
               'requisition.issue.create',
               'requisition.issue.update',
@@ -388,7 +388,7 @@ const UserPermissions = (props) => {
             break;
           case "user":
             setCheckedKeys([
-              'purchase.requests.view',
+              'purchase.request.view',
               'requisition.issue.view',
               'procurement.plan.view',
               'libraries.user.signatories.view',
@@ -454,7 +454,7 @@ const UserPermissions = (props) => {
           'procurement.all',
           'procurement.plan.all',
           'requisition.issue.all',
-          'purchase.requests.all',
+          'purchase.request.all',
           'users.all',
         ]);
         // console.log(props.user.permissions.data);
@@ -506,7 +506,7 @@ const UserPermissions = (props) => {
             onCheck={onCheck}
             // checkedKeys={checkedKeys}
             onSelect={onSelect}
-            // checkedKeys={['users.delete', 'purchase.requests.all']}
+            // checkedKeys={['users.delete', 'purchase.request.all']}
             checkedKeys={checkedKeys}
             treeData={treeData}
             // disabled={role != 'user'}

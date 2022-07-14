@@ -149,17 +149,38 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
 
     const MenuItems = ({userLogout}) => {
         return (
-            <Menu>
-                <Menu.Item icon={<UserOutlined />} key="1"  onClick={userProfile}>
-                    <span style={{fontSize: 18}}>User Profile</span>
-                </Menu.Item>
-                <Menu.Item icon={<MessageOutlined />} key="3" onClick={() => setTicketModal(true)}>
-                    <span style={{fontSize: 18}}>Create IT Support Ticket</span>
-                </Menu.Item>
-                <Menu.Item icon={<LogoutOutlined />} key="4" danger onClick={userLogout}>
-                <span style={{fontSize: 18}}>Logout</span>
-                </Menu.Item>
-            </Menu>
+            <Menu
+                items={[
+                    {
+                        key: 'profile',
+                        label: (
+                            // <span style={{fontSize: 18}}>User Profile</span>
+                            <span>User Profile</span>
+                        ),
+                        icon: <UserOutlined />,
+                        onClick: userProfile,
+                    },
+                    {
+                        key: 'support',
+                        label: (
+                            <span>Create IT Support Ticket</span>
+                        ),
+                        icon: <MessageOutlined />,
+                        onClick: () => {
+                            setTicketModal(true)
+                        },
+                    },
+                    {
+                        key: 'logout',
+                        danger: true,
+                        label: (
+                            <span>Logout</span>
+                        ),
+                        icon: <LogoutOutlined />,
+                        onClick: userLogout,
+                    },
+                ]}
+            />
         );
     };
     

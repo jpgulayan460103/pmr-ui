@@ -187,7 +187,7 @@ const App = (props) => {
             <Route exact path="/libraries/items/measures"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="unit_of_measure" options={{libraryName: "Unit of Measure"}} /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/libraries/uacs_code"  >
+            <Route exact path="/libraries/uacs-codes"  >
                 <PrivateRoute><Layout><ListLibrary libraryType="uacs_code" options={{libraryName: "UACS Code", title: true}} /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/libraries/offices/divisions"  >

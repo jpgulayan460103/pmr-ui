@@ -36,6 +36,35 @@ const Loginform = (props) => {
         }
     }
 
+    const getLibraries = async ($type) => {
+        return api.Library.getLibraries($type)
+        .then(res => {
+            let libraries = res.data.data;
+            libraries = libraries.filter(i => i.is_active);
+            if($type == "user_division"){
+                props.dispatch({
+                    type: "SET_LIBRARY_USER_DIVISIONS",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
+            if($type == "user_section"){
+                props.dispatch({
+                    type: "SET_LIBRARY_USER_SECTION",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
+            if($type == "user_position"){
+                props.dispatch({
+                    type: "SET_LIBRARY_USER_POSITIONS",
+                    data: libraries.filter(library => library.library_type == $type)
+                });
+            }
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
     const onFinish = (values) => {
         setErrorMessage("");
         setSubmit(true);
@@ -46,6 +75,9 @@ const Loginform = (props) => {
             if(res.data.error_code == "no_user"){
                 props.getAdInfo(res.data.data);
                 props.setShowRegister(true);
+                getLibraries("user_division");
+                getLibraries("user_section");
+                getLibraries("user_position");
             }else{
                 localStorage.setItem("auth_token",JSON.stringify(res.data));
                 localStorage.setItem('last_login', dayjs().format('YYYY-MM-DD'));

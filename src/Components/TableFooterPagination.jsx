@@ -9,12 +9,12 @@ const TableFooterPagination = ({pagination, paginationChange}) => {
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
     useEffect(() => {
-        let firstValue = ((pagination.per_page * pagination.current_page) + 1) - pagination.per_page;
-        let secondValue = (firstValue + pagination.count) - 1;
+        let firstValue = ((pagination?.per_page * pagination?.current_page) + 1) - pagination?.per_page;
+        let secondValue = (firstValue + pagination?.count) - 1;
         setFirst(firstValue ? firstValue : 1);
         setSecond(secondValue ? secondValue : 1)
-        setTotal(pagination.total ? pagination.total : 1)
-        setCount(pagination.count ? pagination.count : 1)
+        setTotal(pagination?.total ? pagination?.total : 1)
+        setCount(pagination?.count ? pagination?.count : 1)
     }, [pagination]);
 
     useEffect(() => {

@@ -90,7 +90,7 @@ const ActivityLogs = (props) => {
             filters = tableFilter
         }
         setLoading(true);
-        api.Forms.getLogs(filters)
+        api.ActivityLogs.getLogs(filters)
         .then(res => {
             if (unmounted.current) { return false; }
             setLoading(false);
