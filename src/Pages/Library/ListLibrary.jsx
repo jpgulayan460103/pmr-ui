@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import api from '../../api';
 import { Table, Card, Col, Row, Form, Input, Select, Button, notification, Space, Popconfirm  } from 'antd';
@@ -37,6 +37,7 @@ const ListLibrary = (props) => {
     const [office, setOffice] = useState("");
     const [officeParent, setOfficeParent] = useState("");
     const [role, setRole] = useState("");
+    const [submit, setSubmit] = useState(false);
     var searchInput;
 
     const formRef = React.useRef();
@@ -350,21 +351,27 @@ const ListLibrary = (props) => {
         ;
     }
 
-    const onFinish = (values) => {
+    const onFinish = debounce((values) => {
+        setSubmit(true);
         values.id = selectedLibrary.id;
         api.Library.save(props.libraryType, values, formType)
         .then(res => {
-                notification.success({
-                    message: 'Success',
-                    description:
-                      'The library has been updated',
-                });
-                getLibraries(props.libraryType)
+            setSubmit(false);
+            notification.success({
+                message: 'Success',
+                description:
+                    'The library has been updated',
+            });
+            getLibraries(props.libraryType)
         })
-        .catch(err => {})
-        .then(res => {})
+        .catch(err => {
+            setSubmit(false);
+        })
+        .then(res => {
+            setSubmit(false);
+        })
         ;
-    };
+    }, 150);
 
     const resetForm = () => {
         formRef.current.resetFields();
@@ -447,7 +454,7 @@ const ListLibrary = (props) => {
                             <Form.Item>
 
                                 { (props.libraryType == "user_signatory_name" || props.libraryType == "user_signatory_designation") && formType == 'Update' ? "" : (
-                                    <Button type="primary" htmlType="submit" className="login-form-button">
+                                    <Button type="primary" htmlType="submit" className="login-form-button"  loading={submit} disabled={submit}>
                                         {`${formType}`}
                                     </Button>
                                 )  }
@@ -455,7 +462,7 @@ const ListLibrary = (props) => {
                                     {`${formType}`}
                                 </Button> */}
                                 &nbsp;&nbsp;&nbsp;
-                                <Button type="danger" onClick={() => resetForm()  }>
+                                <Button type="danger" onClick={() => resetForm() }>
                                 Cancel
                                 </Button>
                             </Form.Item>

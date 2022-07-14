@@ -163,7 +163,7 @@ const UserForm = (props) => {
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        disabled={ props.page =='profile' && !helpers.hasPermission(props.user, ['profile.office.update']) }
+                        disabled={ !helpers.hasRole(props.user, ['super-admin']) }
                     >
                         { props.user_divisions.map(division =>  {
                             return (

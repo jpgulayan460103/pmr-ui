@@ -30,10 +30,6 @@ const UserPermissions = (props) => {
                 title: 'Permission to update user technical working group.',
                 key: 'profile.twg.update',
               },
-              {
-                title: 'Permission to update user office/division/section/unit.',
-                key: 'profile.office.update',
-              },
             ],
           },
           {
