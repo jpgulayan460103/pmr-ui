@@ -20,6 +20,7 @@ function mapStateToProps(state) {
         isInitialized: state.user.isInitialized,
         item_categories: state.libraries.item_categories,
         item_classifications: state.libraries.item_classifications,
+        unit_of_measures: state.libraries.unit_of_measures,
         user: state.user.data,
         tableFilter: state.inventory.supplies.tableFilter,
         defaultTableFilter: state.inventory.supplies.defaultTableFilter,
@@ -44,6 +45,7 @@ const Inventory = (props) => {
     const [selectedInventory, setSelectedInventory] = useState({});
     const [adjustedQuantity, setAdjustedQuantity] = useState(0);
     const [logger, setLogger] = useState([]);
+    const [submit, setSubmit] = useState(false);
 
     useEffect(() => {
         return () => { unmounted.current = true }
@@ -153,6 +155,7 @@ const Inventory = (props) => {
                         item_name: record.item_name,
                         remaining_quantity: record.remaining_quantity.quantity,
                         item_category_id: record.item_category_id,
+                        unit_of_measure_id: record.unit_of_measure_id,
                     })
                     // setSelectedInventory(record);
                     if(isEmpty(props.selectedSupply)){
@@ -193,9 +196,21 @@ const Inventory = (props) => {
             sorter: (a, b) => {},
         },
         {
+            title: 'Unit of Measure',
+            key: 'unit_of_measure_id',
+            width: 120,
+            align: "center",
+            ...onCell,
+            render: (text, item, index) => (
+                <span>
+                    { item.unit_of_measure.name }
+                </span>
+            ),
+        },
+        {
             title: 'Remaining Quantity',
             key: 'remaining_quantity',
-            width: 150,
+            width: 120,
             align: "center",
             // ...filter.search('remaining_quantity','number_range', setTableFilter, props.tableFilter, getSupplies),
             render: (text, item, index) => (
@@ -237,6 +252,7 @@ const Inventory = (props) => {
     }
 
     const onFinish = (values) => {
+        setSubmit(true);
         let adjusted_quantity = {
             adjusted_quantity: adjustedQuantity,
             id: props.selectedSupply.id
@@ -248,6 +264,7 @@ const Inventory = (props) => {
 
         api.ItemSupply.save(formData, formType)
         .then(res => {
+            setSubmit(false);
             notification.success({
                 message: 'Success',
                 description:
@@ -255,6 +272,15 @@ const Inventory = (props) => {
             });
             getSupplies();
             resetForm();
+        })
+        .catch(err => {
+            setSubmit(false);
+            setFormErrors(err.response.data.errors);
+            notification.error({
+                message: 'Error',
+                description:
+                  'Please review the form.',
+            });
         })
         ;
     };
@@ -265,7 +291,9 @@ const Inventory = (props) => {
     }
 
     const computeAdjustedQuantity = (e) => {
-        setAdjustedQuantity(e - props.selectedSupply.remaining_quantity.quantity);
+        if(formType == "update"){
+            setAdjustedQuantity(e - props.selectedSupply.remaining_quantity.quantity);
+        }
     }
 
     
@@ -343,36 +371,62 @@ const Inventory = (props) => {
                             </Form.Item>
 
                             <Form.Item
+                                name="unit_of_measure_id"
+                                label="Unit of Measure"
+                                { ...helpers.displayError(formErrors, `unit_of_measure_id`)  }
+                                rules={[{ required: true, message: 'Item name field is required' }]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="Select a Unit"
+                                    optionFilterProp="children"
+                                    style={{ width: "100%" }}
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                >
+                                    { props.unit_of_measures.map((option, index) => (
+                                        <Option value={option.id} key={option.id}>{option.name}</Option>
+                                    )) }
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
                                 name="remaining_quantity"
                                 label="Remaining quantity"
                                 { ...helpers.displayError(formErrors, `remaining_quantity`)  }
                                 rules={[{ required: true, message: 'Remaining quantity field is required' }]}
                             >
                                 <InputNumber style={{width: "100%"}} placeholder="Remaining quantity" onChange={computeAdjustedQuantity} />
-                            </Form.Item> 
-
-                            <Form.Item
-                                // name="adjusted_quantity"
-                                label="Adjusted quantity"
-                                { ...helpers.displayError(formErrors, `adjusted_quantity`)  }
-                                // rules={[{ required: true, message: 'Adjusted quantity field is required' }]}
-                            >
-                                <Input placeholder="Adjusted quantity" value={adjustedQuantity} />
                             </Form.Item>
 
-                            <Form.Item
-                                name="remarks"
-                                label="Remarks"
-                                { ...helpers.displayError(formErrors, `remarks`)  }
-                                rules={[{ required: true, message: 'Remarks field is required' }]}
-                            >
-                                <Input placeholder="Remarks" />
-                            </Form.Item>
+                            { formType == 'update' && (
+                                <>
+                                <Form.Item
+                                    // name="adjusted_quantity"
+                                    label="Adjusted quantity"
+                                    { ...helpers.displayError(formErrors, `adjusted_quantity`)  }
+                                >
+                                    <Input placeholder="Adjusted quantity" value={adjustedQuantity} />
+                                </Form.Item>
+                                <Form.Item
+                                    name="remarks"
+                                    label="Remarks"
+                                    { ...helpers.displayError(formErrors, `remarks`)  }
+                                    rules={[{ required: true, message: 'Remarks field is required' }]}
+                                >
+                                    <Input placeholder="Remarks" />
+                                </Form.Item>
+                                </>
+
+                            ) }
+
+                            
 
                             
 
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" className="login-form-button">
+                                <Button type="primary" htmlType="submit" className="login-form-button" loading={submit} disabled={submit}>
                                     { formType == 'create' ? "Create" : "Update" }
                                 </Button>
                                 &nbsp;&nbsp;&nbsp;
