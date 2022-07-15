@@ -221,6 +221,20 @@ const Listpurchaserequest = (props) => {
         .catch(err => {})
         .then(res => {})
         ;
+
+        api.RequisitionIssue.get(item.requisition_issue_id)
+        .then(res => {
+            let risRes = res.data;
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_SELECTED_REQUISITION_ISSUE",
+                data: risRes
+            });
+
+            // history.push("/purchase-requests/form");
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
     }
 
     const loadAuditTrail = async (id) => {

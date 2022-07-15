@@ -328,12 +328,14 @@ const ListRequisitionIssue = (props) => {
                 pr_date: customDayJs().format('YYYY-MM-DD'),
                 requisition_issue_id: risRes.id,
                 requisition_issue_file: risRes.file,
+                from_ppmp: risRes.from_ppmp,
             };
             ris.items = ris.items.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
                 risItem.item_name = risItem.description;
                 risItem.item_code = risItem.item?.item_code;
                 risItem.quantity = risItem.request_quantity - risItem.issue_quantity;
                 risItem.unit_cost = risItem.procurement_plan_item ? risItem.procurement_plan_item.price : 0;
+                risItem.requisition_issue_item_id = risItem.id;
                 return risItem;
             });
             props.dispatch({
@@ -343,6 +345,10 @@ const ListRequisitionIssue = (props) => {
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
                 data: {}
+            });
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_SELECTED_REQUISITION_ISSUE",
+                data: risRes
             });
 
             history.push("/purchase-requests/form");

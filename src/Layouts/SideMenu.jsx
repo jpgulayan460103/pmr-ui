@@ -18,6 +18,8 @@ const { SubMenu } = Menu;
 function mapStateToProps(state) {
     return {
         purchaseRequestFormType: state.purchaseRequests.create.formType,
+        requisitionIssueFormType: state.requisitionIssues.create.formType,
+        procurementPlanFormType: state.procurementPlans.create.formType,
         user: state.user.data,
     };
 }
@@ -146,7 +148,7 @@ const Sidemenu = (props) => {
             label: (
                 <React.Fragment>
                     <Link to="/procurement-plans/form"></Link>
-                    { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } PPMP
+                    { props.procurementPlanFormType == "create" ? "Create" : "Edit" } PPMP
                 </React.Fragment>
             ),
         });
@@ -171,7 +173,7 @@ const Sidemenu = (props) => {
             label: (
                 <React.Fragment>
                     <Link to="/requisition-and-issues/form"></Link>
-                    { props.purchaseRequestFormType == "create" ? "Create" : "Edit" } RIS
+                    { props.requisitionIssueFormType == "create" ? "Create" : "Edit" } RIS
                 </React.Fragment>
             ),
         });

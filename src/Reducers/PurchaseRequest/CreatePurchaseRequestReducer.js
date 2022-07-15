@@ -9,6 +9,7 @@ const initialState = () => {
       },
       formErrors: {},
       formType: "create",
+      selectedRequisitionIssue: {},
     }
   }
   
@@ -33,6 +34,11 @@ const initialState = () => {
         return {
           ...state,
           formData: {...initialState().formData, ...action.data},
+        };
+      case 'SET_PURCHASE_REQUEST_SELECTED_REQUISITION_ISSUE':
+        return {
+          ...state,
+          selectedRequisitionIssue: action.data,
         };
       case 'SET_INITIAL_STATE':
         state = initialState();

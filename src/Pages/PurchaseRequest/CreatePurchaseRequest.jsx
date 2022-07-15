@@ -10,6 +10,7 @@ import moment from 'moment';
 import helpers from '../../Utilities/helpers';
 import { RouterPrompt } from '../../Components/RouterPrompt';
 import { useHistory } from 'react-router-dom'
+import CreatePurchaseRequestItemName from './CreatePurchaseRequestItemName';
 
 function mapStateToProps(state) {
     return {
@@ -26,6 +27,7 @@ function mapStateToProps(state) {
         formProccess: state.purchaseRequests.create.formProccess,
         requestedBySignatory: state.purchaseRequests.create.requestedBySignatory,
         approvedBySignatory: state.purchaseRequests.create.approvedBySignatory,
+        selectedRequisitionIssue: state.purchaseRequests.create.selectedRequisitionIssue,
         user: state.user.data,
         isInitialized: state.user.isInitialized,
     };
@@ -55,6 +57,7 @@ const CreatePurchaseRequest = (props) => {
             }
         }
     }, [props.isInitialized]);
+    
     useEffect(() => {
         document.title = "Create Purchase Request";
         return function cleanup() {
@@ -184,6 +187,10 @@ const CreatePurchaseRequest = (props) => {
             type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
             data: {}
         });
+        props.dispatch({
+            type: "SET_PURCHASE_REQUEST_SELECTED_REQUISITION_ISSUE",
+            data: {}
+        });
     }
 
     const previewPurchaseRequest = debounce(() => {
@@ -293,14 +300,42 @@ const CreatePurchaseRequest = (props) => {
         changeTableFieldValue(value, {}, 'unit_of_measure_id', index);
     }
 
+    const itemOptions = cloneDeep(props.selectedRequisitionIssue?.items?.data)?.map(item => {
+        item.value = item.description;
+        item.item_code = item.item?.item_code;
+        item.in_libraries = item.item_id != null;
+        item.unit_cost = item.procurement_plan_item?.price;
+        item.quantity = item.request_quantity - item.issue_quantity;
+        item.requisition_issue_item_id = item.id;
+        return item;
+    });
+
     const selectItem = (value, item, index) => {
+        // console.log(item);
+        // let item = itemOptions.filter(item => item.requisition_issue_item_id == value);
+        // item = item[0];
+        let existed_item = props.formData[`items`].filter(propsItem => propsItem.requisition_issue_item_id == item.requisition_issue_item_id);
+        if(!isEmpty(existed_item)){
+            notification.error({
+                message: 'Item existed!',
+                description:
+                    `The item ${existed_item[0].description} is already in the list`,
+                }
+            );
+            return false;
+        }
+
         let newValue = cloneDeep(props.formData.items);
         newValue[index]["item_code"] = item.item_code;
         newValue[index]["unit_of_measure_id"] = item.unit_of_measure.id;
-        newValue[index]["is_ppmp"] = item.is_ppmp;
+        // newValue[index]["is_ppmp"] = item.is_ppmp;
         newValue[index]["in_libraries"] = true;
         newValue[index]["item_name"] = value;
-        newValue[index]["item_id"] = item.id;
+        newValue[index]["item_id"] = item.item_id;
+        newValue[index]["unit_cost"] = item.unit_cost;
+        newValue[index]["quantity"] = item.quantity;
+        newValue[index]["is_common_item"] = item.is_common_item;
+        newValue[index]["requisition_issue_item_id"] = item.requisition_issue_item_id;
         props.dispatch({
             type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
             data: {
@@ -342,6 +377,15 @@ const CreatePurchaseRequest = (props) => {
             }
         });
     }
+
+    const getRisItemName = (id) => {
+        let item = itemOptions?.filter(item => item.requisition_issue_item_id == id);
+        if(!isEmpty(item)){
+            return item[0].description;
+        }
+        return "";
+    }
+
     
     return (
         <div id="pr-container" className='container-fuild bg-white p-16'>
@@ -371,11 +415,20 @@ const CreatePurchaseRequest = (props) => {
                     </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={24} md={4} lg={4} xl={4}>
                     <Form.Item label="Date">
                         <Input placeholder="input placeholder" value={props.formData.pr_date} />
                     </Form.Item>
                 </Col>
+
+                <Col xs={24} sm={24} md={4} lg={4} xl={4}>
+                        <Form.Item label="Items From PPMP?"  {...helpers.displayError(props.formErrors, `from_ppmp`)}>
+                            <Select style={{ width: "100%" }} value={props.formData.from_ppmp} placeholder="Select Item Type">
+                                <Option value={1}>Yes</Option>
+                                <Option value={0}>No</Option>
+                            </Select>
+                        </Form.Item>
+                    </Col>
             </Row>
             <Row gutter={[8, 8]} className="pr-items-header">
                 <Col xs={24} sm={24} md={4} lg={4} xl={4}>
@@ -438,8 +491,9 @@ const CreatePurchaseRequest = (props) => {
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_of_measure_id`) }>
-                                { item.item_id ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
+                                { (item.is_common_item) ? props.unit_of_measures.filter(i => i.id == item.unit_of_measure_id)[0].name : (<Select
                                     showSearch
+                                    defaultValue={item.unit_of_measure_id || ""}
                                     value={item.unit_of_measure_id}
                                     placeholder="Select a Unit"
                                     optionFilterProp="children"
@@ -456,42 +510,63 @@ const CreatePurchaseRequest = (props) => {
                             </Form.Item>
                             </div>
                         </Col>
+
+
                         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.item_name`) }>
-                                { item.item_id ? item.item_name : (
-                                    <AutoComplete
-                                        style={{ width: "100%" }}
-                                        allowClear
-                                        options={props.items}
-                                        onSelect={(val, item) => selectItem(val, item, index)}
-                                        placeholder="Item Description"
-                                        filterOption={(input, option) =>
-                                            option.item_name.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        onBlur={(e) => {
-                                            // console.log(e);
-                                            changeTableFieldValue(e.target.value, {}, 'item_name', index);
-                                        }}
-                                        defaultValue={item.item_name}
-                                    >
-                                        <TextArea autoSize />
-                                    </AutoComplete>
+                                { item.requisition_issue_item_id ? (
+                                    <React.Fragment>
+                                        { item.is_common_item ? item.item_name : (
+                                            <TextArea
+                                                autoSize
+                                                placeholder="Item Description"
+                                                onBlur={(e) => {
+                                                    changeTableFieldValue(e.target.value, {}, 'item_name', index);
+                                                }}
+                                                defaultValue={item.item_name || ""}
+                                            />
+                                        ) }
+                                    </React.Fragment>
+                                ) : (
+                                    <React.Fragment>
+                                        { item.is_common_item ? item.item_name : (
+                                            <AutoComplete
+                                                style={{ width: "100%" }}
+                                                allowClear
+                                                options={itemOptions}
+                                                onSelect={(val, item) => selectItem(val, item, index)}
+                                                placeholder="Item Description"
+                                                filterOption={(input, option) =>
+                                                    option.description.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                }
+                                                onBlur={(e) => {
+                                                    changeTableFieldValue(e.target.value, {}, 'item_name', index);
+                                                }}
+                                                defaultValue={item.item_name || ""}
+                                                value={item.item_name}
+                                            >
+                                                <TextArea autoSize />
+                                            </AutoComplete>
+                                        ) }
+                                    </React.Fragment>
                                 ) }
                             </Form.Item>
                             </div>
                         </Col>
+                        
+                        
                         <Col xs={24} sm={24} md={2} lg={2} xl={2}>
                             <div className='text-center'>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.quantity`) }>
-                                <InputNumber style={{width: "100%"}} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index)}  defaultValue={item.quantity}  placeholder="Quantity" />
+                                <InputNumber style={{width: "100%"}} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'quantity', index)}  defaultValue={item.quantity || ''} value={item.quantity}  placeholder="Quantity" />
                             </Form.Item>
                             </div>
                         </Col>
                         <Col xs={24} sm={24} md={3} lg={3} xl={3}>
                             <div>
                             <Form.Item { ...helpers.displayError(props.formErrors, `items.${index}.unit_cost`) }>
-                                <InputNumber style={{width: "100%"}} step={0.01} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } defaultValue={item.unit_cost}  placeholder="Quantity" />
+                                <InputNumber style={{width: "100%"}} step={0.01} min={0} onBlur={(e) => changeTableFieldValue(e.target.value, item, 'unit_cost', index) } defaultValue={item.unit_cost || ''} value={item.unit_cost}  placeholder="Quantity" />
                             </Form.Item>
                             </div>
                         </Col>
@@ -507,6 +582,11 @@ const CreatePurchaseRequest = (props) => {
                                 </Tooltip>
                             </div>
                         </Col>
+                        { (item.requisition_issue_item_id && !item.is_common_item && props.formData.from_ppmp == 1) && (
+                            <span>
+                                Item from PPMP that will be deducted: <b>{ getRisItemName(item.requisition_issue_item_id) }</b> 
+                            </span>
+                        )  }
                     </Row>
                 ))
             }
@@ -602,7 +682,7 @@ const CreatePurchaseRequest = (props) => {
                 {/* { props.formType == "create" ? (
                     <Button type="default" onClick={() => previewPurchaseRequest()}><FolderViewOutlined />Preview</Button>
                 ) : ""} */}
-                { !props.formData.requisition_issue_file ? (
+                { !props.formData.requisition_issue_file && props.formType == "create" ? (
                     <Button type="default" onClick={() => history.push("/requisition-and-issues")} disabled={submit} loading={submit}><SaveOutlined />
                         Select Requistion and Issue Slip
                     </Button>
