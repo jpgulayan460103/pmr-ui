@@ -44,7 +44,7 @@ const CreateProcurementPlan = (props) => {
             setItemTypeA(props.item_types[0].id);
             setItemTypeB(props.item_types[1].id);
             let dn = props.item_categories.filter(item => item.name == "Donations");
-            console.log(dn);
+            // console.log(dn);
             setDonation(dn[0]);
             if(props.formData.end_user_id){
                 let itemALength = props.formData.itemsA.length;
@@ -208,7 +208,7 @@ const CreateProcurementPlan = (props) => {
 
     const changeTableFieldValue = (e, item, field, index, itemType = "A") => {
         let value = e;
-        console.log(value);
+        // console.log(value);
         let newValue = cloneDeep(props.formData[`items${itemType}`]);
         newValue[index][field] = value;
         switch (field) {

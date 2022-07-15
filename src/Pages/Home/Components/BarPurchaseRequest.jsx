@@ -43,7 +43,7 @@ const BarPurchaseRequest = ({label, yearlyData}) => {
                         left: 20,
                     }}
                     onClick={(e) => {
-                        console.log(e);
+                        // console.log(e);
                     }}
                     >
                         <Tooltip formatter={(value) => new Intl.NumberFormat('en').format(value)} />

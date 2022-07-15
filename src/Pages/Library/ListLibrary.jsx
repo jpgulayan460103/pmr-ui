@@ -46,7 +46,7 @@ const ListLibrary = (props) => {
             let officeId = props.user?.user_offices?.data[0]?.office?.id;
             let parentTitle = props.user?.user_offices?.data[0]?.office?.parent?.title;
             let userRole = props.user.roles?.data[0]?.name;
-            console.log(parentTitle);
+            // console.log(parentTitle);
             setRole(userRole);
             setOfficeParent(parentTitle);
             setOffice(officeId);
