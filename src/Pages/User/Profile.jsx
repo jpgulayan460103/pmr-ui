@@ -106,10 +106,20 @@ const Profile = (props) => {
     const dataSource = props.profile.activity_logs;
     const columns = [
         {
-            title: 'Activity',
+            title: 'Type',
             dataIndex: 'form_type_header',
             key: 'form_type_header',
             ...onCell,
+        },
+        {
+            title: 'Subject',
+            key: 'subjects',
+            ...onCell,
+            render: (text, record, index) => (
+                <span>
+                    { record.subject?.display_log }
+                </span>
+            ),
         },
         {
             title: 'Timestamp',

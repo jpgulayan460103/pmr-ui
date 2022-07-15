@@ -30,11 +30,6 @@ const AuditBatches = ({logger}) => {
     const dataSource = logger;
     const columns = [
         {
-            title: 'Timestamp',
-            dataIndex: 'created_at',
-            key: 'created_at',
-        },
-        {
             title: 'User',
             key: 'user',
             render: (text, record, index) => (
@@ -42,6 +37,11 @@ const AuditBatches = ({logger}) => {
                     { record.causer?.user_information?.fullname }
                 </span>
             ),
+        },
+        {
+            title: 'Timestamp',
+            dataIndex: 'created_at',
+            key: 'created_at',
         },
         {
             title: '',

@@ -137,16 +137,20 @@ const ActivityLogs = (props) => {
     const dataSource = props.activityLogs;
     const columns = [
         {
-            title: 'Timestamp',
-            dataIndex: 'created_at',
-            key: 'created_at',
-            ...onCell,
-        },
-        {
-            title: 'Activity',
+            title: 'Type',
             dataIndex: 'form_type_header',
             key: 'form_type_header',
             ...onCell,
+        },
+        {
+            title: 'Subject',
+            key: 'subjects',
+            ...onCell,
+            render: (text, record, index) => (
+                <span>
+                    { record.subject?.display_log }
+                </span>
+            ),
         },
         {
             title: 'User',
@@ -157,6 +161,12 @@ const ActivityLogs = (props) => {
                     { record.causer?.user_information?.fullname }
                 </span>
             ),
+        },
+        {
+            title: 'Timestamp',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            ...onCell,
         },
         {
             title: '',

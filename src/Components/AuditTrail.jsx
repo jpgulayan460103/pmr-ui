@@ -50,6 +50,7 @@ const AuditTrail = ({audit}) => {
                         </div>
                     </div>
                     <i>Audit Type: <b>{selectedLogger.description} {selectedLogger.form_type_header}</b></i><br />
+                    <i>Subject.: <b>{ selectedLogger.subject?.display_log }</b></i><br />
                     <i>Audit No.: <b>{selectedLogger.logger_id}</b></i><br />
                     <Button className='float-right mb-1' size='small' type='danger' onClick={() => setShowLoggerDetails(false) }>
                         <CloseOutlined />
@@ -68,6 +69,7 @@ const AuditTrail = ({audit}) => {
                             <div className="flex">
                                 <div className='truncate' style={{width: "70%"}}>
                                     <b>
+                                        {/* {i.description} { i.form_type_header } { i.subject?.display_log } */}
                                         {i.description} { i.form_type_header }
                                     </b>
                                 </div>
@@ -75,6 +77,7 @@ const AuditTrail = ({audit}) => {
                                     <span>View Changes</span>
                                 </div>
                             </div>
+                            <i>Subject.: <b>{ i.subject?.display_log }</b></i><br />
                             <i>Audit No.: <b>{i.logger_id}</b></i><br />
                         </Timeline.Item>
                         )) }
