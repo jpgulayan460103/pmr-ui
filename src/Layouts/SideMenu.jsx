@@ -96,7 +96,15 @@ const Sidemenu = (props) => {
     }
 
     const formSubMenu = [];
-    if(helpers.hasPermission(props.user, ['form.routing.pending.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+    if(helpers.hasPermission(props.user, [
+        'form.routing.approve.procurement.plan',
+        'form.routing.approve.purchase.request',
+        'form.routing.approve.requisition.issue',
+        'form.routing.review.procurement.plan',
+        'form.routing.review.purchase.request',
+        'form.routing.review.requisition.issue',
+        'form.routing.issue.requisition.issue',
+    ]) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/pending",
             label: (
@@ -106,8 +114,6 @@ const Sidemenu = (props) => {
                 </React.Fragment>
             ),
         });
-    }
-    if(helpers.hasPermission(props.user, ['form.routing.approved.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/approved",
             label: (
@@ -117,8 +123,7 @@ const Sidemenu = (props) => {
                 </React.Fragment>
             ),
         });
-    }
-    if(helpers.hasPermission(props.user, ['form.routing.disapproved.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+
         formSubMenu.push({
             key: "/forms/disapproved",
             label: (
@@ -129,6 +134,43 @@ const Sidemenu = (props) => {
             ),
         });
     }
+
+    if(helpers.hasPermission(props.user, ['form.routing.purchase.request.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+        formSubMenu.push({
+            key: "/forms/purchase-requests",
+            label: (
+                <React.Fragment>
+                    <Link to="/forms/purchase-requests"></Link>
+                    All Purchase Requests
+                </React.Fragment>
+            ),
+        });
+    }
+
+    if(helpers.hasPermission(props.user, ['form.routing.procurement.plan.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+        formSubMenu.push({
+            key: "/forms/project-procurement-plans",
+            label: (
+                <React.Fragment>
+                    <Link to="/forms/project-procurement-plans"></Link>
+                    All Project Procurment Plans
+                </React.Fragment>
+            ),
+        });
+    }
+
+    if(helpers.hasPermission(props.user, ['form.routing.requisition.issue.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+        formSubMenu.push({
+            key: "/forms/requisition-and-issue-slips",
+            label: (
+                <React.Fragment>
+                    <Link to="/forms/requisition-and-issue-slips"></Link>
+                    All Requisition and Issue Slips
+                </React.Fragment>
+            ),
+        });
+    }
+
 
     const procurementPlanSubMenu = [
         {
@@ -327,9 +369,16 @@ const Sidemenu = (props) => {
     //Forms
     if(
         helpers.hasPermission(props.user, [
-            'form.routing.pending.view',
-            'form.routing.approved.view',
-            'form.routing.disapproved.view',
+            'form.routing.purchase.request.view',
+            'form.routing.procurement.plan.view',
+            'form.routing.requisition.issue.view',
+            'form.routing.approve.procurement.plan',
+            'form.routing.approve.purchase.request',
+            'form.routing.approve.requisition.issue',
+            'form.routing.review.procurement.plan',
+            'form.routing.review.purchase.request',
+            'form.routing.review.requisition.issue',
+            'form.routing.issue.requisition.issue',
         ])
         || 
         helpers.hasRole(props.user, ["super-admin"])

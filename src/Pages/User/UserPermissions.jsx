@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tree, Button, notification, Radio } from 'antd';
-import { isEmpty, map } from 'lodash';
+import { cloneDeep, isEmpty, map } from 'lodash';
 import api from '../../api';
 import helpers from '../../Utilities/helpers';
 
@@ -9,8 +9,8 @@ const UserPermissions = (props) => {
     useEffect(() => {
         return () => { unmounted.current = true }
     }, []);
-    const [expandedKeys, setExpandedKeys] = useState();
-    const [checkedKeys, setCheckedKeys] = useState();
+    const [expandedKeys, setExpandedKeys] = useState([]);
+    const [checkedKeys, setCheckedKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -44,63 +44,52 @@ const UserPermissions = (props) => {
           },
 
           {
-            title: 'Approved Forms Module',
-            key: 'form.routing.approved.all',
+            title: 'Forms Module',
+            key: 'form.routing.all',
             children: [
-              {
-                title: 'Permission to view the list of approved forms.',
-                key: 'form.routing.approved.view',
-              },
-            ],
-          },
-
-          {
-            title: 'Disapproved Forms Module',
-            key: 'form.routing.disapproved.all',
-            children: [
-              {
-                title: 'Permission to view the list of disapproved forms.',
-                key: 'form.routing.disapproved.view',
-              },
-            ],
-          },
-
-          {
-            title: 'Pending Forms Module',
-            key: 'form.routing.pending.all',
-            children: [
-              {
-                title: 'Permission to view the list of forwarded forms.',
-                key: 'form.routing.pending.view',
-              },
               {
                 title: 'Permission to review and finailize created project procurement plans.',
-                key: 'form.routing.pending.review.procurement.plan',
-              },
-              {
-                title: 'Permission to approve or disapprove project procurement plans.',
-                key: 'form.routing.pending.approve.procurement.plan',
+                key: 'form.routing.review.procurement.plan',
               },
               {
                 title: 'Permission to review and finailize created purchase requests.',
-                key: 'form.routing.pending.review.purchase.request',
-              },
-              {
-                title: 'Permission to approve or disapprove purchase requests.',
-                key: 'form.routing.pending.approve.purchase.request',
+                key: 'form.routing.review.purchase.request',
               },
               {
                 title: 'Permission to review and finailize created requisition and issue slips.',
-                key: 'form.routing.pending.review.requisition.issue',
+                key: 'form.routing.review.requisition.issue',
+              },
+              {
+                title: 'Permission to approve or disapprove project procurement plans.',
+                key: 'form.routing.approve.procurement.plan',
+              },
+              {
+                title: 'Permission to approve or disapprove purchase requests.',
+                key: 'form.routing.approve.purchase.request',
               },
               {
                 title: 'Permission to approve or disapprove requisition and issue slips.',
-                key: 'form.routing.pending.approve.requisition.issue',
+                key: 'form.routing.approve.requisition.issue',
               },
               {
                 title: 'Permission to issue items using requisition and issue slips. (Inventory permission is required)',
-                key: 'form.routing.pending.issue.requisition.issue',
+                key: 'form.routing.issue.requisition.issue',
                 disabled: office != "PSAMS" && role != "super-admin",
+              },
+              {
+                title: 'Permission to view project procurement plans of all offices.',
+                key: 'form.routing.procurement.plan.view',
+                disabled: !['PSAMS', 'BS', 'BACS', 'PS'].includes(office)  && role != "super-admin",
+              },
+              {
+                title: 'Permission to view purchase requests of all offices.',
+                key: 'form.routing.purchase.request.view',
+                disabled: !['BS', 'BACS', 'PS'].includes(office)  && role != "super-admin",
+              },
+              {
+                title: 'Permission to view requisition and issue slips of all offices.',
+                key: 'form.routing.requisition.issue.view',
+                disabled: !['PSAMS'].includes(office)  && role != "super-admin",
               },
             ],
           },
@@ -332,15 +321,16 @@ const UserPermissions = (props) => {
               'profile.information.update',
               'profile.twg.update',
               'activitylogs.view',
-              'form.routing.approved.view',
-              'form.routing.disapproved.view',
-              'form.routing.pending.view',
-              'form.routing.pending.review.procurement.plan',
-              'form.routing.pending.approve.procurement.plan',
-              'form.routing.pending.review.purchase.request',
-              'form.routing.pending.approve.purchase.request',
-              'form.routing.pending.review.requisition.issue',
-              'form.routing.pending.approve.requisition.issue',
+              'form.routing.purchase.request.view',
+              'form.routing.procurement.plan.view',
+              'form.routing.requisition.issue.view',
+              'form.routing.approve.procurement.plan',
+              'form.routing.approve.purchase.request',
+              'form.routing.approve.requisition.issue',
+              'form.routing.review.procurement.plan',
+              'form.routing.review.purchase.request',
+              'form.routing.review.requisition.issue',
+              'form.routing.issue.requisition.issue',
               'libraries.user.signatories.view',
               'libraries.uom.view',
               'libraries.uom.add',
@@ -369,7 +359,7 @@ const UserPermissions = (props) => {
             ]
 
             if(office == "PSAMS" || selectedRole == "super-admin"){
-              perms.push('form.routing.pending.issue.requisition.issue');
+              perms.push('form.routing.issue.requisition.issue');
               perms.push('inventories.items.view');
               perms.push('inventories.items.create');
               perms.push('inventories.items.update');
@@ -449,9 +439,7 @@ const UserPermissions = (props) => {
         setExpandedKeys([
           'profile.all',
           'activitylogs.all',
-          'form.routing.approved.all',
-          'form.routing.disapproved.all',
-          'form.routing.pending.all',
+          'form.routing.all',
           'libraries.all',
           'inventories.all',
           'procurement.all',
@@ -477,16 +465,32 @@ const UserPermissions = (props) => {
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);
       };
+
     
-      const onCheck = (checkedKeysValue) => {
-        // console.log('onCheck', checkedKeysValue);
-        setCheckedKeys(checkedKeysValue);
+      const onCheck = (checkedKeysValue, info) => {
+        handleTreeChange(info)
       };
     
       const onSelect = (selectedKeysValue, info) => {
-        // console.log('onSelect', info);
-        setSelectedKeys(selectedKeysValue);
+        handleTreeChange(info)
       };
+
+      const handleTreeChange = (info) => {
+        let key = info.node.key;
+        let perms = setPermissions(key);
+        setCheckedKeys(perms);
+      }
+
+      const setPermissions = (key) => {
+        if(!checkedKeys.includes(key)){
+          let prevCheckedKeys = cloneDeep(checkedKeys);
+          return [...prevCheckedKeys, key];
+        }else{
+          let filteredKeys = checkedKeys.filter(checked => checked != key);
+          return filteredKeys;
+        }
+      }
+
 
     return (
         
@@ -507,7 +511,7 @@ const UserPermissions = (props) => {
             expandedKeys={expandedKeys}
             autoExpandParent={autoExpandParent}
             onCheck={onCheck}
-            // checkedKeys={checkedKeys}
+            selectedKeys={selectedKeys}
             onSelect={onSelect}
             // checkedKeys={['users.delete', 'purchase.request.all']}
             checkedKeys={checkedKeys}
