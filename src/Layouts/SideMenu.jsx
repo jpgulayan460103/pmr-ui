@@ -98,11 +98,11 @@ const Sidemenu = (props) => {
     const formSubMenu = [];
     if(helpers.hasPermission(props.user, ['form.routing.pending.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
-            key: "/forms/forwarded",
+            key: "/forms/pending",
             label: (
                 <React.Fragment>
-                    <Link to="/forms/forwarded"></Link>
-                    Forwarded Forms
+                    <Link to="/forms/pending"></Link>
+                    Pending Forms
                 </React.Fragment>
             ),
         });

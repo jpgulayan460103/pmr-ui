@@ -22,7 +22,7 @@ import ListLibrary from './Pages/Library/ListLibrary'
 import ItemLibrary from './Pages/Library/ItemLibrary'
 import User from './Pages/User/User'
 import Echo from 'laravel-echo';
-import ForwardedForm from './Pages/Forms/ForwardedForm';
+import PendingForm from './Pages/Forms/PendingForm';
 import ApprovedForm from './Pages/Forms/ApprovedForm';
 import DisapprovedForm from './Pages/Forms/DisapprovedForm';
 import Procurement from './Pages/Procurement/Procurement'
@@ -145,8 +145,8 @@ const App = (props) => {
             <Route exact path="/procurement/quotations/suppliers"  >
                 <PrivateRoute><Layout><Quotation /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/forms/forwarded"  >
-                <PrivateRoute><Layout><ForwardedForm /></Layout></PrivateRoute>
+            <Route exact path="/forms/pending"  >
+                <PrivateRoute><Layout><PendingForm /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/forms/approved"  >
                 <PrivateRoute><Layout><ApprovedForm /></Layout></PrivateRoute>

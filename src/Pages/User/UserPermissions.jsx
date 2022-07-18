@@ -66,7 +66,7 @@ const UserPermissions = (props) => {
           },
 
           {
-            title: 'Forwarded Forms Module',
+            title: 'Pending Forms Module',
             key: 'form.routing.pending.all',
             children: [
               {
@@ -100,7 +100,7 @@ const UserPermissions = (props) => {
               {
                 title: 'Permission to issue items using requisition and issue slips. (Inventory permission is required)',
                 key: 'form.routing.pending.issue.requisition.issue',
-                disabled: office != "PSAMS",
+                disabled: office != "PSAMS" && role != "super-admin",
               },
             ],
           },
@@ -108,27 +108,27 @@ const UserPermissions = (props) => {
           {
             title: 'Inventory Module',
             key: 'inventories.all',
-            disabled: office != "PSAMS",
+            disabled: office != "PSAMS" && role != "super-admin",
             children: [
               {
                 title: 'Permission to view the list of items in the inventory.',
                 key: 'inventories.items.view',
-                disabled: office != "PSAMS",
+                disabled: office != "PSAMS" && role != "super-admin",
               },
               {
                 title: 'Permission to create items in the inventory.',
                 key: 'inventories.items.create',
-                disabled: office != "PSAMS",
+                disabled: office != "PSAMS" && role != "super-admin",
               },
               {
                 title: 'Permission to update items in the inventory.',
                 key: 'inventories.items.update',
-                disabled: office != "PSAMS",
+                disabled: office != "PSAMS" && role != "super-admin",
               },
               {
                 title: 'Permission to update quantity of items in the inventory.',
                 key: 'inventories.items.quantity.update',
-                disabled: office != "PSAMS",
+                disabled: office != "PSAMS" && role != "super-admin",
               },
             ],
           },
@@ -149,6 +149,7 @@ const UserPermissions = (props) => {
               {
                 title: 'Permission to update the list of office signatories.',
                 key: 'libraries.user.signatories.update',
+                disabled: role != 'super-admin',
               },
               {
                 title: 'Permission to delete the list of office signatories.',
@@ -174,22 +175,22 @@ const UserPermissions = (props) => {
               {
                 title: 'Permission to view the list of UACS Codes.',
                 key: 'libraries.uacs.view',
-                disabled: office != "BS",
+                disabled: office != "BS" && role != "super-admin",
               },
               {
                 title: 'Permission to add the list of UACS Codes.',
                 key: 'libraries.uacs.add',
-                disabled: office != "BS",
+                disabled: office != "BS" && role != "super-admin",
               },
               {
                 title: 'Permission to update the list of UACS Codes.',
                 key: 'libraries.uacs.update',
-                disabled: office != "BS",
+                disabled: office != "BS" && role != "super-admin",
               },
               {
                 title: 'Permission to delete the list of UACS Codes.',
                 key: 'libraries.uacs.delete',
-                disabled: office != "BS",
+                disabled: office != "BS" && role != "super-admin",
               },
             ],
           },
@@ -328,6 +329,8 @@ const UserPermissions = (props) => {
           case "admin":
           case "super-admin":
             let perms = [
+              'profile.information.update',
+              'profile.twg.update',
               'activitylogs.view',
               'form.routing.approved.view',
               'form.routing.disapproved.view',
@@ -339,7 +342,6 @@ const UserPermissions = (props) => {
               'form.routing.pending.review.requisition.issue',
               'form.routing.pending.approve.requisition.issue',
               'libraries.user.signatories.view',
-              'libraries.user.signatories.update',
               'libraries.uom.view',
               'libraries.uom.add',
               'libraries.uom.update',
@@ -383,6 +385,7 @@ const UserPermissions = (props) => {
             if(selectedRole == 'super-admin'){
               perms.push('libraries.user.signatories.add');
               perms.push('libraries.user.signatories.delete');
+              perms.push('libraries.user.signatories.update');
             }
             setCheckedKeys(perms);
             break;

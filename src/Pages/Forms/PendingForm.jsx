@@ -50,7 +50,7 @@ const MaximizeSvg = () => (
     </svg>
 );  
 
-const ForwardedForm = (props) => {
+const PendingForm = (props) => {
     const unmounted = React.useRef(false);
     let history = useHistory();
     useEffect(() => {
@@ -76,7 +76,7 @@ const ForwardedForm = (props) => {
     const budgetFormRef = React.useRef();
     const procurementFormRef = React.useRef();
     useEffect(() => {
-        document.title = "Forwarded Forms";
+        document.title = "Pending Forms";
         if(props.isInitialized){
             if(isEmpty(props.forms)){
             }
@@ -1027,7 +1027,7 @@ const ForwardedForm = (props) => {
 
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={16} xl={18}>
-                    <Card size="small" title="Forwarded Forms" bordered={false}>
+                    <Card size="small" title="Pending Forms" bordered={false}>
                         <div className='forms-card-content'>
                             <div className="flex justify-end mb-2 space-x-2">
                                 <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
@@ -1128,4 +1128,4 @@ const ForwardedForm = (props) => {
 
 export default connect(
     mapStateToProps,
-  )(ForwardedForm);
+  )(PendingForm);

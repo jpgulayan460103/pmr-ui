@@ -266,7 +266,7 @@ const CreateRequisitionIssue = (props) => {
                     data: []
                 });
                 await approveForm(props.formData.form_route_id, formData);
-                history.push("/forms/forwarded");
+                history.push("/forms/pending");
                 clearForm();
                 setSubmit(false);
             } catch (err) {

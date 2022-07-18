@@ -39,7 +39,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
 
     const handleOpen = (item) => {
         // console.log(item);
-        history.push("/forms/forwarded");
+        history.push("/forms/pending");
     }
     
     const handleDelete = (index) => {
