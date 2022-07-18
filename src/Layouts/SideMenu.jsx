@@ -97,13 +97,13 @@ const Sidemenu = (props) => {
 
     const formSubMenu = [];
     if(helpers.hasPermission(props.user, [
-        'form.routing.approve.procurement.plan',
-        'form.routing.approve.purchase.request',
-        'form.routing.approve.requisition.issue',
-        'form.routing.review.procurement.plan',
-        'form.routing.review.purchase.request',
-        'form.routing.review.requisition.issue',
-        'form.routing.issue.requisition.issue',
+        'forms.approve.procurement.plan',
+        'forms.approve.purchase.request',
+        'forms.approve.requisition.issue',
+        'forms.review.procurement.plan',
+        'forms.review.purchase.request',
+        'forms.review.requisition.issue',
+        'forms.issue.requisition.issue',
     ]) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/pending",
@@ -135,7 +135,7 @@ const Sidemenu = (props) => {
         });
     }
 
-    if(helpers.hasPermission(props.user, ['form.routing.purchase.request.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+    if(helpers.hasPermission(props.user, ['forms.purchase.request.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/purchase-requests",
             label: (
@@ -147,7 +147,7 @@ const Sidemenu = (props) => {
         });
     }
 
-    if(helpers.hasPermission(props.user, ['form.routing.procurement.plan.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+    if(helpers.hasPermission(props.user, ['forms.procurement.plan.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/project-procurement-plans",
             label: (
@@ -159,7 +159,7 @@ const Sidemenu = (props) => {
         });
     }
 
-    if(helpers.hasPermission(props.user, ['form.routing.requisition.issue.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
+    if(helpers.hasPermission(props.user, ['forms.requisition.issue.view']) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
             key: "/forms/requisition-and-issue-slips",
             label: (
@@ -369,16 +369,16 @@ const Sidemenu = (props) => {
     //Forms
     if(
         helpers.hasPermission(props.user, [
-            'form.routing.purchase.request.view',
-            'form.routing.procurement.plan.view',
-            'form.routing.requisition.issue.view',
-            'form.routing.approve.procurement.plan',
-            'form.routing.approve.purchase.request',
-            'form.routing.approve.requisition.issue',
-            'form.routing.review.procurement.plan',
-            'form.routing.review.purchase.request',
-            'form.routing.review.requisition.issue',
-            'form.routing.issue.requisition.issue',
+            'forms.purchase.request.view',
+            'forms.procurement.plan.view',
+            'forms.requisition.issue.view',
+            'forms.approve.procurement.plan',
+            'forms.approve.purchase.request',
+            'forms.approve.requisition.issue',
+            'forms.review.procurement.plan',
+            'forms.review.purchase.request',
+            'forms.review.requisition.issue',
+            'forms.issue.requisition.issue',
         ])
         || 
         helpers.hasRole(props.user, ["super-admin"])

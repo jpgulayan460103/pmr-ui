@@ -45,50 +45,50 @@ const UserPermissions = (props) => {
 
           {
             title: 'Forms Module',
-            key: 'form.routing.all',
+            key: 'forms.all',
             children: [
               {
                 title: 'Permission to review and finailize created project procurement plans.',
-                key: 'form.routing.review.procurement.plan',
+                key: 'forms.review.procurement.plan',
               },
               {
                 title: 'Permission to review and finailize created purchase requests.',
-                key: 'form.routing.review.purchase.request',
+                key: 'forms.review.purchase.request',
               },
               {
                 title: 'Permission to review and finailize created requisition and issue slips.',
-                key: 'form.routing.review.requisition.issue',
+                key: 'forms.review.requisition.issue',
               },
               {
                 title: 'Permission to approve or disapprove project procurement plans.',
-                key: 'form.routing.approve.procurement.plan',
+                key: 'forms.approve.procurement.plan',
               },
               {
                 title: 'Permission to approve or disapprove purchase requests.',
-                key: 'form.routing.approve.purchase.request',
+                key: 'forms.approve.purchase.request',
               },
               {
                 title: 'Permission to approve or disapprove requisition and issue slips.',
-                key: 'form.routing.approve.requisition.issue',
+                key: 'forms.approve.requisition.issue',
               },
               {
                 title: 'Permission to issue items using requisition and issue slips. (Inventory permission is required)',
-                key: 'form.routing.issue.requisition.issue',
+                key: 'forms.issue.requisition.issue',
                 disabled: office != "PSAMS" && role != "super-admin",
               },
               {
                 title: 'Permission to view project procurement plans of all offices.',
-                key: 'form.routing.procurement.plan.view',
+                key: 'forms.procurement.plan.view',
                 disabled: !['PSAMS', 'BS', 'BACS', 'PS'].includes(office)  && role != "super-admin",
               },
               {
                 title: 'Permission to view purchase requests of all offices.',
-                key: 'form.routing.purchase.request.view',
+                key: 'forms.purchase.request.view',
                 disabled: !['BS', 'BACS', 'PS'].includes(office)  && role != "super-admin",
               },
               {
                 title: 'Permission to view requisition and issue slips of all offices.',
-                key: 'form.routing.requisition.issue.view',
+                key: 'forms.requisition.issue.view',
                 disabled: !['PSAMS'].includes(office)  && role != "super-admin",
               },
             ],
@@ -321,16 +321,16 @@ const UserPermissions = (props) => {
               'profile.information.update',
               'profile.twg.update',
               'activitylogs.view',
-              'form.routing.purchase.request.view',
-              'form.routing.procurement.plan.view',
-              'form.routing.requisition.issue.view',
-              'form.routing.approve.procurement.plan',
-              'form.routing.approve.purchase.request',
-              'form.routing.approve.requisition.issue',
-              'form.routing.review.procurement.plan',
-              'form.routing.review.purchase.request',
-              'form.routing.review.requisition.issue',
-              'form.routing.issue.requisition.issue',
+              'forms.purchase.request.view',
+              'forms.procurement.plan.view',
+              'forms.requisition.issue.view',
+              'forms.approve.procurement.plan',
+              'forms.approve.purchase.request',
+              'forms.approve.requisition.issue',
+              'forms.review.procurement.plan',
+              'forms.review.purchase.request',
+              'forms.review.requisition.issue',
+              'forms.issue.requisition.issue',
               'libraries.user.signatories.view',
               'libraries.uom.view',
               'libraries.uom.add',
@@ -359,7 +359,7 @@ const UserPermissions = (props) => {
             ]
 
             if(office == "PSAMS" || selectedRole == "super-admin"){
-              perms.push('form.routing.issue.requisition.issue');
+              perms.push('forms.issue.requisition.issue');
               perms.push('inventories.items.view');
               perms.push('inventories.items.create');
               perms.push('inventories.items.update');
@@ -439,7 +439,7 @@ const UserPermissions = (props) => {
         setExpandedKeys([
           'profile.all',
           'activitylogs.all',
-          'form.routing.all',
+          'forms.all',
           'libraries.all',
           'inventories.all',
           'procurement.all',
