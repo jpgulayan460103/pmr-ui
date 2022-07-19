@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Skeleton, Button, Tabs, Card, Col, Row, Tooltip  } from 'antd';
-import api from '../../../api';
+import api from '../../api';
 import Icon, {
     CloseOutlined,
 } from '@ant-design/icons';
 import { debounce, isEmpty } from 'lodash';
-import AttachmentUpload from '../../../Components/AttachmentUpload';
-import AuditBatches from '../../../Components/AuditBatches';
+import AttachmentUpload from '../../Components/AttachmentUpload';
+import AuditBatches from '../../Components/AuditBatches';
 import TableProcurementPlan from './Components/TableProcurementPlan';
 import InfoProcurementPlan from './Components/InfoProcurementPlan';
-import FormRouting from '../../../Components/FormRouting';
-import MaximizeSvg from '../../../Icons/MaximizeSvg';
+import FormRouting from '../../Components/FormRouting';
+import MaximizeSvg from '../../Icons/MaximizeSvg';
 
 const { TabPane } = Tabs;
 
@@ -86,6 +86,19 @@ const ListProcurementPlan = (props) => {
             data: value
         });
     }
+    const setTimelines = (value) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_LIST_TIMELINES",
+            data: value
+        });
+    }
+
+    const setLogger = (value) => {
+        props.dispatch({
+            type: "SET_PROCUREMENT_PLAN_LIST_LOGGER",
+            data: value,
+        });
+    }
 
     const getProcurementPlans = debounce((filters) => {
         if(filters == null){
@@ -110,6 +123,28 @@ const ListProcurementPlan = (props) => {
         })
         ;
     }, 200);
+
+    const loadProcurementPlanData = async (id) => {
+        await api.ProcurementPlan.get(id)
+        .then(res => {
+            let item = res.data;
+            let form_routes = item.form_routes.data;
+            setTimelines(form_routes);
+            setSelectedProcurementPlan(item)
+        })
+        .catch(err => {})
+        .then(res => {})
+        ;
+    }
+
+    const loadAuditTrail = async (id) => {
+        await api.ProcurementPlan.logger(id)
+        .then(res => {
+            setLogger(res.data.data);
+        })
+        .catch(res => {})
+        .then(res => {})
+    }
      
     const openInFull = () => {
         window.open(`${props.selectedProcurementPlan.file}?view=1`,
@@ -122,8 +157,13 @@ const ListProcurementPlan = (props) => {
         setSelectedProcurementPlan({});
     }
 
-
-    
+    const openProcurementPlan = async (item, index) => {
+        setSelectedProcurementPlan(item)
+        setTimelines([]);
+        setLogger([]);
+        loadProcurementPlanData(item.id);
+        loadAuditTrail(item.id);
+    }
 
 
     return (
@@ -132,7 +172,7 @@ const ListProcurementPlan = (props) => {
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Project Procurement Management Plan" bordered={false}>
-                        <TableProcurementPlan getProcurementPlans={getProcurementPlans} />
+                        <TableProcurementPlan getProcurementPlans={getProcurementPlans} openProcurementPlan={openProcurementPlan} />
                     </Card>
                 </Col>
                 { isEmpty(props.selectedProcurementPlan.file) ? "" : ( 

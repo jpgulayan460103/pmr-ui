@@ -5,12 +5,12 @@ import { useHistory } from 'react-router-dom'
 import {
     EditOutlined,
 } from '@ant-design/icons';
-import TableRefresh from '../../../../Components/TableRefresh';
-import TableResetFilter from '../../../../Components/TableResetFilter';
 import { cloneDeep, isEmpty } from 'lodash';
-import api from '../../../../api';
-import filter from '../../../../Utilities/filter';
-import TableFooterPagination from '../../../../Components/TableFooterPagination';
+import api from '../../../api';
+import filter from '../../../Utilities/filter';
+import TableResetFilter from '../../../Components/TableResetFilter';
+import TableRefresh from '../../../Components/TableRefresh';
+import TableFooterPagination from '../../../Components/TableFooterPagination';
 
 function mapStateToProps(state) {
     return {
@@ -29,28 +29,6 @@ function mapStateToProps(state) {
 
 const TableProcurementPlan = (props) => {
     let history = useHistory()
-
-    const loadProcurementPlanData = async (id) => {
-        await api.ProcurementPlan.get(id)
-        .then(res => {
-            let item = res.data;
-            let form_routes = item.form_routes.data;
-            setTimelines(form_routes);
-            setSelectedProcurementPlan(item)
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-    const loadAuditTrail = async (id) => {
-        await api.ProcurementPlan.logger(id)
-        .then(res => {
-            setLogger(res.data.data);
-        })
-        .catch(res => {})
-        .then(res => {})
-    }
 
     const editProcurementPlan = (item, index) => {
         api.ProcurementPlan.get(item.id)
@@ -96,29 +74,6 @@ const TableProcurementPlan = (props) => {
         });
     }
     
-    const setTimelines = (value) => {
-        props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_LIST_TIMELINES",
-            data: value
-        });
-    }
-
-    const setLogger = (value) => {
-        props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_LIST_LOGGER",
-            data: value,
-        });
-    }
-
-
-    const openProcurementPlan = async (item, index) => {
-        setSelectedProcurementPlan(item)
-        setTimelines([]);
-        setLogger([]);
-        loadProcurementPlanData(item.id);
-        loadAuditTrail(item.id);
-    }
-   
 
     const endUserFilter = cloneDeep(props.user_sections).map(i => {
         i.value = i.id;
@@ -134,10 +89,10 @@ const TableProcurementPlan = (props) => {
                 onClick: event => {
                     setSelectedProcurementPlan(record)
                     if(isEmpty(props.selectedProcurementPlan)){
-                        openProcurementPlan(record, colIndex);
+                        props.openProcurementPlan(record, colIndex);
                     }else{
                         if(props.selectedProcurementPlan.id != record.id){
-                            openProcurementPlan(record, colIndex);
+                            props.openProcurementPlan(record, colIndex);
                         }
                     }
                 },

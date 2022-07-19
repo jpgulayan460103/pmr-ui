@@ -12,6 +12,7 @@ import AuditBatches from '../../Components/AuditBatches';
 import MaximizeSvg from '../../Icons/MaximizeSvg';
 import TableRequisitionIssue from './Components/TableRequisitionIssue';
 import FormRouting from '../../Components/FormRouting';
+import InfoRequisitionIssue from './Components/InfoRequisitionIssue';
 
 const { TabPane } = Tabs;
 
@@ -155,30 +156,6 @@ const ListRequisitionIssue = (props) => {
         setSelectedRequisitionIssue({});
     }
 
-    const editRequisitionIssue = (item, index) => {
-        api.RequisitionIssue.get(item.id)
-        .then(res => {
-            let ris = res.data;
-            ris.items = ris.items.data;
-            ris.issued_items = [];
-            ris.form_route_id = item.id;
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_CREATE_FORM_TYPE",
-                data: "update"
-            });
-
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_CREATE_FORM_DATA",
-                data: ris
-            });
-
-            history.push("/requisition-and-issues/form");
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
     const loadAuditTrail = async (id) => {
         await api.RequisitionIssue.logger(id)
         .then(res => {
@@ -216,14 +193,7 @@ const ListRequisitionIssue = (props) => {
                                 <div className='purchase-request-card-content'>
                                     <Tabs activeKey={props.tab} type="card" size="small" onChange={setTabKey}>
                                         <TabPane tab="Information" key="information">
-                                            <div className='p-2'>
-                                                <p>
-                                                    <b>RIS No.:</b> {props.selectedRequisitionIssue?.ris_number || ""} <br />
-                                                    <b>RIS Date:</b> {props.selectedRequisitionIssue?.ris_date || ""} <br />
-                                                    <b>End User:</b> {props.selectedRequisitionIssue?.end_user?.name || ""} <br />
-                                                    <b>Purpose:</b> {props.selectedRequisitionIssue?.purpose || ""} <br />
-                                                </p>
-                                            </div>
+                                            <InfoRequisitionIssue form={props.selectedRequisitionIssue} />
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
                                             { !isEmpty(props.timelines) ? (

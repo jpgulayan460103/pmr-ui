@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Skeleton, Button, Tabs, Card, Col, Row, Tooltip  } from 'antd';
-import api from '../../../api';
+import api from '../../api';
 import Icon, {
     CloseOutlined,
 } from '@ant-design/icons';
 import { debounce, isEmpty } from 'lodash';
-import AttachmentUpload from '../../../Components/AttachmentUpload';
-import AuditBatches from '../../../Components/AuditBatches';
-import TablePurchaseRequest from './TablePurchaseRequest';
-import FormRouting from '../../../Components/FormRouting';
-import InfoPurchaseRequest from './InfoPurchaseRequest';
-import MaximizeSvg from '../../../Icons/MaximizeSvg';
+import AttachmentUpload from '../../Components/AttachmentUpload';
+import AuditBatches from '../../Components/AuditBatches';
+import FormRouting from '../../Components/FormRouting';
+import InfoPurchaseRequest from './Components/InfoPurchaseRequest';
+import TablePurchaseRequest from './Components/TablePurchaseRequest';
+import MaximizeSvg from '../../Icons/MaximizeSvg';
 
 const { TabPane } = Tabs;
 

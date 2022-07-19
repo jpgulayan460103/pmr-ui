@@ -17,7 +17,7 @@ import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
 import Login from './Pages/Login/Login'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
-import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest/ListPurchaseRequest'
+import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import ItemLibrary from './Pages/Library/ItemLibrary'
 import User from './Pages/User/User'
@@ -35,7 +35,7 @@ import { compare } from 'compare-versions';
 import { version } from '../package.json';
 import { cloneDeep } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
-import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan/ListProcurementPlan';
+import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
 import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
 import CreateRequisitionIssue from './Pages/RequisitionIssue/CreateRequisitionIssue';
 import ListRequisitionIssue from './Pages/RequisitionIssue/ListRequisitionIssue';
