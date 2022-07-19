@@ -15,39 +15,13 @@ import { cloneDeep, isEmpty } from 'lodash';
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        selectedPurchaseRequest: state.purchaseRequests.list.selectedPurchaseRequest,
-        purchaseRequests: state.purchaseRequests.list.purchaseRequests,
-        paginationMeta: state.purchaseRequests.list.paginationMeta,
-        loading: state.purchaseRequests.list.loading,
-        tableFilter: state.purchaseRequests.list.tableFilter,
-        defaultTableFilter: state.purchaseRequests.list.defaultTableFilter,
         user_sections: state.libraries.user_sections,
     };
 }   
 
 function TablePurchaseRequest(props) {
     let history = useHistory()
-    const setTableFilter = (data) => {
-        if(typeof data == "function"){
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
-                data: data(),
-            });
-        }else{
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
-                data: props.defaultTableFilter,
-            });
-        }
-    }
-
-    const setSelectedPurchaseRequest = (value) => {
-        props.dispatch({
-            type: "SET_PURCHASE_REQUEST_LIST_SELECTED_PURCHASE_REQUEST",
-            data: value
-        });
-    }
-
+    
     const editPurchaseRequest = (item, index) => {
         api.PurchaseRequest.get(item.id)
         .then(res => {
@@ -99,7 +73,7 @@ function TablePurchaseRequest(props) {
     };
 
     const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
+        props.setTableFilter(prev => ({...prev, page: e}));
         props.getPurchaseRequests({...props.tableFilter, page: e})
     }
 
@@ -116,7 +90,7 @@ function TablePurchaseRequest(props) {
         onCell: (record, colIndex) => {
             return {
                 onClick: event => {
-                    setSelectedPurchaseRequest(record)
+                    props.setSelectedPurchaseRequest(record)
                     if(isEmpty(props.selectedPurchaseRequest)){
                         props.openPurchaseRequest(record, colIndex);
                     }else{
@@ -136,7 +110,7 @@ function TablePurchaseRequest(props) {
             key: 'pr_date',
             width: 120,
             align: "center",
-            ...filter.search('pr_date','date_range', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.search('pr_date','date_range', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -145,7 +119,7 @@ function TablePurchaseRequest(props) {
             dataIndex: 'pr_number',
             key: 'pr_number',
             width: 150,
-            ...filter.search('pr_number','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.search('pr_number','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -154,7 +128,7 @@ function TablePurchaseRequest(props) {
             dataIndex: 'title',
             key: 'title',
             width: 200,
-            ...filter.search('title','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.search('title','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -163,7 +137,7 @@ function TablePurchaseRequest(props) {
             dataIndex: 'purpose',
             key: 'purpose',
             width: 200,
-            ...filter.search('purpose','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.search('purpose','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -172,7 +146,7 @@ function TablePurchaseRequest(props) {
             key: 'total_cost',
             width: 150,
             align: "center",
-            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.search('total_cost','number_range', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     { item.total_cost_formatted }
@@ -195,7 +169,7 @@ function TablePurchaseRequest(props) {
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
             ],
-            ...filter.list('status','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
         },
         {
@@ -204,7 +178,7 @@ function TablePurchaseRequest(props) {
             ellipsis: true,
             width: 250,
             filters: endUserFilter,
-            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, props.getPurchaseRequests),
+            ...filter.list('end_user_id','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -238,7 +212,7 @@ function TablePurchaseRequest(props) {
     return (
         <div>
             <div className="flex justify-end mb-2 space-x-2">
-                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
+                <TableResetFilter defaultTableFilter="reset" setTableFilter={props.setTableFilter} />
                 <TableRefresh getData={props.getPurchaseRequests} />
             </div>
             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {

@@ -5,7 +5,6 @@ import api from '../../api';
 import Icon, {
     CloseOutlined,
 } from '@ant-design/icons';
-import { useHistory } from 'react-router-dom'
 import { debounce, isEmpty } from 'lodash';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import AuditBatches from '../../Components/AuditBatches';
@@ -41,7 +40,6 @@ const ListRequisitionIssue = (props) => {
             // setRequisitionIssues([]);
         }
     }, []);
-    let history = useHistory()
     useEffect(() => {
         document.title = "List of Requisition and Issue Plan";
         if(props.isInitialized){
@@ -95,6 +93,20 @@ const ListRequisitionIssue = (props) => {
             type: "SET_REQUISITION_ISSUE_LIST_TIMELINES",
             data: value
         });
+    }
+    
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
+                data: data(),
+            });
+        }else{
+            props.dispatch({
+                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
     }
 
     const getRequisitionIssues = debounce((filters) => {
@@ -166,6 +178,18 @@ const ListRequisitionIssue = (props) => {
         .then(res => {})
     }
 
+    const tableProps = {
+        getRequisitionIssues: getRequisitionIssues,
+        openRequisitionIssue: openRequisitionIssue,
+        setTableFilter: setTableFilter,
+        setSelectedRequisitionIssue: setSelectedRequisitionIssue,
+        tableFilter: props.tableFilter,
+        requisitionIssues: props.requisitionIssues,
+        paginationMeta: props.paginationMeta,
+        loading: props.loading,
+        defaultTableFilter: props.defaultTableFilter,
+    };
+
     return (
         <div>
 
@@ -173,7 +197,7 @@ const ListRequisitionIssue = (props) => {
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Requisition and Issue Slips" bordered={false}>
                         <div className='purchase-request-card-content'>
-                            <TableRequisitionIssue getRequisitionIssues={getRequisitionIssues} openRequisitionIssue={openRequisitionIssue} />
+                            <TableRequisitionIssue {...tableProps} />
                         </div>
                     </Card>
                 </Col>

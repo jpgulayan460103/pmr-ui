@@ -143,6 +143,21 @@ const Listpurchaserequest = (props) => {
         });
     }
 
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
+                data: data(),
+            });
+        }else{
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
+    }
+
+
 
      
     const openInFull = () => {
@@ -165,7 +180,17 @@ const Listpurchaserequest = (props) => {
         setSelectedPurchaseRequest({});
     }
 
-    
+    const tableProps = {
+        getPurchaseRequests: getPurchaseRequests,
+        openPurchaseRequest: openPurchaseRequest,
+        setTableFilter: setTableFilter,
+        setSelectedPurchaseRequest: setSelectedPurchaseRequest,
+        tableFilter: props.tableFilter,
+        purchaseRequests: props.purchaseRequests,
+        paginationMeta: props.paginationMeta,
+        loading: props.loading,
+        defaultTableFilter: props.defaultTableFilter,
+    };
 
     return (
         <div>
@@ -174,7 +199,7 @@ const Listpurchaserequest = (props) => {
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Puchase Requests" bordered={false}>
                         <div className='purchase-request-card-content'>
-                            <TablePurchaseRequest getPurchaseRequests={getPurchaseRequests} openPurchaseRequest={openPurchaseRequest} />
+                            <TablePurchaseRequest {...tableProps} />
                         </div>
                     </Card>
                 </Col>

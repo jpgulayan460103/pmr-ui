@@ -17,12 +17,6 @@ import filter from '../../../Utilities/filter';
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
-        selectedRequisitionIssue: state.requisitionIssues.list.selectedRequisitionIssue,
-        requisitionIssues: state.requisitionIssues.list.requisitionIssues,
-        paginationMeta: state.requisitionIssues.list.paginationMeta,
-        loading: state.requisitionIssues.list.loading,
-        tableFilter: state.requisitionIssues.list.tableFilter,
-        defaultTableFilter: state.requisitionIssues.list.defaultTableFilter,
         user_sections: state.libraries.user_sections,
     };
 }
@@ -30,27 +24,6 @@ function mapStateToProps(state) {
 
 function TableRequisitionIssue(props) {
     let history = useHistory()
-    const setTableFilter = (data) => {
-        if(typeof data == "function"){
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
-                data: data(),
-            });
-        }else{
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
-                data: props.defaultTableFilter,
-            });
-        }
-    }
-
-    const setSelectedRequisitionIssue = (value) => {
-        props.dispatch({
-            type: "SET_REQUISITION_ISSUE_LIST_SELECTED_PURCHASE_REQUEST",
-            data: value
-        });
-    }
-
 
     const editRequisitionIssue = (item, index) => {
         api.RequisitionIssue.get(item.id)
@@ -89,7 +62,7 @@ function TableRequisitionIssue(props) {
     };
 
     const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
+        props.setTableFilter(prev => ({...prev, page: e}));
         props.getRequisitionIssues({...props.tableFilter, page: e})
     }
 
@@ -146,7 +119,7 @@ function TableRequisitionIssue(props) {
         onCell: (record, colIndex) => {
             return {
                 onClick: event => {
-                    setSelectedRequisitionIssue(record)
+                    props.setSelectedRequisitionIssue(record)
                     if(isEmpty(props.selectedRequisitionIssue)){
                         props.openRequisitionIssue(record, colIndex);
                     }else{
@@ -166,7 +139,7 @@ function TableRequisitionIssue(props) {
             key: 'ris_date',
             width: 120,
             align: "center",
-            ...filter.search('ris_date','date_range', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.search('ris_date','date_range', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -176,7 +149,7 @@ function TableRequisitionIssue(props) {
             key: 'ris_number',
             width: 150,
             align: "center",
-            ...filter.search('ris_number','text', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.search('ris_number','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -185,7 +158,7 @@ function TableRequisitionIssue(props) {
             dataIndex: 'title',
             key: 'title',
             width: 200,
-            ...filter.search('title','text', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.search('title','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -194,7 +167,7 @@ function TableRequisitionIssue(props) {
             dataIndex: 'purpose',
             key: 'purpose',
             width: 400,
-            ...filter.search('purpose','text', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.search('purpose','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
         },
@@ -213,7 +186,7 @@ function TableRequisitionIssue(props) {
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
             ],
-            ...filter.list('status','text', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
         },
         {
@@ -222,7 +195,7 @@ function TableRequisitionIssue(props) {
             ellipsis: true,
             width: 250,
             filters: endUserFilter,
-            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...filter.list('end_user_id','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             render: (text, item, index) => (
                 <span>
                     <span>{ item.end_user.name }</span>
@@ -262,7 +235,7 @@ function TableRequisitionIssue(props) {
     return (
         <div>
             <div className="flex justify-end mb-2 space-x-2">
-                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
+                <TableResetFilter defaultTableFilter="reset" setTableFilter={props.setTableFilter} />
                 <TableRefresh getData={props.getRequisitionIssues} />
             </div>
             <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {

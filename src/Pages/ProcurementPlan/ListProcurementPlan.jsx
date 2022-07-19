@@ -100,6 +100,21 @@ const ListProcurementPlan = (props) => {
         });
     }
 
+    const setTableFilter = (data) => {
+        if(typeof data == "function"){
+            props.dispatch({
+                type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",
+                data: data(),
+            });
+        }else{
+            props.dispatch({
+                type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",
+                data: props.defaultTableFilter,
+            });
+        }
+    }
+
+
     const getProcurementPlans = debounce((filters) => {
         if(filters == null){
             filters = props.tableFilter
@@ -165,6 +180,18 @@ const ListProcurementPlan = (props) => {
         loadAuditTrail(item.id);
     }
 
+    const tableProps = {
+        getProcurementPlans: getProcurementPlans,
+        openProcurementPlan: openProcurementPlan,
+        setTableFilter: setTableFilter,
+        setSelectedProcurementPlan: setSelectedProcurementPlan,
+        tableFilter: props.tableFilter,
+        procurementPlans: props.procurementPlans,
+        paginationMeta: props.paginationMeta,
+        loading: props.loading,
+        defaultTableFilter: props.defaultTableFilter,
+    };
+
 
     return (
         <div>
@@ -172,7 +199,7 @@ const ListProcurementPlan = (props) => {
             <Row gutter={[16, 16]} className="mb-3">
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Project Procurement Management Plan" bordered={false}>
-                        <TableProcurementPlan getProcurementPlans={getProcurementPlans} openProcurementPlan={openProcurementPlan} />
+                        <TableProcurementPlan {...tableProps} />
                     </Card>
                 </Col>
                 { isEmpty(props.selectedProcurementPlan.file) ? "" : ( 
