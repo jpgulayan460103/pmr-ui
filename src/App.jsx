@@ -17,7 +17,7 @@ import 'react-image-lightbox/style.css';
 import Layout from './Layouts/Main'
 import Login from './Pages/Login/Login'
 import CreatePurchaseRequest from './Pages/PurchaseRequest/CreatePurchaseRequest'
-import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
+import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import ItemLibrary from './Pages/Library/ItemLibrary'
 import User from './Pages/User/User'
