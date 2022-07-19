@@ -1,12 +1,14 @@
 import { combineReducers } from 'redux'
 import approvedForm from './ApprovedFormReducer'
 import disapprovedForm from './DisapprovedFormReducer'
-import forwardedForm from './PendingFormReducer'
+import pendingForm from './PendingFormReducer'
+import referencePurchaseRequest from './ReferencePurchaseRequest'
 
 const rootReducer = combineReducers({
   approvedForm,
   disapprovedForm,
-  forwardedForm,
+  pendingForm,
+  referencePurchaseRequest,
 })
 
 export default rootReducer
