@@ -12,6 +12,9 @@ import TableRefresh from '../../Components/TableRefresh';
 import TableResetFilter from '../../Components/TableResetFilter';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import MaximizeSvg from '../../Icons/MaximizeSvg';
+import InfoPurchaseRequest from '../PurchaseRequest/Components/InfoPurchaseRequest';
+import InfoProcurementPlan from '../ProcurementPlan/Components/InfoProcurementPlan';
+import InfoRequisitionIssue from '../RequisitionIssue/Components/InfoRequisitionIssue';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -143,18 +146,6 @@ const DisapprovedForm = (props) => {
       
     const columns = [
         {
-            title: 'Description',
-            key: 'route_description',
-            width: 150,
-            ...onCell,
-            ellipsis: true,
-            render: (text, item, index) => (
-                <span>
-                    { item.form_process.process_description }
-                </span>
-            ),
-        },
-        {
             title: 'Form Type',
             dataIndex: 'route_type_str',
             key: 'route_type_str',
@@ -175,48 +166,6 @@ const DisapprovedForm = (props) => {
                     { item.created_at_date }
                 </span>
             ),
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Title',
-            key: 'title',
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.title }
-                </span>
-            ),
-            ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
-            ...onCell,
-            ellipsis: true,
-            width: 150,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Purpose',
-            key: 'purpose',
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.purpose }
-                </span>
-            ),
-            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
-            ...onCell,
-            ellipsis: true,
-            width: 150,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Amount',
-            key: 'total_cost',
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.total_cost_formatted }
-                </span>
-            ),
-            ...onCell,
-            ellipsis: true,
-            ...filter.search('total_cost','number_range', setTableFilter, props.tableFilter, getForm),
-            width: 150,
             sorter: (a, b) => {},
         },
         {
@@ -301,7 +250,22 @@ const DisapprovedForm = (props) => {
     }
 
 
-
+    const formInformation = (type) => {
+        switch (type) {
+            case 'purchase_request':
+                return <InfoPurchaseRequest form={props.selectedFormRoute.form_routable} />;
+                break;
+            case 'procurement_plan':
+                return <InfoProcurementPlan form={props.selectedFormRoute.form_routable} />;
+                break;
+            case 'requisition_issue':
+                return <InfoRequisitionIssue form={props.selectedFormRoute.form_routable} />;
+                break;
+        
+            default:
+                break;
+        }
+    }
 
     
     return (
@@ -347,10 +311,7 @@ const DisapprovedForm = (props) => {
                             <div className='forms-card-content'>
                                 <p>
                                     <span><b>Form type:</b> <span>{props.selectedFormRoute.route_type_str}</span></span><br />
-                                    <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
                                     <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
-                                    <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.total_cost_formatted}</span></span><br />
                                     <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
                                     <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
                                     <span><b>Description:</b> <span>{props.selectedFormRoute.remarks}</span><br /></span>
@@ -362,7 +323,8 @@ const DisapprovedForm = (props) => {
                                     <span><b>Disapproved:</b> <span>{ props.selectedFormRoute.updated_at }</span></span><br />
                                     <span><b>Turnaround Time:</b> <span>{ helpers.turnAroundTime(props.selectedFormRoute.updated_at_raw, props.selectedFormRoute.created_at_raw) }</span></span><br />
                                 </p>
-                                
+                                <p className='text-center'><b>{props.selectedFormRoute.route_type_str} Information</b></p>
+                                { formInformation(props.selectedFormRoute.route_type) }
                             </div>
                         </Card>
                     </Col>

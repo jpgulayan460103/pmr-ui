@@ -13,6 +13,9 @@ import TableFooterPagination from '../../Components/TableFooterPagination';
 import TableRefresh from '../../Components/TableRefresh';
 import TableResetFilter from '../../Components/TableResetFilter';
 import MaximizeSvg from '../../Icons/MaximizeSvg';
+import InfoPurchaseRequest from '../PurchaseRequest/Components/InfoPurchaseRequest';
+import InfoProcurementPlan from '../ProcurementPlan/Components/InfoProcurementPlan';
+import InfoRequisitionIssue from '../RequisitionIssue/Components/InfoRequisitionIssue';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -31,6 +34,7 @@ function mapStateToProps(state) {
         forms: state.forms.forwardedForm.forms,
         pagination: state.forms.forwardedForm.pagination,
         selectedFormRoute: state.forms.forwardedForm.selectedFormRoute,
+        selectedForm: state.forms.forwardedForm.selectedForm,
         routeOptions: state.forms.forwardedForm.routeOptions,
         procurementFormType: state.forms.forwardedForm.procurementFormType,
         addOn: state.forms.forwardedForm.addOn,
@@ -120,6 +124,12 @@ const PendingForm = (props) => {
     const setSelectedFormRoute = (value) => {
         props.dispatch({
             type: "SET_FORM_FORWARDED_SELECTED_FORM_ROUTE",
+            data: value,
+        });
+    }
+    const setSelectedForm = (value) => {
+        props.dispatch({
+            type: "SET_FORM_FORWARDED_SELECTED_FORM",
             data: value,
         });
     }
@@ -396,6 +406,7 @@ const PendingForm = (props) => {
                 break;
             case "procurement_plan":
                 viewProcurementPlan(item.form_routable_id);
+                break;
             case "requisition_issue":
                 viewRequisitionIssue(item.form_routable_id);
                 break;
@@ -507,7 +518,7 @@ const PendingForm = (props) => {
             if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)
             setFormLoading(false);
-            // setSelectedForm();
+            setSelectedForm(res.data);
         })
         .catch(err => {
             setFormLoading(false);
@@ -524,7 +535,7 @@ const PendingForm = (props) => {
             if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)
             setFormLoading(false);
-            // setSelectedForm();
+            setSelectedForm(res.data);
         })
         .catch(err => {
             setFormLoading(false);
@@ -541,7 +552,7 @@ const PendingForm = (props) => {
             if (unmounted.current) { return false; }
             setAttachments(res.data.form_uploads.data)
             setFormLoading(false);
-            // setSelectedForm();
+            setSelectedForm(res.data);
         })
         .catch(err => {
             setFormLoading(false);
@@ -565,18 +576,6 @@ const PendingForm = (props) => {
     const dataSource = props.forms
       
     const columns = [
-        // {
-        //     title: 'Description',
-        //     key: 'route_description',
-        //     width: 150,
-        //     ...onCell,
-        //     ellipsis: true,
-        //     render: (text, item, index) => (
-        //         <span>
-        //             { item.form_process.process_description }
-        //         </span>
-        //     ),
-        // },
         {
             title: 'Form Type',
             dataIndex: 'route_type_str',
@@ -598,34 +597,6 @@ const PendingForm = (props) => {
                     { item.created_at_date }
                 </span>
             ),
-        },
-        {
-            title: 'Title',
-            key: 'title',
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.title }
-                </span>
-            ),
-            ...filter.search('title','text', setTableFilter, props.tableFilter, getForm),
-            ...onCell,
-            ellipsis: true,
-            width: 150,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Purpose',
-            key: 'purpose',
-            render: (text, item, index) => (
-                <span>
-                    { item.form_routable?.purpose }
-                </span>
-            ),
-            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getForm),
-            ...onCell,
-            ellipsis: true,
-            width: 150,
-            sorter: (a, b) => {},
         },
         {
             title: 'End User',
@@ -658,7 +629,7 @@ const PendingForm = (props) => {
         {
             title: 'Status',
             key: 'status',
-            width: 250,
+            width: 120,
             render: (text, item, index) => (
                 <span>
                     { item.status != "pending" ? (
@@ -759,6 +730,23 @@ const PendingForm = (props) => {
             // pr_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
             pr_number_last: padded_pr_last,
         });
+    }
+
+    const formInformation = (type) => {
+        switch (type) {
+            case 'purchase_request':
+                return <InfoPurchaseRequest form={props.selectedForm} />;
+                break;
+            case 'procurement_plan':
+                return <InfoProcurementPlan form={props.selectedForm} />;
+                break;
+            case 'requisition_issue':
+                return <InfoRequisitionIssue form={props.selectedForm} />;
+                break;
+        
+            default:
+                break;
+        }
     }
 
     return (
@@ -1082,10 +1070,7 @@ const PendingForm = (props) => {
                             <div className='forms-card-content'>
                                 <p>
                                     <span><b>Form type:</b> <span>{props.selectedFormRoute.route_type_str}</span></span><br />
-                                    <span><b>Title:</b> <span>{props.selectedFormRoute.form_routable?.title}</span></span><br />
                                     <span><b>End User:</b> <span>{props.selectedFormRoute.end_user.name}</span></span><br />
-                                    <span><b>Purpose:</b> <span>{props.selectedFormRoute.form_routable?.purpose}</span></span><br />
-                                    {/* <span><b>Amount:</b> <span>{props.selectedFormRoute.form_routable?.common_amount_formatted}</span></span><br /> */}
                                     <span><b>Forwarded by:</b> <span>{props.selectedFormRoute.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.from_office?.name}` : props.selectedFormRoute.from_office?.name }</span></span><br />
                                     <span><b>Forwarded to:</b> <span>{props.selectedFormRoute.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.selectedFormRoute.to_office?.name}` : props.selectedFormRoute.to_office?.name }</span></span><br />
                                     <span><b>Remarks:</b> <span>{props.selectedFormRoute.remarks}</span></span><br />
@@ -1094,7 +1079,8 @@ const PendingForm = (props) => {
                                     { props.selectedFormRoute.status != "pending" ? <span><b>Disapproved by:</b> <span>{props.selectedFormRoute.user?.user_information?.fullname}</span><br /></span> : ""}
                                     <span><b>Created:</b> <span>{ props.selectedFormRoute.created_at }</span></span><br />
                                 </p>
-                                
+                                <p className='text-center'><b>{props.selectedFormRoute.route_type_str} Information</b></p>
+                                { formInformation(props.selectedFormRoute.route_type) }
                             </div>
                         </Card>
                     </Col>

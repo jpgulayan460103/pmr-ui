@@ -21,6 +21,7 @@ const initialState = () => {
         formLoading: false,
         tableFilter: defaultTableFilter,
         defaultTableFilter: defaultTableFilter,
+        selectedForm: {}
     }
   }
   
@@ -40,6 +41,11 @@ const initialState = () => {
         return {
           ...state,
           selectedFormRoute: action.data,
+        };    
+      case 'SET_FORM_FORWARDED_SELECTED_FORM':
+        return {
+          ...state,
+          selectedForm: action.data,
         };    
       case 'SET_FORM_FORWARDED_ROUTE_OPTIONS':
         return {
