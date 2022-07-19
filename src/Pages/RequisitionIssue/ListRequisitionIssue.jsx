@@ -1,38 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Table, Skeleton, Pagination, Button, Typography, Timeline, Tabs, Input, DatePicker, Card, Col, Row, Dropdown, Menu, Tooltip  } from 'antd';
+import { Skeleton, Button, Tabs, Card, Col, Row, Tooltip  } from 'antd';
 import api from '../../api';
 import Icon, {
     CloseOutlined,
-    EllipsisOutlined,
-    SearchOutlined,
-    CheckCircleOutlined,
-    ExclamationCircleOutlined,
-    QuestionCircleOutlined,
-    InfoCircleOutlined,
-    LoadingOutlined,
-    FormOutlined,
-    EditOutlined,
-    ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
-import dayjs from 'dayjs';
-import { cloneDeep, debounce, isEmpty } from 'lodash';
-import filter from '../../Utilities/filter';
-import AuditTrail from '../../Components/AuditTrail';
+import { debounce, isEmpty } from 'lodash';
 import AttachmentUpload from '../../Components/AttachmentUpload';
-import TableFooterPagination from '../../Components/TableFooterPagination';
-import helpers from '../../Utilities/helpers';
-import TableRefresh from '../../Components/TableRefresh';
-import TableResetFilter from '../../Components/TableResetFilter';
-import customDayJs from "./../../customDayJs";
 import AuditBatches from '../../Components/AuditBatches';
 import MaximizeSvg from '../../Icons/MaximizeSvg';
+import TableRequisitionIssue from './Components/TableRequisitionIssue';
+import FormRouting from '../../Components/FormRouting';
 
-const { Title } = Typography;
 const { TabPane } = Tabs;
-const { Search } = Input;
-const { RangePicker } = DatePicker;
 
 
 function mapStateToProps(state) {
@@ -70,21 +51,6 @@ const ListRequisitionIssue = (props) => {
     }, [props.isInitialized]);
     
     
-
-    const setTableFilter = (data) => {
-        if(typeof data == "function"){
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
-                data: data(),
-            });
-        }else{
-            props.dispatch({
-                type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
-                data: props.defaultTableFilter,
-            });
-        }
-    }
-
     const setTabKey = (value) => {
         props.dispatch({
             type: "SET_REQUISITION_ISSUE_TAB",
@@ -223,253 +189,6 @@ const ListRequisitionIssue = (props) => {
         .then(res => {})
     }
 
-
-    const handleTableChange = (pagination, filters, sorter) => {
-        // console.log(sorter);
-        // console.log(filters);
-        if(!isEmpty(sorter)){
-            filters.sortColumn = sorter.columnKey
-            filters.sortOrder = sorter.order
-            getRequisitionIssues(filters)
-        }else{
-            getRequisitionIssues(filters)
-        }
-    };
-
-    const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
-        getRequisitionIssues({...props.tableFilter, page: e})
-    }
-
-    const timelineContent = (timeline) => {
-        let created;
-        let tat_text;
-        let status;
-        let remarks;
-        let office;
-        let remarksUser;
-        let forwardedUser;
-        let color =""
-        let logo =""
-        created = <span>Created on <i>{ timeline.created_at }</i><br /></span>;
-        status = <span>{timeline.status_str} on <i>{ timeline.updated_at }</i><br /></span>;
-        tat_text = <span>Turnaround Time: <i>{ helpers.turnAroundTime(timeline.updated_at_raw, timeline.created_at_raw) }</i><br /></span>;
-        office = <span><b>{timeline.to_office?.name}</b> <br /></span>;
-        remarks = <span>Remarks: {timeline.remarks}<br /></span>;
-        forwardedUser = <span>From: {timeline.forwarded_by?.user_information?.fullname}<br /></span>;
-        remarksUser = <span>{timeline.status_str} by {timeline.processed_by?.user_information?.fullname}<br /></span>;
-        switch (timeline.status) {
-            case "approved":
-                color = "green";
-                logo = <CheckCircleOutlined />;
-                break;
-            case "rejected":
-                color = "red";
-                logo = <ExclamationCircleOutlined />;
-                break;
-            case "with_issues":
-                color = "blue";
-                logo = <QuestionCircleOutlined />;
-                break;
-            case "resolved":
-                color = "blue";
-                logo = <CheckCircleOutlined />;
-                break;
-            default:
-                tat_text = "";
-                color = "gray";
-                logo = <LoadingOutlined />
-                break;
-        }
-        if(timeline.action_taken == null){
-            color = "gray";
-            logo = <LoadingOutlined />
-            tat_text = "";
-            remarks = "";
-            forwardedUser = "";
-            remarksUser = "";
-        }
-        let label = (<>
-            { office }
-            { created }
-            { status }
-            { tat_text }
-            { remarks }
-            { forwardedUser }
-            { remarksUser }
-        </>)
-        return { label, color, logo }
-    }
-
-    const endUserFilter = cloneDeep(props.user_sections).map(i => {
-        i.value = i.id;
-        return i;
-    });
-
-    const addToPurchaseRequest = (item, index) => {
-        api.RequisitionIssue.get(item.id)
-        .then(res => {
-            let risRes = res.data;
-            let ris = {
-                purpose: risRes.purpose,
-                end_user_id: risRes.end_user_id,
-                items: risRes.items.data,
-                pr_date: customDayJs().format('YYYY-MM-DD'),
-                requisition_issue_id: risRes.id,
-                requisition_issue_file: risRes.file,
-                from_ppmp: risRes.from_ppmp,
-            };
-            ris.items = ris.items.filter(risItem => risItem.is_pr_recommended == 1).map(risItem => {
-                risItem.item_name = risItem.description;
-                risItem.item_code = risItem.item?.item_code;
-                risItem.quantity = risItem.request_quantity - risItem.issue_quantity;
-                risItem.unit_cost = risItem.procurement_plan_item ? risItem.procurement_plan_item.price : 0;
-                risItem.requisition_issue_item_id = risItem.id;
-                return risItem;
-            });
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_CREATE_FORM_DATA",
-                data: ris
-            });
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
-                data: {}
-            });
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_SELECTED_REQUISITION_ISSUE",
-                data: risRes
-            });
-
-            history.push("/purchase-requests/form");
-        })
-        .catch(err => {})
-        .then(res => {})
-        ;
-    }
-
-
-    const dataSource = props.requisitionIssues;
-
-    const onCell = {
-        onCell: (record, colIndex) => {
-            return {
-                onClick: event => {
-                    setSelectedRequisitionIssue(record)
-                    if(isEmpty(props.selectedRequisitionIssue)){
-                        openRequisitionIssue(record, colIndex);
-                    }else{
-                        if(props.selectedRequisitionIssue.id != record.id){
-                            openRequisitionIssue(record, colIndex);
-                        }
-                    }
-                },
-            };
-          }
-    }
-      
-    const columns = [
-        {
-            title: 'RIS Date',
-            dataIndex: 'ris_date',
-            key: 'ris_date',
-            width: 120,
-            align: "center",
-            ...filter.search('ris_date','date_range', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'RIS No.',
-            dataIndex: 'ris_number',
-            key: 'ris_number',
-            width: 150,
-            align: "center",
-            ...filter.search('ris_number','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            width: 200,
-            ...filter.search('title','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-        {
-            title: 'Purpose',
-            dataIndex: 'purpose',
-            key: 'purpose',
-            width: 400,
-            ...filter.search('purpose','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
-
-        {
-            title: 'Status',
-            key: 'status',
-            align: "center",
-            width: 120,
-            render: (text, item, index) => (
-                <span>
-                    { item.status }
-                </span>
-            ),
-            filters: [
-                { text: 'Approved', value: "Approved" },
-                { text: 'Pending', value: "Pending" },
-            ],
-            ...filter.list('status','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-            ...onCell,
-        },
-        {
-            title: 'End User',
-            key: 'end_user',
-            ellipsis: true,
-            width: 250,
-            filters: endUserFilter,
-            ...filter.list('end_user_id','text', setTableFilter, props.tableFilter, getRequisitionIssues),
-            render: (text, item, index) => (
-                <span>
-                    <span>{ item.end_user.name }</span>
-                </span>
-            ),
-            ...onCell,
-        },
-        {
-            title: "Action",
-            key: "action",
-            fixed: 'right',
-            width: 100,
-            align: "center",
-            render: (text, item, index) => (
-                <div className='space-x-0.5'>
-                    <Tooltip placement="bottom" title={"Edit"}>
-                        <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
-
-                        </Button>
-                    </Tooltip>
-                    { item.status == "Issued" && (
-                        <Tooltip placement="bottom" title={"Create Purchase Request"}>
-                            <Button size='small' type='default' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
-
-                            </Button>
-                        </Tooltip>
-                    ) }
-                    {/* <Tooltip placement="bottom" title={"Cancel"}>
-                        <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
-
-                        </Button>
-                    </Tooltip> */}
-                </div>
-              )
-        },
-    ];
-
-
-
     return (
         <div>
 
@@ -477,23 +196,7 @@ const ListRequisitionIssue = (props) => {
                 <Col md={24} lg={14} xl={16}>
                     <Card size="small" title="Created Requisition and Issue Slips" bordered={false}>
                         <div className='purchase-request-card-content'>
-                            <div className="flex justify-end mb-2 space-x-2">
-                                <TableResetFilter defaultTableFilter="reset" setTableFilter={setTableFilter} />
-                                <TableRefresh getData={getRequisitionIssues} />
-                            </div>
-                            <Table dataSource={dataSource} columns={columns} rowClassName={(record, index) => {
-                                    if(props.selectedRequisitionIssue?.id == record.id){
-                                        return "selected-row";
-                                    }
-                                }}
-                                onChange={handleTableChange}
-                                size={"small"}
-                                pagination={false}
-                                scroll={{ y: "50vh" }}
-                                loading={{spinning: props.loading, tip: "Loading..."}}
-                            />
-
-                            <TableFooterPagination pagination={props.paginationMeta} paginationChange={paginationChange} />
+                            <TableRequisitionIssue getRequisitionIssues={getRequisitionIssues} openRequisitionIssue={openRequisitionIssue} />
                         </div>
                     </Card>
                 </Col>
@@ -524,13 +227,7 @@ const ListRequisitionIssue = (props) => {
                                         </TabPane>
                                         <TabPane tab="Routing" key="routing">
                                             { !isEmpty(props.timelines) ? (
-                                                <div className='pt-4'>
-                                                    <Timeline>
-                                                        { props.timelines.map((timeline, index) => {
-                                                            return <Timeline.Item dot={timelineContent(timeline).logo} color={timelineContent(timeline).color} key={index}>{timelineContent(timeline).label}</Timeline.Item>
-                                                        }) }
-                                                    </Timeline>
-                                                </div>
+                                                <FormRouting timelines={props.timelines} />
                                             ) : <Skeleton active />  }
                                         </TabPane>
                                         <TabPane tab="Audit Trail" key="audit-trail" style={{padding: "5px", paddingBottom: "50px"}}>
