@@ -35,7 +35,7 @@ import { compare } from 'compare-versions';
 import { version } from '../package.json';
 import { cloneDeep } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
-import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
+import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan/ListProcurementPlan';
 import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
 import CreateRequisitionIssue from './Pages/RequisitionIssue/CreateRequisitionIssue';
 import ListRequisitionIssue from './Pages/RequisitionIssue/ListRequisitionIssue';
