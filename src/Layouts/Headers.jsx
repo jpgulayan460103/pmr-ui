@@ -224,9 +224,9 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                         <Select placeholder="Select an Issue" style={{ width: "100%" }}>
                             <Option value="Account Problem">Account Problem</Option>
                             <Option value="Bug and Error Report">Bug and Error Report (Please attach the screenshot of the error)</Option>
-                            <Option value="User Training">User Training</Option>
-                            <Option value="Suggestions and Recommendations">Suggestions and Recommendations</Option>
-                            <Option value="Others">Others</Option>
+                            {/* <Option value="User Training">User Training</Option> */}
+                            {/* <Option value="Suggestions and Recommendations">Suggestions and Recommendations</Option> */}
+                            {/* <Option value="Others">Others</Option> */}
                         </Select>
                     </Form.Item>
 
