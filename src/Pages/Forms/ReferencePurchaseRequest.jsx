@@ -79,7 +79,7 @@ function ReferencePurchaseRequest(props) {
 
     const setTableFilters = (data) => {
         if(data == "reset"){
-            setTableFilter(props.defaultTableFilter);
+            setTableFilter(defaultTableFilter);
             getPurchaseRequests(props.defaultTableFilter);
         }else{
             setTableFilter(data);

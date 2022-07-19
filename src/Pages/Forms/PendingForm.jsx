@@ -85,10 +85,6 @@ const PendingForm = (props) => {
         }
         // console.log("rerender");
     }, [props.isInitialized]);
-    const defaultTableFilter = {
-        page: 1,
-        created_at: helpers.defaultDateRange
-    };
     // const [tableFilter, setTableFilter] = useState(defaultTableFilter);
     const [modalRejectForm, setModalRejectForm] = useState(false);
     const [modalResolveForm, setModalResolveForm] = useState(false);

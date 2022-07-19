@@ -3,7 +3,7 @@ import helpers from "../../Utilities/helpers";
 const initialState = () => {
     const defaultTableFilter = {
       page: 1,
-      created_at: helpers.defaultDateRange
+      // created_at: helpers.defaultDateRange
     }
     return {
       forms: [],
