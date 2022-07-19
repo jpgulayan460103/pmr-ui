@@ -101,15 +101,15 @@ const ListProcurementPlan = (props) => {
     }
 
     const setTableFilter = (data) => {
-        if(typeof data == "function"){
+        if(data == "reset"){
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",
-                data: data(),
+                data: props.defaultTableFilter,
             });
         }else{
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",
-                data: props.defaultTableFilter,
+                data: data,
             });
         }
     }

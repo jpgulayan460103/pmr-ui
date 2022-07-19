@@ -59,15 +59,15 @@ const ApprovedForm = (props) => {
     }, [props.isInitialized]);
     
     const setTableFilter = (data) => {
-        if(typeof data == "function"){
+        if(data == "reset"){
             props.dispatch({
                 type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
-                data: { ...props.tableFilter, ...data() },
+                data: props.defaultTableFilter,
             });
         }else{
             props.dispatch({
                 type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
-                data: props.defaultTableFilter,
+                data: data,
             });
         }
     }

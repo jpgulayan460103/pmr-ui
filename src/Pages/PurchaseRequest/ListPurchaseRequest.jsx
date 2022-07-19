@@ -144,17 +144,18 @@ const Listpurchaserequest = (props) => {
     }
 
     const setTableFilter = (data) => {
-        if(typeof data == "function"){
-            props.dispatch({
-                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
-                data: data(),
-            });
-        }else{
+        if(data == "reset"){
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+        }else{
+            props.dispatch({
+                type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
+                data: data,
+            });
         }
+        
     }
 
 

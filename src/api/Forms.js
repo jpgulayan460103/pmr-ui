@@ -42,4 +42,10 @@ export default {
   deleteUpload(type, id){
     return axios.delete(`api/forms/uploads/${type}/${id}`);
   },
+
+  getPurchaseRequests(formdata){
+    return axios.get(`api/forms/purchase-requests`,{
+      params: formdata
+    });
+  },
 }

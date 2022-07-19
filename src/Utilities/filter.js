@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Input, DatePicker, Select, Button, Tag } from 'antd';
 import { SearchOutlined, FilterFilled } from '@ant-design/icons';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import FilterOptions from './../Components/FilterOptions'
 
 
@@ -16,28 +16,29 @@ const handleSearch = (event, getData) => {
     }
     getData();
 }
-const searchInput = (e, dataIndex, type, setTableFilter) => {
+const searchInput = (e, dataIndex, type, setTableFilter, tableFilter = {}) => {
+    let clonedFilter = cloneDeep(tableFilter);
     if(type == "date_range"){
         if(!isEmpty(e)){
             e = e.map(i => moment(i).format("YYYY-MM-DD"))
         }
-        setTableFilter(prev => ({...prev, [dataIndex]: e, page: 1}));
+        setTableFilter({...clonedFilter, [dataIndex]: e, page: 1});
     }else if(type == "number_range"){
-        setTableFilter(prev => ({...prev, [dataIndex]: e.value, [`${dataIndex}_op`]: e.operand, page: 1 }));
+        setTableFilter({...clonedFilter, [dataIndex]: e.value, [`${dataIndex}_op`]: e.operand, page: 1 });
     }else{
-        setTableFilter(prev => ({...prev, [dataIndex]: e.target.value, page: 1}));
+        setTableFilter({...clonedFilter, [dataIndex]: e.target.value, page: 1});
     }
 }
 
-const NumberRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData}) => {
+const NumberRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData, tableFilter}) => {
     const [range, setRange] = useState(">=");
     const [value, setValue] = useState(null);
     const handleChange = useCallback((e) => {
-        searchInput({ operand: range, value: e.target.value }, dataIndex, type, setTableFilter);
+        searchInput({ operand: range, value: e.target.value }, dataIndex, type, setTableFilter, tableFilter);
         setValue(e.target.value);
     },[value]);
     const handleSelect = useCallback((e) => {
-        searchInput({ operand: e, value }, dataIndex, type, setTableFilter);
+        searchInput({ operand: e, value }, dataIndex, type, setTableFilter, tableFilter);
         setRange(e);
         setValue(null);
     },[range])
@@ -70,7 +71,7 @@ const ExtraDateRangeFooter = ({selectFilter, getData}) => {
     );
 }
 
-const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData}) => {
+const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, getData, tableFilter}) => {
     const [value, setValue] = useState([]);
     useEffect(() => {
         setValue(defaultValue?.map(i => moment(i, "YYYY-MM-DD")));
@@ -81,42 +82,42 @@ const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, 
         var dateEnd;
         switch (selected) {
             case "now":
-                searchInput([currentDate, currentDate], dataIndex, type, setTableFilter)
+                searchInput([currentDate, currentDate], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             case "this_week":
                 dateStart = currentDate.clone().startOf('isoWeek');
                 dateEnd = currentDate.clone().endOf('isoWeek');
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             case "this_month":
                 dateStart = currentDate.clone().startOf('month');
                 dateEnd = currentDate.clone().endOf('month');
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             case "three_month":
                 dateStart = currentDate.clone().subtract(2, 'month');
                 dateEnd = currentDate.clone();
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             case "six_month":
                 dateStart = currentDate.clone().subtract(5, 'month');
                 dateEnd = currentDate.clone();
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             case "this_year":
                 dateStart = currentDate.clone().startOf('year');
                 dateEnd = currentDate.clone().endOf('year');
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
             case "last_year":
                 dateStart = currentDate.clone().subtract(1, 'year').startOf('year');
                 dateEnd = currentDate.clone().subtract(1, 'year').endOf('year');
-                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter)
+                searchInput([dateStart, dateEnd], dataIndex, type, setTableFilter, tableFilter)
                 break;
         
             default:
@@ -125,7 +126,7 @@ const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, 
     }, []);
     return (
         <Input.Group compact>
-            <RangePicker value={value} format={'YYYY-MM-DD'} style={{width: "90%"}} onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} renderExtraFooter={() => <ExtraDateRangeFooter selectFilter={selectFilter} getData={getData} />} />
+            <RangePicker value={value} format={'YYYY-MM-DD'} style={{width: "90%"}} onChange={(e) => searchInput(e, dataIndex, type, setTableFilter, tableFilter)} renderExtraFooter={() => <ExtraDateRangeFooter selectFilter={selectFilter} getData={getData} />} />
             <Button type="default" icon={<SearchOutlined />}  onClick={() => getData() } />
         </Input.Group>
     );
@@ -134,10 +135,10 @@ const DateRange = ({defaultValue, searchInput, dataIndex, type, setTableFilter, 
 const search = (dataIndex, type, setTableFilter, tableFilter, getData) => ({
     filterDropdown: ({ }) => (
       <div style={{ padding: 8 }}>
-          { type == "text" ? <Search placeholder="input search text" value={tableFilter[dataIndex]} allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} onSearch={(e, event) => handleSearch(event, getData)} style={{ width: 200 }} /> : "" }
-          { type == "number" ? <Input type="number" value={tableFilter[dataIndex]} placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
-          { type == "number_range" ? <NumberRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} /> : "" }
-          { type == "date_range" ? <DateRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} /> : "" }
+          { type == "text" ? <Search placeholder="input search text" value={tableFilter[dataIndex]} allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter, tableFilter)} onSearch={(e, event) => handleSearch(event, getData)} style={{ width: 200 }} /> : "" }
+          { type == "number" ? <Input type="number" value={tableFilter[dataIndex]} placeholder="input search text" allowClear onChange={(e) => searchInput(e, dataIndex, type, setTableFilter, tableFilter)} onPressEnter={() => getData() } style={{ width: 200 }} /> : "" }
+          { type == "number_range" ? <NumberRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} tableFilter={tableFilter} /> : "" }
+          { type == "date_range" ? <DateRange defaultValue={tableFilter[dataIndex]} searchInput={searchInput} dataIndex={dataIndex} type={type} setTableFilter={setTableFilter} getData={getData} tableFilter={tableFilter} /> : "" }
       </div>
     ),
     filterIcon: filtered => <FilterFilled className={filtered ? 'table-active-filter' : null} />,

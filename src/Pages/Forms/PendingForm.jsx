@@ -96,15 +96,15 @@ const PendingForm = (props) => {
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
 
     const setTableFilter = (data) => {
-        if(typeof data == "function"){
+        if(data == "reset"){
             props.dispatch({
                 type: "SET_FORM_FORWARDED_TABLE_FILTER",
-                data: { ...props.tableFilter, ...data() },
+                data: props.defaultTableFilter,
             });
         }else{
             props.dispatch({
                 type: "SET_FORM_FORWARDED_TABLE_FILTER",
-                data: props.defaultTableFilter,
+                data: data,
             });
         }
     }

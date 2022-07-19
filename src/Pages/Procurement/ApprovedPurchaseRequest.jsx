@@ -84,15 +84,15 @@ const ApprovedPurchaseRequest = (props) => {
     }, [props.isInitialized]);
     
     const setTableFilter = (data) => {
-        if(typeof data == "function"){
+        if(data == "reset"){
             props.dispatch({
                 type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-                data: {...props.tableFilter, ...data()}
+                data: props.defaultTableFilter,
             });
         }else{
             props.dispatch({
                 type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-                data: props.defaultTableFilter
+                data: data,
             });
         }
     }
