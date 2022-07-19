@@ -64,6 +64,7 @@ const ApprovedForm = (props) => {
                 type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getForm(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_FORM_APPROVED_FORM_TABLE_FILTER",
@@ -225,17 +226,19 @@ const ApprovedForm = (props) => {
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
         // console.log(filters);
+        let clonedFilter = cloneDeep(props.tableFilter);
         if(!isEmpty(sorter)){
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
-            setTableFilter(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
+            setTableFilter({...clonedFilter, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder});
         }
         getForm({...props.tableFilter, ...filters})
     };
 
     const paginationChange = async (e) => {
         // console.log(e);
-        setTableFilter(prev => ({...prev, page: e}));
+        let clonedFilter = cloneDeep(props.tableFilter);
+        setTableFilter({...clonedFilter, page: e});
         getForm({...props.tableFilter, page: e})
     }
 

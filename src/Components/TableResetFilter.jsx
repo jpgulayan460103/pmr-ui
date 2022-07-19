@@ -9,7 +9,7 @@ const TableResetFilter = ({defaultTableFilter, setTableFilter}) => {
             <Tooltip placement="top" title="Clear Filters">
                 <ClearOutlined style={{cursor: "pointer"}} onClick={() => {
                     setTableFilter(defaultTableFilter);
-                    message.info('Table filter has been set to default. Please refresh the table');
+                    message.info('The filters of the table has been removed.');
                 }} />
             </Tooltip>
         </>

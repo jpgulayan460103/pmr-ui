@@ -149,6 +149,7 @@ const Listpurchaserequest = (props) => {
                 type: "SET_PURCHASE_REQUEST_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getPurchaseRequests(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_PURCHASE_REQUEST_TABLE_FILTER",

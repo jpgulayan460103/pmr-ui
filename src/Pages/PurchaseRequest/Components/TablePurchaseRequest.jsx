@@ -73,7 +73,8 @@ function TablePurchaseRequest(props) {
     };
 
     const paginationChange = async (e) => {
-        props.setTableFilter(prev => ({...prev, page: e}));
+        let clonedFilter = cloneDeep(props.tableFilter);
+        props.setTableFilter({...clonedFilter, page: e});
         props.getPurchaseRequests({...props.tableFilter, page: e})
     }
 

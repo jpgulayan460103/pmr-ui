@@ -89,6 +89,7 @@ const ApprovedPurchaseRequest = (props) => {
                 type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            props.getPurchaseRequests(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
@@ -100,27 +101,20 @@ const ApprovedPurchaseRequest = (props) => {
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
         // console.log(filters);
+        let clonedFilter = cloneDeep(props.tableFilter);
         if(!isEmpty(sorter)){
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
-            props.dispatch({
-                type: "SET_PROCUREMENT_PURCHASE_REQUESTS_TABLE_FILTER",
-                data: {...props.tableFilter, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}
-            });
+            setTableFilter({...clonedFilter, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder});
         }
         props.getPurchaseRequests({...props.tableFilter, ...filters})
     };
 
-
-
     const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
+        // console.log(e);
+        let clonedFilter = cloneDeep(props.tableFilter);
+        setTableFilter({...clonedFilter, page: e});
         props.getPurchaseRequests({...props.tableFilter, page: e})
-    }
-
-    const changePageSize = (page, size) => {
-        setTableFilter(prev => ({...prev, page: page, size: size}));
-        props.getPurchaseRequests({...props.tableFilter, page: page, size: size})
     }
 
     const viewPurchaseRequest = async (item, index) => {

@@ -106,6 +106,7 @@ const ListProcurementPlan = (props) => {
                 type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getProcurementPlans(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_TABLE_FILTER",

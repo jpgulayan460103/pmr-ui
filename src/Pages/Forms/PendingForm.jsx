@@ -96,11 +96,13 @@ const PendingForm = (props) => {
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
 
     const setTableFilter = (data) => {
+        console.log(data);
         if(data == "reset"){
             props.dispatch({
                 type: "SET_FORM_FORWARDED_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getForm(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_FORM_FORWARDED_TABLE_FILTER",
@@ -709,17 +711,19 @@ const PendingForm = (props) => {
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);
         // console.log(filters);
+        let clonedFilter = cloneDeep(props.tableFilter);
         if(!isEmpty(sorter)){
             filters.sortColumn = sorter.columnKey
             filters.sortOrder = sorter.order
-            setTableFilter(prev => ({...prev, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder}));
+            setTableFilter({...clonedFilter, sortColumn: filters.sortColumn, sortOrder: filters.sortOrder});
         }
         getForm({...props.tableFilter, ...filters})
     };
 
     const paginationChange = async (e) => {
         // console.log(e);
-        setTableFilter(prev => ({...prev, page: e}));
+        let clonedFilter = cloneDeep(props.tableFilter);
+        setTableFilter({...clonedFilter, page: e});
         getForm({...props.tableFilter, page: e})
     }
 

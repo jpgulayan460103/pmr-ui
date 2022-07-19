@@ -112,7 +112,8 @@ const ActivityLogs = (props) => {
     }, 150)
 
     const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
+        let clonedFilter = cloneDeep(props.tableFilter);
+        setTableFilter({...clonedFilter, page: e});
         getLogs({...tableFilter, page: e})
     }
 

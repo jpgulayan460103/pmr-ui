@@ -101,6 +101,7 @@ const ListRequisitionIssue = (props) => {
                 type: "SET_REQUISITION_ISSUE_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getRequisitionIssues(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_REQUISITION_ISSUE_TABLE_FILTER",

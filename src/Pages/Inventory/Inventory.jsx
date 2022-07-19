@@ -121,6 +121,7 @@ const Inventory = (props) => {
                 type: "SET_INVENTORY_SUPPLY_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
+            getSupplies(props.defaultTableFilter);
         }else{
             props.dispatch({
                 type: "SET_INVENTORY_SUPPLY_TABLE_FILTER",
@@ -233,7 +234,8 @@ const Inventory = (props) => {
     };
 
     const paginationChange = async (e) => {
-        setTableFilter(prev => ({...prev, page: e}));
+        let clonedFilter = cloneDeep(props.tableFilter);
+        setTableFilter({...clonedFilter, page: e});
         getSupplies({...props.tableFilter, page: e})
     }
 

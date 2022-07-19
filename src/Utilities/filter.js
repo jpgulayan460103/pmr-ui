@@ -160,6 +160,7 @@ const list = (dataIndex, type, setTableFilter, tableFilter, getData) => ({
             setTableFilter={setTableFilter}
             dataIndex={dataIndex}
             getData={getData}
+            tableFilter={tableFilter}
         />;
     },
     filteredValue: tableFilter[dataIndex] || null,

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Input, Checkbox, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import _map from 'lodash/map'
+import { cloneDeep } from 'lodash';
 
 const FilterOptions = (
     {
@@ -12,6 +12,7 @@ const FilterOptions = (
         setTableFilter,
         dataIndex,
         getData,
+        tableFilter
     }
 ) => {
     useEffect(() => {
@@ -23,29 +24,32 @@ const FilterOptions = (
         setSearchStr(val);
     }
     const resetSelected = () => {
+        let clonedFilter = cloneDeep(tableFilter);
         setSelectedKeys([]);
-        setTableFilter(prev => ({...prev, [dataIndex]: []}));
+        setTableFilter({...clonedFilter, [dataIndex]: []});
     }
     const setFilterOptions = () => {
+        let clonedFilter = cloneDeep(tableFilter);
         confirm({ closeDropdown: true });
-        setTableFilter(prev => ({...prev, [dataIndex]: selectedKeys}));
+        setTableFilter({...clonedFilter, [dataIndex]: selectedKeys});
         getData();
     }
     const selectOption = (e, option) => {
+        let clonedFilter = cloneDeep(tableFilter);
         if(e.target.checked){
             if(selectedKeys && selectedKeys.indexOf(option.value) > -1){
             }else{
                 if(selectedKeys){
                     setSelectedKeys([...selectedKeys, option.value]);
-                    setTableFilter(prev => ({...prev, [dataIndex]: [...selectedKeys, option.value]}));
+                    setTableFilter({...clonedFilter, [dataIndex]: [...selectedKeys, option.value]});
                 }else{
                     setSelectedKeys([option.value]);
-                    setTableFilter(prev => ({...prev, [dataIndex]: [option.value]}));
+                    setTableFilter({...clonedFilter, [dataIndex]: [option.value]});
                 }
             }
         }else{
             setSelectedKeys(selectedKeys.filter(i => i != option.value));
-            setTableFilter(prev => ({...prev, [dataIndex]: selectedKeys.filter(i => i != option.value)}));
+            setTableFilter({...clonedFilter, [dataIndex]: selectedKeys.filter(i => i != option.value)});
         }
     }
     return (
