@@ -3,30 +3,30 @@ import { cloneDeep, debounce } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
 import api from '../../api';
-import TablePurchaseRequest from '../PurchaseRequest/Components/TablePurchaseRequest';
+import TableRequisitionIssue from '../RequisitionIssue/Components/TableRequisitionIssue';
 
 
 function mapStateToProps(state) {
     return {
         isInitialized: state.user.isInitialized,
         user: state.user.data,
-        purchaseRequests: state.forms.allForm.purchaseRequests,
-        paginationMeta: state.forms.allForm.purchaseRequestPagination,
+        requisitionIssues: state.forms.allForm.requisitionIssues,
+        paginationMeta: state.forms.allForm.requisitionIssuePagination,
         loading: state.forms.allForm.loading,
     };
 }
 
 
-function ReferencePurchaseRequest(props) {
+function ReferenceRequisitionIssue(props) {
 
     useEffect(() => {
-        getPurchaseRequests();
+        getRequisitionIssues();
     }, []);
     const [form, setForm] = useState({});
 
     const defaultTableFilter = {
         page: 1,
-        status: ['Approved']
+        status: ['Issued', 'Approved']
     }
 
     const [tableFilter, setTableFilter] = useState(defaultTableFilter);
@@ -37,32 +37,32 @@ function ReferencePurchaseRequest(props) {
             data: value,
         });
     }
-    const setPurchaseRequests = (value) => {
+    const setRequisitionIssues = (value) => {
         props.dispatch({
-            type: "SET_FORM_ALL_FORM_PURCHASE_REQUESTS",
+            type: "SET_FORM_ALL_FORM_REQUISITION_ISSUES",
             data: value,
         });
     }
 
     const setPaginationMeta = (value) => {
         props.dispatch({
-            type: "SET_FORM_ALL_FORM_PURCHASE_REQUEST_PAGINATION",
+            type: "SET_FORM_ALL_FORM_REQUISITION_ISSUE_PAGINATION",
             data: value,
         });
     }
     
     
-    const getPurchaseRequests = debounce((filters) => {
+    const getRequisitionIssues = debounce((filters) => {
         if(filters == null){
             filters = tableFilter
         }
         setTableLoading(true);
-        api.Forms.getPurchaseRequests(filters)
+        api.Forms.getRequisitionIssues(filters)
         .then(res => {
             setTableLoading(false);
             let data = res.data.data;
             let meta = res.data.meta;
-            setPurchaseRequests(data);
+            setRequisitionIssues(data);
             setPaginationMeta(meta.pagination);
         })
         .catch(res => {
@@ -74,27 +74,27 @@ function ReferencePurchaseRequest(props) {
         ;
     }, 200);
 
-    const setSelectedPurchaseRequest = (record) => {
+    const setSelectedRequisitionIssue = (record) => {
         setForm(record);
     }
 
     const setTableFilters = (data) => {
         if(data == "reset"){
             setTableFilter(defaultTableFilter);
-            getPurchaseRequests(props.defaultTableFilter);
+            getRequisitionIssues(props.defaultTableFilter);
         }else{
             setTableFilter(data);
         }
     }
 
     const tableProps = {
-        getPurchaseRequests: getPurchaseRequests,
-        openPurchaseRequest: () => {},
+        getRequisitionIssues: getRequisitionIssues,
+        openRequisitionIssue: () => {},
         setTableFilter: setTableFilters,
-        setSelectedPurchaseRequest: setSelectedPurchaseRequest,
+        setSelectedRequisitionIssue: setSelectedRequisitionIssue,
         tableFilter: tableFilter,
-        selectedPurchaseRequest: form,
-        purchaseRequests: props.purchaseRequests,
+        selectedRequisitionIssue: form,
+        requisitionIssues: props.requisitionIssues,
         paginationMeta: props.paginationMeta,
         loading: props.loading,
         defaultTableFilter,
@@ -105,14 +105,14 @@ function ReferencePurchaseRequest(props) {
         <div>
             <Row gutter={[16, 16]} className="mb-3">
                 <Col span={24}>
-                    <Card size="small" title="All Puchase Requests" bordered={false}>
+                    <Card size="small" title="All Requisition and Issue Slips" bordered={false}>
                         <div className='purchase-request-card-content'>
-                            <TablePurchaseRequest {...tableProps} />
+                            <TableRequisitionIssue {...tableProps} />
                         </div>
                     </Card>
                 </Col>
                 <Col span={24}>
-                    <Card size="small" bordered={false} title="Puchase Request Details">
+                    <Card size="small" bordered={false} title="Requisition and Issue Slip Details">
                         <div className='forms-card-form-content'>
                             { form.file && (
                                 <iframe src={`${form.file}?view=1`} style={{width: "100%", height: "100%"}}></iframe>
@@ -127,4 +127,4 @@ function ReferencePurchaseRequest(props) {
 
 export default connect(
     mapStateToProps,
-  )(ReferencePurchaseRequest);
+  )(ReferenceRequisitionIssue);

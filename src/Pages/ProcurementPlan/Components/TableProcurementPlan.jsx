@@ -73,7 +73,7 @@ const TableProcurementPlan = (props) => {
           }
     }
       
-    const columns = [
+    const defaultColumn = [
         {
             title: 'PPMP Date',
             dataIndex: 'ppmp_date',
@@ -162,28 +162,36 @@ const TableProcurementPlan = (props) => {
             ),
             ...onCell,
         },
-        {
-            title: "Action",
-            key: "action",
-            fixed: 'right',
-            width: 100,
-            align: "center",
-            render: (text, item, index) => (
-                <div className='space-x-0.5'>
-                    <Tooltip placement="bottom" title={"Edit"}>
-                        <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
-
-                        </Button>
-                    </Tooltip>
-                    {/* <Tooltip placement="bottom" title={"Cancel"}>
-                        <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
-
-                        </Button>
-                    </Tooltip> */}
-                </div>
-              )
-        },
     ];
+
+    const addColumns = () => {
+        if(props.page == "list"){
+            defaultColumn.push({
+                title: "Action",
+                key: "action",
+                fixed: 'right',
+                width: 100,
+                align: "center",
+                render: (text, item, index) => (
+                    <div className='space-x-0.5'>
+                        <Tooltip placement="bottom" title={"Edit"}>
+                            <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
+    
+                            </Button>
+                        </Tooltip>
+                        {/* <Tooltip placement="bottom" title={"Cancel"}>
+                            <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
+    
+                            </Button>
+                        </Tooltip> */}
+                    </div>
+                  )
+            })
+        }
+    }
+
+    addColumns();
+    const columns = defaultColumn;
 
     const handleTableChange = (pagination, filters, sorter) => {
         // console.log(sorter);

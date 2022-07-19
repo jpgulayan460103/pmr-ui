@@ -48,4 +48,14 @@ export default {
       params: formdata
     });
   },
+  getProcurementPlans(formdata){
+    return axios.get(`api/forms/procurement-plans`,{
+      params: formdata
+    });
+  },
+  getRequisitionIssues(formdata){
+    return axios.get(`api/forms/requisition-issues`,{
+      params: formdata
+    });
+  },
 }

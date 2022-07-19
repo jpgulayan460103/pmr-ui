@@ -132,8 +132,8 @@ function TableRequisitionIssue(props) {
             };
           }
     }
-      
-    const columns = [
+
+    const defaultColumn = [
         {
             title: 'RIS Date',
             dataIndex: 'ris_date',
@@ -186,6 +186,7 @@ function TableRequisitionIssue(props) {
             filters: [
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
+                { text: 'Issued', value: "Issued" },
             ],
             ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
@@ -204,35 +205,43 @@ function TableRequisitionIssue(props) {
             ),
             ...onCell,
         },
-        {
-            title: "Action",
-            key: "action",
-            fixed: 'right',
-            width: 100,
-            align: "center",
-            render: (text, item, index) => (
-                <div className='space-x-0.5'>
-                    <Tooltip placement="bottom" title={"Edit"}>
-                        <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
+    ];
+    
 
-                        </Button>
-                    </Tooltip>
-                    { item.status == "Issued" && (
-                        <Tooltip placement="bottom" title={"Create Purchase Request"}>
-                            <Button size='small' type='default' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
-
+    const addColumns = () => {
+        if(props.page == "list"){
+            defaultColumn.push({
+                title: "Action",
+                key: "action",
+                fixed: 'right',
+                width: 100,
+                align: "center",
+                render: (text, item, index) => (
+                    <div className='space-x-0.5'>
+                        <Tooltip placement="bottom" title={"Edit"}>
+                            <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
+    
                             </Button>
                         </Tooltip>
-                    ) }
-                    {/* <Tooltip placement="bottom" title={"Cancel"}>
-                        <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
-
-                        </Button>
-                    </Tooltip> */}
-                </div>
-              )
-        },
-    ];
+                        { item.status == "Issued" && (
+                            <Tooltip placement="bottom" title={"Create Purchase Request"}>
+                                <Button size='small' type='default' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
+    
+                                </Button>
+                            </Tooltip>
+                        ) }
+                        {/* <Tooltip placement="bottom" title={"Cancel"}>
+                            <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
+    
+                            </Button>
+                        </Tooltip> */}
+                    </div>
+                  )
+            })
+        }
+    }
+    addColumns();
+    const columns = defaultColumn;
     return (
         <div>
             <div className="flex justify-end mb-2 space-x-2">

@@ -189,6 +189,7 @@ const ListRequisitionIssue = (props) => {
         paginationMeta: props.paginationMeta,
         loading: props.loading,
         defaultTableFilter: props.defaultTableFilter,
+        page: "list",
     };
 
     return (

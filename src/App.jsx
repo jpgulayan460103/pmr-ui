@@ -42,6 +42,8 @@ import ListRequisitionIssue from './Pages/RequisitionIssue/ListRequisitionIssue'
 import Inventory from './Pages/Inventory/Inventory';
 import Profile from './Pages/User/Profile';
 import ReferencePurchaseRequest from './Pages/Forms/ReferencePurchaseRequest';
+import ReferenceProcurementPlan from './Pages/Forms/ReferenceProcurementPlan';
+import ReferenceRequisitionIssue from './Pages/Forms/ReferenceRequisitionIssue';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -156,13 +158,13 @@ const App = (props) => {
                 <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/forms/project-procurement-plans"  >
-                <PrivateRoute><Layout><ReferencePurchaseRequest /></Layout></PrivateRoute>
+                <PrivateRoute><Layout><ReferenceProcurementPlan /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/forms/purchase-requests"  >
                 <PrivateRoute><Layout><ReferencePurchaseRequest /></Layout></PrivateRoute>
             </Route>
-            <Route exact path="/forms/project-procurement-plans"  >
-                <PrivateRoute><Layout><ReferencePurchaseRequest /></Layout></PrivateRoute>
+            <Route exact path="/forms/requisition-and-issue-slips"  >
+                <PrivateRoute><Layout><ReferenceRequisitionIssue /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/procurement-plans/form"  >
                 <PrivateRoute><Layout><CreateProcurementPlan /></Layout></PrivateRoute>
