@@ -44,6 +44,7 @@ import Profile from './Pages/User/Profile';
 import ReferencePurchaseRequest from './Pages/Forms/ReferencePurchaseRequest';
 import ReferenceProcurementPlan from './Pages/Forms/ReferenceProcurementPlan';
 import ReferenceRequisitionIssue from './Pages/Forms/ReferenceRequisitionIssue';
+import Error404 from './Pages/Error404';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -233,7 +234,7 @@ const App = (props) => {
                 <Login />
             </Route>
             <Route exact path="*"  >
-                <PrivateRoute><Layout></Layout></PrivateRoute>
+                <PrivateRoute><Layout><Error404></Error404></Layout></PrivateRoute>
             </Route>
             </Switch>
     );
