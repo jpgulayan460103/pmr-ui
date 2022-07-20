@@ -1,5 +1,5 @@
 import { Card, Col, Row } from 'antd';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
 import api from '../../api';
@@ -18,10 +18,14 @@ function mapStateToProps(state) {
 
 
 function ReferencePurchaseRequest(props) {
-
     useEffect(() => {
-        getPurchaseRequests();
-    }, []);
+        document.title = "List all of Purchase Requests";
+        if(props.isInitialized){
+            if(isEmpty(props.purchaseRequests)){
+                getPurchaseRequests();
+            }
+        }
+    }, [props.isInitialized]);
     const [form, setForm] = useState({});
 
     const defaultTableFilter = {

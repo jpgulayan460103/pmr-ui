@@ -1,5 +1,5 @@
 import { Card, Col, Row } from 'antd';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
 import api from '../../api';
@@ -18,10 +18,14 @@ function mapStateToProps(state) {
 
 
 function ReferenceRequisitionIssue(props) {
-
     useEffect(() => {
-        getRequisitionIssues();
-    }, []);
+        document.title = "List all of Requisition and Issue Slips";
+        if(props.isInitialized){
+            if(isEmpty(props.requisitionIssues)){
+                getRequisitionIssues();
+            }
+        }
+    }, [props.isInitialized]);
     const [form, setForm] = useState({});
 
     const defaultTableFilter = {
