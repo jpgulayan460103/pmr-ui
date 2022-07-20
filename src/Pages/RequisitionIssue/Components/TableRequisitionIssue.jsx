@@ -1,10 +1,11 @@
-import React from 'react';
-import { Button, Table, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Button, Form, Input, Modal, Select, Table, Tooltip } from 'antd';
 import {
     EditOutlined,
     ShoppingCartOutlined,
+    FileZipFilled,
 } from '@ant-design/icons';
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom'
 import api from '../../../api';
@@ -13,6 +14,7 @@ import TableRefresh from '../../../Components/TableRefresh';
 import TableResetFilter from '../../../Components/TableResetFilter';
 import dayjs from '../../../customDayJs';
 import filter from '../../../Utilities/filter';
+import ArchiveForm from '../../../Components/ArchiveForm';
 
 function mapStateToProps(state) {
     return {
@@ -23,7 +25,8 @@ function mapStateToProps(state) {
 
 
 function TableRequisitionIssue(props) {
-    let history = useHistory()
+    let history = useHistory();
+    const [archiveModal, setArchiveModal] = useState(false);
 
     const editRequisitionIssue = (item, index) => {
         api.RequisitionIssue.get(item.id)
@@ -113,6 +116,10 @@ function TableRequisitionIssue(props) {
         ;
     }
 
+    const showArchiveForm = (item, index) => {
+        setArchiveModal(true);
+        props.setSelectedRequisitionIssue(item)
+    }
 
     const dataSource = props.requisitionIssues;
 
@@ -167,7 +174,7 @@ function TableRequisitionIssue(props) {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
-            width: 400,
+            width: 350,
             ...filter.search('purpose','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
             sorter: (a, b) => {},
@@ -186,7 +193,9 @@ function TableRequisitionIssue(props) {
             filters: [
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
+                { text: 'Disapproved', value: "Disapproved" },
                 { text: 'Issued', value: "Issued" },
+                { text: 'Archived', value: "Archived" },
             ],
             ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
             ...onCell,
@@ -205,6 +214,15 @@ function TableRequisitionIssue(props) {
             ),
             ...onCell,
         },
+        {
+            title: 'Remarks',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: 250,
+            ...filter.search('remarks','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
     ];
     
 
@@ -218,23 +236,27 @@ function TableRequisitionIssue(props) {
                 align: "center",
                 render: (text, item, index) => (
                     <div className='space-x-0.5'>
-                        <Tooltip placement="bottom" title={"Edit"}>
+                        { item.status != "Archived" && (
+                        <Tooltip placement="right" title={"Edit"}>
                             <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
     
                             </Button>
                         </Tooltip>
+                        ) }
                         { item.status == "Issued" && (
-                            <Tooltip placement="bottom" title={"Create Purchase Request"}>
-                                <Button size='small' type='default' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
+                            <Tooltip placement="right" title={"Create Purchase Request"}>
+                                <Button size='small' type='primary' icon={<ShoppingCartOutlined />}  onClick={() => { addToPurchaseRequest(item, index) }}>
     
                                 </Button>
                             </Tooltip>
                         ) }
-                        {/* <Tooltip placement="bottom" title={"Cancel"}>
-                            <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editRequisitionIssue(item, index) }}>
+                        { item.status == "Disapproved" && (
+                            <Tooltip placement="right" title={"Archive"}>
+                                <Button size='small' type='danger' icon={<FileZipFilled />}  onClick={() => { showArchiveForm(item, index) }}>
     
-                            </Button>
-                        </Tooltip> */}
+                                </Button>
+                            </Tooltip>
+                        ) }
                     </div>
                   )
             })
@@ -261,6 +283,7 @@ function TableRequisitionIssue(props) {
             />
 
             <TableFooterPagination pagination={props.paginationMeta} paginationChange={paginationChange} />
+            <ArchiveForm reloadData={props.getRequisitionIssues} selectedForm={props.selectedRequisitionIssue} setArchiveModal={setArchiveModal} archiveModal={archiveModal} formType="requisition_issue" />
         </div>
     );
 }

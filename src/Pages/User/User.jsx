@@ -62,7 +62,7 @@ const User = (props) => {
         })
         .then(res => {})
         ;
-    }, 150)
+    }, 250)
     
     return (
         <div>

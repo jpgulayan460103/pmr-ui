@@ -371,7 +371,7 @@ const ListLibrary = (props) => {
             setSubmit(false);
         })
         ;
-    }, 150);
+    }, 250);
 
     const resetForm = () => {
         formRef.current.resetFields();

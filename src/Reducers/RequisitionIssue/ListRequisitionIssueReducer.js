@@ -23,12 +23,12 @@ const initialState = () => {
   
   export default function reducer(state = initialState(), action) {
     switch (action.type) {
-      case 'SET_REQUISITION_ISSUE_LIST_SELECTED_PURCHASE_REQUEST':
+      case 'SET_REQUISITION_ISSUE_LIST_SELECTED_REQUISITION_ISSUE':
         return {
           ...state,
           selectedRequisitionIssue: action.data,
         };
-      case 'SET_REQUISITION_ISSUE_LIST_PURCHASE_REQUESTS':
+      case 'SET_REQUISITION_ISSUE_LIST_REQUISTION_ISSUES':
         return {
           ...state,
           requisitionIssues: action.data,

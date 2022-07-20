@@ -76,7 +76,7 @@ function ReferenceRequisitionIssue(props) {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
 
     const setSelectedRequisitionIssue = (record) => {
         setForm(record);

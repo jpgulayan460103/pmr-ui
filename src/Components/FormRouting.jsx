@@ -5,6 +5,7 @@ import {
     ExclamationCircleOutlined,
     QuestionCircleOutlined,
     LoadingOutlined,
+    FileZipFilled,
 } from '@ant-design/icons';
 import helpers from '../Utilities/helpers';
 
@@ -43,6 +44,10 @@ function FormRouting({timelines}) {
             case "resolved":
                 color = "blue";
                 logo = <CheckCircleOutlined />;
+                break;
+            case "archived":
+                // color = "red";
+                logo = <FileZipFilled />;
                 break;
             default:
                 tat_text = "";

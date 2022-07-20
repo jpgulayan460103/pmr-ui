@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Card, Col, Row, DatePicker, Tag, Select, Button } from 'antd';
+import { Card, Col, Row, DatePicker, Tag, Select, Button, message } from 'antd';
 import style from './style.less'
 import ReportPurchaseRequest from './Components/ReportPurchaseRequest';
 import BarPurchaseRequest from './Components/BarPurchaseRequest';
@@ -9,7 +9,7 @@ import TopRequestedItems from './Components/TopRequestedItems';
 import PieModeOfProcurement from './Components/PieModeOfProcurement';
 import ReportAccount from './Components/ReportAccount';
 import api from '../../api';
-import { cloneDeep, isEmpty, uniqBy } from 'lodash';
+import { cloneDeep, debounce, isEmpty, uniqBy } from 'lodash';
 import moment from 'moment';
 import PieUacsCode from './Components/PieUacsCode';
 
@@ -49,80 +49,87 @@ const Home = (
             }
         }
     }, [isInitialized]);
+
+    const [submit, setSubmit] = useState(false);
     
 
-    const getPurchaseRequests = (initial = {}) => {
-       let filter;
-       if(isEmpty(initial)){
-           filter = tableFilter;
-        }else{
-           filter = initial;
-       }
-       api.Report.purchaseRequest(filter)
-       .then(res => {
-           let results = res.data;
-           //start of procurement types
-           let accounts = cloneDeep(results.accounts.data);
-           let uniqProcCategory = uniqBy(accounts, 'account_classification');
-           let mappedUniqProcCategory = uniqProcCategory.map(i => {
-                let categoryAccounts = accounts.filter(p => p.account_classification_id == i.account_classification_id);
-                let category_percentage = categoryAccounts.reduce((sum, item) => {
-                    return sum += item.account_percentage;
-                }, 0);
-                let category_total = categoryAccounts.reduce((sum, item) => {
-                    return sum += item.sum_cost;
-                }, 0);
-                i.category_percentage = Math.round((category_percentage + Number.EPSILON) * 100) / 100;
-                i.category_total = Math.round((category_total + Number.EPSILON) * 100) / 100;
-                delete i.sum_cost;
-                delete i.account_percentage;
-                delete i.name;
-                delete i.account_id;
-                i.name = i.account_classification;
-                delete i.account_classification;
-               return i;
-           });
-           results.accounts = {
-               data1: mappedUniqProcCategory,
-               data2: results.accounts.data,
-               start_day: results.accounts.start_day,
-               end_day: results.accounts.end_day,
-           };
-           //end of procurement types
-
-           let per_section = cloneDeep(results.per_section.data);
-           let uniqProcPerDivision = uniqBy(per_section, 'division_id');
-           let mappeduniqProcPerDivision = uniqProcPerDivision.map(i => {
-                let perDivisionAccounts = per_section.filter(d=> d.division_id == i.division_id);
-                let perDivisionApprovedTotal = perDivisionAccounts.reduce((sum, item) => {
-                    return sum += item.approved;
-                }, 0);
-                let perDivisionPendingTotal = perDivisionAccounts.reduce((sum, item) => {
-                    return sum += item.pending;
-                }, 0);
-                delete i.section_name;
-                delete i.section_id;
-                delete i.section_title;
-                delete i.end_user_id;
-                i.approved_total = Math.round((perDivisionApprovedTotal + Number.EPSILON) * 100) / 100;
-                i.pending_total = Math.round((perDivisionPendingTotal + Number.EPSILON) * 100) / 100;
+    const getPurchaseRequests = debounce((initial = {}) => {
+        setSubmit(true);
+        let filter;
+        if(isEmpty(initial)){
+            filter = tableFilter;
+         }else{
+            filter = initial;
+        }
+        api.Report.purchaseRequest(filter)
+        .then(res => {
+            setSubmit(false);
+            let results = res.data;
+            //start of procurement types
+            let accounts = cloneDeep(results.accounts.data);
+            let uniqProcCategory = uniqBy(accounts, 'account_classification');
+            let mappedUniqProcCategory = uniqProcCategory.map(i => {
+                 let categoryAccounts = accounts.filter(p => p.account_classification_id == i.account_classification_id);
+                 let category_percentage = categoryAccounts.reduce((sum, item) => {
+                     return sum += item.account_percentage;
+                 }, 0);
+                 let category_total = categoryAccounts.reduce((sum, item) => {
+                     return sum += item.sum_cost;
+                 }, 0);
+                 i.category_percentage = Math.round((category_percentage + Number.EPSILON) * 100) / 100;
+                 i.category_total = Math.round((category_total + Number.EPSILON) * 100) / 100;
+                 delete i.sum_cost;
+                 delete i.account_percentage;
+                 delete i.name;
+                 delete i.account_id;
+                 i.name = i.account_classification;
+                 delete i.account_classification;
                 return i;
             });
-            results.per_section = {
-                data1: mappeduniqProcPerDivision,
-                data2: results.per_section.data,
-                start_day: results.per_section.start_day,
-                end_day: results.per_section.end_day,
+            results.accounts = {
+                data1: mappedUniqProcCategory,
+                data2: results.accounts.data,
+                start_day: results.accounts.start_day,
+                end_day: results.accounts.end_day,
             };
-            // console.log(mappeduniqProcPerDivision);
-           dispatch({
-               type: "SET_REPORT_PURCHASE_REQUEST",
-               data: results
-           });
-       })
-       .catch(err => {})
-       .then(res => {})
-    }
+            //end of procurement types
+ 
+            let per_section = cloneDeep(results.per_section.data);
+            let uniqProcPerDivision = uniqBy(per_section, 'division_id');
+            let mappeduniqProcPerDivision = uniqProcPerDivision.map(i => {
+                 let perDivisionAccounts = per_section.filter(d=> d.division_id == i.division_id);
+                 let perDivisionApprovedTotal = perDivisionAccounts.reduce((sum, item) => {
+                     return sum += item.approved;
+                 }, 0);
+                 let perDivisionPendingTotal = perDivisionAccounts.reduce((sum, item) => {
+                     return sum += item.pending;
+                 }, 0);
+                 delete i.section_name;
+                 delete i.section_id;
+                 delete i.section_title;
+                 delete i.end_user_id;
+                 i.approved_total = Math.round((perDivisionApprovedTotal + Number.EPSILON) * 100) / 100;
+                 i.pending_total = Math.round((perDivisionPendingTotal + Number.EPSILON) * 100) / 100;
+                 return i;
+             });
+             results.per_section = {
+                 data1: mappeduniqProcPerDivision,
+                 data2: results.per_section.data,
+                 start_day: results.per_section.start_day,
+                 end_day: results.per_section.end_day,
+             };
+             // console.log(mappeduniqProcPerDivision);
+            dispatch({
+                type: "SET_REPORT_PURCHASE_REQUEST",
+                data: results
+            });
+            message.success("Dashboard has been loaded.");
+        })
+        .catch(err => {
+         setSubmit(false);
+        })
+        .then(res => {})
+     }, 250)
 
     const setTableFilter = (e, name) => {
         let cloned = cloneDeep(tableFilter);
@@ -177,7 +184,7 @@ const Home = (
                     </Select>
                 </Col>
                 <Col xs={4} sm={4} md={4} lg={4} xl={4}>
-                    <Button type='primary' onClick={getPurchaseRequests}>View</Button>
+                    <Button type='primary' onClick={() => getPurchaseRequests()} loading={submit} disabled={submit}>View</Button>
                 </Col>
              </Row>
              <Row gutter={[16, 16]} className="mb-3">

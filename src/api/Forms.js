@@ -1,4 +1,7 @@
 import axios from './axios.settings'
+import ProcurementPlan from './ProcurementPlan';
+import PurchaseRequest from './PurchaseRequest';
+import RequisitionIssue from './RequisitionIssue';
 
 export default {
   getForApproval(formData){
@@ -58,4 +61,21 @@ export default {
       params: formdata
     });
   },
+
+  archive(formData, type){
+    switch (type) {
+      case 'requisition_issue':
+        return RequisitionIssue.archive(formData);
+        break;
+      case 'purchase_request':
+        return PurchaseRequest.archive(formData);
+        break;
+      case 'procurement_plan':
+        return ProcurementPlan.archive(formData);
+        break;
+    
+      default:
+        break;
+    }
+  }
 }

@@ -76,7 +76,7 @@ function ReferencePurchaseRequest(props) {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
 
     const setSelectedPurchaseRequest = (record) => {
         setForm(record);

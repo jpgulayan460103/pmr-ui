@@ -173,7 +173,7 @@ const CreateProcurementPlan = (props) => {
         })
         .then(res => {})
         ;
-    }, 200);
+    }, 250);
 
 
     const clearForm = async () => {

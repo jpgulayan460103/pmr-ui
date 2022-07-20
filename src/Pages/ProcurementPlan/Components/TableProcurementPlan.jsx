@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Button, Table, Tooltip } from 'antd';
 import { useHistory } from 'react-router-dom'
 import {
     EditOutlined,
+    FileZipFilled,
 } from '@ant-design/icons';
 import { cloneDeep, isEmpty } from 'lodash';
 import api from '../../../api';
@@ -11,6 +12,7 @@ import filter from '../../../Utilities/filter';
 import TableResetFilter from '../../../Components/TableResetFilter';
 import TableRefresh from '../../../Components/TableRefresh';
 import TableFooterPagination from '../../../Components/TableFooterPagination';
+import ArchiveForm from '../../../Components/ArchiveForm';
 
 function mapStateToProps(state) {
     return {
@@ -23,6 +25,7 @@ function mapStateToProps(state) {
 
 const TableProcurementPlan = (props) => {
     let history = useHistory()
+    const [archiveModal, setArchiveModal] = useState(false);
 
     const editProcurementPlan = (item, index) => {
         api.ProcurementPlan.get(item.id)
@@ -32,7 +35,7 @@ const TableProcurementPlan = (props) => {
             let itemTypeB = props.item_types[1].id;
             procurementPlan.itemsA = res.data.items.data.filter(item => item.item_type_id == itemTypeA);
             procurementPlan.itemsB = res.data.items.data.filter(item => item.item_type_id == itemTypeB);
-            console.log(procurementPlan);
+            // console.log(procurementPlan);
             props.dispatch({
                 type: "SET_PROCUREMENT_PLAN_CREATE_FORM_DATA",
                 data: procurementPlan
@@ -53,6 +56,10 @@ const TableProcurementPlan = (props) => {
         return i;
     });
 
+    const showArchiveForm = (item, index) => {
+        setArchiveModal(true);
+        props.setSelectedProcurementPlan(item)
+    }
 
     const dataSource = props.procurementPlans;
 
@@ -112,20 +119,20 @@ const TableProcurementPlan = (props) => {
             ...onCell,
             sorter: (a, b) => {},
         },
-        {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            width: 450,
-            ...filter.search('title','text', props.setTableFilter, props.tableFilter, props.getProcurementPlans),
-            ...onCell,
-            sorter: (a, b) => {},
-        },
+        // {
+        //     title: 'Title',
+        //     dataIndex: 'title',
+        //     key: 'title',
+        //     width: 450,
+        //     ...filter.search('title','text', props.setTableFilter, props.tableFilter, props.getProcurementPlans),
+        //     ...onCell,
+        //     sorter: (a, b) => {},
+        // },
         {
             title: 'Purpose',
             dataIndex: 'purpose',
             key: 'purpose',
-            width: 450,
+            width: 250,
             ...filter.search('purpose','text', props.setTableFilter, props.tableFilter, props.getProcurementPlans),
             ...onCell,
             sorter: (a, b) => {},
@@ -144,6 +151,8 @@ const TableProcurementPlan = (props) => {
             filters: [
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
+                { text: 'Disappoved', value: "Disappoved" },
+                { text: 'Archived', value: "Archived" },
             ],
             ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getProcurementPlans),
             ...onCell,
@@ -162,6 +171,15 @@ const TableProcurementPlan = (props) => {
             ),
             ...onCell,
         },
+        {
+            title: 'Remarks',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: 250,
+            ...filter.search('remarks','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
     ];
 
     const addColumns = () => {
@@ -174,16 +192,20 @@ const TableProcurementPlan = (props) => {
                 align: "center",
                 render: (text, item, index) => (
                     <div className='space-x-0.5'>
-                        <Tooltip placement="bottom" title={"Edit"}>
+                        { item.status != "Archived" && (
+                        <Tooltip placement="right" title={"Edit"}>
                             <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
     
                             </Button>
                         </Tooltip>
-                        {/* <Tooltip placement="bottom" title={"Cancel"}>
-                            <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editProcurementPlan(item, index) }}>
+                        ) }
+                        { item.status == "Disapproved" && (
+                            <Tooltip placement="right" title={"Archive"}>
+                                <Button size='small' type='danger' icon={<FileZipFilled />}  onClick={() => { showArchiveForm(item, index) }}>
     
-                            </Button>
-                        </Tooltip> */}
+                                </Button>
+                            </Tooltip>
+                        ) }
                     </div>
                   )
             })
@@ -233,6 +255,7 @@ const TableProcurementPlan = (props) => {
             />
 
             <TableFooterPagination pagination={props.paginationMeta} paginationChange={paginationChange} />
+            <ArchiveForm reloadData={props.getProcurementPlans} selectedForm={props.selectedProcurementPlan} setArchiveModal={setArchiveModal} archiveModal={archiveModal} formType="procurement_plan" />
         </div>
     );
 }

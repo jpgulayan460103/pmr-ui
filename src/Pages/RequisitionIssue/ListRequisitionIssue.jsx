@@ -65,7 +65,7 @@ const ListRequisitionIssue = (props) => {
     }
     const setRequisitionIssues = (value) => {
         props.dispatch({
-            type: "SET_REQUISITION_ISSUE_LIST_PURCHASE_REQUESTS",
+            type: "SET_REQUISITION_ISSUE_LIST_REQUISTION_ISSUES",
             data: value,
         });
     }
@@ -83,7 +83,7 @@ const ListRequisitionIssue = (props) => {
     }
     const setSelectedRequisitionIssue = (value) => {
         props.dispatch({
-            type: "SET_REQUISITION_ISSUE_LIST_SELECTED_PURCHASE_REQUEST",
+            type: "SET_REQUISITION_ISSUE_LIST_SELECTED_REQUISITION_ISSUE",
             data: value
         });
     }
@@ -132,7 +132,7 @@ const ListRequisitionIssue = (props) => {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
      
     const openInFull = () => {
         window.open(`${props.selectedRequisitionIssue.file}?view=1`,
@@ -184,6 +184,7 @@ const ListRequisitionIssue = (props) => {
         openRequisitionIssue: openRequisitionIssue,
         setTableFilter: setTableFilter,
         setSelectedRequisitionIssue: setSelectedRequisitionIssue,
+        selectedRequisitionIssue: props.selectedRequisitionIssue,
         tableFilter: props.tableFilter,
         requisitionIssues: props.requisitionIssues,
         paginationMeta: props.paginationMeta,

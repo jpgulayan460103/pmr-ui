@@ -20,4 +20,8 @@ export default {
   logger(id){
     return axios.get(`api/logger/requisition-issue/${id}`);
   },
+
+  archive(formdata){
+    return axios.post(`api/requisition-issues/${formdata.id}/archive`,formdata);
+  },
 }

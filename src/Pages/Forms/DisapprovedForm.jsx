@@ -122,7 +122,7 @@ const DisapprovedForm = (props) => {
         })
         .then(res => {})
         ;
-    },150);
+    }, 250);
 
     const onCell = {
         onCell: (record, colIndex) => {

@@ -23,5 +23,9 @@ export default {
 
   management(){
     return axios.get(`api/summaries/procurement-management`);
-  }
+  },
+
+  archive(formdata){
+    return axios.post(`api/procurement-plans/${formdata.id}/archive`,formdata);
+  },
 }

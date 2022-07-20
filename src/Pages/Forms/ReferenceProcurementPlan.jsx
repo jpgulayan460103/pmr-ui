@@ -76,7 +76,7 @@ function ReferenceProcurementPlan(props) {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
 
     const setSelectedProcurementPlan = (record) => {
         setForm(record);

@@ -59,7 +59,7 @@ const Quotation = (props) => {
         })
         .then(res => {})
         ;
-    }, 150);
+    }, 250);
     const handleSelect = (e, item) => {
         let clonedSuppliers = cloneDeep(props.suppliers);
         let supplierIndex = clonedSuppliers.findIndex(i => i.id == item.id);

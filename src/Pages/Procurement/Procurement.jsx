@@ -72,7 +72,7 @@ const Procurement = (props) => {
         })
         .then(res => {})
         ;
-    }, 200);
+    }, 250);
     
     const closePurchaseRequest = () => {
         props.dispatch({

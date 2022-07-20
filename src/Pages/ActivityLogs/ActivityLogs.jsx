@@ -109,7 +109,7 @@ const ActivityLogs = (props) => {
             setLoading(false);
         })
         ;
-    }, 150)
+    }, 250)
 
     const paginationChange = async (e) => {
         let clonedFilter = cloneDeep(props.tableFilter);

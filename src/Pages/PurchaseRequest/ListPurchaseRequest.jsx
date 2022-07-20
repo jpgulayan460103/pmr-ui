@@ -71,7 +71,7 @@ const Listpurchaserequest = (props) => {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
 
     const loadPurchaseRequestData = async (id) => {
         await api.PurchaseRequest.get(id)
@@ -188,6 +188,7 @@ const Listpurchaserequest = (props) => {
         setTableFilter: setTableFilter,
         setSelectedPurchaseRequest: setSelectedPurchaseRequest,
         tableFilter: props.tableFilter,
+        selectedPurchaseRequest: props.selectedPurchaseRequest,
         purchaseRequests: props.purchaseRequests,
         paginationMeta: props.paginationMeta,
         loading: props.loading,

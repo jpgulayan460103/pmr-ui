@@ -70,7 +70,7 @@ const ListProcurementPlan = (props) => {
     }
     const setProcurementPlans = (value) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_LIST_PURCHASE_REQUESTS",
+            type: "SET_PROCUREMENT_PLAN_LIST_PROCUREMENT_PLANS",
             data: value,
         });
     }
@@ -82,7 +82,7 @@ const ListProcurementPlan = (props) => {
     }
     const setSelectedProcurementPlan = (value) => {
         props.dispatch({
-            type: "SET_PROCUREMENT_PLAN_LIST_SELECTED_PURCHASE_REQUEST",
+            type: "SET_PROCUREMENT_PLAN_LIST_SELECTED_PROCUREMENT_PLAN",
             data: value
         });
     }
@@ -138,7 +138,7 @@ const ListProcurementPlan = (props) => {
             setTableLoading(false);
         })
         ;
-    }, 200);
+    }, 250);
 
     const loadProcurementPlanData = async (id) => {
         await api.ProcurementPlan.get(id)
@@ -187,6 +187,7 @@ const ListProcurementPlan = (props) => {
         setTableFilter: setTableFilter,
         setSelectedProcurementPlan: setSelectedProcurementPlan,
         tableFilter: props.tableFilter,
+        selectedProcurementPlan: props.selectedProcurementPlan,
         procurementPlans: props.procurementPlans,
         paginationMeta: props.paginationMeta,
         loading: props.loading,

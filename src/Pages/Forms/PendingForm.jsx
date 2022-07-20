@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useHistory  } from 'react-router-dom'
 import dayjs from 'dayjs';
 import { Table, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
-import Icon, { CloseOutlined, FormOutlined, BankOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
+import Icon, { CloseOutlined, FileZipFilled, BankOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import _, { cloneDeep, debounce, isEmpty } from 'lodash';
 import api from '../../api';
 import filter from '../../Utilities/filter';
@@ -16,6 +16,7 @@ import MaximizeSvg from '../../Icons/MaximizeSvg';
 import InfoPurchaseRequest from '../PurchaseRequest/Components/InfoPurchaseRequest';
 import InfoProcurementPlan from '../ProcurementPlan/Components/InfoProcurementPlan';
 import InfoRequisitionIssue from '../RequisitionIssue/Components/InfoRequisitionIssue';
+import ArchiveForm from '../../Components/ArchiveForm';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -90,6 +91,7 @@ const PendingForm = (props) => {
     const [modalResolveForm, setModalResolveForm] = useState(false);
     const [modalBudgetForm, setModalBudgetForm] = useState(false);
     const [modalProcurementForm, setModalProcurementForm] = useState(false);
+    const [archiveModal, setArchiveModal] = useState(false);
 
     const setTableFilter = (data) => {
         console.log(data);
@@ -226,7 +228,7 @@ const PendingForm = (props) => {
             setSubmit(false);
         })
         ;
-    }, 150);
+    }, 250);
 
 
 
@@ -269,6 +271,7 @@ const PendingForm = (props) => {
             setErrorMessage({});
             getForm();
             setSelectedFormRoute({});
+            setSelectedForm({});
         })
         .catch(err => {
             setSubmit(false);
@@ -277,7 +280,7 @@ const PendingForm = (props) => {
             setSubmit(false);
         })
         ;
-    }, 150);
+    }, 250);
 
 
     const closeBudgetForm = () => {
@@ -356,7 +359,7 @@ const PendingForm = (props) => {
             setTableLoading(false);
         })
         ;
-    },150);
+    }, 250);
     const getFormNoLoading = debounce((filters) => {
         if(filters == null){
             filters = props.tableFilter
@@ -374,7 +377,7 @@ const PendingForm = (props) => {
         })
         .then(res => {})
         ;
-    },150);
+    }, 250);
     var debouncedGetForm = React.useCallback(debounce(getFormNoLoading, 400), []);
     useEffect(() => {
         window.Echo.channel('home').listen('NewMessage', (e) => {
@@ -416,6 +419,13 @@ const PendingForm = (props) => {
     const resolveForm = (item, index) => {
         setSelectedFormRoute(item);
         showResolveForm(item);
+    }
+
+    const showArchiveForm = (item, index) => {
+        setSelectedFormRoute(item);
+        viewForm(item, 0);
+        setArchiveModal(true);
+        // showResolveForm(item);
     }
     const closeForm = () => {
         setSelectedFormRoute({});
@@ -472,6 +482,7 @@ const PendingForm = (props) => {
             });
             getForm();
             setSelectedFormRoute({});
+            setSelectedForm({});
             return Promise.resolve(res)
         })
         .catch(err => {
@@ -665,13 +676,16 @@ const PendingForm = (props) => {
             width: 100,
             align: "center",
             render: (text, item, index) => (
-                <span>
+                <div className='space-x-0.5'>
                     { item.status == "with_issues" ? (
+                        <React.Fragment>
+
                             <Tooltip placement="bottom" title={"Resolve"}>
                                 <Button size='small' type='default' icon={<SendOutlined twoToneColor="#0000FF" />} onClick={() => { resolveForm(item, index) }}>
                     
                                 </Button>
                             </Tooltip>
+                        </React.Fragment>
                     ) : (
                         <>
                             {item.route_code == "last_route" && item.route_type == "requisition_issue" ? (
@@ -681,16 +695,26 @@ const PendingForm = (props) => {
                                     </Button>
                                 </Tooltip>
                             ) : (
+                                <React.Fragment>
+
                                 <Tooltip placement="bottom" title={"Approve"}>
                                     <Button size='small' type='default' icon={<LikeTwoTone twoToneColor="#0000FF" />} onClick={() => { confirm(item, index) }} disabled={props.submit}>
                                     
                                     </Button>
                                 </Tooltip>
+
+                                </React.Fragment>
                             )}
                             {/* 
                                 { item.from_office_id == item.to_office_id ? "" : (
                             */}
-                            { item.route_code == "route_origin" ? "" : (
+                            { item.route_code == "route_origin" ? (
+                                <Tooltip placement="bottom" title={"Archive"}>
+                                    <Button size='small' type='danger' icon={<FileZipFilled />}  onClick={() => { showArchiveForm(item, index) }}>
+        
+                                    </Button>
+                                </Tooltip>
+                            ) : (
                                 <Tooltip placement="bottom" title={"Disapprove"}>
                                     <Button size='small' type='default' icon={<DislikeTwoTone twoToneColor="#FF0000" />} onClick={() => { showRejectForm(item, index) }}>
                     
@@ -699,7 +723,7 @@ const PendingForm = (props) => {
                             ) }
                         </>
                     ) }
-                </span>
+                </div>
             ),
         },
     ];
@@ -1105,6 +1129,11 @@ const PendingForm = (props) => {
                     </Col>
             </Row>
             )  }
+            <ArchiveForm reloadData={() => {
+                getForm();
+                setSelectedFormRoute({});
+                setSelectedForm({});
+            }} selectedForm={props.selectedForm} setArchiveModal={setArchiveModal} archiveModal={archiveModal} formType={props.selectedFormRoute?.route_type} />
         </div>
     );
 }

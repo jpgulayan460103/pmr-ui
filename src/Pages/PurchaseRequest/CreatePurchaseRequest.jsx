@@ -172,7 +172,7 @@ const CreatePurchaseRequest = (props) => {
         })
         .then(res => {})
         ;
-    }, 200);
+    }, 250);
 
     const clearForm = async () => {
         if(formRef.current){
@@ -192,33 +192,6 @@ const CreatePurchaseRequest = (props) => {
             data: {}
         });
     }
-
-    const previewPurchaseRequest = debounce(() => {
-        // props.dispatch({
-        //     type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
-        //     data: {}
-        // });
-        // let formData = cloneDeep(props.formData);
-        // formData.requested_by_id = props.requestedBySignatory.id;
-        // formData.approved_by_id = props.approvedBySignatory.id;
-        // api.PurchaseRequest.preview(formData,"create")
-        // .then(res => {
-        //     let json = encodeURIComponent(JSON.stringify(formData));
-        //     window.open(`${res.data.url}?json=${json}`,
-        //         'newwindow',
-        //         'width=960,height=1080');
-        //     return false;
-        // })
-        // .catch(err => {
-        //     props.dispatch({
-        //         type: "SET_PURCHASE_REQUEST_CREATE_FORM_ERRORS",
-        //         data: err.response.data.errors
-        //     });
-        // })
-        // .then(res => {})
-        // ;
-    }, 200);
-
 
     const addItem = () => {
         setTableKey(tableKey + 1);

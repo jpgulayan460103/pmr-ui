@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom'
 import { Button, Table, Tooltip } from 'antd';
-import Icon, {
+import {
     EditOutlined,
+    FileZipFilled,
 } from '@ant-design/icons';
 import TableFooterPagination from '../../../Components/TableFooterPagination';
 import TableRefresh from '../../../Components/TableRefresh';
@@ -11,6 +12,7 @@ import TableResetFilter from '../../../Components/TableResetFilter';
 import filter from '../../../Utilities/filter';
 import api from '../../../api';
 import { cloneDeep, isEmpty } from 'lodash';
+import ArchiveForm from '../../../Components/ArchiveForm';
 
 function mapStateToProps(state) {
     return {
@@ -21,6 +23,7 @@ function mapStateToProps(state) {
 
 function TablePurchaseRequest(props) {
     let history = useHistory()
+    const [archiveModal, setArchiveModal] = useState(false);
     
     const editPurchaseRequest = (item, index) => {
         api.PurchaseRequest.get(item.id)
@@ -84,6 +87,10 @@ function TablePurchaseRequest(props) {
         return i;
     });
 
+    const showArchiveForm = (item, index) => {
+        setArchiveModal(true);
+        props.setSelectedPurchaseRequest(item)
+    }
 
     const dataSource = props.purchaseRequests;
 
@@ -169,6 +176,8 @@ function TablePurchaseRequest(props) {
             filters: [
                 { text: 'Approved', value: "Approved" },
                 { text: 'Pending', value: "Pending" },
+                { text: 'Disappoved', value: "Disappoved" },
+                { text: 'Archived', value: "Archived" },
             ],
             ...filter.list('status','text', props.setTableFilter, props.tableFilter, props.getPurchaseRequests),
             ...onCell,
@@ -187,6 +196,15 @@ function TablePurchaseRequest(props) {
             ),
             ...onCell,
         },
+        {
+            title: 'Remarks',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: 250,
+            ...filter.search('remarks','text', props.setTableFilter, props.tableFilter, props.getRequisitionIssues),
+            ...onCell,
+            sorter: (a, b) => {},
+        },
     ];
 
     const addColumns = () => {
@@ -199,16 +217,20 @@ function TablePurchaseRequest(props) {
                 align: "center",
                 render: (text, item, index) => (
                     <div className='space-x-0.5'>
-                        <Tooltip placement="bottom" title={"Edit"}>
+                        { item.status != "Archived" && (
+                        <Tooltip placement="right" title={"Edit"}>
                             <Button size='small' type='default' icon={<EditOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
     
                             </Button>
                         </Tooltip>
-                        {/* <Tooltip placement="bottom" title={"Cancel"}>
-                            <Button size='small' type='danger' icon={<StopOutlined />}  onClick={() => { editPurchaseRequest(item, index) }}>
+                        ) }
+                        { item.status == "Disapproved" && (
+                            <Tooltip placement="right" title={"Archive"}>
+                                <Button size='small' type='danger' icon={<FileZipFilled />}  onClick={() => { showArchiveForm(item, index) }}>
     
-                            </Button>
-                        </Tooltip> */}
+                                </Button>
+                            </Tooltip>
+                        ) }
                     </div>
                   )
             })
@@ -236,6 +258,7 @@ function TablePurchaseRequest(props) {
             />
 
             <TableFooterPagination pagination={props.paginationMeta} paginationChange={paginationChange} />
+            <ArchiveForm reloadData={props.getPurchaseRequests} selectedForm={props.selectedPurchaseRequest} setArchiveModal={setArchiveModal} archiveModal={archiveModal} formType="purchase_request" />
         </div>
     );
 }

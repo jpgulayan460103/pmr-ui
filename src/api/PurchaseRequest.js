@@ -57,4 +57,8 @@ export default {
   getNextNumber(){
     return axios.get(`api/next-numbers/purchase-request`);
   },
+
+  archive(formdata){
+    return axios.post(`api/purchase-requests/${formdata.id}/archive`,formdata);
+  },
 }

@@ -52,7 +52,7 @@ const Suppliers = (props) => {
         })
         .then(res => {})
         ;
-    }, 150);
+    }, 250);
 
     const deleteSupplier = async (supplier) => {
         await api.Supplier.delete(supplier.id);
@@ -243,7 +243,7 @@ const Suppliers = (props) => {
             });
         })
         .then(res => {})
-    }, 150)
+    }, 250)
 
     const resetForm = () => {
         setSelectedSupplier({});

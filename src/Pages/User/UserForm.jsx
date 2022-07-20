@@ -54,7 +54,7 @@ const UserForm = (props) => {
             values.account_type = "ad_account";
             createUser(values);
         }
-    }, 150);
+    }, 250);
 
     const createUser = (values) => {
         setSubmit(true);
