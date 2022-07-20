@@ -11,6 +11,7 @@ import ReportAccount from './Components/ReportAccount';
 import api from '../../api';
 import { cloneDeep, isEmpty, uniqBy } from 'lodash';
 import moment from 'moment';
+import PieUacsCode from './Components/PieUacsCode';
 
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
@@ -22,6 +23,7 @@ function mapStateToProps(state) {
         tableFilter: state.reports.tableFilter,
         user_divisions: state.libraries.user_divisions,
         user_sections: state.libraries.user_sections,
+        user: state.user.data,
     };
 }
 
@@ -33,20 +35,30 @@ const Home = (
         tableFilter,
         user_divisions,
         user_sections,
+        user,
     }
 ) => {
     useEffect(() => {
         document.title = "Dashboard";
         if(isInitialized){
             if(isEmpty(purchaseRequest)){
-                getPurchaseRequests();
+                setTableFilter(user.user_offices?.data[0]?.office_id, "end_user_id")
+                getPurchaseRequests({
+                    end_user_id: user.user_offices?.data[0]?.office_id
+                });
             }
         }
     }, [isInitialized]);
     
 
-    const getPurchaseRequests = () => {
-       api.Report.purchaseRequest(tableFilter)
+    const getPurchaseRequests = (initial = {}) => {
+       let filter;
+       if(isEmpty(initial)){
+           filter = tableFilter;
+        }else{
+           filter = initial;
+       }
+       api.Report.purchaseRequest(filter)
        .then(res => {
            let results = res.data;
            //start of procurement types
@@ -124,20 +136,23 @@ const Home = (
     return (
         <div style={style}>
              <Row gutter={[16, 16]} className="mb-3">
-                <Col span={24}>
+             <Col xs={24} sm={24} md={10} lg={10} xl={6}>
                     {/* <RangePicker renderExtraFooter={() => <ExtraDateRangeFooter />} /> */}
-                    <RangePicker picker="month" format={"MMMM YYYY"} onChange={(e) => {
+                    <RangePicker picker="month" style={{width: "100%"}} format={"MMMM YYYY"} onChange={(e) => {
                         let month = null;
                         if(e){
                             month = e.map(i => moment(i).format("YYYY-MM-DD"));
                         }
                         setTableFilter(month, "month");
                     }} value={tableFilter.month && tableFilter.month.map(i => moment(i, "YYYY-MM-DD"))} />
+                </Col>
+                <Col xs={24} sm={24} md={10} lg={10} xl={6}>
+
                     <Select
                         placeholder="Section/Unit/Office"
                         optionFilterProp="children"
                         showSearch
-                        style={{width: "288px"}}
+                        style={{width: "100%"}}
                         filterOption={(input, option) =>
                             option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -160,8 +175,12 @@ const Home = (
                             );
                         }) }
                     </Select>
+                </Col>
+                <Col xs={4} sm={4} md={4} lg={4} xl={4}>
                     <Button type='primary' onClick={getPurchaseRequests}>View</Button>
                 </Col>
+             </Row>
+             <Row gutter={[16, 16]} className="mb-3">
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
@@ -187,7 +206,8 @@ const Home = (
                     <BarPurchaseRequestOffice />
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                    <TopRequestedItems label="Most requested items" summaryData={purchaseRequest.most_quantity_items}/>
+                    {/* <TopRequestedItems label="Most requested items" summaryData={purchaseRequest.most_quantity_items}/> */}
+                    <PieUacsCode label="UACS Code" summaryData={purchaseRequest.uacs_codes} />
                 </Col>
 
 
