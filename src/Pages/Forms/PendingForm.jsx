@@ -379,18 +379,18 @@ const PendingForm = (props) => {
         ;
     }, 250);
     var debouncedGetForm = React.useCallback(debounce(getFormNoLoading, 400), []);
-    useEffect(() => {
-        window.Echo.channel('home').listen('NewMessage', (e) => {
-            if(sessionStorage.getItem("user_office") == e.message.notify_offices){
-                debouncedGetForm();
-            }
-        });
-        return () => {
-            debouncedGetForm = () => {
+    // useEffect(() => {
+    //     window.Echo.channel('home').listen('NewMessage', (e) => {
+    //         if(sessionStorage.getItem("user_office") == e.message.notify_offices){
+    //             debouncedGetForm();
+    //         }
+    //     });
+    //     return () => {
+    //         debouncedGetForm = () => {
 
-            }
-        };
-    }, []);
+    //         }
+    //     };
+    // }, []);
     
     const openInFull = () => {
         window.open(`${props.selectedFormRoute.form_routable?.file}?view=1`,

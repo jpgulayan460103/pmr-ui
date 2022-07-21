@@ -1,6 +1,6 @@
 // https://mail.google.com/mail/?view=cm&fs=1&to=ictsupport.fo11@dswd.gov.ph&su=Request%20technical%20assistance%20for%20&body=Issue:%0AName:%0AOffice:
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import {
   BrowserRouter as Router,
@@ -45,19 +45,23 @@ import ReferencePurchaseRequest from './Pages/Forms/ReferencePurchaseRequest';
 import ReferenceProcurementPlan from './Pages/Forms/ReferenceProcurementPlan';
 import ReferenceRequisitionIssue from './Pages/Forms/ReferenceRequisitionIssue';
 import Error404 from './Pages/Error404';
+import { getTokens, onMessageListener } from './firebase';
+import api from './api';
+
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-window.Pusher = require('pusher-js');
+// window.Pusher = require('pusher-js');
 
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_PUSHER_APP_KEY_PRODUCTION : process.env.REACT_APP_PUSHER_APP_KEY_DEVEOPMENT),
-    cluster: process.env.REACT_APP_PUSHER_APP_CLUSTER,
-    forceTLS: false,
-    wsHost: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_WS_HOST : process.env.REACT_APP_PRODUCTION_WS_HOST),
-    wsPort: 6001,
-});
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_PUSHER_APP_KEY_PRODUCTION : process.env.REACT_APP_PUSHER_APP_KEY_DEVEOPMENT),
+//     cluster: process.env.REACT_APP_PUSHER_APP_CLUSTER,
+//     forceTLS: false,
+//     wsHost: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_WS_HOST : process.env.REACT_APP_PRODUCTION_WS_HOST),
+//     wsPort: 6001,
+// });
+
 const auth = {
   isAuthenticated: false,
 };
@@ -87,43 +91,37 @@ function mapStateToProps(state) {
 }
 
 const App = (props) => {
+    const [show, setShow] = useState(false);
+    const [notification, setNotification] = useState({title: '', body: ''});
+    const [isTokenFound, setTokenFound] = useState(false);
 
-    useEffect(() => {
-        window.Echo.channel('home').listen('NewMessage', (e) => {
-            // var notification = new Notification(e.message);
-            console.log(e);
-            if(sessionStorage.getItem("user_office") == e.message.notify_offices){
-                let clonedNotif = cloneDeep(props.notifications)
-                switch (e.message.notification_type) {
-                    case "approved_form":
-                        clonedNotif.push({
-                            notification_type: e.message.notification_type,
-                            notification_title: e.message.notification_title,
-                            notification_message: e.message.notification_message,
-                            notification_data: e.message.notification_data,
-                            // data: e.message.form_route,
-                        })
-                        break;
-                    case "rejected_form":
-                        clonedNotif.push({
-                            notification_title: e.message.notification_title,
-                            notification_type: e.message.notification_type,
-                            notification_message: e.message.notification_message,
-                            notification_data: e.message.notification_data,
-                            // // data: e.message.form_route,
-                        })
-                        break;
-                
-                    default:
-                        break;
+    useEffect(async () => {
+        if(props.isInitialized){
+            getTokens()
+            .then((currentToken) => {
+                if (currentToken) {
+                    console.log('current token for client: ', currentToken);
+                    setFirebaseToken(currentToken);
+                    setTokenFound(true);
+                } else {
+                    console.warn('No registration token available. Request permission to generate one.');
+                    setTokenFound(false);
                 }
-                props.dispatch({
-                    type: "ADD_NOTIFICATION",
-                    data: clonedNotif
-                });
-            }
-          });
-    }, []);
+                }).catch((err) => {
+                    console.warn('An error occurred while retrieving token. ', err);
+                });;
+        }
+    }, [props.isInitialized]);
+
+    onMessageListener().then(payload => {
+        setShow(true);
+        setNotification({title: payload.notification.title, body: payload.notification.body})
+        console.log(payload);
+    }).catch(err => console.log('failed: ', err));
+
+    const setFirebaseToken = (token) => {
+        api.User.saveFirebaseToken(token)
+    }
 
     return (
 

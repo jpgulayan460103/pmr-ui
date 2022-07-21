@@ -43,4 +43,8 @@ export default {
   updatePermission(formData){
     return axios.post(`api/users/${formData.user_id}/permissions`, formData);
   },
+
+  saveFirebaseToken(formData){
+    return axios.post(`api/tokens/firebase`, formData);
+  },
 }
