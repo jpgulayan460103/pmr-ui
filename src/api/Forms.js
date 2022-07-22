@@ -34,6 +34,9 @@ export default {
   getRoute(id){
     return axios.get(`api/forms/routes/${id}`);
   },
+  get(id){
+    return axios.get(`api/form-routes/${id}`);
+  },
   upload(type, id, files, index, uploadProgress){
     return axios.post(`api/forms/uploads/${type}/${id}`, files, {
         headers: {

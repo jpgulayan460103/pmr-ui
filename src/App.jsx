@@ -46,6 +46,7 @@ import ReferenceRequisitionIssue from './Pages/Forms/ReferenceRequisitionIssue';
 import Error404 from './Pages/Error404';
 import { getTokens, onMessageListener } from './firebase';
 import api from './api';
+import PreviewForm from './Pages/Forms/PreviewForm';
 
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -133,6 +134,9 @@ const App = (props) => {
             </Route>
             <Route exact path="/forms/disapproved"  >
                 <PrivateRoute><Layout><DisapprovedForm /></Layout></PrivateRoute>
+            </Route>
+            <Route path={`/forms/preview/:uuid`} >
+                <PrivateRoute><Layout><PreviewForm /></Layout></PrivateRoute>
             </Route>
             <Route exact path="/forms/project-procurement-plans"  >
                 <PrivateRoute><Layout><ReferenceProcurementPlan /></Layout></PrivateRoute>
