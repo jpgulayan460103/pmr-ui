@@ -21,7 +21,6 @@ import ListPurchaseRequest from './Pages/PurchaseRequest/ListPurchaseRequest'
 import ListLibrary from './Pages/Library/ListLibrary'
 import ItemLibrary from './Pages/Library/ItemLibrary'
 import User from './Pages/User/User'
-import Echo from 'laravel-echo';
 import PendingForm from './Pages/Forms/PendingForm';
 import ApprovedForm from './Pages/Forms/ApprovedForm';
 import DisapprovedForm from './Pages/Forms/DisapprovedForm';
@@ -33,7 +32,7 @@ import Suppliers from './Pages/Suppliers/Suppliers';
 import { compare } from 'compare-versions';
 
 import { version } from '../package.json';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
 import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
 import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
@@ -50,17 +49,6 @@ import api from './api';
 
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-// window.Pusher = require('pusher-js');
-
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_PUSHER_APP_KEY_PRODUCTION : process.env.REACT_APP_PUSHER_APP_KEY_DEVEOPMENT),
-//     cluster: process.env.REACT_APP_PUSHER_APP_CLUSTER,
-//     forceTLS: false,
-//     wsHost: (process.env.NODE_ENV == "development" ? process.env.REACT_APP_DEVELOPMENT_WS_HOST : process.env.REACT_APP_PRODUCTION_WS_HOST),
-//     wsPort: 6001,
-// });
 
 const auth = {
   isAuthenticated: false,
@@ -91,36 +79,26 @@ function mapStateToProps(state) {
 }
 
 const App = (props) => {
-    const [show, setShow] = useState(false);
-    const [notification, setNotification] = useState({title: '', body: ''});
-    const [isTokenFound, setTokenFound] = useState(false);
-
     useEffect(async () => {
         if(props.isInitialized){
-            getTokens()
-            .then((currentToken) => {
-                if (currentToken) {
-                    console.log('current token for client: ', currentToken);
-                    setFirebaseToken(currentToken);
-                    setTokenFound(true);
-                } else {
-                    console.warn('No registration token available. Request permission to generate one.');
-                    setTokenFound(false);
-                }
-                }).catch((err) => {
-                    console.warn('An error occurred while retrieving token. ', err);
-                });;
+            if(!isEmpty(props.user)){
+                getTokens()
+                .then((currentToken) => {
+                    if (currentToken) {
+                        console.log('current token for client: ', currentToken);
+                        setFirebaseToken(currentToken);
+                    } else {
+                        console.warn('No registration token available. Request permission to generate one.');
+                    }
+                    }).catch((err) => {
+                        console.warn('An error occurred while retrieving token. ', err);
+                    });;
+            }
         }
     }, [props.isInitialized]);
 
-    onMessageListener().then(payload => {
-        setShow(true);
-        setNotification({title: payload.notification.title, body: payload.notification.body})
-        console.log(payload);
-    }).catch(err => console.log('failed: ', err));
-
     const setFirebaseToken = (token) => {
-        api.User.saveFirebaseToken(token)
+        api.User.saveFirebaseToken({token})
     }
 
     return (

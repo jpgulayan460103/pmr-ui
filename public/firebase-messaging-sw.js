@@ -20,11 +20,23 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload) {
   console.log('Received background message ', payload);
 
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.data.title;
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data.body,
+    data: {
+      clickAction: payload.data.click_action
+    },
+    actions: [{action: "get", title: "Get now."}, {action: "get", title: "Get now."}]
   };
 
   self.registration.showNotification(notificationTitle,
     notificationOptions);
+
+  self.addEventListener('notificationclick', function(event) {
+    console.log(event);
+    event.notification.close();
+    // console.log(clients);
+    clients.openWindow("/forms/pending").then(windowClient => windowClient ? windowClient.focus() : null);
+  }, false);
+
 });

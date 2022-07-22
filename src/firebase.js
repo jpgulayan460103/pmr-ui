@@ -14,12 +14,17 @@ var firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
 
+const serviceWorkerRegistration = async () => {
+  const dir = process.env.NODE_ENV == "development" ? "" : process.env.PUBLIC_URL;
+  const serviceWorkerRegistration = await navigator
+    .serviceWorker
+    .register(`${dir}/firebase-messaging-sw.js`);
+  return serviceWorkerRegistration;
+}
+
 export const getTokens = async () => {
-    const dir = process.env.NODE_ENV == "development" ? "" : process.env.PUBLIC_URL;
-    const serviceWorkerRegistration = await navigator
-      .serviceWorker
-      .register(`${dir}/firebase-messaging-sw.js`);
-    return getToken(messaging, {vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY, serviceWorkerRegistration})
+    let serviceWorkerRegistrations = serviceWorkerRegistration();
+    return getToken(messaging, {vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY, serviceWorkerRegistrations})
   }
 
 export const onMessageListener = () =>

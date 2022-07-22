@@ -17,6 +17,7 @@ import InfoPurchaseRequest from '../PurchaseRequest/Components/InfoPurchaseReque
 import InfoProcurementPlan from '../ProcurementPlan/Components/InfoProcurementPlan';
 import InfoRequisitionIssue from '../RequisitionIssue/Components/InfoRequisitionIssue';
 import ArchiveForm from '../../Components/ArchiveForm';
+import { onMessageListener } from '../../firebase';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -52,12 +53,27 @@ function mapStateToProps(state) {
 
 
 
+let hidden = null;
+let visibilityChange = null;
+if (typeof document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support 
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+} else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+  visibilityChange = 'msvisibilitychange';
+    } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
+}
+
 const PendingForm = (props) => {
     const unmounted = React.useRef(false);
     let history = useHistory();
     useEffect(() => {
+        document.addEventListener(visibilityChange, handleVisibilityChange, false);
         return () => {
             unmounted.current = true;
+            document.removeEventListener(visibilityChange, handleVisibilityChange);
             // setForms([]);
             // setPaginationMeta({});
             // setSelectedFormRoute({});
@@ -72,6 +88,13 @@ const PendingForm = (props) => {
             // setFormLoading(false);
         }
     }, []);
+
+    const handleVisibilityChange = () => {
+        if (document[hidden]) {
+        } else {
+            debouncedGetForm();
+        }
+      }
 
     const rejectFormRef = React.useRef();
     const resolveFormRef = React.useRef();
@@ -379,18 +402,11 @@ const PendingForm = (props) => {
         ;
     }, 250);
     var debouncedGetForm = React.useCallback(debounce(getFormNoLoading, 400), []);
-    // useEffect(() => {
-    //     window.Echo.channel('home').listen('NewMessage', (e) => {
-    //         if(sessionStorage.getItem("user_office") == e.message.notify_offices){
-    //             debouncedGetForm();
-    //         }
-    //     });
-    //     return () => {
-    //         debouncedGetForm = () => {
 
-    //         }
-    //     };
-    // }, []);
+    onMessageListener().then(payload => {
+        debouncedGetForm();
+        console.log(payload);
+    }).catch(err => console.log('failed: ', err));
     
     const openInFull = () => {
         window.open(`${props.selectedFormRoute.form_routable?.file}?view=1`,
