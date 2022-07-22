@@ -73,9 +73,8 @@ const Sidemenu = (props) => {
         'forms.approve.procurement.plan',
         'forms.approve.purchase.request',
         'forms.approve.requisition.issue',
-        'forms.review.procurement.plan',
-        'forms.review.purchase.request',
-        'forms.review.requisition.issue',
+        'forms.review',
+        'forms.resolve',
         'forms.issue.requisition.issue',
     ]) ||  helpers.hasRole(props.user, ["super-admin"])){
         formSubMenu.push({
@@ -348,9 +347,9 @@ const Sidemenu = (props) => {
             'forms.approve.procurement.plan',
             'forms.approve.purchase.request',
             'forms.approve.requisition.issue',
-            'forms.review.procurement.plan',
-            'forms.review.purchase.request',
-            'forms.review.requisition.issue',
+            'forms.review',
+            'forms.review',
+            'forms.review',
             'forms.issue.requisition.issue',
         ])
         || 

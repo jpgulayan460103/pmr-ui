@@ -32,7 +32,7 @@ import Suppliers from './Pages/Suppliers/Suppliers';
 import { compare } from 'compare-versions';
 
 import { version } from '../package.json';
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep, debounce, isEmpty } from 'lodash';
 import CreateProcurementPlan from './Pages/ProcurementPlan/CreateProcurementPlan';
 import ListProcurementPlan from './Pages/ProcurementPlan/ListProcurementPlan';
 import SummaryProcurementPlan from './Pages/ProcurementPlan/SummaryProcurementPlan';
@@ -79,10 +79,26 @@ function mapStateToProps(state) {
     };
 }
 
+
+let hidden = null;
+let visibilityChange = null;
+if (typeof document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support 
+    hidden = 'hidden';
+    visibilityChange = 'visibilitychange';
+} else if (typeof document.msHidden !== 'undefined') {
+    hidden = 'msHidden';
+  visibilityChange = 'msvisibilitychange';
+    } else if (typeof document.webkitHidden !== 'undefined') {
+    hidden = 'webkitHidden';
+    visibilityChange = 'webkitvisibilitychange';
+}
+
 const App = (props) => {
     useEffect(async () => {
         if(props.isInitialized){
             if(!isEmpty(props.user)){
+                getUserNotifications();
+                document.addEventListener(visibilityChange, handleVisibilityChange, false);
                 getTokens()
                 .then((currentToken) => {
                     if (currentToken) {
@@ -96,10 +112,39 @@ const App = (props) => {
                     });;
             }
         }
+        return () => {
+            document.removeEventListener(visibilityChange, handleVisibilityChange);
+        }
     }, [props.isInitialized]);
 
     const setFirebaseToken = (token) => {
         api.User.saveFirebaseToken({token})
+    }
+
+    const getUserNotifications = debounce(() => {
+        api.User.getNotifications()
+        .then(res => {
+            props.dispatch({
+                type: "ADD_NOTIFICATION",
+                data: res.data
+            });
+        })
+        .catch(res => {})
+        .then(res => {})
+        ;
+    }, 250)
+
+    var debouncedGetNotification = React.useCallback(debounce(getUserNotifications, 400), []);
+
+    const handleVisibilityChange = () => {
+        if (document[hidden]) {
+        } else {
+            if(props.isInitialized){
+                if(!isEmpty(props.user)){
+                    debouncedGetNotification();
+                }
+            }
+        }
     }
 
     return (

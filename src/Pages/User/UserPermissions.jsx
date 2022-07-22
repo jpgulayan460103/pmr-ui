@@ -48,16 +48,12 @@ const UserPermissions = (props) => {
             key: 'forms.all',
             children: [
               {
-                title: 'Permission to review and finailize created project procurement plans.',
-                key: 'forms.review.procurement.plan',
+                title: 'Permission to review and finailize created forms.',
+                key: 'forms.review',
               },
               {
-                title: 'Permission to review and finailize created purchase requests.',
-                key: 'forms.review.purchase.request',
-              },
-              {
-                title: 'Permission to review and finailize created requisition and issue slips.',
-                key: 'forms.review.requisition.issue',
+                title: 'Permission to resolve the disapproved forms.',
+                key: 'forms.resolve',
               },
               {
                 title: 'Permission to approve or disapprove project procurement plans.',
@@ -327,9 +323,9 @@ const UserPermissions = (props) => {
               'forms.approve.procurement.plan',
               'forms.approve.purchase.request',
               'forms.approve.requisition.issue',
-              'forms.review.procurement.plan',
-              'forms.review.purchase.request',
-              'forms.review.requisition.issue',
+              'forms.review',
+              'forms.review',
+              'forms.review',
               'forms.issue.requisition.issue',
               'libraries.user.signatories.view',
               'libraries.uom.view',

@@ -6,6 +6,7 @@ import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
 import api from '../api';
 import { cloneDeep } from 'lodash';
+import dayjs from 'dayjs';
 
 const { Header } = Layout;
 const { Option } = Select;
@@ -42,14 +43,26 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
         history.push("/forms/pending");
     }
     
-    const handleDelete = (index) => {
-        // console.log(index);
-        let clonedNotif = cloneDeep(notifications)
-        clonedNotif.splice(index, 1)
-        dispatch({
-            type: "ADD_NOTIFICATION",
-            data: clonedNotif
-        });
+    const handleDelete = (item) => {
+        api.User.deleteNotification(item.id)
+        .then(res => {
+            dispatch({
+                type: "ADD_NOTIFICATION",
+                data: res.data
+            });
+        })
+        ;
+    }
+
+    const clearNotifications = () => {
+        api.User.clearNotifications()
+        .then(res => {
+            dispatch({
+                type: "ADD_NOTIFICATION",
+                data: res.data
+            });
+        })
+        ;
     }
 
     const [ticketModal, setTicketModal] = useState(false);
@@ -70,26 +83,36 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     const handleActions = (item, index) => {
         return [
             <Tooltip placement="top" title="Delete">
-                <Button size='small' icon={<DeleteOutlined />} type="link" onClick={()=> handleDelete(index)} />
-            </Tooltip>
+                <Button size='small' icon={<DeleteOutlined />} type="link" onClick={()=> handleDelete(item)} />
+            </Tooltip>,
         ];
     }
     
-    const popOverContent = (item) => {
-        return (
-            <div style={{width: "240px"}}>
-                <p>
-                    <b>Form Type:</b> <span>{ item.notification_title }</span><br />
-                    <b>Form:</b> <span>{ item.notification_data.form }</span><br />
-                    <b>Status:</b> <span>{ item.notification_data.status }</span><br />
-                    <b>User:</b> <span>{ item.notification_data.user }</span><br />
-                    <b>Remarks:</b> <span>{ item.notification_data.remarks }</span><br />
-                    <i>{ item.notification_data.datetime }</i><br />
-                </p>
-            </div>
-        )
+    const openNotification = (notification) => {
+        // console.log(notification);
+        history.push(notification.message.url);
+        api.User.readNotifications(notification.id)
+        .then(res => {
+            dispatch({
+                type: "ADD_NOTIFICATION",
+                data: res.data
+            });
+        })
+        ;
     }
-    
+
+    const notificationClassName = (item) => {
+        if(item.status == 1){
+            return "notificaton-items-unread";
+        }
+        return "notificaton-items";
+    }
+
+    const fromNow = (time) => {
+        var relativeTime = require('dayjs/plugin/relativeTime')
+        dayjs.extend(relativeTime)
+        return dayjs(time).fromNow()
+    }
     
     const NotificationItems = ({notifications, history, dispatch}) => {
         return (
@@ -97,28 +120,20 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 <List
                 size="small"
                 header={<div>Notifications</div>}
-                footer={<div className='custom-pointer' onClick={() => {
-                    dispatch({
-                        type: "ADD_NOTIFICATION",
-                        data: []
-                    });
-                }}>Clear Notifications</div>}
+                footer={<div className='custom-pointer' onClick={clearNotifications}>Clear Notifications</div>}
                 bordered
                 dataSource={notifications}
                 renderItem={(item, index) => (
                     <List.Item
                         actions={handleActions(item, index)}
-                        className="notificaton-items"
+                        className={notificationClassName(item)}
                     >
-                        <div className="truncate" style={{width: "80%"}} onClick={showTicketModal}>
-                            <Popover placement="left" title={item.title} content={popOverContent(item)} trigger="hover">
-                                { item.notification_type == "rejected_form" ?  (
-                                    <Button size='small' icon={<ExclamationCircleOutlined />} type="link" style={{ color: "red" }} />
-                                ) : (
-                                    <Button size='small' icon={<QuestionCircleOutlined />} type="link" />
-                                ) }
-                            </Popover>
-                            <span className='ml-2'>{item.notification_title}</span>
+                        <div style={{width: "80%"}} onClick={() => openNotification(item)}>
+                            <span><b className='font-sans'>{item.message.title}</b></span>
+                            <br />
+                            <span className='text-base font-sans'>{item.message.body}</span>
+                            <br />
+                            <i><span className='text-sm font-sans'>{fromNow(item.created_at)}</span></i>
                         </div>
     
                     </List.Item>
@@ -250,9 +265,9 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 <Dropdown overlay={<MenuItems userLogout={userLogout} />}  trigger={['click']} placement="bottomRight" >
                     <p className="float-right mr-4 ml-4 header-items" style={{color:"white", cursor: "pointer"}}> { user.username } <MenuIcon icon={<CaretDownOutlined style={{fontSize: 18}} />} label="Menu" /></p>
                 </Dropdown>
-                <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['click']} placement="bottomRight" >
+                <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['hover']} placement="bottomRight" >
                         <p className="float-right mr-2 header-items" style={{color:"white", cursor: "pointer"}}>
-                        <Badge count={notifications.length}>
+                        <Badge count={(notifications.filter(not => not.status == 1)).length}>
                             <span  style={{color:"white", cursor: "pointer"}}>
                                 <MenuIcon icon={<BellFilled style={{fontSize: 18}} />} label="Menu" />
                             </span>

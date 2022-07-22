@@ -24,9 +24,9 @@ messaging.onBackgroundMessage(function(payload) {
   const notificationOptions = {
     body: payload.data.body,
     data: {
-      clickAction: payload.data.click_action
+      url: payload.data.url,
     },
-    actions: [{action: "get", title: "Get now."}, {action: "get", title: "Get now."}]
+    actions: [{action: "get", title: "View"}]
   };
 
   self.registration.showNotification(notificationTitle,
@@ -34,9 +34,10 @@ messaging.onBackgroundMessage(function(payload) {
 
   self.addEventListener('notificationclick', function(event) {
     console.log(event);
+    // console.log(event.notification.data.url);
     event.notification.close();
     // console.log(clients);
-    clients.openWindow("/forms/pending").then(windowClient => windowClient ? windowClient.focus() : null);
+    clients.openWindow(event.notification.data.url).then(windowClient => windowClient ? windowClient.focus() : null);
   }, false);
 
 });

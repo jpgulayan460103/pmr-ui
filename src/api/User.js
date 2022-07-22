@@ -47,4 +47,17 @@ export default {
   saveFirebaseToken(formData){
     return axios.post(`api/tokens/firebase`, formData);
   },
+
+  getNotifications(){
+    return axios.get(`api/notifications`);
+  },
+  readNotifications(id){
+    return axios.put(`api/notifications/${id}`);
+  },
+  deleteNotification(id){
+    return axios.delete(`api/notifications/${id}`);
+  },
+  clearNotifications(){
+    return axios.delete(`api/notifications`);
+  },
 }

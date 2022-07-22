@@ -33,18 +33,21 @@ function PreviewForm(props) {
         return () => {
             unmounted.current = true;
         }
-    }, []);
+    }, [uuid]);
 
     const [route, setRoute] = useState({});
     const [form, setForm] = useState({});
     const [attachments, setAttachments] = useState([]);
 
     const getRoute = () => {
+        setRoute({});
+        setForm({});
+        setAttachments([]);
         api.Forms.get(uuid)
         .then(res => {
-            if (unmounted.current) { return false; }
+            // if (unmounted.current) { return false; }
             setRoute(res.data);
-            loadForm(res.data.route_type, res.data.id);
+            loadForm(res.data.route_type, res.data.form_routable_id);
         })
         .catch(res => {})
         .then(res => {})
@@ -54,7 +57,7 @@ function PreviewForm(props) {
     const loadProcurementPlanData = async (id) => {
         await api.ProcurementPlan.get(id)
         .then(res => {
-            if (unmounted.current) { return false; }
+            // if (unmounted.current) { return false; }
             setForm(res.data);
             setAttachments(res.data.form_uploads.data);
         })
@@ -66,7 +69,7 @@ function PreviewForm(props) {
     const loadPurchaseRequestData = async (id) => {
         await api.PurchaseRequest.get(id)
         .then(res => {
-            if (unmounted.current) { return false; }
+            // if (unmounted.current) { return false; }
             setForm(res.data);
             setAttachments(res.data.form_uploads.data);
         })
@@ -78,7 +81,7 @@ function PreviewForm(props) {
     const loadRequisitionIssueData = async (id) => {
         await api.RequisitionIssue.get(id)
         .then(res => {
-            if (unmounted.current) { return false; }
+            // if (unmounted.current) { return false; }
             setForm(res.data);
             setAttachments(res.data.form_uploads.data);
         })
