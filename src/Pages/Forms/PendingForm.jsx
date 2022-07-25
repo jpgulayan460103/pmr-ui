@@ -116,13 +116,13 @@ const PendingForm = (props) => {
         console.log(data);
         if(data == "reset"){
             props.dispatch({
-                type: "SET_FORM_FORWARDED_TABLE_FILTER",
+                type: "SET_FORM_PENDING_TABLE_FILTER",
                 data: props.defaultTableFilter,
             });
             getForm(props.defaultTableFilter);
         }else{
             props.dispatch({
-                type: "SET_FORM_FORWARDED_TABLE_FILTER",
+                type: "SET_FORM_PENDING_TABLE_FILTER",
                 data: data,
             });
         }
@@ -130,79 +130,79 @@ const PendingForm = (props) => {
 
     const setForms = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_FORMS",
+            type: "SET_FORM_PENDING_FORMS",
             data: value,
         });
     }
     const setPaginationMeta = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_PAGINATION_META",
+            type: "SET_FORM_PENDING_PAGINATION_META",
             data: value,
         });
     }
     const setSelectedFormRoute = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_SELECTED_FORM_ROUTE",
+            type: "SET_FORM_PENDING_SELECTED_FORM_ROUTE",
             data: value,
         });
     }
     const setSelectedForm = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_SELECTED_FORM",
+            type: "SET_FORM_PENDING_SELECTED_FORM",
             data: value,
         });
     }
     const setRouteOptions = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_ROUTE_OPTIONS",
+            type: "SET_FORM_PENDING_ROUTE_OPTIONS",
             data: value,
         });
     }
     const setProcurementFormType = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_PROCUREMENT_FORM_TYPE",
+            type: "SET_FORM_PENDING_PROCUREMENT_FORM_TYPE",
             data: value,
         });
     }
     const setAddOn = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_ADD_ON",
+            type: "SET_FORM_PENDING_ADD_ON",
             data: value,
         });
     }
     const setErrorMessage = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_ERROR_MESSAGE",
+            type: "SET_FORM_PENDING_ERROR_MESSAGE",
             data: value,
         });
     }
     const setTableLoading = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_TABLE_LOADING",
+            type: "SET_FORM_PENDING_TABLE_LOADING",
             data: value,
         });
     }
     const setSelectedAccountClassification = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_SELECTED_PROCUREMENT_CATEGORY",
+            type: "SET_FORM_PENDING_SELECTED_PROCUREMENT_CATEGORY",
             data: value,
         });
     }
     const setSubmit = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_SUBMIT",
+            type: "SET_FORM_PENDING_SUBMIT",
             data: value,
         });
     }
     const setAttachments = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_ATTACHMENTS",
+            type: "SET_FORM_PENDING_ATTACHMENTS",
             data: value,
         });
     }
     const setFormLoading = (value) => {
         props.dispatch({
-            type: "SET_FORM_FORWARDED_FORM_LOADING",
+            type: "SET_FORM_PENDING_FORM_LOADING",
             data: value,
         });
     }
