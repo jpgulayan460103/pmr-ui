@@ -1,5 +1,5 @@
 import { Button, Card, Col, Row, Tooltip } from 'antd';
-import { isEmpty } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -39,7 +39,7 @@ function PreviewForm(props) {
     const [form, setForm] = useState({});
     const [attachments, setAttachments] = useState([]);
 
-    const getRoute = () => {
+    const getRoute = debounce(() => {
         setRoute({});
         setForm({});
         setAttachments([]);
@@ -52,7 +52,7 @@ function PreviewForm(props) {
         .catch(res => {})
         .then(res => {})
         ;
-    }
+    }, 250)
 
     const loadProcurementPlanData = async (id) => {
         await api.ProcurementPlan.get(id)
@@ -93,13 +93,13 @@ function PreviewForm(props) {
     const loadForm = (type, id) => {
         switch (type) {
             case 'purchase_request':
-                loadPurchaseRequestData(id);
+                return loadPurchaseRequestData(id);
                 break;
             case 'procurement_plan':
-                loadProcurementPlanData(id)
+                return loadProcurementPlanData(id)
                 break;
             case 'requisition_issue':
-                loadRequisitionIssueData(id);
+                return loadRequisitionIssueData(id);
                 break;
         
             default:
@@ -113,7 +113,6 @@ function PreviewForm(props) {
                 return <InfoPurchaseRequest form={form} />;
                 break;
             case 'procurement_plan':
-                loadProcurementPlanData()
                 return <InfoProcurementPlan form={form} />;
                 break;
             case 'requisition_issue':
