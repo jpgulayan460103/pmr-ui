@@ -147,6 +147,10 @@ const App = (props) => {
         }
     }
 
+    onMessageListener().then(payload => {
+        debouncedGetNotification();
+    }).catch(err => console.log('failed: ', err));
+
     return (
 
     <Switch>

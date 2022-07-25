@@ -5,7 +5,7 @@ import { QuestionCircleOutlined , CaretDownOutlined, LogoutOutlined, UserOutline
 import { useLocation, useHistory } from 'react-router-dom'
 import logo from './../Images/logo.png'
 import api from '../api';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import dayjs from 'dayjs';
 
 const { Header } = Layout;
@@ -267,7 +267,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
                 </Dropdown>
                 <Dropdown overlay={<NotificationItems notifications={notifications} history={history} dispatch={dispatch} />} overlayStyle={{ zIndex: 1000}}  trigger={['hover']} placement="bottomRight" >
                         <p className="float-right mr-2 header-items" style={{color:"white", cursor: "pointer"}}>
-                        <Badge count={(notifications.filter(not => not.status == 1)).length}>
+                        <Badge count={isEmpty(notifications) ? 0 : (notifications.filter(not => not.status == 1)).length}>
                             <span  style={{color:"white", cursor: "pointer"}}>
                                 <MenuIcon icon={<BellFilled style={{fontSize: 18}} />} label="Menu" />
                             </span>
