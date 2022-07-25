@@ -23,6 +23,7 @@ const themes = {
 
 const defaultTheme = localStorage.getItem("theme");
 
+
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={(process.env.NODE_ENV == "development" ? '' : process.env.PUBLIC_URL)}>
@@ -40,4 +41,10 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 // serviceWorkerRegistration.register();
-serviceWorkerRegistration.unregister();
+// serviceWorkerRegistration.unregister();
+
+const dir = process.env.NODE_ENV == "development" ? "" : process.env.PUBLIC_URL;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(`..${dir}/firebase-messaging-sw.js`);
+}
