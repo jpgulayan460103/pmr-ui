@@ -22,6 +22,9 @@ function mapStateToProps(state) {
     return {
         user: state.user.data,
         isInitialized: state.user.isInitialized,
+        form: state.forms.preview.form,
+        route: state.forms.preview.route,
+        attachments: state.forms.preview.attachments,
     };
 }
 
@@ -35,9 +38,28 @@ function PreviewForm(props) {
         }
     }, [uuid]);
 
-    const [route, setRoute] = useState({});
-    const [form, setForm] = useState({});
-    const [attachments, setAttachments] = useState([]);
+    // const [props.route, setRoute] = useState({});
+    // const [form, setForm] = useState({});
+    // const [props.attachments, setAttachments] = useState([]);
+
+    const setRoute = (data) => {
+        props.dispatch({
+            type: "SET_FORM_PREVIEW_ROUTE",
+            data
+        });
+    }
+    const setForm = (data) => {
+        props.dispatch({
+            type: "SET_FORM_PREVIEW_FORM",
+            data
+        });
+    }
+    const setAttachments = (data) => {
+        props.dispatch({
+            type: "SET_FORM_PREVIEW_ATTACHMENTS",
+            data
+        });
+    }
 
     const getRoute = debounce(() => {
         setRoute({});
@@ -110,13 +132,13 @@ function PreviewForm(props) {
     const formInformation = (type) => {
         switch (type) {
             case 'purchase_request':
-                return <InfoPurchaseRequest form={form} />;
+                return <InfoPurchaseRequest form={props.form} />;
                 break;
             case 'procurement_plan':
-                return <InfoProcurementPlan form={form} />;
+                return <InfoProcurementPlan form={props.form} />;
                 break;
             case 'requisition_issue':
-                return <InfoRequisitionIssue form={form} />;
+                return <InfoRequisitionIssue form={props.form} />;
                 break;
         
             default:
@@ -129,8 +151,8 @@ function PreviewForm(props) {
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <Card size="small" title="Routed Form" bordered={false}>
                         <div className='forms-card-form-content'>
-                            { !isEmpty(form) && (
-                                <iframe src={`${form?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
+                            { !isEmpty(props.form) && (
+                                <iframe src={`${props.form?.file}?view=1`} style={{height: "100%", width: "100%"}}></iframe>
                             ) }
                         </div>
                     </Card>
@@ -139,18 +161,18 @@ function PreviewForm(props) {
                     <Card size="small" title="Routed Form Information" bordered={false}>
                         <div className='forms-card-form-content'>
                             <p>
-                                <span><b>Form type:</b> <span>{route.route_type_str}</span></span><br />
-                                <span><b>End User:</b> <span>{route.end_user?.name}</span></span><br />
-                                <span><b>Forwarded by:</b> <span>{route.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${route.from_office?.name}` : route.from_office?.name }</span></span><br />
-                                <span><b>Forwarded to:</b> <span>{route.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${route.to_office?.name}` : route.to_office?.name }</span></span><br />
-                                <span><b>Remarks:</b> <span>{route.remarks}</span></span><br />
-                                { route.forwarded_remarks ? <span><b>Remarks:</b> <span>{route.forwarded_remarks}</span><br /></span> : ""}
-                                <span><b>Status:</b> <span>{ route.status != "pending" ? "Disapproved" : "Pending"}</span></span><br />
-                                { route.status != "pending" ? <span><b>Disapproved by:</b> <span>{route.user?.user_information?.fullname}</span><br /></span> : ""}
-                                <span><b>Created:</b> <span>{ route.created_at }</span></span><br />
+                                <span><b>Form type:</b> <span>{props.route?.route_type_str}</span></span><br />
+                                <span><b>End User:</b> <span>{props.route?.end_user?.name}</span></span><br />
+                                <span><b>Forwarded by:</b> <span>{props.route?.from_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.route?.from_office?.name}` : props.route?.from_office?.name }</span></span><br />
+                                <span><b>Forwarded to:</b> <span>{props.route?.to_office?.library_type == 'technical_working_group' ? `Techinical Working Group: ${props.route?.to_office?.name}` : props.route?.to_office?.name }</span></span><br />
+                                <span><b>Remarks:</b> <span>{props.route?.remarks}</span></span><br />
+                                { props.route?.forwarded_remarks ? <span><b>Remarks:</b> <span>{props.route?.forwarded_remarks}</span><br /></span> : ""}
+                                <span><b>Status:</b> <span>{ props.route?.status != "pending" ? "Disapproved" : "Pending"}</span></span><br />
+                                { props.route?.status != "pending" ? <span><b>Disapproved by:</b> <span>{props.route?.user?.user_information?.fullname}</span><br /></span> : ""}
+                                <span><b>Created:</b> <span>{ props.route?.created_at }</span></span><br />
                             </p>
-                            <p className='text-center'><b>{route.route_type_str} Information</b></p>
-                            { formInformation(route.route_type) }
+                            <p className='text-center'><b>{props.route?.route_type_str} Information</b></p>
+                            { formInformation(props.route?.route_type) }
                             <br />
                             <br />
 
@@ -160,7 +182,7 @@ function PreviewForm(props) {
                 <Col xs={24} sm={24} md={24} lg={6} xl={6}>
                     <Card size="small" title="Attachments" bordered={false}>
                         <div className='forms-card-form-content'>
-                            <AttachmentUpload formId={route.form_routable_id} formType={route.route_type} fileList={attachments}></AttachmentUpload>
+                            <AttachmentUpload formId={props.route?.form_routable_id} formType={props.route?.route_type} fileList={props.attachments}></AttachmentUpload>
                         </div>
                     </Card>
                 </Col>
