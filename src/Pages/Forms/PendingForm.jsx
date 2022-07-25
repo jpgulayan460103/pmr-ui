@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useHistory  } from 'react-router-dom'
-import dayjs from 'dayjs';
-import { Table, Button, Typography, Tooltip, notification, Modal, Form, Input, Select, Card, Col, Row, Dropdown, Menu } from 'antd';
+import { Table, Button, Tooltip, notification, Card, Col, Row } from 'antd';
 import Icon, { CloseOutlined, FileZipFilled, BankOutlined, LikeTwoTone, DislikeTwoTone, SendOutlined } from '@ant-design/icons';
 import _, { cloneDeep, debounce, isEmpty } from 'lodash';
 import api from '../../api';
 import filter from '../../Utilities/filter';
-import helpers from '../../Utilities/helpers';
 import AttachmentUpload from '../../Components/AttachmentUpload';
 import TableFooterPagination from '../../Components/TableFooterPagination';
 import TableRefresh from '../../Components/TableRefresh';
@@ -18,10 +16,11 @@ import InfoProcurementPlan from '../ProcurementPlan/Components/InfoProcurementPl
 import InfoRequisitionIssue from '../RequisitionIssue/Components/InfoRequisitionIssue';
 import ArchiveForm from '../../Components/ArchiveForm';
 import { onMessageListener } from '../../firebase';
+import ModalDisapproveForm from './Components/ModalDisapproveForm';
+import ModalResolveForm from './Components/ModalResolveForm';
+import ModalBudgetForm from './Components/ModalBudgetForm';
+import ModalProcurementForm from './Components/ModalProcurementForm';
 
-const { Title } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
 
 function mapStateToProps(state) {
     return {
@@ -96,10 +95,7 @@ const PendingForm = (props) => {
         }
       }
 
-    const rejectFormRef = React.useRef();
-    const resolveFormRef = React.useRef();
-    const budgetFormRef = React.useRef();
-    const procurementFormRef = React.useRef();
+    
     useEffect(() => {
         document.title = "Pending Forms";
         if(props.isInitialized){
@@ -211,153 +207,42 @@ const PendingForm = (props) => {
         });
     }
 
-    const showRejectForm = (formRouteItem) => {
-        setSelectedFormRoute(formRouteItem)
+    const [rejectFormData, setRejectFormData] = useState({});
+
+    const showRejectForm = (item) => {
+        setSelectedFormRoute(item)
         setModalRejectForm(true);
-        let options = formRouteItem.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
+        let options = item.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
         setRouteOptions(options);
-        setTimeout(() => {
-            rejectFormRef.current.setFieldsValue({
-                to_office_id: formRouteItem.origin_office_id,
-            });
-        }, 150);
+        setRejectFormData({
+            to_office_id: item.origin_office_id,
+        });
         return false;
     }
-
-    const closeRejectForm = () => {
-        rejectFormRef.current.resetFields();
-        setModalRejectForm(false);
-    };
-
-    const submitRejectForm = debounce((e) => {
-        setErrorMessage({});
-        setSubmit(true);
-        let formData = {
-            ...e,
-        };
-        api.Forms.reject(props.selectedFormRoute.id, formData)
-        .then(res => {
-            if (unmounted.current) { return false; }
-            setSubmit(false);
-            closeRejectForm();
-            setErrorMessage({});
-            getForm();
-            setSelectedFormRoute({});
-        })
-        .catch(err => {
-            setSubmit(false);
-        })
-        .then(res => {
-            setSubmit(false);
-        })
-        ;
-    }, 250);
-
-
 
     const showResolveForm = (formRouteItem) => {
         setSelectedFormRoute(formRouteItem)
         setModalResolveForm(true);
-        let options = formRouteItem.form_process.form_routes.filter(i => i.status == "approve" || i.status == "approved");
-        setRouteOptions(options);
-        setTimeout(() => {
-            resolveFormRef.current.setFieldsValue({
-                to_office_id: formRouteItem.origin_office_id,
-            });
-        }, 150);
         return false;
-       
     }
 
-    const closeResolveForm = () => {
-        resolveFormRef.current.resetFields();
-        setModalResolveForm(false);
-    };
+    const [budgetFormData, setBudgetFormData] = useState({});
 
-
-    const submitResolveForm = debounce((e) => {
-        setSubmit(true);
-        setErrorMessage({});
-        let formData = {
-            ...e,
-        };
-        api.Forms.approve(props.selectedFormRoute.id, formData)
+    const showBudgetForm = (item) => {
+        setModalBudgetForm(true);
+        api.PurchaseRequest.getNextNumber()
         .then(res => {
             if (unmounted.current) { return false; }
-            let alertMessage = res.data.alert_message;
-            notification.success({
-                message: `${alertMessage.message} ${alertMessage.status}`,
-                description: alertMessage.action_taken,
+            setBudgetFormData({
+                pr_number_last: res.data.next_number,
+                alloted_amount: item.form_routable.common_amount,
             });
-            setSubmit(false);
-            closeResolveForm();
-            setErrorMessage({});
-            getForm();
-            setSelectedFormRoute({});
-            setSelectedForm({});
         })
-        .catch(err => {
-            setSubmit(false);
-        })
-        .then(res => {
-            setSubmit(false);
-        })
-        ;
-    }, 250);
-
-
-    const closeBudgetForm = () => {
-        budgetFormRef.current.resetFields();
-        setModalBudgetForm(false);
+        .catch(res => {})
+        .then(res => {})
     }
-
-    const submitBudgetForm = debounce(async (e) => {
-        setErrorMessage({});
-        setSubmit(true);
-        let formData = {
-            ...e,
-            pr_number: `${props.addOn}${e.pr_number_last}`,
-            updater: "budget",
-        };
-        if(props.selectedFormRoute.route_type == "purchase_request"){
-            try {
-                await approve(props.selectedFormRoute, formData);
-                closeBudgetForm();
-                setErrorMessage({});
-                setSubmit(false);
-            } catch (error) {
-                setErrorMessage(error.response.data.errors);
-                setSubmit(false);
-            }
-        }
-    }, 150);
     
-    const closeProcurementForm = () => {
-        procurementFormRef.current.resetFields();
-        setProcurementFormType("");
-        setModalProcurementForm(false);
-    }
-
-    const submitProcurementForm = debounce(async (e) => {
-        setErrorMessage({});
-        setSubmit(true);
-        if(props.selectedFormRoute.route_type == "purchase_request"){
-            let formData = {
-                ...e,
-                type: props.procurementFormType,
-                updater: "procurement",
-            }
-            try {
-                await approve(props.selectedFormRoute, formData);
-                setSubmit(false);
-                setErrorMessage({});
-                closeProcurementForm();
-            } catch (error) {
-                setErrorMessage(error.response.data.errors);
-                setSubmit(false);
-            }
-        }
-    }, 150);
+    
     
 
     const getForm = debounce((filters) => {
@@ -448,42 +333,25 @@ const PendingForm = (props) => {
     }
     
 
-    const endUserFilter = cloneDeep(props.userSections).map(i => {
-        i.value = i.id;
-        return i;
-    });
-
-
-
     const confirm = debounce(async (item) => {
         setSelectedFormRoute(item);
-        let procurement_user_office = props.user.user_offices.data.filter(i => i.office.title == "PS");
-        let budget_user_office = props.user.user_offices.data.filter(i => i.office.title == "BS");
-        if(procurement_user_office.length != 0){
-            if(item.route_code == "pr_select_action" || item.route_code == "pr_approval_from_proc"){
+        switch (item.route_code) {
+            case 'pr_select_action':
                 setModalProcurementForm(true);
-                if(item.route_code == "pr_approval_from_proc"){
-                    setProcurementFormType("approve");
-                }
-            }
-        }else if(budget_user_office.length != 0  && item.route_code == "pr_approval_from_budget"){
-            api.PurchaseRequest.getNextNumber()
-            .then(res => {
-                if (unmounted.current) { return false; }
-                setModalBudgetForm(true);
-                setTimeout(() => {
-                    budgetFormRef.current.setFieldsValue({
-                        pr_number_last: res.data.next_number,
-                        alloted_amount: item.form_routable.common_amount,
-                    });
-                }, 150);
-            })
-            .catch(res => {})
-            .then(res => {})
-        }else{
-            setSubmit(true);
-            await approve(item);
-            setSubmit(false);
+                break;
+            case 'pr_approval_from_proc':
+                setModalProcurementForm(true);
+                setProcurementFormType("approve");
+                break;
+            case 'pr_approval_from_budget':
+                showBudgetForm(item);
+                break;
+        
+            default:
+                setSubmit(true);
+                await approve(item);
+                setSubmit(false);
+                break;
         }
     }, 150);
 
@@ -530,10 +398,6 @@ const PendingForm = (props) => {
         })
         .catch(err => {})
         .then(res => {})
-    }
-
-    const actionTypeProcurement = (e) => {
-        setProcurementFormType(e);
     }
 
     const viewPurchaseRequest = (id) => {
@@ -587,6 +451,11 @@ const PendingForm = (props) => {
         })
         ;
     }
+
+    const endUserFilter = cloneDeep(props.userSections).map(i => {
+        i.value = i.id;
+        return i;
+    });
 
     const onCell = {
         onCell: (record, colIndex) => {
@@ -763,15 +632,6 @@ const PendingForm = (props) => {
         getForm({...props.tableFilter, page: e})
     }
 
-    const formatPrNumber = (e) => {
-        let pr_last = e.target.value;
-        let padded_pr_last = pr_last.padStart(5, '0');
-        budgetFormRef.current.setFieldsValue({
-            // pr_number: "BUDRP-PR-"+dayjs().format("YYYY-MM-"),
-            pr_number_last: padded_pr_last,
-        });
-    }
-
     const formInformation = (type) => {
         switch (type) {
             case 'purchase_request':
@@ -789,265 +649,68 @@ const PendingForm = (props) => {
         }
     }
 
+    const disapprovedFormProps = {
+        showModal: modalRejectForm,
+        formData: rejectFormData,
+        setShowModal: setModalRejectForm,
+        setSubmit,
+        setErrorMessage,
+        setSelectedFormRoute,
+        setSelectedForm,
+        submit: props.submit,
+        routeOptions: props.routeOptions,
+        selectedFormRoute: props.selectedFormRoute,
+        getForm,
+    };
+
+    const resolveFormProps = {
+        showModal: modalResolveForm,
+        setShowModal: setModalResolveForm,
+        setSubmit,
+        setErrorMessage,
+        setSelectedFormRoute,
+        setSelectedForm,
+        submit: props.submit,
+        selectedFormRoute: props.selectedFormRoute,
+        getForm,
+    };
+
+    const budgetFormProps = {
+        formData: budgetFormData,
+        showModal: modalBudgetForm,
+        setModalBudgetForm,
+        setSelectedFormRoute,
+        setSelectedForm,
+        setErrorMessage,
+        selectedFormRoute: props.selectedFormRoute,
+        submit: props.submit,
+        setSubmit,
+        approve,
+        setAddOn,
+        errorMessage: props.errorMessage,
+    };
+    const procurementFormProps = {
+        showModal: modalProcurementForm,
+        setShowModal: setModalProcurementForm,
+        setErrorMessage,
+        setSubmit,
+        selectedFormRoute: props.selectedFormRoute,
+        setSelectedFormRoute,
+        setSelectedForm,
+        approve,
+        setProcurementFormType,
+        procurementFormType: props.procurementFormType,
+        setSelectedAccountClassification,
+        selectedAccountClassification: props.selectedAccountClassification
+    };
+
     return (
         <div className='row' style={{minHeight: "50vh"}}>
-            <Modal title="Disapproval Form" visible={modalRejectForm} 
-                footer={[
-                    <Button type='primary' form="rejectForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
-                        Submit
-                    </Button>,
-                    <Button form="rejectForm" key="cancel" onClick={() => closeRejectForm()}>
-                        Cancel
-                    </Button>
-                    ]}
-                onCancel={closeRejectForm}>
-                <Form
-                    ref={rejectFormRef}
-                    name="normal_login"
-                    className="login-form"
-                    onFinish={(e) => submitRejectForm(e)}
-                    layout='vertical'
-                    id="rejectForm"
-                >
-                    <Form.Item
-                        name="remarks"
-                        label="Remarks"
-                        // rules={[{ required: true, message: 'Please add remarks' }]}
-                    >
-                        <TextArea rows={4} />
-                    </Form.Item>
-                    <Form.Item
-                        name="to_office_id"
-                        label="Return to"
-                        // rules={[{ required: true, message: 'Please select office.' }]}
-                    >
-                        <Select>
-                            { props.routeOptions.map((item, index) => <Option value={item.office_id} key={index}>{item.office_name}</Option> ) }
-                        </Select>
-                    </Form.Item>
-
-                </Form>
-            </Modal>
-
-            <Modal title="Resolve Form" visible={modalResolveForm} 
-                footer={[
-                    <Button type='primary' form="resolveForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
-                        Submit
-                    </Button>,
-                    <Button form="resolveForm" key="cancel" onClick={() => closeResolveForm()}>
-                        Cancel
-                    </Button>
-                    ]}
-                onCancel={closeResolveForm}>
-                <Form
-                    ref={resolveFormRef}
-                    name="normal_login"
-                    className="login-form"
-                    onFinish={(e) => submitResolveForm(e)}
-                    layout='vertical'
-                    id="resolveForm"
-                >
-                    <Form.Item
-                        name="remarks"
-                        label="Remarks"
-                        // rules={[{ required: true, message: 'Please add remarks' }]}
-                    >
-                        <TextArea rows={4} />
-                    </Form.Item>
-                </Form>
-            </Modal>
-
-            <Modal title="Budget Approval Form" visible={modalBudgetForm} 
-                footer={[
-                    <Button type='primary' form="budgetForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
-                        Submit
-                    </Button>,
-                    <Button form="budgetForm" key="cancel" onClick={() => closeBudgetForm()}>
-                        Cancel
-                    </Button>
-                    ]}
-                onCancel={closeBudgetForm}>
-                <Form
-                    ref={budgetFormRef}
-                    name="normal_login"
-                    className="login-form"
-                    onFinish={(e) => submitBudgetForm(e)}
-                    layout='vertical'
-                    id="budgetForm"
-                >
-
-                    <Form.Item
-                        name="pr_number_last"
-                        label="Purchase Request Number"
-                        // rules={[{ required: true, message: 'Please input Purchase Request Number.' }]}
-                        { ...helpers.displayError(props.errorMessage, 'pr_number') }
-                    >
-                        <Input onBlur={(e) => formatPrNumber(e)} addonBefore={(
-                            <Select onChange={setAddOn} defaultValue={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` } className="select-after">
-                                <Option value={ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` }>{ `BUDRP-PR-${dayjs().format("YYYY-MM-")}` }</Option>
-                                <Option value={ `BUDSP-PR-${dayjs().format("YYYY-MM-")}` }>{ `BUDSP-PR-${dayjs().format("YYYY-MM-")}` }</Option>
-                            </Select>
-                        )} placeholder="Purchase Request Number" />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="fund_cluster"
-                        label="Fund Cluster"
-                        // rules={[{ required: true, message: 'Please input Fund Cluster.' }]}
-                        { ...helpers.displayError(props.errorMessage, 'fund_cluster') }
-                    >
-                        <Input placeholder="Fund Cluster" />
-                    </Form.Item>
-
-                    {/* <Form.Item
-                        name="center_code"
-                        label="Responsibility Center Code"
-                        // rules={[{ required: true, message: 'Please input Responsibility Center Code.' }]}
-                        { ...helpers.displayError(props.errorMessage, 'center_code') }
-                    >
-                        <Input placeholder="Responsibility Center Code" />
-                    </Form.Item> */}
-                    <Form.Item
-                        name="charge_to"
-                        label="Charge To"
-                        // rules={[{ required: true, message: 'Please where to charge' }]}
-                        { ...helpers.displayError(props.errorMessage, 'charge_to') }
-                    >
-                        <Input placeholder='Charge to' />
-                    </Form.Item>
-                    <Form.Item
-                        name="alloted_amount"
-                        label="Amount"
-                        // rules={[{ required: true, message: 'Please enter amount' }]}
-                        { ...helpers.displayError(props.errorMessage, 'alloted_amount') }
-                    >
-                        <Input placeholder='Amount' type="number" min={0.01} step={0.01} />
-                    </Form.Item>
-                    <Form.Item
-                        name="uacs_code_id"
-                        label="UACS Code"
-                        // rules={[{ required: true, message: 'Please enter UACS Code' }]}
-                        { ...helpers.displayError(props.errorMessage, 'uacs_code_id') }
-                    >
-                        {/* <Input placeholder='UACS CODE' /> */}
-                        <Select
-                            placeholder='Select Category'
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            { props.uacsCodes.map(i => <Option value={i.id} key={i.key}>{`${i.name} - ${i.title}`}</Option> ) }
-                        </Select>
-                    </Form.Item>
-                    <Form.Item
-                        name="sa_or"
-                        label="SA/OR"
-                        // rules={[{ required: true, message: 'Please enter SA/OR' }]}
-                        { ...helpers.displayError(props.errorMessage, 'sa_or') }
-                    >
-                        <Input placeholder='SA/OR' />
-                    </Form.Item>
-
-                </Form>
-            </Modal>
-
-
-            <Modal title="Procurement Approval Form" visible={modalProcurementForm} 
-                footer={[
-                    props.procurementFormType !="" ? (<Button type='primary' form="procurementForm" key="submit" htmlType="submit" disabled={props.submit} loading={props.submit}>
-                        Submit
-                    </Button>) : ""
-                    ,
-                    <Button form="procurementForm" key="cancel" onClick={() => closeProcurementForm()}>
-                        Cancel
-                    </Button>
-                    ]}
-                onCancel={closeProcurementForm}
-                >
-                <Form
-                    ref={procurementFormRef}
-                    name="normal_login"
-                    className="login-form"
-                    onFinish={(e) => submitProcurementForm(e)}
-                    layout='vertical'
-                    id="procurementForm"
-                >
-
-                    { props.selectedFormRoute.route_code != "pr_approval_from_proc" ? (
-                        <Form.Item
-                            name="type"
-                            label="Action"
-                            // rules={[{ required: true, message: 'Please select Procurement Description.' }]}
-                            { ...helpers.displayError(props.errorMessage, 'type') }
-                        >
-                            <Select placeholder='Select Action' onChange={(e) => actionTypeProcurement(e)}>
-                                <Option value="twg">Forward to Technical Working Group</Option>
-                                <Option value="approve">Proceed to Approval</Option>
-                            </Select>
-                        </Form.Item>
-                    ) : "" }
-
-                    { props.procurementFormType == "twg" ? (
-                        <Form.Item
-                            name="technical_working_group_id"
-                            label="Technical Working Groups"
-                            // rules={[{ required: true, message: 'Please select Technical Working Group.' }]}
-                            { ...helpers.displayError(props.errorMessage, 'technical_working_group_id') }
-                        >
-                            <Select placeholder='Select Technical Working Groups'>
-                                { props.technicalWorkingGroups.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                            </Select>
-                        </Form.Item>
-                    ) : "" }
-                    { props.procurementFormType == "approve" ? (
-                        <>
-                            <Form.Item
-                                name="account_classification"
-                                label="Procurement Description Classification"
-                                { ...helpers.displayError(props.errorMessage, 'account_classification') }
-                                // rules={[{ required: true, message: 'Please select Procurement Description Classification.' }]}
-                            >
-                                <Select placeholder='Select Procurement Description Classification' onSelect={(e) => {
-                                    procurementFormRef.current.setFieldsValue({
-                                        account_id: null,
-                                    });
-                                    setSelectedAccountClassification(e);
-                                }}>
-                                    { props.accountClassifications.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                                </Select>
-                            </Form.Item>
-
-                            {
-                                props.selectedAccountClassification != null ? (
-                                    <Form.Item
-                                        name="account_id"
-                                        label="Procurement Description"
-                                        { ...helpers.displayError(props.errorMessage, 'account_id') }
-                                        // rules={[{ required: true, message: 'Please select Procurement Description.' }]}
-                                    >
-                                        <Select placeholder='Select Procurement Description Classification' allowClear > 
-                                            { props.accounts.filter(i => i.parent.id == props.selectedAccountClassification).map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                                        </Select>
-                                    </Form.Item>
-                                ) : ""
-                            }
-
-                            <Form.Item
-                                name="mode_of_procurement_id"
-                                label="Mode of Procurement"
-                                { ...helpers.displayError(props.errorMessage, 'mode_of_procurement_id') }
-                                // rules={[{ required: true, message: 'Please select Mode of Procurement.' }]}
-                            >
-                                <Select placeholder='Select Mode of Procurement'>
-                                    { props.modeOfProcurements.map(i => <Option value={i.id} key={i.key}>{i.name}</Option>) }
-                                </Select>
-                            </Form.Item>
-                        </>
-                    ) : "" }
-                                        
-                </Form>
-            </Modal>
+            
+            <ModalDisapproveForm {...disapprovedFormProps} />
+            <ModalResolveForm {...resolveFormProps} />
+            <ModalBudgetForm {...budgetFormProps} />
+            <ModalProcurementForm {...procurementFormProps} />
 
 
             <Row gutter={[16, 16]} className="mb-3">
