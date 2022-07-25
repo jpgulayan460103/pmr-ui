@@ -48,7 +48,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
         .then(res => {
             dispatch({
                 type: "ADD_NOTIFICATION",
-                data: res.data
+                data: res.data.data
             });
         })
         ;
@@ -59,7 +59,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
         .then(res => {
             dispatch({
                 type: "ADD_NOTIFICATION",
-                data: res.data
+                data: res.data.data
             });
         })
         ;
@@ -95,7 +95,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
         .then(res => {
             dispatch({
                 type: "ADD_NOTIFICATION",
-                data: res.data
+                data: res.data.data
             });
         })
         ;

@@ -126,7 +126,7 @@ const App = (props) => {
         .then(res => {
             props.dispatch({
                 type: "ADD_NOTIFICATION",
-                data: res.data
+                data: res.data.data
             });
         })
         .catch(res => {})
