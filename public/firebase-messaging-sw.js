@@ -25,6 +25,7 @@ messaging.onBackgroundMessage(function(payload) {
     body: payload.data.body,
     data: {
       url: payload.data.url,
+      base_url: payload.data.base_url,
     },
     actions: [{action: "get", title: "View"}]
   };
@@ -37,7 +38,7 @@ messaging.onBackgroundMessage(function(payload) {
     // console.log(event.notification.data.url);
     event.notification.close();
     // console.log(clients);
-    clients.openWindow(event.notification.data.url).then(windowClient => windowClient ? windowClient.focus() : null);
+    clients.openWindow(`${event.notification.data.base_url}${event.notification.data.url}`).then(windowClient => windowClient ? windowClient.focus() : null);
   }, false);
 
 });

@@ -46,5 +46,5 @@ reportWebVitals();
 const dir = process.env.NODE_ENV == "development" ? "" : process.env.PUBLIC_URL;
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register(`..${dir}/firebase-messaging-sw.js`);
+  navigator.serviceWorker.register(`${dir}/firebase-messaging-sw.js`, { scope: dir });
 }

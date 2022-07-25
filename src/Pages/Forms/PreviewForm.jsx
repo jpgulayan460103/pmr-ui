@@ -127,7 +127,7 @@ function PreviewForm(props) {
     return (
         <div>
             <Row gutter={[16, 16]} className="mb-3">
-                <Col md={24} lg={12} xl={12}>
+                <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                     <Card size="small" title="Routed Form" bordered={false}>
                         <div className='forms-card-form-content'>
                             { !isEmpty(form) && (
@@ -136,7 +136,7 @@ function PreviewForm(props) {
                         </div>
                     </Card>
                 </Col>
-                <Col md={24} lg={6} xl={6}>
+                <Col xs={24} sm={24} md={24} lg={6} xl={6}>
                     <Card size="small" title="Routed Form Information" bordered={false}>
                         <div className='forms-card-form-content'>
                             <p>
@@ -158,7 +158,7 @@ function PreviewForm(props) {
                         </div>
                     </Card>
                 </Col>
-                <Col md={24} lg={6} xl={6}>
+                <Col xs={24} sm={24} md={24} lg={6} xl={6}>
                     <Card size="small" title="Attachments" bordered={false}>
                         <div className='forms-card-form-content'>
                             <AttachmentUpload formId={route.form_routable_id} formType={route.route_type} fileList={attachments}></AttachmentUpload>

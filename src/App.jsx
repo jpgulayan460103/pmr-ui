@@ -148,6 +148,9 @@ const App = (props) => {
     }
 
     onMessageListener().then(payload => {
+        console.log('====================================');
+        console.log(payload);
+        console.log('====================================');
         debouncedGetNotification();
     }).catch(err => console.log('failed: ', err));
 

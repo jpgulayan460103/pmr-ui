@@ -20,7 +20,7 @@ const dir = process.env.NODE_ENV == "development" ? "" : process.env.PUBLIC_URL;
 const init = async () => {
   return await navigator
   .serviceWorker
-  .register(`${dir}/firebase-messaging-sw.js`);
+  .register(`${dir}/firebase-messaging-sw.js`, { scope: dir });
 }
 
 export const getTokens = async () => {
