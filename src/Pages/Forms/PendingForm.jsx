@@ -687,6 +687,7 @@ const PendingForm = (props) => {
         setSubmit,
         approve,
         setAddOn,
+        addOn: props.addOn,
         errorMessage: props.errorMessage,
     };
     const procurementFormProps = {

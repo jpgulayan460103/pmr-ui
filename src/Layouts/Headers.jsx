@@ -116,7 +116,7 @@ const Headers = ({ notifications, dispatch, collapsed, user }) => {
     
     const NotificationItems = ({notifications, history, dispatch}) => {
         return (
-            <div id='notifications-container'>
+            <div id='notifications-container' style={{height: "40vh", overflow: "auto"}}>
                 <List
                 size="small"
                 header={<div>Notifications</div>}
